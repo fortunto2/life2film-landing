@@ -1,0 +1,142 @@
+---
+import { useStudio } from '../studio-i18n';
+import type { Lang } from '../i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const s = useStudio(lang);
+
+const DMG = 'https://github.com/fortunto2/life2film-landing/releases/latest/download/Life2FilmStudio.dmg';
+const RELEASES = 'https://github.com/fortunto2/life2film-landing/releases';
+
+const steps = [
+  { t: s('d1t'), d: s('d1d') },
+  { t: s('d2t'), d: s('d2d') },
+  { t: s('d3t'), d: s('d3d') },
+];
+
+// Feature names stay in English: they are the identifiers shown in the app itself.
+const groups = [
+  { t: s('g1t'), n: s('g1n'), items: ['sharpness', 'stability', 'noise', 'exposure_balance', 'contrast_balance', 'brightness', 'white_balance'] },
+  { t: s('g2t'), n: s('g2n'), items: ['face_presence', 'face_area_ratio', 'face_quality', 'body_area_ratio', 'animal_presence', 'text_likelihood'] },
+  { t: s('g3t'), n: s('g3n'), items: ['composition', 'symmetry', 'asymmetry', 'horizon_level', 'attention_saliency', 'bokeh', 'aesthetic_score'] },
+  { t: s('g4t'), n: s('g4n'), items: ['colorfulness', 'saturation', 'hue', 'color_harmony', 'color_temperature', 'dominant_color_variety', 'entropy', 'texture_energy', 'edge_direction_entropy', 'uniformity', 'std_dev'] },
+];
+---
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <span class="badge beta">{s('badge')}</span>
+      <h1>{s('title')}</h1>
+      <p class="lede">{s('lede')}</p>
+
+      <div class="cta">
+        <a class="btn" href={DMG}>{s('ctaDownload')}</a>
+        <a class="btn-ghost" href={RELEASES}>{s('ctaReleases')}</a>
+      </div>
+      <p class="muted small">{s('ctaNote')}</p>
+
+      <figure class="shot">
+        <img src="/img/studio.jpg" alt={s('shotCaption')} width="1400" height="1026" loading="lazy" decoding="async" />
+        <figcaption>{s('shotCaption')}</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap prose">
+      <h2>{s('installTitle')}</h2>
+      <p>{s('installBrew')}</p>
+      <pre><code>brew install --cask fortunto2/tap/life2film-studio</code></pre>
+      <p>{s('installDmg')}</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>{s('doesTitle')}</h2>
+      <div class="grid cols-3 steps">
+        {steps.map((st, i) => (
+          <div class="card">
+            <span class="num gradient-text">{String(i + 1).padStart(2, '0')}</span>
+            <h3>{st.t}</h3>
+            <p>{st.d}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap prose">
+      <h2>{s('photosTitle')}</h2>
+      <p>{s('photosBody')}</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>{s('measuresTitle')}</h2>
+      <p class="muted lede-sub">{s('measuresSub')}</p>
+      <div class="grid cols-2 feats">
+        {groups.map((g) => (
+          <div class="card">
+            <h3>{g.t}</h3>
+            <ul class="chips">{g.items.map((i) => <li>{i}</li>)}</ul>
+            <p>{g.n}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap prose">
+      <h2>{s('archivesTitle')}</h2>
+      <p>{s('archivesBody')}</p>
+
+      <h2>{s('betaTitle')}</h2>
+      <p>{s('betaBody')}</p>
+      <p>
+        {s('betaContact')} <a href="mailto:info@superduperai.co">info@superduperai.co</a>
+      </p>
+    </div>
+  </section>
+</main>
+
+<style>
+  .hero { padding-top: 56px; }
+  h1 { font-size: clamp(40px, 6vw, 60px); margin: 16px 0 18px; }
+  .lede { font-size: 19px; color: #cfcfd6; max-width: 62ch; }
+  .lede-sub { max-width: 60ch; margin-top: 10px; }
+  .badge.beta { border-color: #33333d; color: var(--cyan); }
+
+  .cta { margin: 28px 0 10px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .small { font-size: 14px; }
+  .btn-ghost {
+    display: inline-flex; align-items: center; padding: 12px 22px; border-radius: 12px;
+    border: 1px solid var(--line); background: var(--panel); color: var(--fg);
+    text-decoration: none; font-size: 15px; font-weight: 500;
+  }
+  .btn-ghost:hover { border-color: #33333d; }
+
+  .shot { margin: 44px 0 0; }
+  .shot img { width: 100%; height: auto; display: block; border-radius: 16px; border: 1px solid var(--line); }
+  .shot figcaption { margin-top: 12px; font-size: 14px; color: var(--muted); }
+
+  .steps, .feats { margin-top: 28px; }
+  .num { display: block; font-size: 13px; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 10px; }
+
+  .chips { list-style: none; padding: 0; margin: 0 0 14px; display: flex; flex-wrap: wrap; gap: 7px; }
+  .chips li {
+    font-size: 12.5px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    padding: 4px 9px; border-radius: 7px;
+    background: #16161b; border: 1px solid var(--line); color: #b9b9c4;
+  }
+
+  pre {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px 18px; overflow-x: auto; margin: 12px 0 18px;
+  }
+  pre code { background: none; padding: 0; font-size: 14px; color: var(--cyan); }
+</style>

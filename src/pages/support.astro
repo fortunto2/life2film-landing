@@ -1,53 +1,13 @@
 ---
 import Base from '../layouts/Base.astro';
+import Support from '../components/Support.astro';
+import { legal } from '../legal-i18n';
 ---
 <Base
   lang="en"
-  title="Support — Life2Film"
-  description="Get help with Life2Film, report a bug, or ask a question."
+  title={`${legal.en.supTitle} — Life2Film`}
+  description={legal.en.supIntro}
   basePath="/support"
 >
-  <main>
-    <section>
-      <div class="wrap prose">
-        <h1>Support</h1>
-        <p>Something broken, confusing, or missing? Write to us — a real person reads it.</p>
-
-        <p class="mail"><a href="mailto:info@superduperai.co">info@superduperai.co</a></p>
-
-        <p class="muted">
-          When reporting a problem, include your device model, iOS version, and what you were doing
-          when it happened. If a montage came out wrong, say roughly how many clips were involved
-          and what you asked for.
-        </p>
-
-        <h2>Common questions</h2>
-
-        <h3>Do I need an account?</h3>
-        <p>No. The app works without signing in.</p>
-
-        <h3>Do my videos get uploaded?</h3>
-        <p>
-          No. Analysis and editing run on your device; originals never leave it. Details in the
-          <a href="/privacy">privacy policy</a>.
-        </p>
-
-        <h3>Do I need an API key?</h3>
-        <p>
-          Only for the AI director. Without one the app still builds montages with its deterministic
-          pipeline. With one, requests go straight from your device to the provider you chose.
-        </p>
-
-        <h3>Why does the app ask for photo access?</h3>
-        <p>It edits videos already in your library. Without access there is nothing to work with.</p>
-      </div>
-    </section>
-  </main>
+  <Support lang="en" />
 </Base>
-
-<style>
-  h1 { font-size: clamp(32px, 5vw, 44px); margin-bottom: 16px; }
-  h3 { margin: 22px 0 6px; font-size: 17px; }
-  .mail { font-size: 20px; margin: 22px 0; }
-  .mail a { color: var(--cyan); text-decoration: none; }
-</style>

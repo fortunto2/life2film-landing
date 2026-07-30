@@ -1,0 +1,13 @@
+---
+import Base from '../../layouts/Base.astro';
+import Privacy from '../../components/Privacy.astro';
+import { legal } from '../../legal-i18n';
+---
+<Base
+  lang="ru"
+  title={`${legal.ru.privTitle} — Life2Film`}
+  description={legal.ru.privIntro}
+  basePath="/privacy"
+>
+  <Privacy lang="ru" />
+</Base>

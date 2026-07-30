@@ -1,0 +1,65 @@
+---
+import { useLegal } from '../legal-i18n';
+import type { Lang } from '../i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const l = useLegal(lang);
+---
+
+<main>
+  <section>
+    <div class="wrap prose">
+      <h1>{l('privTitle')}</h1>
+      <p class="muted">{l('privUpdated')}</p>
+
+      <p>{l('privIntro')}</p>
+
+      <h2>{l('privStaysT')}</h2>
+      <p>{l('privStaysP')}</p>
+      <ul>
+        <li>{l('privStays1')}</li>
+        <li>{l('privStays2')}</li>
+        <li>{l('privStays3')}</li>
+      </ul>
+
+      <h2>{l('privLeavesT')}</h2>
+      <p>{l('privLeavesP')}</p>
+      <p>{l('privLeavesList')}</p>
+      <ul>
+        <li>OpenAI (<code>api.openai.com</code>)</li>
+        <li>Google Gemini (<code>generativelanguage.googleapis.com</code>)</li>
+        <li>OpenRouter (<code>openrouter.ai</code>)</li>
+      </ul>
+      <p>{l('privLeavesP2')}</p>
+
+      <h2>{l('privKeyT')}</h2>
+      <p>{l('privKeyP')}</p>
+
+      <h2>{l('privNotT')}</h2>
+      <ul>
+        <li>{l('privNot1')}</li>
+        <li>{l('privNot2')}</li>
+        <li>{l('privNot3')}</li>
+        <li>{l('privNot4')}</li>
+      </ul>
+
+      <h2>{l('privPermT')}</h2>
+      <p>{l('privPermP')}</p>
+
+      <h2>{l('privKidsT')}</h2>
+      <p>{l('privKidsP')}</p>
+
+      <h2>{l('privChangesT')}</h2>
+      <p>{l('privChangesP')}</p>
+
+      <h2>{l('privContactT')}</h2>
+      <p>{l('privContactP')} <a href="mailto:info@superduperai.co">info@superduperai.co</a></p>
+    </div>
+  </section>
+</main>
+
+<style>
+  h1 { font-size: clamp(32px, 5vw, 44px); margin-bottom: 8px; }
+  ul { color: #cfcfd6; padding-left: 22px; }
+  li { margin-bottom: 8px; }
+</style>

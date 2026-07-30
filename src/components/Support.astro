@@ -1,0 +1,43 @@
+---
+import { useLegal } from '../legal-i18n';
+import { localePath, type Lang } from '../i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const l = useLegal(lang);
+---
+
+<main>
+  <section>
+    <div class="wrap prose">
+      <h1>{l('supTitle')}</h1>
+      <p>{l('supIntro')}</p>
+
+      <p class="mail"><a href="mailto:info@superduperai.co">info@superduperai.co</a></p>
+
+      <p class="muted">{l('supHow')}</p>
+
+      <h2>{l('supFaq')}</h2>
+
+      <h3>{l('supQ1')}</h3>
+      <p>{l('supA1')}</p>
+
+      <h3>{l('supQ2')}</h3>
+      <p>
+        {l('supA2')} <a href={localePath(lang, '/privacy')}>{l('supA2Link')}</a>.
+      </p>
+
+      <h3>{l('supQ3')}</h3>
+      <p>{l('supA3')}</p>
+
+      <h3>{l('supQ4')}</h3>
+      <p>{l('supA4')}</p>
+    </div>
+  </section>
+</main>
+
+<style>
+  h1 { font-size: clamp(32px, 5vw, 44px); margin-bottom: 16px; }
+  h3 { margin: 22px 0 6px; font-size: 17px; }
+  .mail { font-size: 20px; margin: 22px 0; }
+  .mail a { color: var(--cyan); text-decoration: none; }
+</style>

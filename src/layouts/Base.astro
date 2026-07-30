@@ -36,9 +36,9 @@ const t = useTranslations(lang);
       </a>
       <div class="navlinks">
         <a href={localePath(lang, '/about')}>{t('navAbout')}</a>
-        <a href={'/studio'}>{t('navStudio')}</a>
-        <a href={'/privacy'}>{t('navPrivacy')}</a>
-        <a href={'/support'}>{t('navSupport')}</a>
+        <a href={localePath(lang, '/studio')}>{t('navStudio')}</a>
+        <a href={localePath(lang, '/privacy')}>{t('navPrivacy')}</a>
+        <a href={localePath(lang, '/support')}>{t('navSupport')}</a>
       </div>
       <div class="langs">
         {langEntries.map(([code, label]) => (
@@ -54,8 +54,8 @@ const t = useTranslations(lang);
     <div class="wrap footrow">
       <span>{t('footerTag')}</span>
       <div class="footlinks">
-        <a href={'/privacy'}>{t('navPrivacy')}</a>
-        <a href={'/support'}>{t('navSupport')}</a>
+        <a href={localePath(lang, '/privacy')}>{t('navPrivacy')}</a>
+        <a href={localePath(lang, '/support')}>{t('navSupport')}</a>
         <a href="mailto:info@superduperai.co">info@superduperai.co</a>
       </div>
       <span class="muted">© 2026 SuperDuperAI. {t('footerRights')}</span>

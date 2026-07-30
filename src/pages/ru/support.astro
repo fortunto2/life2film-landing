@@ -1,0 +1,13 @@
+---
+import Base from '../../layouts/Base.astro';
+import Support from '../../components/Support.astro';
+import { legal } from '../../legal-i18n';
+---
+<Base
+  lang="ru"
+  title={`${legal.ru.supTitle} — Life2Film`}
+  description={legal.ru.supIntro}
+  basePath="/support"
+>
+  <Support lang="ru" />
+</Base>
