@@ -58,7 +58,7 @@ const jsonLd = {
       applicationCategory: 'MultimediaApplication',
       operatingSystem: 'macOS 13+',
       processorRequirements: 'Apple Silicon',
-      url: 'https://life2film.com/studio',
+      url: 'https://life2film.com/studio/',
       downloadUrl: 'https://github.com/fortunto2/life2film-landing/releases',
       softwareVersion: '0.1.1',
       publisher: { '@id': 'https://life2film.com/#org' },
@@ -83,12 +83,15 @@ const jsonLd = {
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:type" content="website" />
+  <meta property="og:url" content={`https://life2film.com${localePath(lang, basePath)}`} />
+  <meta property="og:site_name" content="Life2Film" />
   <meta property="og:image" content="/img/hero.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="canonical" href={`https://life2film.com${localePath(lang, basePath)}`} />
   {langEntries.map(([code]) => (
     <link rel="alternate" hreflang={code} href={`https://life2film.com${localePath(code, basePath)}`} />
   ))}
+  <link rel="alternate" hreflang="x-default" href={`https://life2film.com${localePath('en', basePath)}`} />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎞️</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

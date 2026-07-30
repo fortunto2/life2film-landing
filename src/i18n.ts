@@ -4,8 +4,9 @@ export const defaultLang: Lang = 'en';
 
 /** Prefix a root-relative path with the locale (en has no prefix). */
 export function localePath(lang: Lang, path = '/'): string {
-  const p = path.startsWith('/') ? path : `/${path}`;
-  return lang === defaultLang ? p : `/${lang}${p === '/' ? '' : p}`;
+  const raw = path.startsWith('/') ? path : `/${path}`;
+  const p = raw.endsWith('/') ? raw : `${raw}/`;            // avoid a 308 on every internal link
+  return lang === defaultLang ? p : `/${lang}${p === '/' ? '/' : p}`;
 }
 
 export const ui = {
