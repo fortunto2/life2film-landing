@@ -63,6 +63,27 @@ const feats = [
     </div>
   </section>
 
+  <section class="screens">
+    <div class="wrap">
+      <h2>{t('screensTitle')}</h2>
+      <div class="shots">
+        {[1, 2, 3, 4].map((n) => (
+          <figure>
+            <img
+              src={`/img/shot-0${n}.jpg`}
+              alt={t(`s${n}` as 's1')}
+              width="620"
+              height="1280"
+              loading="lazy"
+              decoding="async"
+            />
+            <figcaption>{t(`s${n}` as 's1')}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+
   <section class="priv">
     <div class="wrap privwrap">
       <h2>{t('privTitle')}</h2>
@@ -85,6 +106,30 @@ const feats = [
 
   .steps, .feats { margin-top: 28px; }
   .num { display: block; font-size: 13px; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 10px; }
+
+  .shots {
+    display: grid;
+    gap: 24px;
+    margin-top: 32px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (min-width: 860px) { .shots { grid-template-columns: repeat(4, 1fr); } }
+
+  .shots figure { margin: 0; }
+  .shots img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 18px;
+    border: 1px solid var(--line);
+    background: var(--panel);
+  }
+  .shots figcaption {
+    margin-top: 12px;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--muted);
+  }
 
   .privwrap { max-width: 62ch; }
   .privwrap .lede { margin: 18px 0 14px; }

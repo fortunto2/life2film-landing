@@ -48,6 +48,11 @@ export const ui = {
       'When the AI director plans a cut, it sees a text description of the clips — timings and short labels. Never the video itself.',
     privLink: 'Read the privacy policy',
 
+    screensTitle: 'Inside the app',
+    s1: 'Spin the year to any day you filmed',
+    s2: 'Set length, style and music, then ask for changes',
+    s3: 'Your whole library, filtered to what matters',
+    s4: 'Trim and reorder by hand when you want to',
     footerTag: 'Made by SuperDuperAI',
     footerRights: 'All rights reserved.',
 
@@ -109,6 +114,11 @@ export const ui = {
       'Когда ИИ-режиссёр планирует монтаж, он видит текстовое описание клипов — тайминги и короткие метки. Само видео — никогда.',
     privLink: 'Политика конфиденциальности',
 
+    screensTitle: 'Как это выглядит',
+    s1: 'Крутите год до любого дня, когда снимали',
+    s2: 'Задайте длину, стиль и музыку, потом просите изменить',
+    s3: 'Вся библиотека, отфильтрованная до нужного',
+    s4: 'Подрезать и переставить вручную, когда хочется',
     footerTag: 'Сделано в SuperDuperAI',
     footerRights: 'Все права защищены.',
 
@@ -170,6 +180,11 @@ export const ui = {
       'Yapay zekâ yönetmen kurguyu planlarken kliplerin metin açıklamasını görür — süreler ve kısa etiketler. Videonun kendisini asla.',
     privLink: 'Gizlilik politikasını okuyun',
 
+    screensTitle: 'Uygulamanın içi',
+    s1: 'Yılı çevirip çekim yaptığınız güne gidin',
+    s2: 'Süreyi, stili ve müziği seçin, sonra değişiklik isteyin',
+    s3: 'Tüm kütüphaneniz, işinize yarayana göre süzülmüş',
+    s4: 'İsterseniz elle kırpın ve sırayı değiştirin',
     footerTag: 'SuperDuperAI tarafından yapıldı',
     footerRights: 'Tüm hakları saklıdır.',
 
