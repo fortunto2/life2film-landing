@@ -50,6 +50,24 @@ export const ui = {
 
     footerTag: 'Made by SuperDuperAI',
     footerRights: 'All rights reserved.',
+
+    navAbout: 'About',
+    aboutTitle: 'About Life2Film',
+    aboutQuote:
+      'Collect experiences, not things. One day you wake up and realise your possessions carry no meaning. Only memories keep their value.',
+    aboutP1:
+      'Every day people record video. Almost all of it ends up in an archive nobody opens. Storage runs out, recording stops, and years quietly go missing.',
+    aboutP2:
+      'From a whole holiday, a few photos survive. Children grow up as if they were never small. Friends fade out of the frame entirely.',
+    aboutH2: 'The editor you never have to learn',
+    aboutP3:
+      'Point Life2Film at an event, a trip, a month of your kid — it picks the moments worth keeping, orders them, and cuts a film. No editing skills, no timeline. What survives is not just the footage but the feeling of being there.',
+    aboutH3: 'A film made of films',
+    aboutP4:
+      'Once you have several films, they can become one. Take a fragment from each and you get a film about a month; from months, a year; from years, a life. The calendar wheel is that idea made usable — spin to any point in time and see what is there.',
+    aboutH4: 'Why it stays on your device',
+    aboutP5:
+      'This only works if you can trust it with everything — the unflattering takes, the family, the home. So the analysis runs on your iPhone and the footage never leaves it. Not a policy we could change later: there is no server to send it to.',
   },
 
   ru: {
@@ -93,6 +111,24 @@ export const ui = {
 
     footerTag: 'Сделано в SuperDuperAI',
     footerRights: 'Все права защищены.',
+
+    navAbout: 'О проекте',
+    aboutTitle: 'О Life2Film',
+    aboutQuote:
+      'Собирайте впечатления, а не вещи. Однажды вы проснётесь и поймёте, что имущество не имеет значения. Ценность со временем сохраняют только воспоминания.',
+    aboutP1:
+      'Люди снимают видео каждый день. Почти всё это оседает в архиве, который никто не открывает. Место заканчивается, съёмка прекращается, и годы тихо пропадают.',
+    aboutP2:
+      'От целого отпуска остаётся пара фотографий. Дети вырастают так, будто никогда не были маленькими. Друзья просто исчезают из кадра.',
+    aboutH2: 'Монтаж, которому не нужно учиться',
+    aboutP3:
+      'Укажите Life2Film событие, поездку или месяц из жизни ребёнка — он выберет моменты, которые стоит сохранить, расставит их по местам и соберёт фильм. Без навыков монтажа и без таймлайна. Остаётся не просто запись, а ощущение того дня.',
+    aboutH3: 'Фильм из фильмов',
+    aboutP4:
+      'Когда фильмов становится несколько, из них получается один. Берём фрагмент из каждого — выходит фильм о месяце; из месяцев — о годе; из лет — о жизни. Круглый календарь и есть эта идея в рабочем виде: крутите к любой точке во времени и смотрите, что там.',
+    aboutH4: 'Почему всё остаётся на устройстве',
+    aboutP5:
+      'Это работает, только если приложению можно доверить всё — неудачные дубли, семью, дом. Поэтому анализ идёт на самом iPhone, а записи никуда не уходят. Это не обещание, которое можно потом изменить: отправлять их просто некуда, сервера нет.',
   },
 
   tr: {
@@ -136,6 +172,24 @@ export const ui = {
 
     footerTag: 'SuperDuperAI tarafından yapıldı',
     footerRights: 'Tüm hakları saklıdır.',
+
+    navAbout: 'Hakkında',
+    aboutTitle: 'Life2Film hakkında',
+    aboutQuote:
+      'Eşya değil, deneyim biriktirin. Bir gün uyanır ve sahip olduklarınızın bir anlam taşımadığını fark edersiniz. Zamanla değerini koruyan tek şey anılardır.',
+    aboutP1:
+      'İnsanlar her gün video çekiyor. Neredeyse tamamı kimsenin açmadığı bir arşivde kalıyor. Yer doluyor, çekim duruyor ve yıllar sessizce kayboluyor.',
+    aboutP2:
+      'Koca bir tatilden geriye birkaç fotoğraf kalıyor. Çocuklar hiç küçük olmamış gibi büyüyor. Arkadaşlar kareden tamamen çıkıyor.',
+    aboutH2: 'Öğrenmeniz gerekmeyen kurgu',
+    aboutP3:
+      "Life2Film'e bir etkinliği, bir tatili ya da çocuğunuzun bir ayını gösterin; saklamaya değer anları seçsin, sıraya koysun ve bir film çıkarsın. Kurgu bilgisi yok, zaman çizelgesi yok. Geriye yalnızca görüntü değil, o günün duygusu kalır.",
+    aboutH3: 'Filmlerden yapılmış bir film',
+    aboutP4:
+      'Elinizde birkaç film olunca hepsi tek bir filme dönüşebilir. Her birinden bir parça alın: bir ayın filmi çıkar; aylardan bir yılın; yıllardan bir ömrün. Takvim çarkı bu fikrin çalışan hâli — zamanda istediğiniz noktaya çevirin ve orada ne varsa görün.',
+    aboutH4: 'Neden her şey cihazınızda kalıyor',
+    aboutP5:
+      'Bu ancak uygulamaya her şeyi emanet edebiliyorsanız işe yarar — kötü çekimleri, aileyi, evi. Bu yüzden analiz iPhone’unuzda çalışır ve görüntüler cihazdan çıkmaz. Sonradan değiştirilebilecek bir vaat değil: gönderilecek bir sunucu zaten yok.',
   },
 } as const satisfies Record<Lang, Record<string, string>>;
 

@@ -1,0 +1,8 @@
+---
+import Base from '../../layouts/Base.astro';
+import About from '../../components/About.astro';
+import { ui } from '../../i18n';
+---
+<Base lang="tr" title={`${ui.tr.aboutTitle} — Life2Film`} description={ui.tr.metaDesc} basePath="/about">
+  <About lang="tr" />
+</Base>

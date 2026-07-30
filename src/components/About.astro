@@ -1,0 +1,43 @@
+---
+import { useTranslations, type Lang } from '../i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<main>
+  <section>
+    <div class="wrap prose">
+      <h1>{t('aboutTitle')}</h1>
+
+      <blockquote>{t('aboutQuote')}</blockquote>
+
+      <p>{t('aboutP1')}</p>
+      <p>{t('aboutP2')}</p>
+
+      <h2>{t('aboutH2')}</h2>
+      <p>{t('aboutP3')}</p>
+
+      <h2>{t('aboutH3')}</h2>
+      <p>{t('aboutP4')}</p>
+
+      <h2>{t('aboutH4')}</h2>
+      <p>{t('aboutP5')}</p>
+    </div>
+  </section>
+</main>
+
+<style>
+  h1 { font-size: clamp(32px, 5vw, 44px); margin-bottom: 24px; }
+  blockquote {
+    margin: 0 0 32px;
+    padding: 20px 24px;
+    border-left: 3px solid transparent;
+    border-image: linear-gradient(180deg, var(--cyan), var(--pink), var(--yellow)) 1;
+    background: var(--panel);
+    border-radius: 0 12px 12px 0;
+    font-size: 18px;
+    line-height: 1.55;
+    color: #e4e4ea;
+  }
+</style>
