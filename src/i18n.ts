@@ -53,6 +53,8 @@ export const ui = {
     s2: 'Set length, style and music, then ask for changes',
     s3: 'Your whole library, filtered to what matters',
     s4: 'Trim and reorder by hand when you want to',
+    macCta: 'Also on Mac',
+    macNote: 'Desktop beta · Apple Silicon · free',
     footerTag: 'Made by SuperDuperAI',
     footerRights: 'All rights reserved.',
 
@@ -119,6 +121,8 @@ export const ui = {
     s2: 'Задайте длину, стиль и музыку, потом просите изменить',
     s3: 'Вся библиотека, отфильтрованная до нужного',
     s4: 'Подрезать и переставить вручную, когда хочется',
+    macCta: 'Ещё есть версия для Mac',
+    macNote: 'Бета для десктопа · Apple Silicon · бесплатно',
     footerTag: 'Сделано в SuperDuperAI',
     footerRights: 'Все права защищены.',
 
@@ -185,6 +189,8 @@ export const ui = {
     s2: 'Süreyi, stili ve müziği seçin, sonra değişiklik isteyin',
     s3: 'Tüm kütüphaneniz, işinize yarayana göre süzülmüş',
     s4: 'İsterseniz elle kırpın ve sırayı değiştirin',
+    macCta: "Mac sürümü de var",
+    macNote: 'Masaüstü beta · Apple Silicon · ücretsiz',
     footerTag: 'SuperDuperAI tarafından yapıldı',
     footerRights: 'Tüm hakları saklıdır.',
 
