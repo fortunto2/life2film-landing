@@ -1,79 +1,66 @@
 ---
-// The app's calendar wheel, rebuilt as a standalone SVG: a ring of months around
-// concentric dashed arcs. Purely decorative — hidden from assistive tech.
-const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-
-// Concentric arcs: radius, dash length, gap, rotation offset.
+// The original LIFE2FILM logo pattern (2018, design: MANITOU / ann.ridzel —
+// codepen.io/lifefilm/pen/zgKWMa), restored from startups/old/patterndemo and
+// extended with the app's calendar ring.
+//
+// Exact radii, dash patterns and gradients from the original. Each circle spins
+// on its own with a staggered delay, so the dashes drift out of phase and the
+// pattern never repeats; the gradient sweeps back and forth via SMIL.
 const rings = [
-  { r: 196, dash: 62, gap: 26, spin: 0 },
-  { r: 176, dash: 40, gap: 22, spin: 12 },
-  { r: 158, dash: 74, gap: 18, spin: 26 },
-  { r: 141, dash: 30, gap: 20, spin: 8 },
-  { r: 125, dash: 52, gap: 16, spin: 34 },
-  { r: 110, dash: 24, gap: 18, spin: 18 },
-  { r: 96, dash: 44, gap: 14, spin: 42 },
-  { r: 83, dash: 20, gap: 15, spin: 6 },
-  { r: 71, dash: 34, gap: 12, spin: 28 },
-  { r: 60, dash: 16, gap: 13, spin: 15 },
+  { r: 200, dash: null, offset: 0, paint: 'paint2' },
+  { r: 292, dash: '500 80', offset: 0, paint: 'paint2' },
+  { r: 380, dash: '400 80', offset: 0, paint: 'paint2' },
+  { r: 464, dash: '400 100', offset: 0, paint: 'paint1' },
+  { r: 554, dash: '400 120', offset: 100, paint: 'paint1' },
+  { r: 652, dash: '600 140', offset: 200, paint: 'paint1' },
+  { r: 753, dash: '700 160', offset: 0, paint: 'paint1' },
+  { r: 862, dash: '800 180', offset: 400, paint: 'paint1' },
+  { r: 981, dash: '1000 200', offset: 500, paint: 'paint1' },
+  { r: 1108, dash: '1500 220', offset: 600, paint: 'paint1' },
+  { r: 1230, dash: '1500 240', offset: 700, paint: 'paint1' },
+  { r: 1370, dash: '2000 260', offset: 0, paint: 'paint3' },
+  { r: 1510, dash: '3000 280', offset: 300, paint: 'paint1' },
+  { r: 1650, dash: '1500 300', offset: 0, paint: 'paint3' },
 ];
 
-const strokes = ['var(--cyan)', 'var(--blue)', 'var(--pink)', 'var(--orange)', 'var(--yellow)'];
-// Highlighted month segments — the "days you actually shot something" look.
+const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+// Months with footage — the wheel's whole point.
 const active = new Set([1, 4, 5, 6, 9]);
+const MONTH_R = 1850;
 ---
 
-<div class="wheel" aria-hidden="true">
-  <svg viewBox="0 0 480 480" role="presentation">
-    <defs>
-      <linearGradient id="l2f-grad" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0%" stop-color="var(--cyan)" />
-        <stop offset="35%" stop-color="var(--blue)" />
-        <stop offset="65%" stop-color="var(--pink)" />
-        <stop offset="85%" stop-color="var(--orange)" />
-        <stop offset="100%" stop-color="var(--yellow)" />
-      </linearGradient>
-      <filter id="l2f-soft" x="-50%" y="-50%" width="200%" height="200%">
-        <feGaussianBlur stdDeviation="6" result="b" />
-        <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
-      </filter>
-    </defs>
-
-    <g class="spin-slow" transform="translate(240 240)">
+<div class="wheel">
+  <svg viewBox="-2000 -2000 4000 4000" preserveAspectRatio="xMidYMid meet" role="img"
+       aria-label="Life2Film calendar wheel">
+    <g class="g-circles" fill="none" stroke-width="40" stroke-linecap="round" stroke-linejoin="round">
       {rings.map((ring, i) => (
         <circle
           r={ring.r}
-          fill="none"
-          stroke={strokes[i % strokes.length]}
-          stroke-width="3"
-          stroke-linecap="round"
-          stroke-dasharray={`${ring.dash} ${ring.gap}`}
-          stroke-dashoffset={ring.spin}
-          opacity={0.28 + (rings.length - i) * 0.055}
+          stroke={`url(#${ring.paint})`}
+          stroke-dasharray={ring.dash ?? undefined}
+          stroke-dashoffset={ring.offset || undefined}
+          style={`animation-delay: ${i}s`}
         />
       ))}
     </g>
 
-    <g transform="translate(240 240)">
+    <g class="months" aria-hidden="true">
       {months.map((m, i) => {
-        const a = (i / 12) * 360 - 90;
-        const rad = (a * Math.PI) / 180;
-        const R = 224;
-        const x = Math.cos(rad) * R;
-        const y = Math.sin(rad) * R;
+        const a = ((i / 12) * 360 - 90) * (Math.PI / 180);
+        const seg = (d: number) => (((i / 12) * 360 - 90 + d) * Math.PI) / 180;
         return (
           <>
             <path
-              d={`M ${Math.cos(((a - 12) * Math.PI) / 180) * 210} ${Math.sin(((a - 12) * Math.PI) / 180) * 210}
-                  A 210 210 0 0 1 ${Math.cos(((a + 12) * Math.PI) / 180) * 210} ${Math.sin(((a + 12) * Math.PI) / 180) * 210}`}
+              d={`M ${Math.cos(seg(-11)) * 1760} ${Math.sin(seg(-11)) * 1760}
+                  A 1760 1760 0 0 1 ${Math.cos(seg(11)) * 1760} ${Math.sin(seg(11)) * 1760}`}
               fill="none"
-              stroke={active.has(i) ? 'url(#l2f-grad)' : 'var(--line)'}
-              stroke-width={active.has(i) ? 4 : 2}
+              stroke={active.has(i) ? 'url(#paint2)' : '#26262e'}
+              stroke-width={active.has(i) ? 34 : 16}
               stroke-linecap="round"
-              opacity={active.has(i) ? 0.95 : 0.6}
             />
             <text
-              x={x}
-              y={y}
+              x={Math.cos(a) * MONTH_R}
+              y={Math.sin(a) * MONTH_R}
               text-anchor="middle"
               dominant-baseline="middle"
               class={active.has(i) ? 'month on' : 'month'}
@@ -83,26 +70,77 @@ const active = new Set([1, 4, 5, 6, 9]);
       })}
     </g>
 
-    <g transform="translate(240 240)" filter="url(#l2f-soft)">
-      <circle r="38" fill="none" stroke="url(#l2f-grad)" stroke-width="3" />
-      <path d="M -9 -13 L 15 0 L -9 13 Z" fill="url(#l2f-grad)" />
-    </g>
+    <path
+      class="play"
+      d="M0 9.83437V148.366C0 155.576 7.63653 160.224 14.0397 156.911L137.267 85.0624C144.538 81.3003 144.089 70.756 136.527 67.6256L13.2997 0.944402C12.0764 0.439044 10.8291 0.204499 9.61384 0.204499C4.53419 0.202494 0 4.30151 0 9.83437Z"
+      fill="url(#paint2)"
+      transform="translate(-50 -80)"
+    />
+
+    <defs>
+      <linearGradient id="paint1" x1="90%" y1="10%" x2="10%" y2="90%">
+        <stop offset="0" stop-color="#00F2E0" />
+        <stop offset="20%" stop-color="#017AFF" />
+        <stop offset="50%" stop-color="#FA3FA5" />
+        <stop offset="90%" stop-color="#FFA61D" />
+        <stop offset="100%" stop-color="#FEFF00" />
+        <animate id="anim1" attributeName="x1" dur="10s" from="90%" to="20%" begin="0s; anim2.end" fill="freeze" />
+        <animate id="anim2" attributeName="x1" dur="10s" from="20%" to="90%" begin="anim1.end" fill="freeze" />
+      </linearGradient>
+
+      <linearGradient id="paint2" x1="100%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0" stop-color="#00F2E0" />
+        <stop offset="10%" stop-color="#017AFF" />
+        <stop offset="50%" stop-color="#FA3FA5" />
+        <stop offset="90%" stop-color="#FFA61D" />
+        <stop offset="100%" stop-color="#FEFF00" />
+      </linearGradient>
+
+      <linearGradient id="paint3">
+        <stop offset="0.0565613" stop-color="#00F2E0" />
+        <stop offset="0.128837" stop-color="#0076FE" />
+        <stop offset="0.190234" stop-color="#F54AB2" />
+        <stop offset="0.272982" stop-color="#FEED07" />
+        <stop offset="0.350254" stop-color="#F340A8" />
+        <stop offset="0.432681" stop-color="#0075FC" />
+        <stop offset="0.53372" stop-color="#00F2E0" />
+        <stop offset="0.644791" stop-color="#0077FF" />
+        <stop offset="0.737128" stop-color="#FF3EA3" />
+        <stop offset="0.807227" stop-color="#FEFF00" />
+        <stop offset="0.890742" stop-color="#EC42AA" />
+        <stop offset="0.968214" stop-color="#356DEC" />
+      </linearGradient>
+    </defs>
   </svg>
 </div>
 
 <style>
-  .wheel { width: min(520px, 88vw); margin-inline: auto; }
-  .wheel svg { width: 100%; height: auto; display: block; overflow: visible; }
+  .wheel { width: min(560px, 92vw); margin-inline: auto; }
+  .wheel svg { width: 100%; height: auto; display: block; }
+
+  /* Origin is the viewBox centre (0,0 here), so plain rotate() is enough — no
+     translate in the keyframes, which would drag the group off-canvas. */
+  .g-circles circle {
+    transform-origin: 0 0;
+    animation: l2f-rotation 50s linear infinite;
+  }
+  @keyframes l2f-rotation { to { transform: rotate(360deg); } }
+
+  .g-circles circle:hover {
+    stroke: #feff00;
+    filter: drop-shadow(0 0 40px #ffa61d);
+  }
 
   .month {
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 13px;
+    font-size: 108px;
     font-weight: 500;
     letter-spacing: 0.08em;
-    fill: var(--muted);
+    fill: #8a8a95;
   }
-  .month.on { fill: var(--fg); }
+  .month.on { fill: #f2f2f4; }
 
-  .spin-slow { animation: l2f-spin 90s linear infinite; transform-origin: 240px 240px; }
-  @keyframes l2f-spin { to { transform: translate(240px, 240px) rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) {
+    .g-circles circle { animation: none; }
+  }
 </style>
