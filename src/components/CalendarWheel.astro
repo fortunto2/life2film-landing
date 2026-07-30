@@ -1,0 +1,108 @@
+---
+// The app's calendar wheel, rebuilt as a standalone SVG: a ring of months around
+// concentric dashed arcs. Purely decorative — hidden from assistive tech.
+const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+
+// Concentric arcs: radius, dash length, gap, rotation offset.
+const rings = [
+  { r: 196, dash: 62, gap: 26, spin: 0 },
+  { r: 176, dash: 40, gap: 22, spin: 12 },
+  { r: 158, dash: 74, gap: 18, spin: 26 },
+  { r: 141, dash: 30, gap: 20, spin: 8 },
+  { r: 125, dash: 52, gap: 16, spin: 34 },
+  { r: 110, dash: 24, gap: 18, spin: 18 },
+  { r: 96, dash: 44, gap: 14, spin: 42 },
+  { r: 83, dash: 20, gap: 15, spin: 6 },
+  { r: 71, dash: 34, gap: 12, spin: 28 },
+  { r: 60, dash: 16, gap: 13, spin: 15 },
+];
+
+const strokes = ['var(--cyan)', 'var(--blue)', 'var(--pink)', 'var(--orange)', 'var(--yellow)'];
+// Highlighted month segments — the "days you actually shot something" look.
+const active = new Set([1, 4, 5, 6, 9]);
+---
+
+<div class="wheel" aria-hidden="true">
+  <svg viewBox="0 0 480 480" role="presentation">
+    <defs>
+      <linearGradient id="l2f-grad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="var(--cyan)" />
+        <stop offset="35%" stop-color="var(--blue)" />
+        <stop offset="65%" stop-color="var(--pink)" />
+        <stop offset="85%" stop-color="var(--orange)" />
+        <stop offset="100%" stop-color="var(--yellow)" />
+      </linearGradient>
+      <filter id="l2f-soft" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="6" result="b" />
+        <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+      </filter>
+    </defs>
+
+    <g class="spin-slow" transform="translate(240 240)">
+      {rings.map((ring, i) => (
+        <circle
+          r={ring.r}
+          fill="none"
+          stroke={strokes[i % strokes.length]}
+          stroke-width="3"
+          stroke-linecap="round"
+          stroke-dasharray={`${ring.dash} ${ring.gap}`}
+          stroke-dashoffset={ring.spin}
+          opacity={0.28 + (rings.length - i) * 0.055}
+        />
+      ))}
+    </g>
+
+    <g transform="translate(240 240)">
+      {months.map((m, i) => {
+        const a = (i / 12) * 360 - 90;
+        const rad = (a * Math.PI) / 180;
+        const R = 224;
+        const x = Math.cos(rad) * R;
+        const y = Math.sin(rad) * R;
+        return (
+          <>
+            <path
+              d={`M ${Math.cos(((a - 12) * Math.PI) / 180) * 210} ${Math.sin(((a - 12) * Math.PI) / 180) * 210}
+                  A 210 210 0 0 1 ${Math.cos(((a + 12) * Math.PI) / 180) * 210} ${Math.sin(((a + 12) * Math.PI) / 180) * 210}`}
+              fill="none"
+              stroke={active.has(i) ? 'url(#l2f-grad)' : 'var(--line)'}
+              stroke-width={active.has(i) ? 4 : 2}
+              stroke-linecap="round"
+              opacity={active.has(i) ? 0.95 : 0.6}
+            />
+            <text
+              x={x}
+              y={y}
+              text-anchor="middle"
+              dominant-baseline="middle"
+              class={active.has(i) ? 'month on' : 'month'}
+            >{m}</text>
+          </>
+        );
+      })}
+    </g>
+
+    <g transform="translate(240 240)" filter="url(#l2f-soft)">
+      <circle r="38" fill="none" stroke="url(#l2f-grad)" stroke-width="3" />
+      <path d="M -9 -13 L 15 0 L -9 13 Z" fill="url(#l2f-grad)" />
+    </g>
+  </svg>
+</div>
+
+<style>
+  .wheel { width: min(520px, 88vw); margin-inline: auto; }
+  .wheel svg { width: 100%; height: auto; display: block; overflow: visible; }
+
+  .month {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    fill: var(--muted);
+  }
+  .month.on { fill: var(--fg); }
+
+  .spin-slow { animation: l2f-spin 90s linear infinite; transform-origin: 240px 240px; }
+  @keyframes l2f-spin { to { transform: translate(240px, 240px) rotate(360deg); } }
+</style>

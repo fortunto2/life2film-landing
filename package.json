@@ -1,0 +1,15 @@
+{
+  "name": "life2film-landing",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "deploy": "astro build && wrangler pages deploy dist --project-name=life2film-site"
+  },
+  "dependencies": {
+    "astro": "^5.0.0"
+  }
+}

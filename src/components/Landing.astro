@@ -1,0 +1,93 @@
+---
+import CalendarWheel from './CalendarWheel.astro';
+import { localePath, useTranslations, type Lang } from '../i18n';
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const steps = [
+  { t: t('h1t'), d: t('h1d') },
+  { t: t('h2t'), d: t('h2d') },
+  { t: t('h3t'), d: t('h3d') },
+];
+const feats = [
+  { t: t('f1t'), d: t('f1d') },
+  { t: t('f2t'), d: t('f2d') },
+  { t: t('f3t'), d: t('f3d') },
+  { t: t('f4t'), d: t('f4d') },
+];
+---
+
+<main>
+  <section class="hero">
+    <div class="wrap herogrid">
+      <div>
+        <span class="badge">{t('heroBadge')}</span>
+        <h1 set:html={t('heroTitle')} />
+        <p class="lede">{t('heroLede')}</p>
+        <div class="cta">
+          <span class="btn" aria-disabled="true">{t('ctaPrimary')}</span>
+        </div>
+        <p class="muted small">{t('ctaNote')}</p>
+      </div>
+      <CalendarWheel />
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>{t('howTitle')}</h2>
+      <div class="grid cols-3 steps">
+        {steps.map((s, i) => (
+          <div class="card">
+            <span class="num gradient-text">{String(i + 1).padStart(2, '0')}</span>
+            <h3>{s.t}</h3>
+            <p>{s.d}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <h2>{t('featTitle')}</h2>
+      <div class="grid cols-2 feats">
+        {feats.map((f) => (
+          <div class="card">
+            <h3>{f.t}</h3>
+            <p>{f.d}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="priv">
+    <div class="wrap privwrap">
+      <h2>{t('privTitle')}</h2>
+      <p class="lede">{t('privLede')}</p>
+      <p class="muted">{t('privNote')}</p>
+      <p><a class="privlink" href={'/privacy'}>{t('privLink')} →</a></p>
+    </div>
+  </section>
+</main>
+
+<style>
+  .hero { padding-top: 64px; }
+  .herogrid { display: grid; gap: 48px; align-items: center; }
+  @media (min-width: 900px) { .herogrid { grid-template-columns: 1.05fr 1fr; } }
+
+  h1 { margin: 20px 0 18px; }
+  .lede { font-size: 19px; color: #cfcfd6; max-width: 54ch; }
+  .cta { margin: 28px 0 12px; }
+  .small { font-size: 14px; }
+
+  .steps, .feats { margin-top: 28px; }
+  .num { display: block; font-size: 13px; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 10px; }
+
+  .privwrap { max-width: 62ch; }
+  .privwrap .lede { margin: 18px 0 14px; }
+  .privlink { display: inline-block; margin-top: 18px; color: var(--cyan); text-decoration: none; font-weight: 500; }
+  .privlink:hover { text-decoration: underline; }
+</style>

@@ -1,0 +1,96 @@
+---
+import Base from '../layouts/Base.astro';
+const UPDATED = 'July 30, 2026';
+---
+<Base
+  lang="en"
+  title="Privacy Policy — Life2Film"
+  description="How Life2Film handles your videos and photos. Analysis runs on your device; originals never leave it."
+  basePath="/privacy"
+>
+  <main>
+    <section>
+      <div class="wrap prose">
+        <h1>Privacy Policy</h1>
+        <p class="muted">Last updated: {UPDATED}</p>
+
+        <p>
+          Life2Film turns videos you already have into a montage. Those videos are personal, so the
+          app is built to keep them where they are: on your device.
+        </p>
+
+        <h2>What stays on your device</h2>
+        <p>
+          Your videos and photos are read, analysed and edited locally. Scene detection, face
+          grouping, quality scoring and the montage itself run on your iPhone using Apple's Vision
+          framework and the app's own on-device engine.
+        </p>
+        <ul>
+          <li>Original video and photo files are never uploaded.</li>
+          <li>Rendered montages are saved to your device and shared only when you choose to.</li>
+          <li>The photo-library index the app builds is stored locally and removed with the app.</li>
+        </ul>
+
+        <h2>What leaves your device</h2>
+        <p>
+          When you ask the AI director for a cut, the app sends a <strong>text description</strong>
+          of the clips — timings, short scene labels, and your instruction — to the language-model
+          provider you configured. No video, no photos, no audio.
+        </p>
+        <p>Supported providers, chosen by you in Settings:</p>
+        <ul>
+          <li>OpenAI (<code>api.openai.com</code>)</li>
+          <li>Google Gemini (<code>generativelanguage.googleapis.com</code>)</li>
+          <li>OpenRouter (<code>openrouter.ai</code>)</li>
+        </ul>
+        <p>
+          Requests are made with <em>your</em> API key, directly from your device to that provider.
+          We do not proxy them and never see their contents. Each provider processes the request
+          under its own privacy policy and retention terms — please review the one you use. If you
+          configure no provider, the app runs its deterministic pipeline and sends nothing at all.
+        </p>
+
+        <h2>Your API key</h2>
+        <p>
+          The key you enter is stored on your device and used only to authenticate requests to the
+          provider you selected. It is never sent to us or to anyone else.
+        </p>
+
+        <h2>What we do not do</h2>
+        <ul>
+          <li>No account or sign-in is required to use the app.</li>
+          <li>No analytics, tracking or advertising SDKs.</li>
+          <li>No selling or sharing of personal data — we do not receive it in the first place.</li>
+          <li>No training of any model on your content.</li>
+        </ul>
+
+        <h2>Permissions</h2>
+        <p>
+          <strong>Photo library</strong> — to read the videos and photos you want in a montage and to
+          save the result. Without it the app has nothing to edit.
+        </p>
+
+        <h2>Children</h2>
+        <p>
+          Life2Film is not directed at children under 13 and does not knowingly collect information
+          from them.
+        </p>
+
+        <h2>Changes</h2>
+        <p>
+          If this policy changes, the date above changes with it. Material changes are noted on this
+          page.
+        </p>
+
+        <h2>Contact</h2>
+        <p>Questions about privacy: <a href="mailto:info@superduperai.co">info@superduperai.co</a></p>
+      </div>
+    </section>
+  </main>
+</Base>
+
+<style>
+  h1 { font-size: clamp(32px, 5vw, 44px); margin-bottom: 8px; }
+  ul { color: #cfcfd6; padding-left: 22px; }
+  li { margin-bottom: 8px; }
+</style>
