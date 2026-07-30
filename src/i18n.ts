@@ -76,6 +76,9 @@ export const ui = {
     aboutH4: 'Why it stays on your device',
     aboutP5:
       'This only works if you can trust it with everything — the unflattering takes, the family, the home. So the analysis runs on your iPhone and the footage never leaves it. Not a policy we could change later: there is no server to send it to.',
+    aboutH5: 'Who makes it',
+    aboutP6:
+      'Life2Film is built by SuperDuperAi, Corp., a Delaware company. Bugs, questions and feature requests all go to the same inbox, and a person reads them.',
   },
 
   ru: {
@@ -145,6 +148,9 @@ export const ui = {
     aboutH4: 'Почему всё остаётся на устройстве',
     aboutP5:
       'Это работает, только если приложению можно доверить всё — неудачные дубли, семью, дом. Поэтому анализ идёт на самом iPhone, а записи никуда не уходят. Это не обещание, которое можно потом изменить: отправлять их просто некуда, сервера нет.',
+    aboutH5: 'Кто делает',
+    aboutP6:
+      'Life2Film делает SuperDuperAi, Corp., компания из штата Делавэр. Ошибки, вопросы и пожелания идут в один и тот же ящик, и их читает человек.',
   },
 
   tr: {
@@ -214,6 +220,9 @@ export const ui = {
     aboutH4: 'Neden her şey cihazınızda kalıyor',
     aboutP5:
       'Bu ancak uygulamaya her şeyi emanet edebiliyorsanız işe yarar — kötü çekimleri, aileyi, evi. Bu yüzden analiz iPhone’unuzda çalışır ve görüntüler cihazdan çıkmaz. Sonradan değiştirilebilecek bir vaat değil: gönderilecek bir sunucu zaten yok.',
+    aboutH5: 'Kim yapıyor',
+    aboutP6:
+      'Life2Film, Delaware merkezli SuperDuperAi, Corp. tarafından geliştiriliyor. Hatalar, sorular ve istekler aynı posta kutusuna gidiyor ve hepsini bir insan okuyor.',
   },
 } as const satisfies Record<Lang, Record<string, string>>;
 

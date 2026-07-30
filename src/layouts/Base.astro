@@ -4,6 +4,74 @@ interface Props { lang: Lang; title: string; description: string; basePath?: str
 const { lang, title, description, basePath = '/' } = Astro.props;
 const langEntries = Object.entries(languages) as [Lang, string][];
 const t = useTranslations(lang);
+
+const ORG = {
+  '@type': 'Organization',
+  '@id': 'https://life2film.com/#org',
+  name: 'SuperDuperAi, Corp.',
+  url: 'https://superduperai.co',
+  email: 'info@superduperai.co',
+  telephone: '+1-818-619-0966',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: '1207 Delaware Ave, Unit 4241',
+    addressLocality: 'Wilmington',
+    addressRegion: 'DE',
+    postalCode: '19806',
+    addressCountry: 'US',
+  },
+};
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    ORG,
+    {
+      '@type': 'WebSite',
+      '@id': 'https://life2film.com/#website',
+      url: 'https://life2film.com',
+      name: 'Life2Film',
+      description,
+      inLanguage: ['en', 'ru', 'tr'],
+      publisher: { '@id': 'https://life2film.com/#org' },
+    },
+    {
+      '@type': 'MobileApplication',
+      '@id': 'https://life2film.com/#ios',
+      name: 'Life2Film',
+      applicationCategory: 'MultimediaApplication',
+      operatingSystem: 'iOS 17+',
+      url: 'https://life2film.com',
+      publisher: { '@id': 'https://life2film.com/#org' },
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      featureList: [
+        'On-device AI video montage',
+        'Beat-synced editing',
+        'Calendar wheel over the photo library',
+        'Works offline, no account required',
+      ],
+    },
+    {
+      '@type': 'SoftwareApplication',
+      '@id': 'https://life2film.com/#studio',
+      name: 'Life2Film Studio',
+      applicationCategory: 'MultimediaApplication',
+      operatingSystem: 'macOS 13+',
+      processorRequirements: 'Apple Silicon',
+      url: 'https://life2film.com/studio',
+      downloadUrl: 'https://github.com/fortunto2/life2film-landing/releases',
+      softwareVersion: '0.1.1',
+      publisher: { '@id': 'https://life2film.com/#org' },
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      featureList: [
+        '30 per-frame quality and composition features',
+        'Ensemble scene segmentation',
+        'Automatic montage assembly',
+        'Direct import from the Apple Photos library',
+      ],
+    },
+  ],
+};
 ---
 <!doctype html>
 <html lang={lang}>
@@ -25,6 +93,7 @@ const t = useTranslations(lang);
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
 </head>
 <body>
   <div class="glow" aria-hidden="true"></div>

@@ -1,0 +1,44 @@
+# Life2Film
+
+> AI video montage that runs on the device. Point it at videos already in your camera roll and it
+> finds the moments worth keeping, cuts them to the beat of a track, and never uploads the footage.
+
+Two products, one engine:
+
+- **Life2Film** — iPhone app. Analysis runs on the phone using Apple's Vision framework, a compact
+  neural model for grouping faces, and a native engine that assembles the timeline. No account, no
+  upload, works in airplane mode.
+- **Life2Film Studio** — macOS desktop app, public beta. Built for large archives: 30 measurements
+  per frame, ensemble scene segmentation, montage assembly, and direct import from the Apple Photos
+  library. Free while in beta.
+
+What makes it different from other video editors:
+
+- The analysis is local. Original video and photos never leave the device; there is no server they
+  could be sent to. The only thing that can leave, and only if the user configures an LLM provider
+  with their own API key, is a text description of clips — timings and short scene labels.
+- Cuts land on the beat. Tempo and downbeats are detected, and edits are placed where the music
+  turns rather than at fixed intervals.
+- The calendar wheel replaces the endless scroll: spin to any month or day and see what was actually
+  filmed then.
+
+## Pages
+
+- [Home](https://life2film.com/): what the app does, in three steps
+- [About](https://life2film.com/about): why it exists, the film-made-of-films idea
+- [Studio](https://life2film.com/studio): the desktop analyser — features it measures, install
+- [Privacy](https://life2film.com/privacy): what stays on device, what can leave, and when
+- [Support](https://life2film.com/support): contact and common questions
+
+Also available in Russian (/ru) and Turkish (/tr).
+
+## Install
+
+- iPhone: App Store (submitted, pending review)
+- macOS: `brew install --cask fortunto2/tap/life2film-studio`, or the DMG from
+  https://github.com/fortunto2/life2film-landing/releases — Apple Silicon, macOS 13+, signed and
+  notarised.
+
+## Maker
+
+SuperDuperAi, Corp. — Delaware, USA. info@superduperai.co
