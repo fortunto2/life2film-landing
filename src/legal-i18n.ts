@@ -172,7 +172,7 @@ export const legal = {
     supQ4: 'Uygulama neden fotoğraf erişimi istiyor?',
     supA4: 'Kitaplığınızdaki videoları kurguluyor. Erişim olmadan çalışacağı bir şey yok.',
   },
-} as const satisfies Record<Lang, Record<string, string>>;
+} as const;
 
 export function useLegal(lang: Lang) {
   return function l(key: keyof (typeof legal)['en']): string {

@@ -154,7 +154,7 @@ export const studio = {
       'Olgun olan kısım analiz motoru; etrafındaki arayüz değil. Pürüzler, eksik cilalar ve ara sıra çıkmaz sokaklar olacak. Orijinallerinize dokunulmaz — hiçbir şeyin üzerine yazılmaz, hiçbir şey yüklenmez — ama yine de tek kopyanız burası olmasın.',
     betaContact: 'Bozuk bir şey mi buldunuz?',
   },
-} as const satisfies Record<Lang, Record<string, string>>;
+} as const;
 
 export function useStudio(lang: Lang) {
   return function s(key: keyof (typeof studio)['en']): string {

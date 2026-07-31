@@ -1,5 +1,5 @@
 ---
-import { languages, localePath, useTranslations, type Lang } from '../i18n';
+import { languages, localePath, rtl, useTranslations, type Lang } from '../i18n';
 interface Props { lang: Lang; title: string; description: string; basePath?: string }
 const { lang, title, description, basePath = '/' } = Astro.props;
 const langEntries = Object.entries(languages) as [Lang, string][];
@@ -74,7 +74,7 @@ const jsonLd = {
 };
 ---
 <!doctype html>
-<html lang={lang}>
+<html lang={lang} dir={rtl.has(lang) ? "rtl" : "ltr"}>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />

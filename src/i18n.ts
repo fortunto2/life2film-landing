@@ -1,4 +1,7 @@
-export const languages = { en: 'EN', ru: 'RU', tr: 'TR' } as const;
+export const languages = { en: 'EN', es: 'ES', pt: 'PT', id: 'ID', ar: 'AR', ru: 'RU', tr: 'TR' } as const;
+
+/** Right-to-left locales — the <html dir> attribute depends on this. */
+export const rtl = new Set<string>(['ar']);
 export type Lang = keyof typeof languages;
 export const defaultLang: Lang = 'en';
 
@@ -82,6 +85,306 @@ export const ui = {
     aboutH5: 'Who makes it',
     aboutP6:
       'Life2Film is built by SuperDuperAi, Corp., a Delaware company. Bugs, questions and feature requests all go to the same inbox, and a person reads them.',
+  },
+
+  es: {
+    metaTitle: 'Life2Film — editor de video con IA, offline, para iPhone',
+    metaDesc:
+      'Editor de video con IA que funciona sin internet: monta los videos que ya tienes en el iPhone, corta al ritmo de la música y nunca sube tus grabaciones. Sin cuenta.',
+    navPrivacy: 'Privacidad',
+    navSupport: 'Soporte',
+    navAbout: 'Acerca de',
+    navStudio: 'Studio',
+    navBlog: 'Blog',
+
+    heroBadge: 'IA en el dispositivo',
+    heroTitle: 'Tu galería,<br>convertida en película.',
+    heroLede:
+      'Horas de clips de un viaje, un cumpleaños, un año de tu hijo creciendo. Life2Film mira cada fotograma, se queda con los momentos que sostienen la historia y los monta en algo que vale la pena ver.',
+    ctaPrimary: 'Pronto en el App Store',
+    ctaNote: 'iPhone · sin cuenta · tus videos no salen del teléfono',
+    macCta: 'También para Mac',
+    macNote: 'Beta de escritorio · Apple Silicon · gratis',
+
+    howTitle: 'Tres pasos',
+    h1t: 'Elige un momento del tiempo',
+    h1d: 'Gira la rueda hasta un día, un mes, un viaje. Life2Film reúne todo lo que grabaste entonces.',
+    h2t: 'Di lo que quieres',
+    h2d: '“Dos minutos, deja la playa, quita la carretera.” Lenguaje normal. Sin línea de tiempo, sin arrastrar clips.',
+    h3t: 'Míralo',
+    h3d: 'Un montaje con ritmo pensado. ¿No te convence? Pídelo distinto y lo vuelve a montar.',
+
+    featTitle: 'Qué hace en concreto',
+    f1t: 'Encuentra los momentos',
+    f1d: 'Puntúa cada clip por movimiento, caras, encuadre y sonido, y descarta los arranques temblorosos y los cuarenta segundos de asfalto.',
+    f2t: 'Corta al ritmo',
+    f2d: 'Detecta el tempo y coloca los cortes donde gira la música, en vez de cortar al azar.',
+    f3t: 'Sabe quién es quién',
+    f3d: 'Agrupa caras en el propio teléfono, así “la película de los niños” es la de tus niños.',
+    f4t: 'Rehace el montaje',
+    f4d: 'Cambia la duración, el tono, lo que se queda. El agente vuelve a montar en segundos.',
+
+    screensTitle: 'Por dentro',
+    s1: 'Gira el año hasta cualquier día que grabaste',
+    s2: 'Elige duración, estilo y música, y luego pide cambios',
+    s3: 'Toda tu galería, filtrada a lo que importa',
+    s4: 'Recorta y reordena a mano cuando quieras',
+
+    privTitle: 'La privacidad es la arquitectura',
+    privLede:
+      'Tus grabaciones son personales, así que se quedan donde están. La detección de escenas, el agrupado de caras y la puntuación se ejecutan en tu iPhone. Los originales nunca se suben, nada entrena a ningún modelo y no hay ningún muro donde publicar.',
+    privNote:
+      'Cuando el director de IA planea un montaje, ve una descripción en texto de los clips: tiempos y etiquetas cortas. Nunca el video.',
+    privLink: 'Leer la política de privacidad',
+
+    footerLlms: 'Para asistentes de IA',
+    footerTag: 'Hecho por SuperDuperAI',
+    footerRights: 'Todos los derechos reservados.',
+
+    aboutTitle: 'Sobre Life2Film',
+    aboutQuote:
+      'Colecciona experiencias, no cosas. Un día despiertas y te das cuenta de que lo que posees no significa nada. Solo los recuerdos conservan su valor.',
+    aboutP1:
+      'La gente graba video todos los días. Casi todo acaba en un archivo que nadie abre. Se acaba el espacio, se deja de grabar, y los años desaparecen sin ruido.',
+    aboutP2:
+      'De unas vacaciones enteras sobreviven cuatro fotos. Los niños crecen como si nunca hubieran sido pequeños. Los amigos salen del cuadro del todo.',
+    aboutH2: 'El montaje que no hay que aprender',
+    aboutP3:
+      'Señálale un evento, un viaje o un mes de tu hijo: elige los momentos que merecen quedarse, los ordena y monta una película. Sin saber editar, sin línea de tiempo. Lo que sobrevive no es solo la grabación, sino la sensación de haber estado ahí.',
+    aboutH3: 'Una película hecha de películas',
+    aboutP4:
+      'Cuando tienes varias películas, pueden volverse una. Toma un fragmento de cada una y sale la película de un mes; de los meses, la de un año; de los años, la de una vida. La rueda del calendario es esa idea hecha usable: gira a cualquier punto del tiempo y mira qué hay.',
+    aboutH4: 'Por qué todo se queda en tu dispositivo',
+    aboutP5:
+      'Esto solo funciona si puedes confiarle todo: las tomas poco favorecedoras, la familia, la casa. Por eso el análisis se ejecuta en tu iPhone y las grabaciones no salen de ahí. No es una política que podamos cambiar después: no hay servidor al que enviarlas.',
+    aboutH5: 'Quién lo hace',
+    aboutP6:
+      'Life2Film lo desarrolla SuperDuperAi, Corp., una empresa de Delaware. Errores, preguntas y peticiones llegan al mismo buzón, y los lee una persona.',
+  },
+
+  pt: {
+    metaTitle: 'Life2Film — editor de vídeo automático com IA para iPhone',
+    metaDesc:
+      'Editor de vídeo automático que funciona sem internet: monta os vídeos que já estão no iPhone, corta no ritmo da música e nunca envia suas gravações. Sem conta, grátis.',
+    navPrivacy: 'Privacidade',
+    navSupport: 'Suporte',
+    navAbout: 'Sobre',
+    navStudio: 'Studio',
+    navBlog: 'Blog',
+
+    heroBadge: 'IA no próprio aparelho',
+    heroTitle: 'Sua galeria,<br>virada filme.',
+    heroLede:
+      'Horas de clipes de uma viagem, de um aniversário, de um ano do seu filho crescendo. O Life2Film assiste cada quadro, guarda os momentos que sustentam a história e monta algo que vale rever.',
+    ctaPrimary: 'Em breve na App Store',
+    ctaNote: 'iPhone · sem conta · seus vídeos não saem do aparelho',
+    macCta: 'Também para Mac',
+    macNote: 'Beta para desktop · Apple Silicon · grátis',
+
+    howTitle: 'Três passos',
+    h1t: 'Escolha um trecho do tempo',
+    h1d: 'Gire a roda até um dia, um mês, uma viagem. O Life2Film junta tudo o que você gravou naquele período.',
+    h2t: 'Diga o que você quer',
+    h2d: '“Dois minutos, mantenha a praia, tire a estrada.” Em linguagem comum. Sem linha do tempo, sem arrastar clipes.',
+    h3t: 'Assista',
+    h3d: 'Uma montagem com ritmo pensado. Não gostou? Peça diferente e ele remonta.',
+
+    featTitle: 'O que ele faz de fato',
+    f1t: 'Acha os momentos',
+    f1d: 'Pontua cada clipe por movimento, rostos, enquadramento e som, e descarta os começos tremidos e os quarenta segundos de asfalto.',
+    f2t: 'Corta no ritmo',
+    f2d: 'Detecta o andamento e coloca os cortes onde a música vira, em vez de cortar a esmo.',
+    f3t: 'Sabe quem é quem',
+    f3d: 'Agrupa rostos no próprio aparelho, então “o filme das crianças” é o das suas crianças.',
+    f4t: 'Remonta quando você pede',
+    f4d: 'Mude a duração, o clima, o que fica. O agente remonta em segundos.',
+
+    screensTitle: 'Por dentro',
+    s1: 'Gire o ano até qualquer dia em que filmou',
+    s2: 'Defina duração, estilo e música, depois peça mudanças',
+    s3: 'Sua biblioteca inteira, filtrada no que importa',
+    s4: 'Corte e reordene na mão quando quiser',
+
+    privTitle: 'A privacidade é a arquitetura',
+    privLede:
+      'Suas gravações são pessoais, então elas ficam onde estão. Detecção de cenas, agrupamento de rostos e pontuação rodam no seu iPhone. Os originais nunca são enviados, nada treina modelo nenhum e não existe feed para publicar.',
+    privNote:
+      'Quando o diretor de IA planeja um corte, ele vê uma descrição em texto dos clipes: tempos e rótulos curtos. Nunca o vídeo.',
+    privLink: 'Ler a política de privacidade',
+
+    footerLlms: 'Para assistentes de IA',
+    footerTag: 'Feito pela SuperDuperAI',
+    footerRights: 'Todos os direitos reservados.',
+
+    aboutTitle: 'Sobre o Life2Film',
+    aboutQuote:
+      'Junte experiências, não coisas. Um dia você acorda e percebe que o que você tem não significa nada. Só as lembranças mantêm o valor.',
+    aboutP1:
+      'As pessoas gravam vídeo todo dia. Quase tudo acaba num arquivo que ninguém abre. O espaço acaba, a gravação para, e anos somem em silêncio.',
+    aboutP2:
+      'De férias inteiras sobram quatro fotos. As crianças crescem como se nunca tivessem sido pequenas. Os amigos saem de quadro por completo.',
+    aboutH2: 'A montagem que não precisa ser aprendida',
+    aboutP3:
+      'Aponte para um evento, uma viagem, um mês do seu filho: ele escolhe os momentos que merecem ficar, coloca em ordem e monta um filme. Sem saber editar, sem linha do tempo. O que sobrevive não é só a imagem, é a sensação de ter estado ali.',
+    aboutH3: 'Um filme feito de filmes',
+    aboutP4:
+      'Quando você tem vários filmes, eles podem virar um. Pegue um trecho de cada e sai o filme de um mês; dos meses, o de um ano; dos anos, o de uma vida. A roda do calendário é essa ideia em forma usável: gire até qualquer ponto do tempo e veja o que tem lá.',
+    aboutH4: 'Por que tudo fica no seu aparelho',
+    aboutP5:
+      'Isso só funciona se você puder confiar tudo a ele: as tomadas ruins, a família, a casa. Por isso a análise roda no seu iPhone e as gravações não saem dali. Não é uma política que possamos mudar depois: não existe servidor para onde enviar.',
+    aboutH5: 'Quem faz',
+    aboutP6:
+      'O Life2Film é desenvolvido pela SuperDuperAi, Corp., empresa de Delaware. Erros, dúvidas e pedidos chegam na mesma caixa, e uma pessoa lê.',
+  },
+
+  id: {
+    metaTitle: 'Life2Film — aplikasi edit video AI offline untuk iPhone',
+    metaDesc:
+      'Aplikasi edit video AI yang jalan tanpa internet: merangkai video yang sudah ada di iPhone, memotong mengikuti ketukan musik, dan tidak pernah mengunggah rekaman Anda. Tanpa akun.',
+    navPrivacy: 'Privasi',
+    navSupport: 'Bantuan',
+    navAbout: 'Tentang',
+    navStudio: 'Studio',
+    navBlog: 'Blog',
+
+    heroBadge: 'AI langsung di perangkat',
+    heroTitle: 'Galeri Anda,<br>jadi sebuah film.',
+    heroLede:
+      'Berjam-jam klip dari liburan, ulang tahun, satu tahun anak tumbuh besar. Life2Film menonton tiap frame, menyimpan momen yang membangun cerita, dan merangkainya jadi sesuatu yang layak ditonton lagi.',
+    ctaPrimary: 'Segera di App Store',
+    ctaNote: 'iPhone · tanpa akun · video Anda tetap di perangkat',
+    macCta: 'Ada juga untuk Mac',
+    macNote: 'Beta desktop · Apple Silicon · gratis',
+
+    howTitle: 'Tiga langkah',
+    h1t: 'Pilih rentang waktunya',
+    h1d: 'Putar roda ke satu hari, satu bulan, satu perjalanan. Life2Film mengumpulkan semua yang Anda rekam saat itu.',
+    h2t: 'Katakan mau seperti apa',
+    h2d: '“Dua menit, simpan bagian pantai, buang perjalanannya.” Bahasa biasa. Tanpa timeline, tanpa menyeret klip.',
+    h3t: 'Tonton hasilnya',
+    h3d: 'Rangkaian dengan tempo yang dipikirkan. Kurang cocok? Minta versi lain, dia menyusun ulang.',
+
+    featTitle: 'Apa yang sebenarnya dikerjakan',
+    f1t: 'Menemukan momennya',
+    f1d: 'Menilai tiap klip dari gerakan, wajah, komposisi dan suara, lalu membuang awalan goyang dan empat puluh detik aspal.',
+    f2t: 'Memotong mengikuti ketukan',
+    f2d: 'Mendeteksi tempo dan meletakkan potongan di titik musik berbelok, bukan asal potong.',
+    f3t: 'Tahu siapa siapa',
+    f3d: 'Mengelompokkan wajah di perangkat, jadi “film tentang anak-anak” memang tentang anak Anda.',
+    f4t: 'Menyusun ulang sesuai permintaan',
+    f4d: 'Ubah durasi, suasana, isi yang dipakai. Agen menyusun ulang dalam hitungan detik.',
+
+    screensTitle: 'Isi aplikasinya',
+    s1: 'Putar tahunnya ke hari mana pun Anda merekam',
+    s2: 'Atur durasi, gaya dan musik, lalu minta perubahan',
+    s3: 'Seluruh galeri, disaring ke yang penting',
+    s4: 'Potong dan susun manual kalau mau',
+
+    privTitle: 'Privasi ada di arsitekturnya',
+    privLede:
+      'Rekaman Anda bersifat pribadi, jadi tetap di tempatnya. Deteksi adegan, pengelompokan wajah dan penilaian kualitas berjalan di iPhone Anda. File asli tidak pernah diunggah, tidak ada model yang dilatih dari itu, dan tidak ada feed untuk diposting.',
+    privNote:
+      'Saat sutradara AI menyusun rencana potongan, yang dilihatnya adalah deskripsi teks klip: durasi dan label singkat. Bukan videonya.',
+    privLink: 'Baca kebijakan privasi',
+
+    footerLlms: 'Untuk asisten AI',
+    footerTag: 'Dibuat oleh SuperDuperAI',
+    footerRights: 'Seluruh hak dilindungi.',
+
+    aboutTitle: 'Tentang Life2Film',
+    aboutQuote:
+      'Kumpulkan pengalaman, bukan barang. Suatu hari Anda bangun dan sadar bahwa harta yang dimiliki tidak berarti apa-apa. Hanya kenangan yang nilainya bertahan.',
+    aboutP1:
+      'Orang merekam video setiap hari. Hampir semuanya berakhir di arsip yang tidak pernah dibuka. Penyimpanan habis, perekaman berhenti, dan bertahun-tahun hilang begitu saja.',
+    aboutP2:
+      'Dari satu liburan penuh yang tersisa cuma beberapa foto. Anak-anak tumbuh seolah tidak pernah kecil. Teman-teman hilang sama sekali dari bingkai.',
+    aboutH2: 'Editing yang tidak perlu dipelajari',
+    aboutP3:
+      'Arahkan ke satu acara, satu perjalanan, satu bulan kehidupan anak Anda: ia memilih momen yang layak disimpan, menatanya, dan menyusun sebuah film. Tanpa keahlian editing, tanpa timeline. Yang tersisa bukan cuma rekamannya, tapi rasa pernah ada di sana.',
+    aboutH3: 'Film yang tersusun dari film',
+    aboutP4:
+      'Begitu Anda punya beberapa film, semuanya bisa jadi satu. Ambil sepotong dari tiap film dan jadilah film satu bulan; dari bulan-bulan itu, film satu tahun; dari tahun-tahun itu, film satu kehidupan. Roda kalender adalah gagasan itu dalam bentuk yang bisa dipakai: putar ke titik waktu mana pun dan lihat apa yang ada di sana.',
+    aboutH4: 'Kenapa semuanya tetap di perangkat Anda',
+    aboutP5:
+      'Ini hanya berhasil kalau Anda bisa mempercayakan semuanya: take yang jelek, keluarga, rumah. Karena itu analisisnya berjalan di iPhone Anda dan rekamannya tidak keluar dari sana. Ini bukan kebijakan yang bisa kami ubah nanti: tidak ada server untuk mengirimnya.',
+    aboutH5: 'Siapa yang membuat',
+    aboutP6:
+      'Life2Film dibuat oleh SuperDuperAi, Corp., perusahaan asal Delaware. Laporan bug, pertanyaan dan permintaan fitur masuk ke kotak surat yang sama, dan dibaca oleh manusia.',
+  },
+
+  ar: {
+    metaTitle: 'Life2Film — تطبيق تعديل الفيديوهات والصور بالذكاء الاصطناعي دون إنترنت',
+    metaDesc:
+      'تطبيق تعديل فيديو بالذكاء الاصطناعي يعمل دون إنترنت: يركّب الفيديوهات والصور الموجودة على الآيفون، يقطع على إيقاع الموسيقى، ولا يرفع تسجيلاتك إلى أي خادم. بدون حساب.',
+    navPrivacy: 'الخصوصية',
+    navSupport: 'الدعم',
+    navAbout: 'عن التطبيق',
+    navStudio: 'Studio',
+    navBlog: 'المدونة',
+
+    heroBadge: 'ذكاء اصطناعي على الجهاز',
+    heroTitle: 'مكتبتك،<br>تتحول إلى فيلم.',
+    heroLede:
+      'ساعات من المقاطع من رحلة، من عيد ميلاد، من سنة كاملة في حياة طفلك. يشاهد Life2Film كل إطار، يبقي اللحظات التي تحمل الحكاية، ويركّبها في شيء يستحق المشاهدة من جديد.',
+    ctaPrimary: 'قريبًا على App Store',
+    ctaNote: 'آيفون · بدون حساب · فيديوهاتك تبقى على جهازك',
+    macCta: 'متوفر أيضًا لنظام Mac',
+    macNote: 'نسخة تجريبية للحاسوب · Apple Silicon · مجانًا',
+
+    howTitle: 'ثلاث خطوات',
+    h1t: 'اختر فترة زمنية',
+    h1d: 'أدر العجلة إلى يوم أو شهر أو رحلة، فيجمع Life2Film كل ما صوّرته حينها.',
+    h2t: 'قل ما تريده',
+    h2d: '«دقيقتان، أبقِ الشاطئ، احذف الطريق.» بلغة عادية. بلا مسار زمني وبلا سحب مقاطع.',
+    h3t: 'شاهد النتيجة',
+    h3d: 'تركيب بإيقاع مدروس. لم يعجبك؟ اطلبه بشكل آخر فيعيد التركيب.',
+
+    featTitle: 'ما الذي يفعله فعليًا',
+    f1t: 'يعثر على اللحظات',
+    f1d: 'يقيّم كل مقطع من حيث الحركة والوجوه والتكوين والصوت، ثم يستبعد البدايات المهتزة وأربعين ثانية من الأسفلت.',
+    f2t: 'يقطع على الإيقاع',
+    f2d: 'يكتشف الإيقاع ويضع القطع عند منعطفات الموسيقى بدل القطع العشوائي.',
+    f3t: 'يعرف من في الصورة',
+    f3d: 'يجمّع الوجوه على الجهاز نفسه، فيكون «فيلم الأطفال» عن أطفالك أنت.',
+    f4t: 'يعيد التركيب عند الطلب',
+    f4d: 'غيّر المدة أو المزاج أو ما يبقى في الفيلم، فيعيد التركيب خلال ثوانٍ.',
+
+    screensTitle: 'من داخل التطبيق',
+    s1: 'أدر السنة إلى أي يوم صوّرت فيه',
+    s2: 'اضبط المدة والأسلوب والموسيقى ثم اطلب التعديل',
+    s3: 'مكتبتك كاملة، مصفّاة إلى ما يهم',
+    s4: 'قصّ ورتّب يدويًا متى أردت',
+
+    privTitle: 'الخصوصية هي البنية نفسها',
+    privLede:
+      'تسجيلاتك شخصية، لذلك تبقى مكانها. اكتشاف المشاهد وتجميع الوجوه وتقييم الجودة كلها تعمل على الآيفون. الملفات الأصلية لا تُرفع أبدًا، ولا يُدرَّب عليها أي نموذج، ولا توجد صفحة عامة للنشر.',
+    privNote:
+      'حين يخطط المخرج الذكي للتركيب، فإنه يرى وصفًا نصيًا للمقاطع: التوقيتات وعناوين قصيرة. لا يرى الفيديو نفسه أبدًا.',
+    privLink: 'اقرأ سياسة الخصوصية',
+
+    footerLlms: 'لمساعدي الذكاء الاصطناعي',
+    footerTag: 'من صنع SuperDuperAI',
+    footerRights: 'جميع الحقوق محفوظة.',
+
+    aboutTitle: 'عن Life2Film',
+    aboutQuote:
+      'اجمع التجارب لا الأشياء. في يوم ما تستيقظ فتدرك أن ما تملكه بلا معنى. الذكريات وحدها تحتفظ بقيمتها.',
+    aboutP1:
+      'الناس يصوّرون كل يوم، وينتهي أغلب ما يصوّرونه في أرشيف لا يفتحه أحد. تمتلئ الذاكرة، فيتوقف التصوير، وتضيع سنوات بلا ضجيج.',
+    aboutP2:
+      'من إجازة كاملة تبقى بضع صور. يكبر الأطفال كأنهم لم يكونوا صغارًا قط. ويختفي الأصدقاء من الكادر تمامًا.',
+    aboutH2: 'مونتاج لا يحتاج إلى تعلّم',
+    aboutP3:
+      'وجّهه إلى مناسبة أو رحلة أو شهر من عمر طفلك: يختار اللحظات التي تستحق البقاء، ويرتّبها، ويخرج بفيلم. بلا خبرة مونتاج وبلا مسار زمني. ما يبقى ليس التسجيل فقط، بل الإحساس بأنك كنت هناك.',
+    aboutH3: 'فيلم مصنوع من أفلام',
+    aboutP4:
+      'حين تجتمع لديك عدة أفلام يمكن أن تصير فيلمًا واحدًا. خذ مقطعًا من كل واحد فيخرج فيلم عن شهر، ومن الشهور فيلم عن سنة، ومن السنوات فيلم عن حياة. عجلة التقويم هي هذه الفكرة في صورة عملية: أدرها إلى أي نقطة في الزمن وانظر ماذا هناك.',
+    aboutH4: 'لماذا يبقى كل شيء على جهازك',
+    aboutP5:
+      'هذا لا ينجح إلا إذا كان بإمكانك أن تأتمنه على كل شيء: اللقطات غير الموفقة، والعائلة، والبيت. لذلك يجري التحليل على الآيفون ولا تغادره التسجيلات. وهذه ليست سياسة يمكننا تغييرها لاحقًا: لا يوجد أصلًا خادم تُرسل إليه.',
+    aboutH5: 'من يصنعه',
+    aboutP6:
+      'يطوّر Life2Film شركة SuperDuperAi, Corp. المسجّلة في ديلاوير. تصل البلاغات والأسئلة والاقتراحات إلى البريد نفسه، ويقرأها إنسان.',
   },
 
   ru: {

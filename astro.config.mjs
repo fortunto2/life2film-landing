@@ -9,12 +9,12 @@ export default defineConfig({
     sitemap({
       i18n: {
         defaultLocale: 'en',
-        locales: { en: 'en', ru: 'ru', tr: 'tr' },
+        locales: { en: 'en', es: 'es', pt: 'pt', id: 'id', ar: 'ar', ru: 'ru', tr: 'tr' },
       },
     }),
   ],
   i18n: {
-    locales: ['en', 'ru', 'tr'],
+    locales: ['en', 'es', 'pt', 'id', 'ar', 'ru', 'tr'],
     defaultLocale: 'en',
     routing: { prefixDefaultLocale: false },
   },
