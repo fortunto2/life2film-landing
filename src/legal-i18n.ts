@@ -23,8 +23,11 @@ export const legal = {
     privKeyP:
       'The key you enter is stored on your device and used only to authenticate requests to the provider you selected. It is never sent to us or to anyone else.',
     privNotT: 'What we do not do',
+    privSiteT: 'This website',
+    privSiteP:
+      'The points above describe the app. This website is separate: it uses Google Analytics to count visits and see which pages people read, with IP anonymisation on and Google advertising signals off. That measurement applies to the site only — the app itself carries no analytics of any kind.',
     privNot1: 'No account or sign-in is required to use the app.',
-    privNot2: 'No analytics, tracking or advertising SDKs.',
+    privNot2: 'No analytics, tracking or advertising SDKs inside the app (see the website note below).',
     privNot3: 'No selling or sharing of personal data — we do not receive it in the first place.',
     privNot4: 'No training of any model on your content.',
     privPermT: 'Permissions',
@@ -77,8 +80,11 @@ export const legal = {
     privKeyP:
       'Введённый ключ хранится на устройстве и используется только для авторизации запросов к выбранному провайдеру. Нам или кому-то ещё он не передаётся.',
     privNotT: 'Чего мы не делаем',
+    privSiteT: 'Про этот сайт',
+    privSiteP:
+      'Всё сказанное выше относится к приложению. Сайт — отдельная история: на нём стоит Google Analytics, чтобы считать визиты и видеть, какие страницы читают. IP анонимизируется, рекламные сигналы Google отключены. Это касается только сайта — в самом приложении никакой аналитики нет.',
     privNot1: 'Аккаунт и вход не нужны.',
-    privNot2: 'Нет аналитики, трекинга и рекламных SDK.',
+    privNot2: 'В приложении нет аналитики, трекинга и рекламных SDK (про сайт — ниже).',
     privNot3: 'Мы не продаём и не передаём персональные данные — мы их попросту не получаем.',
     privNot4: 'На вашем контенте не обучается никакая модель.',
     privPermT: 'Разрешения',
@@ -131,8 +137,11 @@ export const legal = {
     privKeyP:
       'Girdiğiniz anahtar cihazınızda saklanır ve yalnızca seçtiğiniz sağlayıcıya yapılan isteklerin kimlik doğrulaması için kullanılır. Bize ya da başka birine hiçbir zaman gönderilmez.',
     privNotT: 'Yapmadıklarımız',
+    privSiteT: 'Bu web sitesi',
+    privSiteP:
+      'Yukarıdakiler uygulamayı anlatıyor. Bu web sitesi ayrı: ziyaretleri saymak ve hangi sayfaların okunduğunu görmek için Google Analytics kullanıyor; IP anonimleştirmesi açık, Google reklam sinyalleri kapalı. Bu ölçüm yalnızca siteyle ilgili — uygulamanın kendisinde hiçbir analitik yok.',
     privNot1: 'Uygulamayı kullanmak için hesap ya da giriş gerekmez.',
-    privNot2: 'Analitik, izleme veya reklam SDK’sı yok.',
+    privNot2: 'Uygulamanın içinde analitik, izleme veya reklam SDK’sı yok (site için aşağıya bakın).',
     privNot3: 'Kişisel veri satmıyor ya da paylaşmıyoruz — zaten bize ulaşmıyor.',
     privNot4: 'İçeriğiniz üzerinde hiçbir model eğitilmiyor.',
     privPermT: 'İzinler',
