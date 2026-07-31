@@ -1,0 +1,54 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+<Base
+  lang="en"
+  title="Blog — Life2Film"
+  description="Notes on editing video without uploading it: on-device analysis, cutting to the beat, and what happened to automatic montage tools."
+  basePath="/blog"
+>
+  <main>
+    <section>
+      <div class="wrap">
+        <h1>Blog</h1>
+        <p class="lede">
+          Notes on editing footage without handing it to a server, and on the tools that tried this
+          before us.
+        </p>
+
+        <div class="posts">
+          {posts.map((post) => (
+            <a class="post" href={`/blog/${post.id}/`}>
+              <time class="muted" datetime={post.data.date.toISOString()}>{fmt(post.data.date)}</time>
+              <h2>{post.data.title}</h2>
+              <p>{post.data.description}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  </main>
+</Base>
+
+<style>
+  h1 { font-size: clamp(34px, 5vw, 48px); margin-bottom: 14px; }
+  .lede { font-size: 18px; color: #cfcfd6; max-width: 58ch; }
+
+  .posts { display: grid; gap: 18px; margin-top: 36px; }
+  .post {
+    display: block; padding: 24px; border-radius: 16px;
+    border: 1px solid var(--line); background: var(--panel);
+    text-decoration: none; transition: border-color 0.15s ease;
+  }
+  .post:hover { border-color: #33333d; }
+  .post time { font-size: 13px; letter-spacing: 0.02em; }
+  .post h2 { margin: 8px 0 8px; font-size: 21px; color: var(--fg); }
+  .post p { color: var(--muted); font-size: 15px; }
+</style>

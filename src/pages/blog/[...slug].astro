@@ -1,0 +1,58 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+<Base
+  lang="en"
+  title={`${post.data.title} — Life2Film`}
+  description={post.data.description}
+  basePath={`/blog/${post.id}`}
+>
+  <main>
+    <section>
+      <article class="wrap prose">
+        <a class="back" href="/blog/">← Blog</a>
+        <h1>{post.data.title}</h1>
+        <p class="muted meta">
+          <time datetime={post.data.date.toISOString()}>{fmt(post.data.date)}</time>
+          {post.data.updated && <> · updated {fmt(post.data.updated)}</>}
+        </p>
+        <Content />
+      </article>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .back { display: inline-block; margin-bottom: 20px; color: var(--muted); text-decoration: none; font-size: 15px; }
+  .back:hover { color: var(--fg); }
+  h1 { font-size: clamp(30px, 4.5vw, 42px); margin-bottom: 10px; }
+  .meta { font-size: 14px; margin-bottom: 34px; }
+
+  article :global(h2) { margin: 40px 0 14px; font-size: 25px; }
+  article :global(h3) { margin: 28px 0 8px; font-size: 18px; }
+  article :global(p), article :global(li) { color: #cfcfd6; margin-bottom: 14px; }
+  article :global(ul), article :global(ol) { padding-left: 22px; }
+  article :global(a) { color: var(--cyan); }
+  article :global(strong) { color: var(--fg); }
+  article :global(blockquote) {
+    margin: 22px 0; padding: 14px 20px; border-left: 3px solid var(--line);
+    background: var(--panel); border-radius: 0 10px 10px 0; color: #b9b9c4;
+  }
+  article :global(table) { width: 100%; border-collapse: collapse; margin: 22px 0; font-size: 15px; }
+  article :global(th), article :global(td) {
+    text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); color: #cfcfd6;
+  }
+  article :global(th) { color: var(--fg); font-weight: 700; }
+  article :global(code) { background: var(--panel); padding: 2px 6px; border-radius: 5px; font-size: 14px; }
+</style>
