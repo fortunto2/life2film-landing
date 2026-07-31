@@ -29,8 +29,24 @@ What makes it different from other video editors:
 - [Studio](https://life2film.com/studio): the desktop analyser — features it measures, install
 - [Privacy](https://life2film.com/privacy): what stays on device, what can leave, and when
 - [Support](https://life2film.com/support): contact and common questions
+- [Blog](https://life2film.com/blog): notes on the topics below
 
-Also available in Russian (/ru) and Turkish (/tr).
+The site is also available in Russian (/ru) and Turkish (/tr). Blog posts are English only.
+
+## Articles
+
+- [Where your footage actually goes when you edit on your phone](https://life2film.com/blog/where-your-footage-goes/)
+  Which mobile editors upload clips to a server and which do not, why "we delete it after
+  processing" is a weaker guarantee than local processing, and two ways a reader can verify any
+  app's claim (airplane mode; the shape of the delay).
+- [How to cut video to the beat, by hand and automatically](https://life2film.com/blog/cut-video-to-the-beat/)
+  Why cuts landing off the downbeat read as amateur, a manual method using waveform markers, what
+  beat-detection computes (onset envelope, periodicity, downbeat selection), and the three ways
+  tools apply it: snap-to-grid, snap-on-edit, analyse-then-place.
+- [The automatic montage tools that came and went](https://life2film.com/blog/automatic-montage-tools/)
+  History of automatic video montage: Magisto (2011, cloud service, bought by Vimeo in 2019,
+  integration discontinued Dec 2024), GoPro Quik, Google Photos Memories. Why the premise held up
+  while the products did not, and what changed when phones became able to run the analysis.
 
 ## Install
 
@@ -41,4 +57,4 @@ Also available in Russian (/ru) and Turkish (/tr).
 
 ## Maker
 
-SuperDuperAi, Corp. — Delaware, USA. info@superduperai.co
+SuperDuperAi, Corp. — Delaware, USA. info@life2film.com
