@@ -15,24 +15,24 @@ export const legal = {
     privStays3: 'The photo-library index the app builds is stored locally and removed with the app.',
     privLeavesT: 'What leaves your device',
     privLeavesP:
-      'When you ask the AI director for a cut, the app sends a text description of the clips — timings, short scene labels, and your instruction — to the language-model provider you configured. No video, no photos, no audio.',
+      'When you ask the AI director for a cut, the app sends a text description of the clips (timings, short scene labels, and your instruction) to the language-model provider you configured. No video, no photos, no audio.',
     privLeavesList: 'Supported providers, chosen by you in Settings:',
     privLeavesP2:
-      'Requests are made with your API key, directly from your device to that provider. We do not proxy them and never see their contents. Each provider processes the request under its own privacy policy and retention terms — please review the one you use. If you configure no provider, the app runs its deterministic pipeline and sends nothing at all.',
+      'Requests are made with your API key, directly from your device to that provider. We do not proxy them and never see their contents. Each provider processes the request under its own privacy policy and retention terms, so please review the one you use. If you configure no provider, the app runs its deterministic pipeline and sends nothing at all.',
     privKeyT: 'Your API key',
     privKeyP:
       'The key you enter is stored on your device and used only to authenticate requests to the provider you selected. It is never sent to us or to anyone else.',
     privNotT: 'What we do not do',
     privSiteT: 'This website',
     privSiteP:
-      'The points above describe the app. This website is separate: it uses Google Analytics to count visits and see which pages people read, with IP anonymisation on and Google advertising signals off. That measurement applies to the site only — the app itself carries no analytics of any kind.',
+      'The points above describe the app. This website is separate: it uses Google Analytics to count visits and see which pages people read, with IP anonymisation on and Google advertising signals off. That measurement applies to the site only. The app itself carries no analytics of any kind.',
     privNot1: 'No account or sign-in is required to use the app.',
     privNot2: 'No analytics, tracking or advertising SDKs inside the app (see the website note below).',
-    privNot3: 'No selling or sharing of personal data — we do not receive it in the first place.',
+    privNot3: 'No selling or sharing of personal data. We do not receive it in the first place.',
     privNot4: 'No training of any model on your content.',
     privPermT: 'Permissions',
     privPermP:
-      'Photo library — to read the videos and photos you want in a montage and to save the result. Without it the app has nothing to edit.',
+      'Photo library, to read the videos and photos you want in a montage and to save the result. Without it the app has nothing to edit.',
     privKidsT: 'Children',
     privKidsP:
       'Life2Film is not directed at children under 13 and does not knowingly collect information from them.',
@@ -43,7 +43,7 @@ export const legal = {
     privContactP: 'Questions about privacy:',
 
     supTitle: 'Support',
-    supIntro: 'Something broken, confusing, or missing? Write to us — a real person reads it.',
+    supIntro: 'Something broken, confusing, or missing? Write to us. A real person reads it.',
     supHow:
       'When reporting a problem, include your device model, iOS version, and what you were doing when it happened. If a montage came out wrong, say roughly how many clips were involved and what you asked for.',
     supFaq: 'Common questions',

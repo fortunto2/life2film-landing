@@ -28,25 +28,25 @@ export const ui = {
     h1t: 'Pick a stretch of time',
     h1d: 'Spin the wheel to a day, a month, a trip. Life2Film pulls everything you shot then.',
     h2t: 'Say what you want',
-    h2d: '“Two minutes, keep the beach, skip the drive.” Plain language — no timeline, no dragging clips.',
+    h2d: '“Two minutes, keep the beach, skip the drive.” Plain language. No timeline, no dragging clips.',
     h3t: 'Watch it back',
     h3d: 'A cut with deliberate pacing. Not liked? Ask again and it re-cuts.',
 
     featTitle: 'What it actually does',
     f1t: 'Finds the moments',
-    f1d: 'Scores every clip on motion, faces, framing and sound — then drops the shaky starts and the forty seconds of pavement.',
+    f1d: 'Scores every clip on motion, faces, framing and sound, then drops the shaky starts and the forty seconds of pavement.',
     f2t: 'Cuts to the beat',
     f2d: 'Beat detection lines the edits up with the music instead of cutting at random.',
     f3t: 'Knows who is who',
     f3d: 'Groups faces on device, so “the film about the kids” means the one about your kids.',
     f4t: 'Re-cuts on request',
-    f4d: 'Change the length, the mood, what stays in. The agent recuts in seconds — no re-editing.',
+    f4d: 'Change the length, the mood, what stays in. The agent recuts in seconds, with no re-editing.',
 
     privTitle: 'Privacy is the architecture',
     privLede:
       'Your footage is personal, so it stays where it is. Scene detection, face grouping and scoring run on your iPhone. Originals are never uploaded, nothing trains a model, and there is no feed to post to.',
     privNote:
-      'When the AI director plans a cut, it sees a text description of the clips — timings and short labels. Never the video itself.',
+      'When the AI director plans a cut, it sees a text description of the clips: timings and short labels. Never the video itself.',
     privLink: 'Read the privacy policy',
 
     screensTitle: 'Inside the app',
@@ -71,13 +71,13 @@ export const ui = {
       'From a whole holiday, a few photos survive. Children grow up as if they were never small. Friends fade out of the frame entirely.',
     aboutH2: 'The editor you never have to learn',
     aboutP3:
-      'Point Life2Film at an event, a trip, a month of your kid — it picks the moments worth keeping, orders them, and cuts a film. No editing skills, no timeline. What survives is not just the footage but the feeling of being there.',
+      'Point Life2Film at an event, a trip, a month of your kid, and it picks the moments worth keeping, orders them, and cuts a film. No editing skills, no timeline. What survives is not just the footage but the feeling of being there.',
     aboutH3: 'A film made of films',
     aboutP4:
-      'Once you have several films, they can become one. Take a fragment from each and you get a film about a month; from months, a year; from years, a life. The calendar wheel is that idea made usable — spin to any point in time and see what is there.',
+      'Once you have several films, they can become one. Take a fragment from each and you get a film about a month; from months, a year; from years, a life. The calendar wheel is that idea made usable. Spin to any point in time and see what is there.',
     aboutH4: 'Why it stays on your device',
     aboutP5:
-      'This only works if you can trust it with everything — the unflattering takes, the family, the home. So the analysis runs on your iPhone and the footage never leaves it. Not a policy we could change later: there is no server to send it to.',
+      'This only works if you can trust it with everything: the unflattering takes, the family, the home. So the analysis runs on your iPhone and the footage never leaves it. Not a policy we could change later: there is no server to send it to.',
     aboutH5: 'Who makes it',
     aboutP6:
       'Life2Film is built by SuperDuperAi, Corp., a Delaware company. Bugs, questions and feature requests all go to the same inbox, and a person reads them.',

@@ -18,7 +18,7 @@ export const studio = {
     installTitle: 'Install',
     installBrew: 'With Homebrew:',
     installDmg:
-      'Or download the DMG and drag the app into Applications. It is signed with a Developer ID and notarised by Apple, so it opens without Gatekeeper warnings, and ffmpeg is linked statically — there is nothing to install first.',
+      'Or download the DMG and drag the app into Applications. It is signed with a Developer ID and notarised by Apple, so it opens without Gatekeeper warnings, and ffmpeg is linked statically, so there is nothing to install first.',
 
     doesTitle: 'What it does',
     d1t: 'Scores every frame',
@@ -30,14 +30,14 @@ export const studio = {
 
     photosTitle: 'Straight from Apple Photos',
     photosBody:
-      'No exporting to a folder first. Studio reads your macOS Photos library directly, in two ways: a picker with the Photos sidebar when you want to choose visually, and a PhotoKit export when you want to pull a whole batch. The library stays untouched — files are copied out for analysis, never modified in place.',
+      'No exporting to a folder first. Studio reads your macOS Photos library directly, in two ways: a picker with the Photos sidebar when you want to choose visually, and a PhotoKit export when you want to pull a whole batch. The library stays untouched: files are copied out for analysis, never modified in place.',
 
     measuresTitle: 'What it measures',
     measuresSub: 'Every number below is computed locally, per frame, and exposed in the interface.',
     g1t: 'Is the shot usable',
     g1n: 'Shaky handoffs, out-of-focus starts and blown-out frames are scored down before anything else is considered.',
     g2t: 'Who and what is in it',
-    g2n: 'Faces are detected with a YOLO model; quality combines detector confidence, landmark visibility and how much of the frame the face occupies — a sharp face filling the shot outranks a distant one.',
+    g2n: 'Faces are detected with a YOLO model; quality combines detector confidence, landmark visibility and how much of the frame the face occupies, so a sharp face filling the shot outranks a distant one.',
     g3t: 'Is it composed well',
     g3n: 'Framing, subject placement and depth separation, so a deliberate shot wins over an accidental one.',
     g4t: 'How it looks',
@@ -49,7 +49,7 @@ export const studio = {
 
     betaTitle: 'Still a beta',
     betaBody:
-      'The analysis engine is the mature part; the interface around it is not. Expect rough edges, missing polish and the occasional dead end. It does not touch your originals — nothing is overwritten and nothing is uploaded — but do not make it the only copy of anything.',
+      'The analysis engine is the mature part; the interface around it is not. Expect rough edges, missing polish and the occasional dead end. It does not touch your originals: nothing is overwritten, nothing is uploaded. Even so, do not make it the only copy of anything.',
     betaContact: 'Found something broken?',
   },
 
