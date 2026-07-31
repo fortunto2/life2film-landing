@@ -11,9 +11,9 @@ export function localePath(lang: Lang, path = '/'): string {
 
 export const ui = {
   en: {
-    metaTitle: 'Life2Film — your camera roll, cut into a film',
+    metaTitle: 'Life2Film — offline AI video montage app for iPhone',
     metaDesc:
-      'AI montage from the videos already on your phone. Analysis runs on device; your footage never leaves it. Ask for the cut you want in plain language.',
+      'AI video montage maker that works offline: it edits the videos already on your iPhone, cuts them to the beat, and never uploads your footage. No account needed.',
     navPrivacy: 'Privacy',
     navSupport: 'Support',
 
@@ -57,6 +57,7 @@ export const ui = {
     navStudio: 'Studio',
     macCta: 'Also on Mac',
     macNote: 'Desktop beta · Apple Silicon · free',
+    footerLlms: 'For AI assistants',
     footerTag: 'Made by SuperDuperAI',
     footerRights: 'All rights reserved.',
 
@@ -83,9 +84,9 @@ export const ui = {
   },
 
   ru: {
-    metaTitle: 'Life2Film — плёнка из вашей камеры',
+    metaTitle: 'Life2Film — офлайн ИИ-монтаж видео на iPhone',
     metaDesc:
-      'ИИ-монтаж из видео, которые уже лежат в телефоне. Анализ идёт на устройстве, записи никуда не уходят. Просите нужный монтаж обычными словами.',
+      'Приложение для ИИ-монтажа видео без интернета: собирает ролик из записей на iPhone, режет под бит и ничего не загружает в облако. Без регистрации.',
     navPrivacy: 'Приватность',
     navSupport: 'Поддержка',
 
@@ -129,6 +130,7 @@ export const ui = {
     navStudio: 'Studio',
     macCta: 'Ещё есть версия для Mac',
     macNote: 'Бета для десктопа · Apple Silicon · бесплатно',
+    footerLlms: 'Для ИИ-ассистентов',
     footerTag: 'Сделано в SuperDuperAI',
     footerRights: 'Все права защищены.',
 
@@ -155,9 +157,9 @@ export const ui = {
   },
 
   tr: {
-    metaTitle: 'Life2Film — galeriniz, bir filme dönüşüyor',
+    metaTitle: 'Life2Film — iPhone için çevrimdışı yapay zekâ video montaj',
     metaDesc:
-      'Telefonunuzdaki videolardan yapay zekâ montajı. Analiz cihazda çalışır, kayıtlarınız cihazdan çıkmaz. İstediğiniz kurguyu gündelik dille söyleyin.',
+      'Çevrimdışı çalışan yapay zekâ video montaj uygulaması: iPhone videolarınızı kurgular, ritme göre keser ve hiçbir görüntüyü yüklemez. Hesap gerekmez.',
     navPrivacy: 'Gizlilik',
     navSupport: 'Destek',
 
@@ -201,6 +203,7 @@ export const ui = {
     navStudio: 'Studio',
     macCta: "Mac sürümü de var",
     macNote: 'Masaüstü beta · Apple Silicon · ücretsiz',
+    footerLlms: 'Yapay zekâ asistanları için',
     footerTag: 'SuperDuperAI tarafından yapıldı',
     footerRights: 'Tüm hakları saklıdır.',
 
