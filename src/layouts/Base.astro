@@ -99,6 +99,14 @@ const jsonLd = {
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
   {import.meta.env.PROD && (
     <>
+      {/*
+        Our own counter. No cookie and no client-side id at all — the anonymous id is derived
+        at the edge and rotates daily — so it adds nothing to the consent question that GA
+        below has already raised. It is what makes this landing comparable with the iOS app in
+        one query instead of two dashboards. https://analytics.superduperai.co
+      */}
+      <script defer src="https://analytics.superduperai.co/sda.js" data-source="life2film" is:inline></script>
+
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-856SXW60BG" is:inline></script>
       <script is:inline>
         window.dataLayer = window.dataLayer || [];
