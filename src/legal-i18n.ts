@@ -25,7 +25,7 @@ export const legal = {
     privNotT: 'What we do not do',
     privSiteT: 'This website',
     privSiteP:
-      'The points above describe the app. This website is separate: it uses Google Analytics to count visits and see which pages people read, with IP anonymisation on and Google advertising signals off. That measurement applies to the site only. The app itself carries no analytics of any kind.',
+      'The points above describe the app. This website is separate: it uses Google Analytics to count visits and see which pages people read, with IP anonymisation on and Google advertising signals off. It also runs our own counter, on infrastructure we operate rather than a third party’s — it sets no cookie and stores nothing in your browser, because the identifier it counts you by is derived at our edge from your IP address, browser type and today’s date, is never sent back to you, and changes at midnight UTC. Your IP address itself is never stored, and the code is public. That measurement applies to the site only. The app itself carries no analytics of any kind.',
     privNot1: 'No account or sign-in is required to use the app.',
     privNot2: 'No analytics, tracking or advertising SDKs inside the app (see the website note below).',
     privNot3: 'No selling or sharing of personal data. We do not receive it in the first place.',
@@ -82,7 +82,7 @@ export const legal = {
     privNotT: 'Чего мы не делаем',
     privSiteT: 'Про этот сайт',
     privSiteP:
-      'Всё сказанное выше относится к приложению. Сайт — отдельная история: на нём стоит Google Analytics, чтобы считать визиты и видеть, какие страницы читают. IP анонимизируется, рекламные сигналы Google отключены. Это касается только сайта — в самом приложении никакой аналитики нет.',
+      'Всё сказанное выше относится к приложению. Сайт — отдельная история: на нём стоит Google Analytics, чтобы считать визиты и видеть, какие страницы читают. IP анонимизируется, рекламные сигналы Google отключены. Ещё на сайте работает наш собственный счётчик — на нашей инфраструктуре, а не у стороннего сервиса. Он не ставит cookie и ничего не хранит в браузере: идентификатор вычисляется на нашем крае из IP-адреса, типа браузера и сегодняшней даты, вам он никогда не передаётся и меняется в полночь UTC. Сам IP-адрес нигде не сохраняется, а код счётчика открыт. Всё это касается только сайта — в самом приложении никакой аналитики нет.',
     privNot1: 'Аккаунт и вход не нужны.',
     privNot2: 'В приложении нет аналитики, трекинга и рекламных SDK (про сайт — ниже).',
     privNot3: 'Мы не продаём и не передаём персональные данные — мы их попросту не получаем.',
@@ -139,7 +139,7 @@ export const legal = {
     privNotT: 'Yapmadıklarımız',
     privSiteT: 'Bu web sitesi',
     privSiteP:
-      'Yukarıdakiler uygulamayı anlatıyor. Bu web sitesi ayrı: ziyaretleri saymak ve hangi sayfaların okunduğunu görmek için Google Analytics kullanıyor; IP anonimleştirmesi açık, Google reklam sinyalleri kapalı. Bu ölçüm yalnızca siteyle ilgili — uygulamanın kendisinde hiçbir analitik yok.',
+      'Yukarıdakiler uygulamayı anlatıyor. Bu web sitesi ayrı: ziyaretleri saymak ve hangi sayfaların okunduğunu görmek için Google Analytics kullanıyor; IP anonimleştirmesi açık, Google reklam sinyalleri kapalı. Ayrıca üçüncü bir tarafın değil, kendi altyapımızda çalışan kendi sayacımızı kullanıyoruz: çerez bırakmaz ve tarayıcınızda hiçbir şey saklamaz, çünkü sizi saydığı tanımlayıcı IP adresiniz, tarayıcı türünüz ve bugünün tarihinden uç sunucumuzda türetilir, size hiçbir zaman geri gönderilmez ve UTC gece yarısında değişir. IP adresinizin kendisi hiçbir yerde saklanmaz ve kodu açıktır. Bu ölçüm yalnızca siteyle ilgili — uygulamanın kendisinde hiçbir analitik yok.',
     privNot1: 'Uygulamayı kullanmak için hesap ya da giriş gerekmez.',
     privNot2: 'Uygulamanın içinde analitik, izleme veya reklam SDK’sı yok (site için aşağıya bakın).',
     privNot3: 'Kişisel veri satmıyor ya da paylaşmıyoruz — zaten bize ulaşmıyor.',
