@@ -7,7 +7,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "deploy": "astro build && wrangler pages deploy dist --project-name=life2film-site"
+    "deploy": "astro build && wrangler pages deploy dist --project-name=life2film-site --branch=production"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

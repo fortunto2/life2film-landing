@@ -1,4 +1,9 @@
+# Content-Signals — how this content may be used, stated rather than left to a default.
+#   search=yes    index it and link to it; that is what a landing page is for
+#   ai-input=yes  quote it when answering someone's question about the app
+#   ai-train=no   do not add it to a training corpus
 User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=no
 Allow: /
 
 # AI crawlers — indexing this site is welcome, the content is meant to be found.
