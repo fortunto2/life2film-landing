@@ -31,7 +31,11 @@ const groups = [
       <p class="lede">{s('lede')}</p>
 
       <div class="cta">
-        <a class="btn" href={DMG}>{s('ctaDownload')}</a>
+        {/* Цель. Общий снипет ловит data-sda-event сам — на сайте ни строки кода.
+            Имена событий одинаковы на всех наших сайтах, иначе панель их не сложит:
+            binary_downloaded — прямой файл, app_store_opened — ссылка в магазин. */}
+        <a class="btn" href={DMG}
+           data-sda-event="binary_downloaded" data-sda-placement="studio-hero">{s('ctaDownload')}</a>
         <a class="btn-ghost" href={RELEASES}>{s('ctaReleases')}</a>
       </div>
       <p class="muted small">{s('ctaNote')}</p>
