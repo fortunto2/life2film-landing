@@ -26,7 +26,17 @@ const feats = [
         <h1 set:html={t('heroTitle')} />
         <p class="lede">{t('heroLede')}</p>
         <div class="cta">
-          <span class="btn" aria-disabled="true">{t('ctaPrimary')}</span>
+          <a
+            class="btn btn-store"
+            href="https://apps.apple.com/app/id6761656888"
+            target="_blank"
+            rel="noopener"
+          >
+            <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="currentColor">
+              <path d="M11.18 0c.08.9-.28 1.78-.83 2.42-.55.64-1.44 1.13-2.31 1.06-.1-.86.32-1.77.85-2.34C9.44.48 10.4.04 11.18 0zm2.7 5.44c-.05.03-1.63.94-1.61 2.8.02 2.23 1.95 2.97 1.98 2.98-.02.06-.31 1.06-1.02 2.09-.61.9-1.25 1.8-2.26 1.82-.99.02-1.31-.59-2.44-.59-1.13 0-1.48.57-2.42.6-.97.04-1.71-.97-2.33-1.87C2.5 11.44 1.53 8.1 2.83 5.84c.64-1.12 1.8-1.83 3.05-1.85.95-.02 1.85.64 2.43.64.58 0 1.67-.79 2.82-.68.48.02 1.83.19 2.7 1.45z"/>
+            </svg>
+            {t('ctaPrimary')}
+          </a>
           <a
             class="btn-mac"
             href="/studio/"
@@ -114,6 +124,12 @@ const feats = [
   .cta { margin: 28px 0 12px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
   .small { font-size: 14px; }
   .mac-note { margin-top: 4px; opacity: 0.75; }
+
+  .btn-store {
+    display: inline-flex; align-items: center; gap: 9px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn-store:hover { transform: translateY(-1px); box-shadow: 0 12px 34px rgba(1, 122, 255, 0.35); }
 
   .btn-mac {
     display: inline-flex; align-items: center; gap: 9px;

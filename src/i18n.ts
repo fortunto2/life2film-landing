@@ -24,7 +24,7 @@ export const ui = {
     heroTitle: 'Your camera roll,<br>cut into a film.',
     heroLede:
       'Hours of clips from a trip, a birthday, a year of a kid growing up. Life2Film watches every frame, keeps the moments that carry the story, and cuts them into something worth watching.',
-    ctaPrimary: 'Coming to the App Store',
+    ctaPrimary: 'Download on the App Store',
     ctaNote: 'iPhone · works without an account · your videos stay on your device',
 
     howTitle: 'Three steps',
@@ -101,7 +101,7 @@ export const ui = {
     heroTitle: 'Tu galería,<br>convertida en película.',
     heroLede:
       'Horas de clips de un viaje, un cumpleaños, un año de tu hijo creciendo. Life2Film mira cada fotograma, se queda con los momentos que sostienen la historia y los monta en algo que vale la pena ver.',
-    ctaPrimary: 'Pronto en el App Store',
+    ctaPrimary: 'Descargar en el App Store',
     ctaNote: 'iPhone · sin cuenta · tus videos no salen del teléfono',
     macCta: 'También para Mac',
     macNote: 'Beta de escritorio · Apple Silicon · gratis',
@@ -176,7 +176,7 @@ export const ui = {
     heroTitle: 'Sua galeria,<br>virada filme.',
     heroLede:
       'Horas de clipes de uma viagem, de um aniversário, de um ano do seu filho crescendo. O Life2Film assiste cada quadro, guarda os momentos que sustentam a história e monta algo que vale rever.',
-    ctaPrimary: 'Em breve na App Store',
+    ctaPrimary: 'Baixar na App Store',
     ctaNote: 'iPhone · sem conta · seus vídeos não saem do aparelho',
     macCta: 'Também para Mac',
     macNote: 'Beta para desktop · Apple Silicon · grátis',
@@ -251,7 +251,7 @@ export const ui = {
     heroTitle: 'Galeri Anda,<br>jadi sebuah film.',
     heroLede:
       'Berjam-jam klip dari liburan, ulang tahun, satu tahun anak tumbuh besar. Life2Film menonton tiap frame, menyimpan momen yang membangun cerita, dan merangkainya jadi sesuatu yang layak ditonton lagi.',
-    ctaPrimary: 'Segera di App Store',
+    ctaPrimary: 'Unduh di App Store',
     ctaNote: 'iPhone · tanpa akun · video Anda tetap di perangkat',
     macCta: 'Ada juga untuk Mac',
     macNote: 'Beta desktop · Apple Silicon · gratis',
@@ -326,7 +326,7 @@ export const ui = {
     heroTitle: 'مكتبتك،<br>تتحول إلى فيلم.',
     heroLede:
       'ساعات من المقاطع من رحلة، من عيد ميلاد، من سنة كاملة في حياة طفلك. يشاهد Life2Film كل إطار، يبقي اللحظات التي تحمل الحكاية، ويركّبها في شيء يستحق المشاهدة من جديد.',
-    ctaPrimary: 'قريبًا على App Store',
+    ctaPrimary: 'حمّله من App Store',
     ctaNote: 'آيفون · بدون حساب · فيديوهاتك تبقى على جهازك',
     macCta: 'متوفر أيضًا لنظام Mac',
     macNote: 'نسخة تجريبية للحاسوب · Apple Silicon · مجانًا',
@@ -398,7 +398,7 @@ export const ui = {
     heroTitle: 'Ваша галерея —<br>смонтированный фильм.',
     heroLede:
       'Часы роликов из поездки, с дня рождения, за год жизни ребёнка. Life2Film просматривает каждый кадр, оставляет то, что держит историю, и собирает из этого фильм, который хочется пересматривать.',
-    ctaPrimary: 'Скоро в App Store',
+    ctaPrimary: 'Загрузить в App Store',
     ctaNote: 'iPhone · без регистрации · видео остаются на устройстве',
 
     howTitle: 'Три шага',
@@ -472,7 +472,7 @@ export const ui = {
     heroTitle: 'Galeriniz,<br>kurgulanmış bir film.',
     heroLede:
       'Bir tatilden, bir doğum gününden, bir çocuğun büyüdüğü yıldan kalan saatlerce görüntü. Life2Film her kareyi izler, hikâyeyi taşıyan anları seçer ve izlemeye değer bir film çıkarır.',
-    ctaPrimary: "Yakında App Store'da",
+    ctaPrimary: "App Store'dan İndirin",
     ctaNote: 'iPhone · hesap gerekmez · videolarınız cihazınızda kalır',
 
     howTitle: 'Üç adım',
