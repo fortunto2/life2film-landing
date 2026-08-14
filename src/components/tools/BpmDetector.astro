@@ -1,4 +1,14 @@
 ---
+import { CHROME } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+
 /**
  * The bpm-detector interface: markup and behaviour, with no page metadata.
  *
@@ -10,8 +20,8 @@
 <div class="tool" slot="tool">
           <label class="drop" id="drop" for="file">
             <input type="file" id="file" accept="audio/*,video/*" hidden />
-            <strong id="dropTitle">Choose an audio file</strong>
-            <span class="muted" id="dropHint">or drag it here — MP3, WAV, M4A, FLAC, OGG</span>
+            <strong>{chrome.chooseFile}</strong>
+            <span class="muted">{chrome.dragHint} — MP3, WAV, M4A, FLAC, OGG</span>
           </label>
 
           <div id="status" class="status" hidden></div>
@@ -66,6 +76,7 @@
           </div>
         </div>
 
+  {lang === 'en' && (
   <Fragment slot="prose">
         <h2>What it measures</h2>
         <p>
@@ -84,7 +95,7 @@
         <h2>Why it runs in your browser</h2>
         <p>
           Every comparable tool asks you to upload the track first. That is a consequence of how they
-          are built, not a requirement of the problem — the analysis is a few million floating-point
+          are built, not a requirement of the problem, the analysis is a few million floating-point
           operations, which a phone does without noticing.
         </p>
         <p>
@@ -93,7 +104,8 @@
           device there for the same reason it does here: sending someone’s footage to a server to
           answer a question the device can answer is a cost, not a feature.
         </p>
-  </Fragment>
+    </Fragment>
+)}
 <style>
 
     .status { margin-top: 16px; font-size: 15px; color: var(--muted); }

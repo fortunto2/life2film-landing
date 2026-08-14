@@ -1,4 +1,14 @@
 ---
+import { CHROME } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+
 /**
  * The video-splitter interface: markup and behaviour, with no page metadata.
  *
@@ -10,8 +20,8 @@
 <div class="tool" slot="tool">
           <label class="drop" id="drop" for="file">
             <input type="file" id="file" accept="video/*" hidden />
-            <strong>Choose a video file</strong>
-            <span class="muted">or drag it here — MP4, MOV (H.264), WebM · up to 10 minutes</span>
+            <strong>{chrome.chooseVideo}</strong>
+            <span class="muted">{chrome.dragHint} — MP4, MOV (H.264), WebM · up to 10 minutes</span>
           </label>
 
           <div class="controls" id="controls" hidden>
@@ -44,12 +54,13 @@
           <div class="clips" id="clipGrid"></div>
         </div>
 
+  {lang === 'en' && (
   <Fragment slot="prose">
         <h2>Why cut on the shot, not on the clock</h2>
         <p>
           A thirty-second rule knows nothing about the video it is cutting. It will end a clip in the
           middle of a movement and open the next one on the tail of it, and the join is visible to
-          anyone watching — the first second of a clip is the second that decides whether they stay.
+          anyone watching, the first second of a clip is the second that decides whether they stay.
         </p>
         <p>
           A shot change is a boundary the footage already contains. Starting there means each clip
@@ -65,8 +76,8 @@
         </p>
         <p>
           What it does have is the picture: where the shots are, and which of them are sharp,
-          well-exposed and worth a viewer's attention. For footage without much talking — travel,
-          action, b-roll, anything shot on a gimbal — that is the information that matters.
+          well-exposed and worth a viewer's attention. For footage without much talking (travel,
+          action, b-roll, anything shot on a gimbal) that is the information that matters.
         </p>
 
         <h2>How it works</h2>
@@ -76,7 +87,8 @@
           so no cut ever lands inside a shot. Encoding uses the browser's own video pipeline, so the
           output is a normal MP4 with no watermark.
         </p>
-  </Fragment>
+    </Fragment>
+)}
 <style>
     select {
       padding: 9px 12px; border-radius: 10px; font: inherit; font-size: 14px; cursor: pointer;

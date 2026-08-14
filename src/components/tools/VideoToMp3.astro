@@ -1,4 +1,14 @@
 ---
+import { CHROME } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+
 /**
  * The video-to-mp3 interface: markup and behaviour, with no page metadata.
  *
@@ -10,8 +20,8 @@
 <div class="tool" slot="tool">
     <label class="drop" id="drop" for="file">
       <input type="file" id="file" accept="video/*,audio/*" hidden />
-      <strong>Choose a video or audio file</strong>
-      <span class="muted">or drag it here — MP4, MOV, WebM, M4A</span>
+      <strong>{chrome.chooseFile}</strong>
+      <span class="muted">{chrome.dragHint} — MP4, MOV, WebM, M4A</span>
     </label>
 
     <div id="editor" hidden>
@@ -56,17 +66,18 @@
     </div>
   </div>
 
+  {lang === 'en' && (
   <Fragment slot="prose">
     <h2>What extracting audio actually is</h2>
     <p>
-      A video file is a container holding separate tracks — picture in one, sound in another. They
+      A video file is a container holding separate tracks, picture in one, sound in another. They
       are already independent, so pulling the audio out is not a conversion in the usual sense: the
       picture is simply left behind.
     </p>
     <p>
       What happens next depends on the format you choose. WAV takes the decoded audio as it is and
       writes it uncompressed, which loses nothing and produces a large file. MP3 and OGG re-encode
-      it, which is why the bitrate matters — and why converting a file that was already compressed
+      it, which is why the bitrate matters, and why converting a file that was already compressed
       once cannot recover what the first encoder discarded, no matter how high you set it.
     </p>
 
@@ -86,7 +97,8 @@
       the <a href="/tools/video-trimmer/">trimmer</a>. To convert the video itself between formats,
       use the <a href="/tools/video-converter/">converter</a>.
     </p>
-  </Fragment>
+    </Fragment>
+)}
 <style>
 </style>
 

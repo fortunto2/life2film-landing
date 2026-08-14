@@ -42,5 +42,5 @@ const Tool = COMPONENTS[slug as keyof typeof COMPONENTS];
 ---
 
 <ToolPage slug={slug} lang={lang}>
-  <Tool slot="tool" />
+  <Tool slot="tool" lang={lang} />
 </ToolPage>
