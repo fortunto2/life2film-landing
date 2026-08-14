@@ -1,7 +1,20 @@
 ---
 import { languages, localePath, rtl, useTranslations, type Lang } from '../i18n';
-interface Props { lang: Lang; title: string; description: string; basePath?: string }
-const { lang, title, description, basePath = '/' } = Astro.props;
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  basePath?: string;
+  /**
+   * Whether this page exists in every locale.
+   *
+   * The tools are English-only. Advertising `/ru/tools/` in hreflang because the pattern holds for
+   * the rest of the site would point Google at pages that 404 — a page must not claim translations
+   * it does not have.
+   */
+  localized?: boolean;
+}
+const { lang, title, description, basePath = '/', localized = true } = Astro.props;
 const langEntries = Object.entries(languages) as [Lang, string][];
 const t = useTranslations(lang);
 
@@ -87,11 +100,15 @@ const jsonLd = {
   <meta property="og:site_name" content="Life2Film" />
   <meta property="og:image" content="/img/hero.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="canonical" href={`https://life2film.com${localePath(lang, basePath)}`} />
-  {langEntries.map(([code]) => (
-    <link rel="alternate" hreflang={code} href={`https://life2film.com${localePath(code, basePath)}`} />
-  ))}
-  <link rel="alternate" hreflang="x-default" href={`https://life2film.com${localePath('en', basePath)}`} />
+  <link rel="canonical" href={`https://life2film.com${localized ? localePath(lang, basePath) : basePath}`} />
+  {localized && (
+    <>
+      {langEntries.map(([code]) => (
+        <link rel="alternate" hreflang={code} href={`https://life2film.com${localePath(code, basePath)}`} />
+      ))}
+      <link rel="alternate" hreflang="x-default" href={`https://life2film.com${localePath('en', basePath)}`} />
+    </>
+  )}
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎞️</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -129,6 +146,7 @@ const jsonLd = {
       <div class="navlinks">
         <a href={localePath(lang, '/about')}>{t('navAbout')}</a>
         <a href={localePath(lang, '/studio')}>{t('navStudio')}</a>
+        <a href={'/tools/'}>Tools</a>
         <a href={'/blog/'}>{t('navBlog')}</a>
         <a href={localePath(lang, '/support')}>{t('navSupport')}</a>
       </div>
