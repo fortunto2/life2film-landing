@@ -2,6 +2,8 @@
 import { languages, localePath, rtl, useTranslations, type Lang } from '../i18n';
 interface Props {
   lang: Lang;
+  /** Social preview. Absolute URL is built here; pass a root-relative path. */
+  image?: string;
   title: string;
   description: string;
   basePath?: string;
@@ -17,7 +19,9 @@ interface Props {
    */
   locales?: Lang[];
 }
-const { lang, title, description, basePath = '/', locales } = Astro.props;
+const { lang, title, description, basePath = '/', locales, image = '/img/og.png' } = Astro.props;
+
+const SITE = 'https://life2film.com';
 
 const alternates = locales ?? (Object.keys(languages) as Lang[]);
 const t = useTranslations(lang);
@@ -100,17 +104,31 @@ const jsonLd = {
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content={`https://life2film.com${localePath(lang, basePath)}`} />
+  <meta property="og:url" content={`${SITE}${localePath(lang, basePath)}`} />
   <meta property="og:site_name" content="Life2Film" />
-  <meta property="og:image" content="/img/hero.png" />
+  {/*
+    Absolute, because the Open Graph spec requires it — a root-relative path is not resolved by
+    most scrapers, so the card rendered with no image at all. The picture is 1200×630, which is
+    what `summary_large_image` expects; the previous one was a 552×1200 phone screenshot and was
+    cropped to a sliver in every feed.
+  */}
+  <meta property="og:image" content={`${SITE}${image}`} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content={title} />
+  <meta property="og:locale" content={lang === 'en' ? 'en_US' : lang} />
+  {alternates.filter((code) => code !== lang).map((code) => (
+    <meta property="og:locale:alternate" content={code === 'en' ? 'en_US' : code} />
+  ))}
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="canonical" href={`https://life2film.com${localePath(lang, basePath)}`} />
+  <meta name="twitter:image" content={`${SITE}${image}`} />
+  <link rel="canonical" href={`${SITE}${localePath(lang, basePath)}`} />
   {alternates.length > 1 && (
     <>
       {alternates.map((code) => (
-        <link rel="alternate" hreflang={code} href={`https://life2film.com${localePath(code, basePath)}`} />
+        <link rel="alternate" hreflang={code} href={`${SITE}${localePath(code, basePath)}`} />
       ))}
-      <link rel="alternate" hreflang="x-default" href={`https://life2film.com${localePath('en', basePath)}`} />
+      <link rel="alternate" hreflang="x-default" href={`${SITE}${localePath('en', basePath)}`} />
     </>
   )}
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎞️</text></svg>" />
