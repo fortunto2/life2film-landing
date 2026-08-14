@@ -28,10 +28,12 @@ What makes it different from other video editors:
 - [About](https://life2film.com/about): why it exists, the film-made-of-films idea
 - [Studio](https://life2film.com/studio): the desktop analyser — features it measures, install
 - [Privacy](https://life2film.com/privacy): what stays on device, what can leave, and when
+- [Engine](https://life2film.com/engine/): the analysis engine as an npm package, with a skill for
+  coding agents
 - [Support](https://life2film.com/support): contact and common questions
 - [Blog](https://life2film.com/blog): notes on the topics below
 
-The site is also available in Russian (/ru) and Turkish (/tr). Blog posts are English only.
+The site is also available in Spanish, Portuguese, Indonesian, Arabic, Russian and Turkish (/es, /pt, /id, /ar, /ru, /tr); tools and engine pages are English only. Blog posts are English only.
 
 ## Articles
 

@@ -21,6 +21,9 @@ importers:
         specifier: ^1.54.0
         version: 1.54.0
     devDependencies:
+      life2film-engine:
+        specifier: ^0.1.2
+        version: 0.1.2
       vitest:
         specifier: ^4.1.10
         version: 4.1.10(@types/node@24.13.3)(vite@6.4.3(@types/node@24.13.3))
@@ -1129,6 +1132,10 @@ packages:
   kleur@3.0.3:
     resolution: {integrity: sha512-eTIzlVOSUR+JxdDFepEYcBMtZ9Qqdef+rnzWdRZuMbOywu5tO2w2N7rqjoANZ5k9vywhL6Br1VRjUIgTQx4E8w==}
     engines: {node: '>=6'}
+
+  life2film-engine@0.1.2:
+    resolution: {integrity: sha512-Vo6uRm+Zcsyu8Ogf1u9mGPoOGItwZWz+OmAJQJ4it3Km+BEy32xNx8pRHGZdOAT2JxrptFILFUipZOz8LXpYlg==}
+    engines: {node: '>=18'}
 
   longest-streak@3.1.0:
     resolution: {integrity: sha512-9Ri+o0JYgehTaVBBDoMqIl8GXtbWg711O3srftcHhZ0dqnETqLaoIK0x17fUw9rFSlK/0NlsKe0Ahhyl5pXE2g==}
@@ -2861,6 +2868,8 @@ snapshots:
       argparse: 2.0.1
 
   kleur@3.0.3: {}
+
+  life2film-engine@0.1.2: {}
 
   longest-streak@3.1.0: {}
 

@@ -216,7 +216,9 @@ const faq = [
     probe, encodeDetailed, saveBlob, formatBytes, preciseClock,
     CONTAINER_EXTENSION, type Container, type Probe,
   } from '../../lib/encode';
-  import { budgetFor, correctBitrate, sourceBitrate, SIZE_PRESETS, MIN_VIDEO_BITRATE } from '../../lib/bitrate';
+  import {
+    budgetFor, encodeToTargetSize, presetOptions, parseTarget, AUDIO_BITRATE, reasonableBitrate,
+  } from '../../lib/bitrate';
 
   const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -227,7 +229,6 @@ const faq = [
   const statusEl = el<HTMLDivElement>('status');
 
   const MB = 1024 * 1024;
-  const AUDIO_BITRATE = 128_000;
 
   let file: File | null = null;
   let info: Probe | null = null;
@@ -237,9 +238,7 @@ const faq = [
   let outPoint = 0;
   let busy = false;
 
-  el('preset').innerHTML =
-    SIZE_PRESETS.map((p, i) => `<option value="${p.bytes}"${i === 0 ? ' selected' : ''}>${p.label}</option>`).join('') +
-    '<option value="custom">Custom…</option>';
+  el('preset').innerHTML = presetOptions();
 
   function status(message: string, fraction?: number, isError = false) {
     statusEl.hidden = false;
@@ -260,20 +259,71 @@ const faq = [
     el<HTMLInputElement>('inValue').value = preciseClock(inPoint);
     el<HTMLInputElement>('outValue').value = preciseClock(outPoint);
     el('selectionLength').textContent = `${(outPoint - inPoint).toFixed(1)}s selected`;
-    refreshEstimate();
+    // Only the number depends on the handles. The mode note and the control visibility do not, and
+    // rewriting a 250-character paragraph on every pointermove invalidated layout ~120 times a
+    // second on the same frame that also seeks the video.
+    refreshSizeEstimate();
   }
 
   const mode = () => el<HTMLSelectElement>('mode').value as 'copy' | 'reencode' | 'size';
   const selectionLength = () => Math.max(0.1, outPoint - inPoint);
 
-  function targetBytes(): number {
-    const value = el<HTMLSelectElement>('preset').value;
-    if (value !== 'custom') return Number(value);
-    const mb = parseFloat(el<HTMLInputElement>('customSize').value.replace(',', '.'));
-    return Number.isFinite(mb) && mb > 0 ? mb * MB : 10 * MB;
+  const targetBytes = () =>
+    parseTarget(el<HTMLSelectElement>('preset').value, el<HTMLInputElement>('customSize').value);
+
+  const NOTES = {
+    copy:
+      'The picture is passed through untouched — no generation loss, and several times faster. ' +
+      'When your in-point does not fall on a keyframe, the file carries the frames back to the ' +
+      'previous one so playback still starts exactly where you set it, which makes it larger ' +
+      'than a re-encode would be.',
+    size: 'Re-encoded to land under the target, correcting once if the first pass misses.',
+    reencode:
+      'Re-encoded at a normal quality — frame-accurate at the in-point, one generation of compression.',
+  };
+
+  /**
+   * The size readout, which is the only thing that moves with the handles.
+   *
+   * Split from the mode UI below because `draw()` calls this on every pointermove — up to 120 times
+   * a second while dragging, on the same frame that seeks the video.
+   */
+  function refreshSizeEstimate() {
+    if (!info) return;
+    const current = mode();
+    const share = selectionLength() / info.duration;
+
+    if (current === 'copy') {
+      // Copied video keeps the source bitrate, so the size follows the selection length directly.
+      el('estimate').textContent = `≈ ${formatBytes(info.size * share)}`;
+      el<HTMLButtonElement>('save').disabled = false;
+      return;
+    }
+
+    if (current === 'reencode') {
+      el('estimate').textContent = `≈ ${formatBytes(info.size * share * 0.6)}`;
+      el<HTMLButtonElement>('save').disabled = false;
+      return;
+    }
+
+    const target = targetBytes();
+    const budget = budgetFor({
+      targetBytes: target * 0.96,
+      duration: selectionLength(),
+      audioBitrate: el<HTMLInputElement>('mute').checked || !info.hasAudio ? 0 : AUDIO_BITRATE,
+    });
+
+    if (!budget.achievable) {
+      el('estimate').textContent = '';
+      el<HTMLButtonElement>('save').disabled = true;
+      return;
+    }
+
+    el('estimate').textContent = `≈ ${formatBytes(target)} at ${Math.round(budget.videoBitrate / 1000)} kbps`;
+    el<HTMLButtonElement>('save').disabled = false;
   }
 
-  /** What the chosen mode implies, said before anything is encoded. */
+  /** Which controls are visible and what the note says — changes only when a control does. */
   function refreshEstimate() {
     if (!info) return;
     const current = mode();
@@ -284,51 +334,16 @@ const faq = [
     // Copying only works into a container that already holds this codec, so format is fixed there.
     el('formatWrap').hidden = current === 'copy';
 
-    if (current === 'copy') {
-      // Copied video keeps the source bitrate, so the size follows the selection length directly.
-      const share = selectionLength() / info.duration;
-      el('estimate').textContent = `≈ ${formatBytes(info.size * share)}`;
-      note.classList.remove('warn');
-      note.textContent =
-        'The picture is passed through untouched — no generation loss, and several times faster. ' +
-        'When your in-point does not fall on a keyframe, the file carries the frames back to the ' +
-        'previous one so playback still starts exactly where you set it, which makes it larger ' +
-        'than a re-encode would be.';
-      el<HTMLButtonElement>('save').disabled = false;
-      return;
-    }
+    refreshSizeEstimate();
 
-    if (current === 'size') {
-      const target = targetBytes();
-      const budget = budgetFor({
-        targetBytes: target * 0.96,
-        duration: selectionLength(),
-        audioBitrate: el<HTMLInputElement>('mute').checked ? 0 : AUDIO_BITRATE,
-      });
-
-      if (!budget.achievable) {
-        el('estimate').textContent = '';
-        note.classList.add('warn');
-        note.textContent =
-          `${formatBytes(target)} is not possible for a ${selectionLength().toFixed(1)}s clip — ` +
-          `the smallest watchable result is about ${formatBytes(budget.floorBytes)}. ` +
-          `Shorten the selection or raise the target.`;
-        el<HTMLButtonElement>('save').disabled = true;
-        return;
-      }
-
-      el('estimate').textContent = `≈ ${formatBytes(target)} at ${Math.round(budget.videoBitrate / 1000)} kbps`;
-      note.classList.remove('warn');
-      note.textContent = 'Re-encoded to land under the target, correcting once if the first pass misses.';
-      el<HTMLButtonElement>('save').disabled = false;
-      return;
-    }
-
-    const share = selectionLength() / info.duration;
-    el('estimate').textContent = `≈ ${formatBytes(info.size * share * 0.6)}`;
-    note.classList.remove('warn');
-    note.textContent = 'Re-encoded at a normal quality — frame-accurate at the in-point, one generation of compression.';
-    el<HTMLButtonElement>('save').disabled = false;
+    // An unreachable target is the one case where the note depends on the selection, so it is
+    // recomputed here from what the estimate just decided.
+    const impossible = current === 'size' && el<HTMLButtonElement>('save').disabled;
+    note.classList.toggle('warn', impossible);
+    note.textContent = impossible
+      ? `${formatBytes(targetBytes())} is not possible for a ${selectionLength().toFixed(1)}s clip. ` +
+        'Shorten the selection or raise the target.'
+      : NOTES[current];
   }
 
   /** Accepts `12.5`, `1:04`, `1:04.5` — whichever way someone happens to think about time. */
@@ -533,65 +548,57 @@ const faq = [
     }
   });
 
-  /** Same two-pass approach the compressor uses, applied to the selected range. */
+  /**
+   * Fit the selection into a size.
+   *
+   * Picks a resolution for the bitrate first, exactly as the compressor does — this copy used to
+   * pass no width at all, so trimming a 4K clip to 10 MB spent a 480p bitrate on 4K frames, which
+   * is the failure `autoWidth` exists to prevent.
+   */
   async function trimToSize(
     source: File,
     trim: { start: number; end: number },
     container: Container,
-    muted: boolean,
+    silent: boolean,
   ): Promise<Blob> {
-    const target = targetBytes();
-    const aim = target * 0.96;
     const length = selectionLength();
-    const budget = budgetFor({
-      targetBytes: aim,
+    const audioBitrate = silent || !info?.hasAudio ? 0 : AUDIO_BITRATE;
+    const target = targetBytes();
+    const budget = budgetFor({ targetBytes: target * 0.96, duration: length, audioBitrate });
+    const width = info ? Math.min(autoWidth(budget.videoBitrate, info.width), info.width) : undefined;
+
+    return encodeToTargetSize({
+      targetBytes: target,
       duration: length,
-      audioBitrate: muted ? 0 : AUDIO_BITRATE,
+      audioBitrate,
+      onStatus: (message, fraction) => status(message, fraction),
+      run: (videoBitrate, onProgress) =>
+        encodeDetailed(source, {
+          container,
+          trim,
+          ...(width ? { width } : {}),
+          videoBitrate,
+          audioBitrate: AUDIO_BITRATE,
+          discardAudio: silent,
+          onProgress,
+        }).then((r) => r.blob),
     });
-
-    status(`Encoding at ${Math.round(budget.videoBitrate / 1000)} kbps…`, 0);
-
-    const first = await encodeDetailed(source, {
-      container,
-      trim,
-      videoBitrate: budget.videoBitrate,
-      audioBitrate: AUDIO_BITRATE,
-      discardAudio: muted,
-      onProgress: (p) => status(`Encoding — ${Math.round(p * 100)}%`, p * 0.5),
-    });
-
-    const missed = Math.abs(first.blob.size - aim) / aim;
-    if (first.blob.size <= target && missed <= 0.04) return first.blob;
-
-    const corrected = correctBitrate(budget.videoBitrate, first.blob.size, aim);
-    if (Math.abs(corrected - budget.videoBitrate) / budget.videoBitrate <= 0.02 || corrected <= MIN_VIDEO_BITRATE) {
-      return first.blob;
-    }
-
-    status(
-      `First pass came out ${formatBytes(first.blob.size)} — retrying at ${Math.round(corrected / 1000)} kbps…`,
-      0.5,
-    );
-
-    const second = await encodeDetailed(source, {
-      container,
-      trim,
-      videoBitrate: corrected,
-      audioBitrate: AUDIO_BITRATE,
-      discardAudio: muted,
-      onProgress: (p) => status(`Second pass — ${Math.round(p * 100)}%`, 0.5 + p * 0.5),
-    });
-
-    if (second.blob.size <= target && first.blob.size <= target) {
-      return second.blob.size > first.blob.size ? second.blob : first.blob;
-    }
-    return second.blob.size <= target ? second.blob : first.blob;
   }
 
-  for (const id of ['mode', 'preset', 'customSize', 'mute', 'container']) {
+  /** Resolution that suits the bitrate being spent — same ladder the compressor uses. */
+  function autoWidth(videoBitrate: number, sourceWidth: number): number {
+    for (const width of [3840, 2560, 1920, 1280, 854, 640]) {
+      if (width <= sourceWidth && videoBitrate >= reasonableBitrate(width) * 0.55) return width;
+    }
+    return Math.min(640, sourceWidth);
+  }
+
+  // `change` on selects and checkboxes, `input` only on the free-text field: both events fire for
+  // one action on a select, which ran every recompute twice.
+  for (const id of ['mode', 'preset', 'mute', 'container']) {
     el(id).addEventListener('change', refreshEstimate);
-    el(id).addEventListener('input', refreshEstimate);
   }
+  el('customSize').addEventListener('input', refreshEstimate);
 
   // --- input ---
 

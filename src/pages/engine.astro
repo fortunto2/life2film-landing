@@ -1,14 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { readFileSync } from 'node:fs';
-
-// The skill ships inside the npm package, and this page shows the same file — read at build time so
-// the two cannot drift. If the package moves, this fails loudly at build rather than serving a
-// stale copy.
-const skill = readFileSync(
-  new URL('../../../life2film/video-analyzer/npm-package/SKILL.md', import.meta.url),
-  'utf-8',
-);
+import { ENGINE_VERSION } from '../lib/skill';
 
 const title = 'life2film-engine — on-device video analysis as a package';
 const description =
@@ -39,7 +31,7 @@ const jsonLd = {
       operatingSystem: 'Any browser with WebAssembly, or Node 18+',
       url: 'https://life2film.com/engine/',
       downloadUrl: 'https://www.npmjs.com/package/life2film-engine',
-      softwareVersion: '0.1.1',
+      softwareVersion: ENGINE_VERSION,
       publisher: { '@id': 'https://life2film.com/#org' },
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       license: 'https://polyformproject.org/licenses/noncommercial/1.0.0/',
@@ -127,9 +119,14 @@ const jsonLd = {
           </div>
         </div>
 
-        <details class="skillbox">
+        <!--
+          The skill is fetched rather than inlined. At 6.8 KB it was 37% of this page's transferred
+          HTML, shipped to every visitor to sit inside a disclosure almost nobody opens — and the
+          same bytes are already served at /engine/skill.md.
+        -->
+        <details class="skillbox" id="skillbox">
           <summary>Read it here</summary>
-          <pre><code id="skillText" set:text={skill} /></pre>
+          <pre><code id="skillText">Loading…</code></pre>
         </details>
 
         <p class="muted small">
@@ -328,25 +325,31 @@ export const BeatFlash = ({ beats, bpm }) => {
   </style>
 
   <script>
-    async function copy(text: string, button: HTMLButtonElement, label: string) {
-      try {
-        await navigator.clipboard.writeText(text);
-        button.textContent = 'Copied';
-      } catch {
-        button.textContent = 'Press ⌘C';
-      }
-      setTimeout(() => { button.textContent = label; }, 2500);
-    }
+    import { copyText } from '../lib/clipboard';
 
-    const install = document.getElementById('copyInstall') as HTMLButtonElement;
+    const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+    // Fetched once, then reused by both the disclosure and the copy button.
+    let skillPromise: Promise<string> | null = null;
+    const loadSkill = () => (skillPromise ??= fetch('/engine/skill.md').then((r) => r.text()));
+
+    el('skillbox').addEventListener('toggle', async (event) => {
+      if (!(event.target as HTMLDetailsElement).open) return;
+      const target = el('skillText');
+      if (target.dataset.loaded) return;
+      target.textContent = await loadSkill();
+      target.dataset.loaded = 'yes';
+    });
+
+    const install = el<HTMLButtonElement>('copyInstall');
     install.addEventListener('click', () =>
-      copy(document.getElementById('installCmd')!.textContent ?? '', install, 'Copy'),
+      copyText(el('installCmd').textContent ?? '', install, 'Copy', el('installCmd')),
     );
 
-    const skill = document.getElementById('copySkill') as HTMLButtonElement;
-    skill.addEventListener('click', () => {
-      // The skill lives in a <details> that may be closed; textContent is there regardless.
-      copy(document.getElementById('skillText')!.textContent ?? '', skill, 'Copy skill');
+    const skill = el<HTMLButtonElement>('copySkill');
+    skill.addEventListener('click', async () => {
+      skill.textContent = 'Fetching…';
+      copyText(await loadSkill(), skill, 'Copy skill', el('skillText'));
     });
   </script>
 </Base>

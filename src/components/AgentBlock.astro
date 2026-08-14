@@ -90,6 +90,8 @@ const { job, code, prompt } = Astro.props;
 </style>
 
 <script>
+  import { copyText } from '../lib/clipboard';
+
   for (const block of document.querySelectorAll<HTMLElement>('.agentblock')) {
     const tabs = block.querySelectorAll<HTMLButtonElement>('.tab');
     const panels = block.querySelectorAll<HTMLElement>('.panel');
@@ -102,26 +104,9 @@ const { job, code, prompt } = Astro.props;
     }
 
     for (const button of block.querySelectorAll<HTMLButtonElement>('.copy')) {
-      button.addEventListener('click', async () => {
-        const panel = block.querySelector<HTMLElement>(`.panel[data-panel="${button.dataset.copy}"]`);
-        const text = panel?.querySelector('code')?.textContent ?? '';
-        try {
-          await navigator.clipboard.writeText(text);
-          button.textContent = 'Copied';
-          button.classList.add('done');
-        } catch {
-          // Clipboard is refused without a secure context or a user gesture the browser trusts;
-          // selecting the text is the fallback that always works.
-          const range = document.createRange();
-          range.selectNodeContents(panel!.querySelector('code')!);
-          getSelection()?.removeAllRanges();
-          getSelection()?.addRange(range);
-          button.textContent = 'Selected — press ⌘C';
-        }
-        setTimeout(() => {
-          button.textContent = 'Copy';
-          button.classList.remove('done');
-        }, 2500);
+      button.addEventListener('click', () => {
+        const code = block.querySelector(`.panel[data-panel="${button.dataset.copy}"] code`);
+        copyText(code?.textContent ?? '', button, 'Copy', code);
       });
     }
   }

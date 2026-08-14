@@ -52,7 +52,6 @@ export interface EncodeOptions {
   /** Drop the sound — used to make a file smaller when nobody will hear it. */
   discardAudio?: boolean;
   mono?: boolean;
-  sampleRate?: number;
   onProgress?: (fraction: number) => void;
 }
 
@@ -89,7 +88,7 @@ export const CONTAINER_EXTENSION: Record<Container, string> = {
 /** Containers that hold no picture — asking for video options with these is a contradiction. */
 const AUDIO_ONLY = new Set<Container>(['wav', 'mp3', 'ogg']);
 
-export const isAudioOnly = (container: Container) => AUDIO_ONLY.has(container);
+const isAudioOnly = (container: Container) => AUDIO_ONLY.has(container);
 
 /** Loaded once and shared: two tools on one page must not fetch 670 KB twice. */
 let libraryPromise: Promise<typeof import('mediabunny')> | null = null;
@@ -151,13 +150,15 @@ export async function encodeDetailed(file: File, options: EncodeOptions): Promis
     registerMp3Encoder();
   }
 
-  const quality = {
-    very_low: library.QUALITY_VERY_LOW,
-    low: library.QUALITY_LOW,
-    medium: library.QUALITY_MEDIUM,
-    high: library.QUALITY_HIGH,
-    very_high: library.QUALITY_VERY_HIGH,
-  }[options.quality ?? 'medium'];
+  const quality = options.quality
+    ? {
+        very_low: library.QUALITY_VERY_LOW,
+        low: library.QUALITY_LOW,
+        medium: library.QUALITY_MEDIUM,
+        high: library.QUALITY_HIGH,
+        very_high: library.QUALITY_VERY_HIGH,
+      }[options.quality]
+    : undefined;
 
   const format = {
     mp4: () => new Mp4OutputFormat(),
@@ -172,46 +173,45 @@ export async function encodeDetailed(file: File, options: EncodeOptions): Promis
   const output = new Output({ format, target: new BufferTarget() });
 
   const dropVideo = options.discardVideo || isAudioOnly(options.container);
-  const audioOnlyContainer = isAudioOnly(options.container);
+
+  // A number aims at a size; a quality name aims at a look. The number wins when both are given,
+  // because a size target is a hard constraint and a quality preference is not.
+  const videoBitrate = options.videoBitrate ?? quality;
+
+  // Decided once, up front. This was previously inferred from `Object.keys(video).length` after the
+  // object had been mutated twice — order-dependent, and silently wrong the moment a video key that
+  // does not imply a transcode gets added.
+  const transcode =
+    !dropVideo &&
+    Boolean(options.width || options.height || options.fit || videoBitrate || options.forceTranscode);
 
   const video = dropVideo
     ? { discard: true as const }
-    : {
-        ...(options.width ? { width: options.width } : {}),
-        ...(options.height ? { height: options.height } : {}),
-        ...(options.fit ? { fit: options.fit } : {}),
-        // A number aims at a size; a quality name aims at a look. The number wins when both are
-        // given, because a size target is a hard constraint and a quality preference is not.
-        ...(options.videoBitrate
-          ? { bitrate: options.videoBitrate }
-          : options.quality
-            ? { bitrate: quality }
-            : {}),
-      };
+    : transcode
+      ? {
+          ...(options.width && { width: options.width }),
+          ...(options.height && { height: options.height }),
+          ...(options.fit && { fit: options.fit }),
+          ...(videoBitrate && { bitrate: videoBitrate }),
+          ...(options.forceTranscode && { forceTranscode: true }),
+          // Measured on an M5 at 1080p: 180 fps against 34 fps for the software path — and the
+          // software encoder also overshot the requested bitrate more than threefold, so this is
+          // about output size as much as speed.
+          hardwareAcceleration: 'prefer-hardware' as const,
+        }
+      : {};
 
-  if (options.forceTranscode && !dropVideo) {
-    Object.assign(video, { forceTranscode: true });
-  }
-
-  // Ask for the hardware encoder explicitly. Measured on an M5: 180 fps against 34 fps for the
-  // software path at 1080p — and the software encoder also overshot the requested bitrate more
-  // than threefold, so this is about output size as much as speed.
-  const wantsTranscode = Object.keys(video).length > 0 && !dropVideo;
-  if (wantsTranscode) {
-    Object.assign(video, { hardwareAcceleration: 'prefer-hardware' as const });
-  }
+  // WAV is uncompressed: sample rate × bit depth × channels, with no bitrate to choose. Every other
+  // container here has one. Testing `isAudioOnly` instead used to lump MP3 and OGG in with WAV, and
+  // a second spread bolted the bitrate back on for MP3 only — leaving OGG silently unset while the
+  // page that offers an OGG bitrate predicted a size based on it.
+  const audioBitrate = options.container === 'wav' ? undefined : options.audioBitrate ?? quality;
 
   const audio = options.discardAudio
     ? { discard: true as const }
     : {
-        ...(options.audioBitrate && !audioOnlyContainer
-          ? { bitrate: options.audioBitrate }
-          : options.quality && !audioOnlyContainer
-            ? { bitrate: quality }
-            : {}),
-        ...(options.audioBitrate && options.container === 'mp3' ? { bitrate: options.audioBitrate } : {}),
-        ...(options.mono ? { numberOfChannels: 1 } : {}),
-        ...(options.sampleRate ? { sampleRate: options.sampleRate } : {}),
+        ...(audioBitrate && { bitrate: audioBitrate }),
+        ...(options.mono && { numberOfChannels: 1 }),
       };
 
   const conversion = await Conversion.init({
@@ -245,7 +245,7 @@ export async function encodeDetailed(file: File, options: EncodeOptions): Promis
 
   return {
     blob: new Blob([buffer], { type: CONTAINER_MIME[options.container] }),
-    copiedVideo: !wantsTranscode && !dropVideo,
+    copiedVideo: !transcode && !dropVideo,
   };
 }
 

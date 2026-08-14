@@ -92,14 +92,79 @@ export function reasonableBitrate(width: number): number {
 export interface Preset {
   label: string;
   bytes: number;
-  note: string;
 }
+
+const MB = 1024 * 1024;
 
 /** Where the common hard limits actually are. */
 export const SIZE_PRESETS: Preset[] = [
-  { label: '10 MB — Discord', bytes: 10 * 1024 * 1024, note: 'Free Discord upload limit' },
-  { label: '16 MB — WhatsApp', bytes: 16 * 1024 * 1024, note: 'WhatsApp video limit' },
-  { label: '25 MB — email', bytes: 25 * 1024 * 1024, note: 'Gmail and most mail servers' },
-  { label: '50 MB — Discord Nitro Basic', bytes: 50 * 1024 * 1024, note: 'Nitro Basic upload limit' },
-  { label: '100 MB', bytes: 100 * 1024 * 1024, note: '' },
+  { label: '10 MB — Discord', bytes: 10 * MB },
+  { label: '16 MB — WhatsApp', bytes: 16 * MB },
+  { label: '25 MB — email', bytes: 25 * MB },
+  { label: '50 MB — Discord Nitro Basic', bytes: 50 * MB },
+  { label: '100 MB', bytes: 100 * MB },
 ];
+
+/** What a typical AAC track costs, charged against every size budget. */
+export const AUDIO_BITRATE = 128_000;
+
+/** The preset `<select>` markup, so two pages cannot offer different limits. */
+export const presetOptions = () =>
+  SIZE_PRESETS.map((p, i) => `<option value="${p.bytes}"${i === 0 ? ' selected' : ''}>${p.label}</option>`).join('') +
+  '<option value="custom">Custom…</option>';
+
+/** Read a target out of the preset select plus the custom megabytes field. */
+export function parseTarget(selected: string, customText: string): number {
+  if (selected !== 'custom') return Number(selected);
+  // Commas are how half the world writes a decimal point.
+  const mb = parseFloat(customText.replace(',', '.'));
+  return Number.isFinite(mb) && mb > 0 ? mb * MB : 10 * MB;
+}
+
+/**
+ * Encode at a bitrate chosen to hit a size, then correct once if the encoder missed.
+ *
+ * Two passes is the ceiling: a third rarely improves on the second and doubles the wait again.
+ * Anything within 4% counts as hit — inside the noise of rate control, and the aim is already set
+ * below the real limit.
+ *
+ * `run` is injected because the two callers encode different things (a whole file, a trimmed range)
+ * but decide identically. Keeping the decision here means the constants live in one place and the
+ * loop is reachable from tests, which it was not while it sat inside two `<script>` blocks.
+ */
+export async function encodeToTargetSize(options: {
+  targetBytes: number;
+  duration: number;
+  audioBitrate: number;
+  run: (videoBitrate: number, onProgress: (fraction: number) => void) => Promise<Blob>;
+  onStatus?: (message: string, fraction: number) => void;
+}): Promise<Blob> {
+  const { targetBytes, duration, audioBitrate, run, onStatus } = options;
+
+  // Aim under the wall: a file of exactly 10.00 MB is still refused by a 10 MB limit.
+  const aim = targetBytes * 0.96;
+  const budget = budgetFor({ targetBytes: aim, duration, audioBitrate });
+
+  onStatus?.(`Encoding at ${Math.round(budget.videoBitrate / 1000)} kbps…`, 0);
+  const first = await run(budget.videoBitrate, (p) => onStatus?.(`Encoding — ${Math.round(p * 100)}%`, p * 0.5));
+
+  const missedBy = Math.abs(first.size - aim) / aim;
+  if (first.size <= targetBytes && missedBy <= 0.04) return first;
+
+  const corrected = correctBitrate(budget.videoBitrate, first.size, aim);
+
+  // No point re-encoding at a bitrate we are already at, or below the floor.
+  const worthRetrying =
+    Math.abs(corrected - budget.videoBitrate) / budget.videoBitrate > 0.02 && corrected > MIN_VIDEO_BITRATE;
+  if (!worthRetrying) return first;
+
+  onStatus?.(
+    `First pass came out ${Math.round(first.size / MB * 10) / 10} MB — retrying at ${Math.round(corrected / 1000)} kbps…`,
+    0.5,
+  );
+  const second = await run(corrected, (p) => onStatus?.(`Second pass — ${Math.round(p * 100)}%`, 0.5 + p * 0.5));
+
+  // Keep whichever satisfies the limit; when both do, prefer the larger, since bigger means better
+  // picture.
+  return second.size <= targetBytes && (first.size > targetBytes || second.size > first.size) ? second : first;
+}

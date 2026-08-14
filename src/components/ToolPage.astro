@@ -128,6 +128,13 @@ const jsonLd = {
     .facts { display: flex; flex-wrap: wrap; gap: 22px; margin-top: 18px; font-size: 15px; color: #cfcfd6; }
     .facts b { color: var(--fg); }
 
+    .verdict {
+      margin-top: 14px; padding: 11px 14px; border-radius: 10px; font-size: 14px;
+      border: 1px solid var(--line); background: #0a0a0d; color: #cfcfd6;
+    }
+    .verdict.warn { border-color: rgba(255,166,29,.4); color: var(--orange); }
+    .verdict.bad { border-color: rgba(250,63,165,.4); color: var(--pink); }
+
     .privacy-note { margin-top: 16px; font-size: 14px; max-width: 62ch; }
     .prose .q { margin: 28px 0 8px; font-size: 17px; }
   </style>
