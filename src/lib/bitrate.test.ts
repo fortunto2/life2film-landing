@@ -161,11 +161,31 @@ describe('two-pass size targeting', () => {
     const { run } = encoder(1.25, 60);
     await encodeToTargetSize({
       targetBytes: 10 * MB, duration: 60, audioBitrate: 0, run,
-      onStatus: (_, fraction) => seen.push(fraction),
+      onStatus: (event) => seen.push(event.fraction),
     });
     expect(seen.length).toBeGreaterThan(1);
     expect(seen).toEqual([...seen].sort((a, b) => a - b));
     expect(Math.max(...seen)).toBeLessThanOrEqual(1);
+  });
+
+  test('progress reports facts, never a sentence', async () => {
+    // The library must not choose words: a Russian page reported 'Encoding at 6314 kbps…' when it
+    // did. Every field here is a number or a known token.
+    const events: unknown[] = [];
+    const { run } = encoder(1.25, 60);
+    await encodeToTargetSize({
+      targetBytes: 10 * MB, duration: 60, audioBitrate: 0, run,
+      onStatus: (event) => events.push(event),
+    });
+
+    for (const event of events as Array<Record<string, unknown>>) {
+      expect(['first', 'second']).toContain(event.pass);
+      for (const [key, value] of Object.entries(event)) {
+        if (key === 'pass') continue;
+        expect(typeof value).toBe('number');
+      }
+    }
+    expect(events.some((e) => (e as { pass: string }).pass === 'second')).toBe(true);
   });
 });
 
