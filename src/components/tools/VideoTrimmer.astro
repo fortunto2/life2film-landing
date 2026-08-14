@@ -1,4 +1,14 @@
 ---
+import { CHROME } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+
 /**
  * The video-trimmer interface: markup and behaviour, with no page metadata.
  *
@@ -10,8 +20,8 @@
 <div class="tool" slot="tool">
     <label class="drop" id="drop" for="file">
       <input type="file" id="file" accept="video/*" hidden />
-      <strong>Choose a video file</strong>
-      <span class="muted">or drag it here — MP4, MOV (H.264), WebM</span>
+      <strong>{chrome.chooseVideo}</strong>
+      <span class="muted">{chrome.dragHint} — MP4, MOV (H.264), WebM</span>
     </label>
 
     <div id="editor" hidden>
@@ -92,26 +102,27 @@
     </div>
   </div>
 
+  {lang === 'en' && (
   <Fragment slot="prose">
     <h2>Why the handles, not two boxes</h2>
     <p>
       Choosing an in-point by typing a number means guessing, checking, and typing again. Dragging a
       handle while the frame under it updates is the same decision made once. The numbers are still
-      there — you can type into them when you know exactly where the cut goes — but they follow the
+      there, you can type into them when you know exactly where the cut goes, but they follow the
       handles rather than replacing them.
     </p>
 
     <h2>Copy or re-encode</h2>
     <p>
       Video is not stored as a sequence of independent pictures. It is stored in groups that begin
-      with one complete frame — a keyframe — followed by frames that describe only what changed.
+      with one complete frame (a keyframe) followed by frames that describe only what changed.
       That is why a cut is not simply a matter of deleting bytes: everything after the in-point
       depends on what came before it.
     </p>
     <p>
       Copying keeps those groups intact and hands them over as they are, which is why nothing is
       lost and why it is quick. When the in-point lands mid-group, the frames back to the previous
-      keyframe come along for the ride — playback still starts where you asked, but the file
+      keyframe come along for the ride, playback still starts where you asked, but the file
       carries them. Re-encoding writes only your selection, producing a smaller file at the cost of
       one generation of compression.
     </p>
@@ -126,7 +137,8 @@
       changes; to make a file smaller without changing its length, use
       the <a href="/tools/video-compressor/">compressor</a>.
     </p>
-  </Fragment>
+    </Fragment>
+)}
 <style>
   video {
     width: 100%; max-height: 46vh; display: block; margin-top: 18px;

@@ -1,4 +1,14 @@
 ---
+import { CHROME } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+
 /**
  * The video-compressor interface: markup and behaviour, with no page metadata.
  *
@@ -10,8 +20,8 @@
 <div class="tool" slot="tool">
     <label class="drop" id="drop" for="file">
       <input type="file" id="file" accept="video/*" hidden />
-      <strong>Choose a video file</strong>
-      <span class="muted">or drag it here — MP4, MOV (H.264), WebM</span>
+      <strong>{chrome.chooseVideo}</strong>
+      <span class="muted">{chrome.dragHint} — MP4, MOV (H.264), WebM</span>
     </label>
 
     <div id="editor" hidden>
@@ -100,18 +110,19 @@
     </div>
   </div>
 
+  {lang === 'en' && (
   <Fragment slot="prose">
     <h2>Size is arithmetic, not a slider</h2>
     <p>
       A video file weighs its bitrate times its length. So "make this fit in 10 MB" has an exact
-      answer the moment you know how long the video is — there is no reason to make someone drag a
+      answer the moment you know how long the video is, there is no reason to make someone drag a
       quality slider, encode, check, and try again.
     </p>
     <p>
       Encoders do not hit a requested bitrate precisely; rate control drifts depending on what is in
       the frame, and a noisy handheld shot overshoots where a locked-off one comes in under. Rather
       than pad the target with a safety margin and always deliver something needlessly small, the
-      first result is measured and — if it missed — a second pass runs with the correction applied.
+      first result is measured and (if it missed) a second pass runs with the correction applied.
     </p>
 
     <h2>Why this can run in a tab at all</h2>
@@ -129,7 +140,8 @@
       To shorten a video rather than shrink it, use the <a href="/tools/video-trimmer/">trimmer</a>;
       to change format, the <a href="/tools/video-converter/">converter</a>.
     </p>
-  </Fragment>
+    </Fragment>
+)}
 <style>
   .modes { display: flex; gap: 6px; margin-top: 20px; }
   .mode {
