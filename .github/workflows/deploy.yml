@@ -24,6 +24,7 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+      - run: pnpm vitest run
       - run: pnpm build
 
       - uses: cloudflare/wrangler-action@v3

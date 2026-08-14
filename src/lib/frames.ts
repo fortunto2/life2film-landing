@@ -193,3 +193,43 @@ export function centerPixel(frame: Frame): { r: number; g: number; b: number } {
     b: Math.round(b / frame.height),
   };
 }
+
+/**
+ * Where exactly did the picture change?
+ *
+ * Walks a tight window around a candidate boundary and returns the instant of the largest
+ * frame-to-frame jump in the centre pixel. No engine call: at this resolution the question is
+ * simply which of twenty adjacent frames differs most from the one before it.
+ *
+ * Both the scene detector and the splitter refine their cuts, and they must agree — the same video
+ * through either tool should report the same boundaries. It lived in both files until one copy
+ * drifted a comment away from the other.
+ */
+export async function refineBoundary(
+  source: VideoSource,
+  boundary: number,
+  coarseStep: number,
+  width: number,
+): Promise<number> {
+  const points = refinePlan(boundary, coarseStep, coarseStep / 10, source.duration);
+  if (points.length < 2) return boundary;
+
+  let previous: { r: number; g: number; b: number } | null = null;
+  let best = boundary;
+  let biggest = -1;
+
+  for (const at of points) {
+    const pixel = centerPixel(await source.frameAt(at, width));
+    if (previous) {
+      const delta =
+        Math.abs(pixel.r - previous.r) + Math.abs(pixel.g - previous.g) + Math.abs(pixel.b - previous.b);
+      if (delta > biggest) {
+        biggest = delta;
+        best = at;
+      }
+    }
+    previous = pixel;
+  }
+
+  return best;
+}

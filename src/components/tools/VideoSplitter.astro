@@ -130,9 +130,10 @@ const status = STATUS[lang];
 </style>
 
 <script>
-  import { toolStrings, fill } from '../../lib/strings';
+  import { toolStrings } from '../../lib/strings';
+    import { saveBlob } from '../../lib/encode';
     import { loadEngine } from '../../lib/engine';
-    import { openVideo, samplePlan, refinePlan, centerPixel, type VideoSource } from '../../lib/frames';
+    import { openVideo, samplePlan, centerPixel, refineBoundary, type VideoSource } from '../../lib/frames';
     import { groupIntoClips, rankByScore, stars, type Clip, type Shot } from '../../lib/clips';
     import { clock } from '../../lib/timeline-export';
 
@@ -229,7 +230,7 @@ const status = STATUS[lang];
         const moved = new Map<number, number>();
         for (const [i, [start]] of ranges.slice(1).entries()) {
           status(`Placing cut ${i + 1} of ${ranges.length - 1}…`, 0.82 + (i / (ranges.length - 1)) * 0.16);
-          moved.set(start, await refineBoundary(source, start, coarseStep));
+          moved.set(start, await refineBoundary(source, start, coarseStep, ANALYSIS_WIDTH));
         }
 
         shots = ranges.map(([start, end]) => {
@@ -251,29 +252,6 @@ const status = STATUS[lang];
         source?.release();
         busy = false;
       }
-    }
-
-    async function refineBoundary(source: VideoSource, boundary: number, coarseStep: number): Promise<number> {
-      const points = refinePlan(boundary, coarseStep, coarseStep / 10, source.duration);
-      if (points.length < 2) return boundary;
-
-      let previous: { r: number; g: number; b: number } | null = null;
-      let best = boundary;
-      let biggest = -1;
-
-      for (const at of points) {
-        const pixel = centerPixel(await source.frameAt(at, ANALYSIS_WIDTH));
-        if (previous) {
-          const delta =
-            Math.abs(pixel.r - previous.r) + Math.abs(pixel.g - previous.g) + Math.abs(pixel.b - previous.b);
-          if (delta > biggest) {
-            biggest = delta;
-            best = at;
-          }
-        }
-        previous = pixel;
-      }
-      return best;
     }
 
     /** Regroup and redraw — cheap, because the shots are already known. */
@@ -362,12 +340,7 @@ const status = STATUS[lang];
           const buffer = output.target.buffer;
           if (!buffer) throw new Error('The encoder produced no data.');
 
-          const url = URL.createObjectURL(new Blob([buffer], { type: 'video/mp4' }));
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `${fileName}-clip-${index + 1}${wantsVertical() ? '-9x16' : ''}.mp4`;
-          a.click();
-          URL.revokeObjectURL(url);
+          saveBlob(new Blob([buffer], { type: 'video/mp4' }), `${fileName}-clip-${index + 1}${wantsVertical() ? '-9x16' : ''}.mp4`);
         }
 
         status(`Done — ${indices.length} clip${indices.length > 1 ? 's' : ''} saved.`, 1);
@@ -436,4 +409,3 @@ const status = STATUS[lang];
       if (file) void analyse(file);
     });
 </script>
-</ToolPage>

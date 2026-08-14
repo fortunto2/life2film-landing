@@ -33,7 +33,12 @@ if (!base) throw new Error(`No registry entry for tool "${slug}"`);
  * video-to-mp3 with one inbound link and the trimmer with four. Generated from the registry, every
  * tool gets the same six — and a new tool is linked from everywhere the moment it is added.
  */
-const others = TOOLS.filter((other) => other.slug !== tool.slug);
+const others = TOOLS.filter((other) => other.slug !== slug).map((other) => ({
+  slug: other.slug,
+  name: other.name,
+  // The blurb has a translation; the name does not, so it stays English on purpose.
+  blurb: TRANSLATIONS[lang]?.[other.slug]?.blurb ?? other.blurb,
+}));
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -60,7 +65,7 @@ const jsonLd = {
 };
 ---
 
-<Base lang={lang} title={tool.title} description={tool.description} basePath={`/tools/${slug}/`} localized={false} hreflangLocales={locales}>
+<Base lang={lang} title={tool.title} description={tool.description} basePath={`/tools/${slug}/`} locales={locales}>
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
 
   <main>
@@ -104,7 +109,7 @@ const jsonLd = {
           snippet, so all seven get one instead of the two that happened to import the component.
         */}
         {base.code && base.prompt && base.agentJob && (
-          <AgentBlock job={base.agentJob} code={base.code} prompt={base.prompt} />
+          <AgentBlock job={base.agentJob} code={base.code} prompt={base.prompt} lang={lang} />
         )}
       </div>
     </section>

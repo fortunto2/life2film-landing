@@ -5,10 +5,11 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro check && astro build",
     "preview": "astro preview",
     "deploy": "astro build && wrangler pages deploy dist --project-name=life2film-site --branch=production",
-    "test": "vitest run"
+    "test": "vitest run",
+    "check": "astro check && vitest run"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
@@ -17,7 +18,9 @@
     "mediabunny": "^1.54.0"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.10",
     "life2film-engine": "^0.1.2",
+    "typescript": "^6.0.3",
     "vitest": "^4.1.10"
   }
 }

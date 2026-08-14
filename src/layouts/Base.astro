@@ -6,25 +6,20 @@ interface Props {
   description: string;
   basePath?: string;
   /**
-   * Whether this page exists in every locale.
-   *
-   * The tools are English-only. Advertising `/ru/tools/` in hreflang because the pattern holds for
-   * the rest of the site would point Google at pages that 404 — a page must not claim translations
-   * it does not have.
-   */
-  localized?: boolean;
-  /**
    * Exactly which locales have this page.
    *
-   * `localized` is the blunt version — all locales or none. Tool pages are translated one at a
-   * time, so they pass the real list and hreflang names only what exists.
+   * There used to be a `localized` boolean beside this, and the pair answered the same question in
+   * two ways: the flag also decided the canonical URL, so a page that passed `localized={false}`
+   * with a real locale list declared the English page canonical while advertising itself in
+   * hreflang. Forty-eight translated pages told Google they were duplicates of the English one.
+   *
+   * Canonical is a property of the URL a page is built at, never of whether siblings exist.
    */
-  hreflangLocales?: Lang[];
+  locales?: Lang[];
 }
-const { lang, title, description, basePath = '/', localized = true, hreflangLocales } = Astro.props;
+const { lang, title, description, basePath = '/', locales } = Astro.props;
 
-const alternates = hreflangLocales ?? (localized ? (Object.keys(languages) as Lang[]) : []);
-const langEntries = Object.entries(languages) as [Lang, string][];
+const alternates = locales ?? (Object.keys(languages) as Lang[]);
 const t = useTranslations(lang);
 
 const ORG = {
@@ -109,7 +104,7 @@ const jsonLd = {
   <meta property="og:site_name" content="Life2Film" />
   <meta property="og:image" content="/img/hero.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <link rel="canonical" href={`https://life2film.com${localized ? localePath(lang, basePath) : basePath}`} />
+  <link rel="canonical" href={`https://life2film.com${localePath(lang, basePath)}`} />
   {alternates.length > 1 && (
     <>
       {alternates.map((code) => (
@@ -155,13 +150,13 @@ const jsonLd = {
       <div class="navlinks">
         <a href={localePath(lang, '/about')}>{t('navAbout')}</a>
         <a href={localePath(lang, '/studio')}>{t('navStudio')}</a>
-        <a href={'/tools/'}>Tools</a>
+        <a href={localePath(lang, '/tools/')}>Tools</a>
         <a href={'/engine/'}>Engine</a>
         <a href={'/blog/'}>{t('navBlog')}</a>
         <a href={localePath(lang, '/support')}>{t('navSupport')}</a>
       </div>
       {/*
-        The switcher follows `localized` too. It used to render regardless, so every English-only
+        The switcher follows the locale list too. It used to render regardless, so every English-only
         page offered six buttons pointing at /ru/tools/…, /es/engine/… and so on — pages that do not
         exist and have no redirect. The flag was declared once and honoured in only one of the two
         places that emit a locale URL.

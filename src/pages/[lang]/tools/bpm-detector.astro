@@ -1,0 +1,26 @@
+---
+import ToolPage from '../../../components/ToolPage.astro';
+import Tool from '../../../components/tools/BpmDetector.astro';
+import { TRANSLATIONS } from '../../../lib/tools/index';
+import type { Lang } from '../../../i18n';
+
+/**
+ * One file per tool rather than a single `[tool].astro`.
+ *
+ * A dynamic route has to reach every component, so Astro cannot tell which tool's styles a page
+ * needs and ships all seven: a Russian trimmer page carried 16.3 KB of CSS against the English
+ * page's 8.9 KB, with selectors for the BPM detector and the splitter in it. Naming the component
+ * statically is what lets the bundler split it.
+ */
+export function getStaticPaths() {
+  return (Object.keys(TRANSLATIONS) as Lang[])
+    .filter((lang) => TRANSLATIONS[lang]?.['bpm-detector'])
+    .map((lang) => ({ params: { lang }, props: { lang } }));
+}
+
+const { lang } = Astro.props;
+---
+
+<ToolPage slug="bpm-detector" lang={lang}>
+  <Tool slot="tool" lang={lang} />
+</ToolPage>
