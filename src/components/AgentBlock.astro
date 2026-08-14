@@ -1,4 +1,7 @@
 ---
+import { CHROME } from '../lib/tools-i18n';
+import type { Lang } from '../i18n';
+
 /**
  * The "take this with you" block.
  *
@@ -12,18 +15,21 @@
 interface Props {
   /** What this tool does, phrased as the job an agent would be asked to do. */
   job: string;
+  /** Which language the surrounding page is in. The code and the prompt stay English. */
+  lang?: Lang;
   /** Runnable snippet — must work as pasted, with no placeholders to fill in. */
   code: string;
   /** Instruction to paste into a coding agent. */
   prompt: string;
 }
 
-const { job, code, prompt } = Astro.props;
+const { job, code, prompt, lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
 ---
 
 <section class="agentblock">
   <div class="head">
-    <h2>Build this into your own project</h2>
+    <h2>{chrome.buildIntoProject}</h2>
     <p class="muted">
       {job} — the same way this page does it, on the user's machine, with no server. Take the code,
       or hand the prompt to a coding agent.
@@ -31,17 +37,17 @@ const { job, code, prompt } = Astro.props;
   </div>
 
   <div class="tabs" role="tablist">
-    <button class="tab on" data-panel="code" type="button" role="tab">Code</button>
-    <button class="tab" data-panel="prompt" type="button" role="tab">Prompt for an agent</button>
+    <button class="tab on" data-panel="code" type="button" role="tab">{chrome.codeTab}</button>
+    <button class="tab" data-panel="prompt" type="button" role="tab">{chrome.promptTab}</button>
   </div>
 
   <div class="panel" data-panel="code">
-    <button class="copy" type="button" data-copy="code">Copy</button>
+    <button class="copy" type="button" data-copy="code">{chrome.copy}</button>
     <pre><code set:text={code} /></pre>
   </div>
 
   <div class="panel" data-panel="prompt" hidden>
-    <button class="copy" type="button" data-copy="prompt">Copy</button>
+    <button class="copy" type="button" data-copy="prompt">{chrome.copy}</button>
     <pre><code set:text={prompt} /></pre>
   </div>
 

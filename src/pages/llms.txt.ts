@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { GROUPS, TOOLS, byGroup } from '../lib/tools';
+import { TRANSLATIONS } from '../lib/tools/index';
 import { ENGINE_VERSION } from '../lib/skill';
 
 /**
@@ -46,7 +47,7 @@ What makes it different from other video editors:
 - [Support](https://life2film.com/support): contact and common questions
 - [Blog](https://life2film.com/blog): notes on the topics below
 
-The site is also available in Spanish, Portuguese, Indonesian, Arabic, Russian and Turkish (/es, /pt, /id, /ar, /ru, /tr); tools and engine pages are English only. Blog posts are English only.
+The site is also available in Spanish, Portuguese, Indonesian, Arabic, Russian and Turkish (/es, /pt, /id, /ar, /ru, /tr); ${['en', ...Object.keys(TRANSLATIONS)].join(', ')} for the tools; the engine page is English only. Blog posts are English only.
 
 ## Articles
 

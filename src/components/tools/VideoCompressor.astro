@@ -178,7 +178,6 @@ const status = STATUS[lang];
 
   const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
   const say = toolStrings();
-  const MB = 1024 * 1024;
 
   const drop = el<HTMLLabelElement>('drop');
   const fileInput = el<HTMLInputElement>('file');
@@ -351,7 +350,7 @@ const status = STATUS[lang];
     el('outcome').hidden = true;
 
     try {
-      result = mode === 'size' ? await compressToSize(file, info) : await compressByQuality(file, info);
+      result = mode === 'size' ? await compressToSize(file, info) : await compressByQuality(file);
       showOutcome();
     } catch (error) {
       status(fill(say.failed, { reason: error instanceof Error ? error.message : '?' }), 1, true);
@@ -361,7 +360,7 @@ const status = STATUS[lang];
     }
   });
 
-  async function compressByQuality(source: File, probed: Probe): Promise<Blob> {
+  async function compressByQuality(source: File): Promise<Blob> {
     const width = Number(el<HTMLSelectElement>('resolution').value) || undefined;
     status(fill(say.encoding, { n: 0 }), 0);
 

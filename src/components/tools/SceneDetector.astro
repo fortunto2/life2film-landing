@@ -1,5 +1,5 @@
 ---
-import { CHROME, STATUS } from '../../lib/tools-i18n';
+import { CHROME } from '../../lib/tools-i18n';
 import type { Lang } from '../../i18n';
 
 interface Props {
@@ -8,7 +8,6 @@ interface Props {
 
 const { lang = 'en' } = Astro.props;
 const chrome = CHROME[lang];
-const status = STATUS[lang];
 
 /**
  * The scene-detector interface: markup and behaviour, with no page metadata.
@@ -19,7 +18,6 @@ const status = STATUS[lang];
 ---
 
 <div class="tool" slot="tool">
-    <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
           <label class="drop" id="drop" for="file">
             <input type="file" id="file" accept="video/*" hidden />
             <strong>{chrome.chooseVideo}</strong>
@@ -140,13 +138,12 @@ const status = STATUS[lang];
 </style>
 
 <script>
-  import { toolStrings, fill } from '../../lib/strings';
+    import type { Shot } from '../../lib/clips';
     import { loadEngine } from '../../lib/engine';
-    import { openVideo, samplePlan, refinePlan, centerPixel, type VideoSource } from '../../lib/frames';
+    import { openVideo, samplePlan, centerPixel, refineBoundary, type VideoSource } from '../../lib/frames';
     import { clock, timecode, render, download, EXTENSION, type Format, type Mark } from '../../lib/timeline-export';
 
     const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
-  const say = toolStrings();
 
     const drop = el<HTMLLabelElement>('drop');
     const fileInput = el<HTMLInputElement>('file');
@@ -164,11 +161,6 @@ const status = STATUS[lang];
     // frames than it should.
     const MAX_MINUTES = 10;
 
-    interface Shot {
-      start: number;
-      end: number;
-      score: number;
-    }
 
     let shots: Shot[] = [];
     let videoDuration = 0;
@@ -255,7 +247,7 @@ const status = STATUS[lang];
 
         for (const [i, boundary] of boundaries.entries()) {
           status(`Refining cut ${i + 1} of ${boundaries.length}…`, 0.93 + (i / boundaries.length) * 0.06);
-          refined.set(boundary, await refineBoundary(source, boundary, coarseStep));
+          refined.set(boundary, await refineBoundary(source, boundary, coarseStep, ANALYSIS_WIDTH));
         }
 
         shots = ranges.map(([start, end]) => {
@@ -292,37 +284,6 @@ const status = STATUS[lang];
       } finally {
         source?.release();
       }
-    }
-
-    /**
-     * Where exactly did the picture change?
-     *
-     * Walks a tight window around the candidate and returns the instant of the largest
-     * frame-to-frame jump in the centre pixel. No engine call: at this resolution the question is
-     * simply which of twenty adjacent frames differs most from the one before it.
-     */
-    async function refineBoundary(source: VideoSource, boundary: number, coarseStep: number): Promise<number> {
-      const points = refinePlan(boundary, coarseStep, coarseStep / 10, source.duration);
-      if (points.length < 2) return boundary;
-
-      let previous: { r: number; g: number; b: number } | null = null;
-      let best = boundary;
-      let biggest = -1;
-
-      for (const at of points) {
-        const pixel = centerPixel(await source.frameAt(at, ANALYSIS_WIDTH));
-        if (previous) {
-          const delta =
-            Math.abs(pixel.r - previous.r) + Math.abs(pixel.g - previous.g) + Math.abs(pixel.b - previous.b);
-          if (delta > biggest) {
-            biggest = delta;
-            best = at;
-          }
-        }
-        previous = pixel;
-      }
-
-      return best;
     }
 
     async function renderShots(source: VideoSource) {
@@ -401,4 +362,3 @@ const status = STATUS[lang];
       );
     });
 </script>
-</ToolPage>

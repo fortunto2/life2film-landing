@@ -2,8 +2,8 @@
 import Base from '../layouts/Base.astro';
 import { GROUPS, TOOLS, byGroup } from '../lib/tools';
 import { TRANSLATIONS } from '../lib/tools/index';
-import { HUB, CHROME } from '../lib/tools-i18n';
-import { localePath, languages, type Lang } from '../i18n';
+import { HUB } from '../lib/tools-i18n';
+import { localePath, type Lang } from '../i18n';
 
 interface Props {
   lang?: Lang;
@@ -11,14 +11,15 @@ interface Props {
 
 const { lang = 'en' } = Astro.props;
 const words = HUB[lang];
-const chrome = CHROME[lang];
 
-/** A card's words come from the translation when there is one. */
-const card = (slug: string) => {
-  const translated = lang === 'en' ? undefined : TRANSLATIONS[lang]?.[slug];
-  const base = TOOLS.find((tool) => tool.slug === slug)!;
-  return { name: translated ? base.name : base.name, blurb: translated?.blurb ?? base.blurb };
-};
+/**
+ * A card's blurb comes from the translation when there is one.
+ *
+ * `ToolTranslation` carries no `name`, so the name is always the English one — this used to be
+ * written as a ternary whose branches were identical, which read like translation happening and
+ * was not.
+ */
+const blurbFor = (slug: string, fallback: string) => TRANSLATIONS[lang]?.[slug]?.blurb ?? fallback;
 
 /** Locales that have at least one tool translated — the hub exists wherever the tools do. */
 const locales = ['en', ...(Object.keys(TRANSLATIONS) as Lang[])] as Lang[];
@@ -45,8 +46,7 @@ const jsonLd = {
   title={words.title}
   description={words.description}
   basePath="/tools/"
-  localized={false}
-  hreflangLocales={locales}
+  locales={locales}
 >
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
 
@@ -63,8 +63,8 @@ const jsonLd = {
             <div class="grid cols-2 tools">
               {byGroup(group.id).map((tool) => (
                 <a class="card tool" href={localePath(lang, `/tools/${tool.slug}/`)}>
-                  <h3>{card(tool.slug).name}</h3>
-                  <p>{card(tool.slug).blurb}</p>
+                  <h3>{tool.name}</h3>
+                  <p>{blurbFor(tool.slug, tool.blurb)}</p>
                   <span class="go">{words.open}</span>
                 </a>
               ))}
