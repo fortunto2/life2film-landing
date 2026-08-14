@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import AgentBlock from './AgentBlock.astro';
-import { TOOL } from '../lib/tools';
+import { TOOL, TOOLS } from '../lib/tools';
 
 interface Props {
   /** Which tool this is. Everything else comes from the registry. */
@@ -12,6 +12,15 @@ const { slug } = Astro.props;
 const tool = TOOL[slug];
 
 if (!tool) throw new Error(`No registry entry for tool "${slug}"`);
+
+/**
+ * The other tools, linked from every page.
+ *
+ * Cross-links used to exist only where the prose happened to mention another tool, which left
+ * video-to-mp3 with one inbound link and the trimmer with four. Generated from the registry, every
+ * tool gets the same six — and a new tool is linked from everywhere the moment it is added.
+ */
+const others = TOOLS.filter((other) => other.slug !== tool.slug);
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -68,6 +77,15 @@ const jsonLd = {
             <p>{a}</p>
           </>
         ))}
+
+        <h2>The other tools</h2>
+        <ul class="related">
+          {others.map((other) => (
+            <li>
+              <a href={`/tools/${other.slug}/`}>{other.name}</a> — {other.blurb}
+            </li>
+          ))}
+        </ul>
 
         {/*
           Rendered here rather than wired into each page: the registry knows which tools have a
@@ -136,5 +154,10 @@ const jsonLd = {
 
     .privacy-note { margin-top: 16px; font-size: 14px; max-width: 62ch; }
     .prose .q { margin: 28px 0 8px; font-size: 17px; }
+
+    .related { padding-left: 0; list-style: none; }
+    .related li { margin-bottom: 10px; color: var(--muted); font-size: 15px; }
+    .related a { color: var(--cyan); text-decoration: none; font-weight: 500; }
+    .related a:hover { text-decoration: underline; }
   </style>
 </Base>
