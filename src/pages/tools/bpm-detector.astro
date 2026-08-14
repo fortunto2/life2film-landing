@@ -1,85 +1,9 @@
 ---
-import Base from '../../layouts/Base.astro';
-
-const title = 'BPM Detector — find a song’s tempo without uploading it';
-const description =
-  'Drop in a track and get its BPM and the position of every beat. Runs entirely in your browser — the audio never leaves your machine. Export the beat grid as EDL, OTIO, FCPXML, Audacity labels, CSV or JSON.';
-
-// The tool answers a question people type into a search box, so the page answers it in text too —
-// a widget alone gives a crawler nothing to rank.
-const faq = [
-  {
-    q: 'Does my audio get uploaded anywhere?',
-    a: 'No. The analysis runs inside your browser as WebAssembly. The file is read from disk into memory and never sent over the network — you can check by opening the network tab, or by pulling the plug once the page has loaded.',
-  },
-  {
-    q: 'How accurate is it?',
-    a: 'It uses onset-strength analysis with dynamic-programming beat tracking — the same approach behind established music-information-retrieval tooling, and the same code that drives Life2Film’s montage engine. On music with a steady pulse it lands within a beat of the truth. On rubato, live recordings without a click, or heavily syncopated material, treat the number as a starting point.',
-  },
-  {
-    q: 'What does “half or double tempo” mean?',
-    a: 'Tempo is ambiguous by nature: a track at 140 BPM is also, correctly, 70 BPM counted in half time. Detectors pick whichever is stronger in the signal. If the number feels off by exactly 2×, that is what happened, and both answers are shown so you can take the one you need.',
-  },
-  {
-    q: 'Which formats work?',
-    a: 'Whatever your browser can decode: MP3, WAV, M4A, AAC, FLAC and OGG in current Chrome, Edge, Safari and Firefox. Video files work too — the audio track is what gets read.',
-  },
-  {
-    q: 'Can I use the beat times in my editor?',
-    a: 'That is what the export is for. EDL is the one to pick for DaVinci Resolve or Premiere Pro — each beat arrives as a named marker on the timeline. Final Cut takes the FCPXML. OTIO works in Resolve, Avid and Premiere too, and is the right choice if the beats are heading into a pipeline rather than straight onto a timeline. Audacity reads the label export, and CSV or JSON cover spreadsheets and scripts.',
-  },
-  {
-    q: 'Why does the frame rate matter?',
-    a: 'Beats fall on fractions of a second; timelines count whole frames. Every marker has to be rounded to the nearest frame of the project it is going into, so a grid exported at 25 fps will sit up to 20 ms off in a 30 fps sequence. Set the rate to match your project and the markers land exactly where the beat is. It does not affect CSV or JSON, which carry raw seconds as well.',
-  },
-];
-
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@type': 'WebApplication',
-      name: 'BPM Detector',
-      url: 'https://life2film.com/tools/bpm-detector/',
-      applicationCategory: 'MultimediaApplication',
-      operatingSystem: 'Any browser with WebAssembly',
-      browserRequirements: 'Requires WebAssembly and Web Audio',
-      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-      publisher: { '@id': 'https://life2film.com/#org' },
-      featureList: [
-        'Tempo (BPM) detection',
-        'Per-beat timestamps',
-        'Runs fully client-side — no upload',
-        'Export to EDL, OTIO, FCPXML, Audacity labels, CSV and JSON',
-        'Frame-rate aware timecode',
-      ],
-    },
-    {
-      '@type': 'FAQPage',
-      mainEntity: faq.map(({ q, a }) => ({
-        '@type': 'Question',
-        name: q,
-        acceptedAnswer: { '@type': 'Answer', text: a },
-      })),
-    },
-  ],
-};
+import ToolPage from '../../components/ToolPage.astro';
 ---
 
-<Base lang="en" title={title} description={description} basePath="/tools/bpm-detector/" localized={false}>
-  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
-
-  <main>
-    <section class="tool-head">
-      <div class="wrap">
-        <a class="back" href="/tools/">← All tools</a>
-        <h1>BPM <span class="gradient-text">Detector</span></h1>
-        <p class="lede">
-          Drop in a track. Get its tempo and the exact time of every beat — computed on your own
-          machine, with nothing uploaded.
-        </p>
-
-        <div id="tool" class="tool">
+<ToolPage slug="bpm-detector">
+        <div class="tool" slot="tool">
           <label class="drop" id="drop" for="file">
             <input type="file" id="file" accept="audio/*,video/*" hidden />
             <strong id="dropTitle">Choose an audio file</strong>
@@ -138,15 +62,7 @@ const jsonLd = {
           </div>
         </div>
 
-        <p class="privacy-note muted">
-          The file is read into memory and analysed in place. No request carries it anywhere — this
-          page has no upload endpoint to send it to.
-        </p>
-      </div>
-    </section>
-
-    <section>
-      <div class="wrap prose">
+  <Fragment slot="prose">
         <h2>What it measures</h2>
         <p>
           Tempo detection starts by finding <em>onsets</em> — the moments when energy rises sharply
@@ -173,35 +89,10 @@ const jsonLd = {
           device there for the same reason it does here: sending someone’s footage to a server to
           answer a question the device can answer is a cost, not a feature.
         </p>
+  </Fragment>
+</ToolPage>
 
-        <h2>Questions</h2>
-        {faq.map(({ q, a }) => (
-          <>
-            <h3 class="q">{q}</h3>
-            <p>{a}</p>
-          </>
-        ))}
-      </div>
-    </section>
-  </main>
-
-  <style>
-    .tool-head { padding-bottom: 40px; }
-    .back { color: var(--muted); text-decoration: none; font-size: 14px; }
-    .back:hover { color: var(--fg); }
-    h1 { margin: 14px 0 12px; }
-    .lede { color: #cfcfd6; max-width: 60ch; margin-bottom: 30px; font-size: 19px; }
-
-    .tool { border: 1px solid var(--line); border-radius: 18px; background: var(--panel); padding: 22px; }
-
-    .drop {
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-      min-height: 150px; padding: 24px; text-align: center; cursor: pointer;
-      border: 1.5px dashed var(--line); border-radius: 14px;
-      transition: border-color .15s ease, background .15s ease;
-    }
-    .drop:hover, .drop.over { border-color: var(--cyan); background: rgba(0, 242, 224, .04); }
-    .drop strong { font-size: 17px; }
+<style>
 
     .status { margin-top: 16px; font-size: 15px; color: var(--muted); }
     .status.err { color: var(--pink); }
@@ -220,12 +111,6 @@ const jsonLd = {
     canvas { width: 100%; height: 120px; display: block; border-radius: 10px; background: #08080a; }
 
     .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; align-items: center; }
-    .ghost {
-      padding: 9px 16px; border-radius: 10px; font: inherit; font-size: 14px; cursor: pointer;
-      color: var(--fg); background: transparent; border: 1px solid var(--line);
-    }
-    .ghost:hover { border-color: var(--cyan); color: var(--cyan); }
-    .ghost.primary { border-color: rgba(0,242,224,.4); color: var(--cyan); }
 
     .export { display: flex; gap: 8px; align-items: center; margin-left: auto; }
     .fps { display: flex; gap: 6px; align-items: center; font-size: 13px; }
@@ -240,12 +125,9 @@ const jsonLd = {
     .scrubline .hint { opacity: .7; }
     canvas { cursor: grab; touch-action: pan-y; }
     canvas:active { cursor: grabbing; }
+</style>
 
-    .privacy-note { margin-top: 16px; font-size: 14px; max-width: 62ch; }
-    .prose .q { margin: 28px 0 8px; font-size: 17px; }
-  </style>
-
-  <script>
+<script>
     import { loadEngine } from '../../lib/engine';
     import { clock, render, download, EXTENSION, type Format, type Mark } from '../../lib/timeline-export';
 
@@ -543,5 +425,5 @@ const jsonLd = {
       );
     });
 
-  </script>
-</Base>
+</script>
+</ToolPage>

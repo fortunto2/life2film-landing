@@ -1,80 +1,10 @@
 ---
 import Base from '../../layouts/Base.astro';
+import { GROUPS, TOOLS, byGroup } from '../../lib/tools';
 
 const title = 'Free video tools that run in your browser — no upload, no watermark';
 const description =
   'Trim, compress, convert and split video without uploading it. Everything runs in your browser through WebCodecs — no size limit, no watermark, no sign-up.';
-
-// One entry per tool. `live: false` describes what is being built rather than pretending it exists —
-// a page that lists a link to nowhere is worse than one that says "not yet".
-// Everyday jobs first — they are what people arrive looking for. The engine-backed tools are the
-// ones nothing else does, so they get their own group rather than being buried among the basics.
-const groups = [
-  {
-    name: 'Everyday',
-    note: 'The things footage usually needs before anything else.',
-    tools: [
-      {
-        href: '/tools/video-trimmer/',
-        name: 'Trim Video',
-        blurb: 'Drag the handles to the part you want, preview it, save it. Audio stays in sync.',
-        live: true,
-      },
-      {
-        href: '/tools/video-compressor/',
-        name: 'Compress Video',
-        blurb: 'Make a file smaller and see exactly what it cost. No size limit, because there is no server.',
-        live: true,
-      },
-      {
-        href: '/tools/video-to-mp3/',
-        name: 'Video to MP3',
-        blurb: 'Pull the audio out of a video and keep it as MP3, WAV or OGG.',
-        live: true,
-      },
-      {
-        href: '/tools/video-converter/',
-        name: 'Convert Video',
-        blurb: 'MP4, WebM and MOV in any direction — or pull the audio out as WAV.',
-        live: true,
-      },
-    ],
-  },
-  {
-    name: 'Made with the engine',
-    note: 'These read what is in the video, which is the part other tools skip.',
-    tools: [
-      {
-        href: '/tools/video-splitter/',
-        name: 'Video Splitter',
-        blurb:
-          'Cut a long video into Reels or Shorts that start on a shot change instead of every 30 seconds, ranked by picture quality.',
-        live: true,
-      },
-      {
-        href: '/tools/bpm-detector/',
-        name: 'BPM Detector',
-        blurb:
-          'Find a track’s tempo and the time of every beat, then send the grid to Resolve, Premiere, Final Cut or Audacity as markers.',
-        live: true,
-      },
-      {
-        href: '/tools/scene-detector/',
-        name: 'Scene Detector',
-        blurb: 'Find every cut in a video and get the shot list with thumbnails, timecodes and quality scores.',
-        live: true,
-      },
-      {
-        href: '/tools/beat-sync/',
-        name: 'Beat-Sync Montage',
-        blurb: 'Hand it clips and a track — it cuts them to the beat and renders an MP4 in the browser.',
-        live: false,
-      },
-    ],
-  },
-];
-
-const tools = groups.flatMap((group) => group.tools);
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -83,15 +13,13 @@ const jsonLd = {
   url: 'https://life2film.com/tools/',
   description,
   publisher: { '@id': 'https://life2film.com/#org' },
-  hasPart: tools
-    .filter((tool) => tool.live)
-    .map((tool) => ({
-      '@type': 'WebApplication',
-      name: tool.name,
-      url: `https://life2film.com${tool.href}`,
-      applicationCategory: 'MultimediaApplication',
-      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    })),
+  hasPart: TOOLS.map((tool) => ({
+    '@type': 'WebApplication',
+    name: tool.appName,
+    url: `https://life2film.com/tools/${tool.slug}/`,
+    applicationCategory: 'MultimediaApplication',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  })),
 };
 ---
 
@@ -107,26 +35,18 @@ const jsonLd = {
           also why they are free, have no size limit and add no watermark.
         </p>
 
-        {groups.map((group) => (
+        {GROUPS.map((group) => (
           <div class="group">
             <h2 class="grouphead">{group.name}</h2>
             <p class="groupnote muted">{group.note}</p>
             <div class="grid cols-2 tools">
-              {group.tools.map((tool) =>
-                tool.live ? (
-                  <a class="card tool" href={tool.href}>
-                    <h3>{tool.name}</h3>
-                    <p>{tool.blurb}</p>
-                    <span class="go">Open →</span>
-                  </a>
-                ) : (
-                  <div class="card tool soon">
-                    <h3>{tool.name}</h3>
-                    <p>{tool.blurb}</p>
-                    <span class="go muted">In progress</span>
-                  </div>
-                ),
-              )}
+              {byGroup(group.id).map((tool) => (
+                <a class="card tool" href={`/tools/${tool.slug}/`}>
+                  <h3>{tool.name}</h3>
+                  <p>{tool.blurb}</p>
+                  <span class="go">Open →</span>
+                </a>
+              ))}
             </div>
           </div>
         ))}

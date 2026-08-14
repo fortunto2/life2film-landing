@@ -1,43 +1,34 @@
 ---
 import Base from '../layouts/Base.astro';
-
-export interface FaqEntry {
-  q: string;
-  a: string;
-}
+import AgentBlock from './AgentBlock.astro';
+import { TOOL } from '../lib/tools';
 
 interface Props {
-  title: string;
-  description: string;
-  path: string;
-  /** Shown as the H1, with the second word picking up the gradient. */
-  heading: string;
-  accent: string;
-  lede: string;
-  faq: FaqEntry[];
-  /** Extra JSON-LD entries — the WebApplication block is built here. */
-  featureList: string[];
-  appName: string;
+  /** Which tool this is. Everything else comes from the registry. */
+  slug: string;
 }
 
-const { title, description, path, heading, accent, lede, faq, featureList, appName } = Astro.props;
+const { slug } = Astro.props;
+const tool = TOOL[slug];
+
+if (!tool) throw new Error(`No registry entry for tool "${slug}"`);
 
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
     {
       '@type': 'WebApplication',
-      name: appName,
-      url: `https://life2film.com${path}`,
+      name: tool.appName,
+      url: `https://life2film.com/tools/${tool.slug}/`,
       applicationCategory: 'MultimediaApplication',
       operatingSystem: 'Any browser with WebCodecs',
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       publisher: { '@id': 'https://life2film.com/#org' },
-      featureList,
+      featureList: tool.featureList,
     },
     {
       '@type': 'FAQPage',
-      mainEntity: faq.map(({ q, a }) => ({
+      mainEntity: tool.faq.map(({ q, a }) => ({
         '@type': 'Question',
         name: q,
         acceptedAnswer: { '@type': 'Answer', text: a },
@@ -47,15 +38,15 @@ const jsonLd = {
 };
 ---
 
-<Base lang="en" title={title} description={description} basePath={path} localized={false}>
+<Base lang="en" title={tool.title} description={tool.description} basePath={`/tools/${tool.slug}/`} localized={false}>
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
 
   <main>
     <section class="tool-head">
       <div class="wrap">
         <a class="back" href="/tools/">← All tools</a>
-        <h1>{heading} <span class="gradient-text">{accent}</span></h1>
-        <p class="lede">{lede}</p>
+        <h1>{tool.heading} <span class="gradient-text">{tool.accent}</span></h1>
+        <p class="lede">{tool.lede}</p>
 
         <slot name="tool" />
 
@@ -71,12 +62,20 @@ const jsonLd = {
         <slot name="prose" />
 
         <h2>Questions</h2>
-        {faq.map(({ q, a }) => (
+        {tool.faq.map(({ q, a }) => (
           <>
             <h3 class="q">{q}</h3>
             <p>{a}</p>
           </>
         ))}
+
+        {/*
+          Rendered here rather than wired into each page: the registry knows which tools have a
+          snippet, so all seven get one instead of the two that happened to import the component.
+        */}
+        {tool.code && tool.prompt && tool.agentJob && (
+          <AgentBlock job={tool.agentJob} code={tool.code} prompt={tool.prompt} />
+        )}
       </div>
     </section>
   </main>

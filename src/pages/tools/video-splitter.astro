@@ -1,81 +1,9 @@
 ---
-import Base from '../../layouts/Base.astro';
-
-const title = 'Video Splitter — cut a long video into clips at the scene changes';
-const description =
-  'Split a long video into Reels, Shorts and TikTok clips that start on a new shot instead of every 30 seconds. Runs in your browser — nothing is uploaded. Optional 9:16 crop.';
-
-const faq = [
-  {
-    q: 'How is this different from other video splitters?',
-    a: 'Most cut every N seconds, so a clip can start halfway through a sentence and end mid-gesture. This one finds the cuts the video already has — the shot changes — and builds clips out of whole shots. You still choose roughly how long a clip should be; the boundaries land on the nearest real change instead of on a stopwatch.',
-  },
-  {
-    q: 'Is my video uploaded?',
-    a: 'No. The browser decodes it, WebAssembly analyses the frames, and the clips are re-encoded locally with WebCodecs — the same hardware path your browser uses to play video. Nothing is sent anywhere, which is also why there is no length limit imposed by a plan, no queue and no watermark.',
-  },
-  {
-    q: 'What are the stars next to each clip?',
-    a: 'The engine scores every sampled frame for sharpness, exposure, contrast, colourfulness and detail, and each clip gets the duration-weighted average of the shots inside it. The stars are relative to the best clip in this video, not an absolute scale — they are a suggestion of where to look first, not a verdict on what is interesting.',
-  },
-  {
-    q: 'Will the vertical crop cut people out of frame?',
-    a: 'It takes the centre of the frame, which is right most of the time and wrong when the subject is off to one side. There is no face tracking here yet, so check the previews before posting. If a clip is framed wide, it is usually better to crop it by hand.',
-  },
-  {
-    q: 'How long does it take?',
-    a: 'Analysis takes a few seconds per minute of video. Encoding is the slow part and depends on your machine — expect roughly real time or better for 1080p on a recent laptop, since it uses the GPU where available. Clips are written one at a time so you can start downloading before the rest finish.',
-  },
-  {
-    q: 'Which files work?',
-    a: 'MP4 and MOV with H.264, and WebM — whatever your browser can both decode and encode. Camera-native formats like ProRes or raw usually cannot be opened by a browser; transcode a proxy first.',
-  },
-];
-
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@type': 'WebApplication',
-      name: 'Video Splitter',
-      url: 'https://life2film.com/tools/video-splitter/',
-      applicationCategory: 'MultimediaApplication',
-      operatingSystem: 'Any browser with WebCodecs and WebAssembly',
-      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-      publisher: { '@id': 'https://life2film.com/#org' },
-      featureList: [
-        'Cuts on scene changes, not on a fixed interval',
-        'Clips ranked by picture quality',
-        'Optional 9:16 crop for Reels, Shorts and TikTok',
-        'Runs fully client-side — no upload, no watermark',
-      ],
-    },
-    {
-      '@type': 'FAQPage',
-      mainEntity: faq.map(({ q, a }) => ({
-        '@type': 'Question',
-        name: q,
-        acceptedAnswer: { '@type': 'Answer', text: a },
-      })),
-    },
-  ],
-};
+import ToolPage from '../../components/ToolPage.astro';
 ---
 
-<Base lang="en" title={title} description={description} basePath="/tools/video-splitter/" localized={false}>
-  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
-
-  <main>
-    <section class="tool-head">
-      <div class="wrap">
-        <a class="back" href="/tools/">← All tools</a>
-        <h1>Video <span class="gradient-text">Splitter</span></h1>
-        <p class="lede">
-          Cut a long video into clips that start where the video changes — not every thirty seconds.
-          Everything happens on your machine.
-        </p>
-
-        <div class="tool">
+<ToolPage slug="video-splitter">
+        <div class="tool" slot="tool">
           <label class="drop" id="drop" for="file">
             <input type="file" id="file" accept="video/*" hidden />
             <strong>Choose a video file</strong>
@@ -112,15 +40,7 @@ const jsonLd = {
           <div class="clips" id="clipGrid"></div>
         </div>
 
-        <p class="privacy-note muted">
-          Frames are read in a canvas and clips are encoded with WebCodecs, both locally. No request
-          carries your video anywhere.
-        </p>
-      </div>
-    </section>
-
-    <section>
-      <div class="wrap prose">
+  <Fragment slot="prose">
         <h2>Why cut on the shot, not on the clock</h2>
         <p>
           A thirty-second rule knows nothing about the video it is cutting. It will end a clip in the
@@ -152,59 +72,15 @@ const jsonLd = {
           so no cut ever lands inside a shot. Encoding uses the browser's own video pipeline, so the
           output is a normal MP4 with no watermark.
         </p>
+  </Fragment>
+</ToolPage>
 
-        <h2>Questions</h2>
-        {faq.map(({ q, a }) => (
-          <>
-            <h3 class="q">{q}</h3>
-            <p>{a}</p>
-          </>
-        ))}
-      </div>
-    </section>
-  </main>
-
-  <style>
-    .tool-head { padding-bottom: 40px; }
-    .back { color: var(--muted); text-decoration: none; font-size: 14px; }
-    .back:hover { color: var(--fg); }
-    h1 { margin: 14px 0 12px; }
-    .lede { color: #cfcfd6; max-width: 60ch; margin-bottom: 30px; font-size: 19px; }
-
-    .tool { border: 1px solid var(--line); border-radius: 18px; background: var(--panel); padding: 22px; }
-
-    .drop {
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-      min-height: 150px; padding: 24px; text-align: center; cursor: pointer;
-      border: 1.5px dashed var(--line); border-radius: 14px;
-      transition: border-color .15s ease, background .15s ease;
-    }
-    .drop:hover, .drop.over { border-color: var(--cyan); background: rgba(0, 242, 224, .04); }
-    .drop strong { font-size: 17px; }
-
-    .controls { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-top: 18px; }
-    .control { display: flex; gap: 8px; align-items: center; font-size: 14px; }
-    .control.checkbox { cursor: pointer; }
-    .control input[type=checkbox] { width: 16px; height: 16px; accent-color: #00f2e0; }
-    .spacer { flex: 1; }
+<style>
     select {
       padding: 9px 12px; border-radius: 10px; font: inherit; font-size: 14px; cursor: pointer;
       color: var(--fg); background: #0a0a0d; border: 1px solid var(--line);
     }
     select:hover { border-color: var(--cyan); }
-    .ghost {
-      padding: 9px 16px; border-radius: 10px; font: inherit; font-size: 14px; cursor: pointer;
-      color: var(--fg); background: transparent; border: 1px solid var(--line);
-    }
-    .ghost:hover:not(:disabled) { border-color: var(--cyan); color: var(--cyan); }
-    .ghost:disabled { opacity: .45; cursor: default; }
-    .ghost.primary { border-color: rgba(0,242,224,.4); color: var(--cyan); }
-
-    .status { margin-top: 18px; }
-    .status.err .statustext { color: var(--pink); }
-    .bar { height: 3px; border-radius: 2px; background: #17171c; overflow: hidden; }
-    .bar span { display: block; height: 100%; width: 0; background: var(--grad); transition: width .12s linear; }
-    .statustext { margin-top: 9px; font-size: 15px; color: var(--muted); }
 
     .summary { margin-top: 18px; font-size: 15px; color: #cfcfd6; }
     .summary b { color: var(--fg); }
@@ -235,12 +111,9 @@ const jsonLd = {
     }
     .clip .act button:hover:not(:disabled) { border-color: var(--cyan); color: var(--cyan); }
     .clip .act button:disabled { opacity: .5; cursor: default; }
+</style>
 
-    .privacy-note { margin-top: 16px; font-size: 14px; max-width: 62ch; }
-    .prose .q { margin: 28px 0 8px; font-size: 17px; }
-  </style>
-
-  <script>
+<script>
     import { loadEngine } from '../../lib/engine';
     import { openVideo, samplePlan, refinePlan, centerPixel, type VideoSource } from '../../lib/frames';
     import { groupIntoClips, rankByScore, stars, type Clip, type Shot } from '../../lib/clips';
@@ -544,5 +417,5 @@ const jsonLd = {
       const file = (e as DragEvent).dataTransfer?.files?.[0];
       if (file) void analyse(file);
     });
-  </script>
-</Base>
+</script>
+</ToolPage>

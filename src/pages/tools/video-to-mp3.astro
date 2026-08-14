@@ -1,94 +1,8 @@
 ---
 import ToolPage from '../../components/ToolPage.astro';
-import AgentBlock from '../../components/AgentBlock.astro';
-
-const code = `// npm i mediabunny @mediabunny/mp3-encoder
-import { Input, Output, Conversion, BlobSource, BufferTarget, Mp3OutputFormat, ALL_FORMATS } from 'mediabunny';
-import { registerMp3Encoder } from '@mediabunny/mp3-encoder';
-
-registerMp3Encoder();   // LAME compiled to WASM; only needed for MP3 output
-
-export async function extractAudio(file, { bitrate = 192_000, mono = false } = {}) {
-  const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
-  const output = new Output({ format: new Mp3OutputFormat(), target: new BufferTarget() });
-
-  const conversion = await Conversion.init({
-    input,
-    output,
-    video: { discard: true },                      // leave the picture behind
-    audio: { bitrate, ...(mono ? { numberOfChannels: 1 } : {}) },
-  });
-
-  if (!conversion.isValid) throw new Error('No audio track, or it cannot be decoded');
-  await conversion.execute();
-
-  return new Blob([output.target.buffer], { type: 'audio/mpeg' });
-}
-
-const mp3 = await extractAudio(file, { bitrate: 192_000 });`;
-
-const prompt = `Add "extract the audio from a video" to my project. It must run entirely in the browser — the
-files are personal (lectures, interviews, recordings) and must not be uploaded anywhere.
-
-Requirements:
-- Use "mediabunny" for decoding and "@mediabunny/mp3-encoder" for MP3 (LAME compiled to WASM).
-  Import the MP3 encoder lazily — only load it when the user actually picks MP3.
-- Support MP3, WAV and OGG output. Set video: { discard: true } so only the audio is written.
-- WAV has no bitrate to choose: hide that control when WAV is selected, because its size is
-  sampleRate x 2 bytes x channels and nothing else.
-- Predict the output size before converting, and read the real channel count and sample rate off the
-  file to do it — assuming stereo doubles the estimate for a mono source. For Vorbis apply about 0.7
-  to the nominal bitrate, since it runs variable-rate and lands under.
-- Tell the user when a requested bitrate exceeds what the source was recorded at: it makes the file
-  bigger without making it sound better.
-- Fail clearly when the file has no audio track at all, before doing any work.
-
-Reference implementation: https://life2film.com/tools/video-to-mp3/`;
-
-const faq = [
-  {
-    q: 'Is my video uploaded?',
-    a: 'No. The browser decodes the file and encodes the audio locally, so nothing is sent anywhere. That matters more here than for most conversions: the reason to pull audio out of a video is often that the video is personal — a lecture, an interview, a recording of your own — and it has no business on someone else\'s server to answer a question your laptop can answer.',
-  },
-  {
-    q: 'Which format should I choose?',
-    a: 'MP3 if it is going anywhere at all — every device and app plays it, and at 192 kbps it is transparent for speech and close to it for music. WAV if the audio is going into an editor or a transcription tool, since it is uncompressed and loses nothing. OGG (Vorbis) is smaller than MP3 at the same quality but less widely supported outside browsers and Android.',
-  },
-  {
-    q: 'What bitrate do I need?',
-    a: 'For speech, 96–128 kbps is plenty and halves the file against the default. For music, 192 kbps is the usual sweet spot and 320 is the most MP3 offers. Higher than the source was recorded at gains nothing: converting a 128 kbps podcast to 320 kbps produces a file two and a half times larger that sounds identical.',
-  },
-  {
-    q: 'Why is my WAV file so large?',
-    a: 'Because it is uncompressed — roughly 10 MB per minute in stereo at 44.1 kHz, regardless of what it contains. That is the point of it: nothing is thrown away. If the size is a problem and the audio is not going into an editor, MP3 is a twentieth of the size and you will not hear the difference.',
-  },
-  {
-    q: 'Can I convert just part of the video?',
-    a: 'Not on this page — it converts the whole file. Trim the video first with the trimmer, then convert what comes out, or convert everything and cut the audio in whatever you are taking it into.',
-  },
-  {
-    q: 'Which files work?',
-    a: 'Anything your browser can open: MP4, MOV and WebM video, and most audio files if you are converting between audio formats. Camera-native formats like ProRes, and DRM-protected files, cannot be read by a browser at all.',
-  },
-];
 ---
 
-<ToolPage
-  title="Video to MP3 — extract audio in your browser, free"
-  description="Pull the audio out of a video and save it as MP3, WAV or OGG. Runs entirely in your browser — nothing is uploaded, no size limit, no watermark, no sign-up."
-  path="/tools/video-to-mp3/"
-  heading="Video to"
-  accent="MP3"
-  lede="Take the sound out of a video and keep it as MP3, WAV or OGG. Nothing is uploaded — the conversion happens on your machine."
-  appName="Video to MP3 Converter"
-  featureList={[
-    'Extract audio from MP4, MOV and WebM',
-    'MP3, WAV and OGG output',
-    'Choose bitrate and mono',
-    'Runs fully client-side — no upload, no watermark',
-  ]}
-  faq={faq}
->
+<ToolPage slug="video-to-mp3">
   <div class="tool" slot="tool">
     <label class="drop" id="drop" for="file">
       <input type="file" id="file" accept="video/*,audio/*" hidden />
@@ -168,12 +82,6 @@ const faq = [
       the <a href="/tools/video-trimmer/">trimmer</a>. To convert the video itself between formats,
       use the <a href="/tools/video-converter/">converter</a>.
     </p>
-
-    <AgentBlock
-      job="Pulling audio out of a video, locally"
-      code={code}
-      prompt={prompt}
-    />
   </Fragment>
 </ToolPage>
 

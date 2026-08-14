@@ -1,46 +1,8 @@
 ---
 import ToolPage from '../../components/ToolPage.astro';
-
-const faq = [
-  {
-    q: 'Which conversions are supported?',
-    a: 'Between MP4, WebM and MOV, and from any of them to WAV audio. What actually works depends on your browser, because the encoding is done by the browser itself — Chrome and Edge cover the most ground, Safari handles MP4 and MOV well. The tool checks before it starts and says so if a combination is not available rather than failing halfway through.',
-  },
-  {
-    q: 'Can I extract just the audio?',
-    a: 'Yes — choose WAV and the picture is discarded, leaving the sound as an uncompressed file any editor or transcription tool will accept. WAV is deliberately large; if you need something small, convert and then compress, or keep the original.',
-  },
-  {
-    q: 'Is anything uploaded?',
-    a: 'No. Conversion runs through WebCodecs in your browser. That is the point of doing it this way: converting a large file by uploading it, waiting on a queue and downloading it back is slower than doing it locally, and it puts your footage on a stranger\'s disk in between.',
-  },
-  {
-    q: 'Why can my browser not open a MOV from my camera?',
-    a: 'A .mov file is a container, and what matters is the codec inside it. Browsers handle H.264 and, increasingly, HEVC — but not ProRes, DNxHD or camera-raw formats, which is what professional cameras usually write into a .mov. Those need a real transcode from a desktop tool first.',
-  },
-  {
-    q: 'Does converting lose quality?',
-    a: 'Changing container between MP4 and MOV can often be done without touching the video at all. Changing codec — to WebM, for example — means re-encoding, and re-encoding always costs a little. It is generally invisible for one generation, and it accumulates if you convert the same file repeatedly.',
-  },
-];
 ---
 
-<ToolPage
-  title="Video Converter — MP4, WebM, MOV and audio, in your browser"
-  description="Convert video between MP4, WebM and MOV, or pull the audio out as WAV. Everything runs in your browser — no upload, no file size limit, no watermark, no sign-up."
-  path="/tools/video-converter/"
-  heading="Convert"
-  accent="Video"
-  lede="Change format without handing your file to anyone. MP4, WebM, MOV — or pull out just the audio."
-  appName="Video Converter"
-  featureList={[
-    'MP4, WebM and MOV conversion',
-    'Extract audio as WAV',
-    'Optional resize during conversion',
-    'Runs fully client-side — no upload, no watermark',
-  ]}
-  faq={faq}
->
+<ToolPage slug="video-converter">
   <div class="tool" slot="tool">
     <label class="drop" id="drop" for="file">
       <input type="file" id="file" accept="video/*,audio/*" hidden />
