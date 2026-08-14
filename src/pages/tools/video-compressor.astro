@@ -1,115 +1,8 @@
 ---
 import ToolPage from '../../components/ToolPage.astro';
-import AgentBlock from '../../components/AgentBlock.astro';
-
-const code = `// npm i mediabunny
-import { Input, Output, Conversion, BlobSource, BufferTarget, Mp4OutputFormat, ALL_FORMATS } from 'mediabunny';
-
-// Size is bitrate x duration, so a target size fixes the bitrate.
-const OVERHEAD = 0.04;               // container headers and packaging
-const AUDIO_BITRATE = 128_000;
-
-export async function compressToSize(file, targetBytes, { width } = {}) {
-  const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
-  const duration = await input.computeDuration();
-
-  // Aim under the wall: a file of exactly 10.00 MB is still refused by a 10 MB limit.
-  const aim = targetBytes * 0.96;
-  const videoBitrate = Math.max(
-    90_000,
-    Math.round((aim * 8 * (1 - OVERHEAD) - AUDIO_BITRATE * duration) / duration),
-  );
-
-  const output = new Output({ format: new Mp4OutputFormat(), target: new BufferTarget() });
-  const conversion = await Conversion.init({
-    input,
-    output,
-    video: {
-      ...(width ? { width } : {}),
-      bitrate: videoBitrate,
-      hardwareAcceleration: 'prefer-hardware',  // 180 fps vs 34 on an M5 at 1080p
-    },
-    audio: { bitrate: AUDIO_BITRATE },
-  });
-
-  if (!conversion.isValid) throw new Error('Cannot convert this file');
-  await conversion.execute();
-
-  return new Blob([output.target.buffer], { type: 'video/mp4' });
-}
-
-// Encoders drift, so measure and correct once if the first pass missed.
-const blob = await compressToSize(file, 10 * 1024 * 1024);
-console.log(blob.size / 1048576, 'MB');`;
-
-const prompt = `Build me a video compressor that runs entirely in the browser — no upload, no server.
-
-Requirements:
-- Use the "mediabunny" npm package, which wraps WebCodecs. Do not use ffmpeg.wasm: it is ~30 MB and
-  needs SharedArrayBuffer, which requires COOP/COEP headers that break third-party scripts.
-- Let the user target a file size (presets: 10 MB Discord, 16 MB WhatsApp, 25 MB email) as well as
-  picking a quality.
-- To hit a size: size = bitrate x duration, so videoBitrate = (targetBytes * 8 * 0.96 - audioBitrate
-  * duration) / duration. Aim at 96% of the limit, because a file of exactly 10.00 MB is still
-  rejected by a 10 MB limit.
-- Encoders do not obey a requested bitrate exactly. Measure the result; if it missed by more than 4%
-  or broke the limit, re-encode once with bitrate * (target / actual), damped to at most a halving
-  or doubling. Stop at two passes.
-- Pass hardwareAcceleration: 'prefer-hardware'. Measured on an M5 at 1080p: 180 fps against 34 fps
-  for software, and the software encoder also overshot the requested bitrate by 3.5x.
-- Show the estimated output size before encoding, and the real before/after afterwards.
-- Refuse impossible targets up front: below about 90 kbps video is unwatchable, so if the target
-  cannot be met at that floor, say so and give the smallest honest size instead of producing junk.
-- Warn when the source is already compressed below what its resolution needs — re-encoding it will
-  make it larger, and only reducing the resolution will help.
-
-Reference implementation: https://life2film.com/tools/video-compressor/`;
-
-const faq = [
-  {
-    q: 'Can it hit an exact file size?',
-    a: 'That is what the "fit a size" mode does. A file\'s size is its bitrate multiplied by its length, so once the length is known the required bitrate is arithmetic. Encoders do not obey a requested bitrate perfectly — rate control drifts with the material — so if the first pass misses by more than a few percent, it measures the miss and re-encodes once with a corrected figure. In practice it lands within a couple of percent of the target.',
-  },
-  {
-    q: 'Why 10 MB, 16 MB, 25 MB?',
-    a: 'They are the walls people actually hit: 10 MB is the free Discord upload limit, 16 MB is WhatsApp, 25 MB is Gmail and most mail servers, and 50 MB is Discord Nitro Basic. The tool aims just under the limit rather than exactly at it, because a file that is 10.0 MB is still rejected by a 10 MB limit.',
-  },
-  {
-    q: 'What if the target is impossible?',
-    a: 'It says so before starting, and tells you the smallest honest size for that video. Squeezing an hour of footage into 10 MB would mean a bitrate no resolution survives — a tool that produced an unwatchable file and called it success would be worse than one that refuses.',
-  },
-  {
-    q: 'How much smaller will my file get?',
-    a: 'The estimate is shown before you press anything, from the settings and the length. Footage straight from a phone or camera is usually recorded far above what it needs, and 60–90% reductions are routine. Something already compressed once has little left to give, and the tool compares your file against what its resolution reasonably needs and warns you when re-encoding would only make it bigger.',
-  },
-  {
-    q: 'What actually makes a video smaller?',
-    a: 'Fewer pixels and fewer bits per pixel. Resolution is the blunt, reliable lever — 4K to 1080p removes three quarters of the pixels before quality enters into it. Bitrate then decides how much detail survives in what remains. Dropping audio helps a little; it is rarely more than a few percent of a video file.',
-  },
-  {
-    q: 'Is it uploaded anywhere?',
-    a: 'No. It runs through WebCodecs in your browser, which is what makes this practical: uploading a gigabyte so a server can hand back 200 MB is slower than doing the work locally, and it puts your footage on someone else\'s disk in the process. No size limit, no queue, no watermark — because there is no server to impose them.',
-  },
-];
 ---
 
-<ToolPage
-  title="Compress Video — hit an exact file size, in your browser"
-  description="Compress a video to a target size — 10 MB for Discord, 25 MB for email — or by quality. Shows the estimate before encoding and runs entirely in your browser. No upload, no limit, no watermark."
-  path="/tools/video-compressor/"
-  heading="Compress"
-  accent="Video"
-  lede="Aim at a size — 10 MB for Discord, 25 MB for email — or just turn the quality down. Runs on your machine, so there is no size limit and no queue."
-  appName="Video Compressor"
-  featureList={[
-    'Target an exact file size',
-    'Presets for Discord, WhatsApp and email limits',
-    'Size estimate before encoding',
-    'Second pass corrects any miss',
-    'Runs fully client-side — no upload, no watermark',
-  ]}
-  faq={faq}
->
+<ToolPage slug="video-compressor">
   <div class="tool" slot="tool">
     <label class="drop" id="drop" for="file">
       <input type="file" id="file" accept="video/*" hidden />
@@ -232,12 +125,6 @@ const faq = [
       To shorten a video rather than shrink it, use the <a href="/tools/video-trimmer/">trimmer</a>;
       to change format, the <a href="/tools/video-converter/">converter</a>.
     </p>
-
-    <AgentBlock
-      job="Compressing video to a target file size"
-      code={code}
-      prompt={prompt}
-    />
   </Fragment>
 </ToolPage>
 

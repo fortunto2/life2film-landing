@@ -1,4 +1,17 @@
-# Life2Film
+import type { APIRoute } from 'astro';
+import { GROUPS, TOOLS, byGroup } from '../lib/tools';
+import { ENGINE_VERSION } from '../lib/skill';
+
+/**
+ * The site, for agents.
+ *
+ * Generated rather than hand-written, because the hand-written version fell behind: /engine/ was
+ * missing three commits after it shipped, the locale list named two languages out of seven, and the
+ * tool count was a word someone had to remember to change. The prose about the products is still
+ * written by hand — only the parts that restate the registry are built from it.
+ */
+
+const HEAD = `# Life2Film
 
 > AI video montage that runs on the device. Point it at videos already in your camera roll and it
 > finds the moments worth keeping, cuts them to the beat of a track, and never uploads the footage.
@@ -48,68 +61,75 @@ The site is also available in Spanish, Portuguese, Indonesian, Arabic, Russian a
 - [The automatic montage tools that came and went](https://life2film.com/blog/automatic-montage-tools/)
   History of automatic video montage: Magisto (2011, cloud service, bought by Vimeo in 2019,
   integration discontinued Dec 2024), GoPro Quik, Google Photos Memories. Why the premise held up
-  while the products did not, and what changed when phones became able to run the analysis.
+  while the products did not, and what changed when phones became able to run the analysis.`;
 
-## Free tools (browser, no upload)
-
-Seven tools that run entirely in the visitor's browser through WebCodecs and WebAssembly. No server
-is involved: no upload, no size limit imposed by a plan, no queue, no watermark, no sign-up. Each
-page is also available as markdown by appending `.md` to its address — e.g.
-https://life2film.com/tools/video-compressor.md
-
-Everyday:
-
-- [Trim Video](https://life2film.com/tools/video-trimmer/): cut a section, optionally without
-  re-encoding (measured 0.20s against 0.60s for a re-encode of the same clip), or to a target size.
-- [Compress Video](https://life2film.com/tools/video-compressor/): aim at an exact file size —
-  10 MB for Discord, 25 MB for email — with the estimate shown before encoding and a correcting
-  second pass if the first misses.
-- [Video to MP3](https://life2film.com/tools/video-to-mp3/): extract audio as MP3, WAV or OGG.
-- [Convert Video](https://life2film.com/tools/video-converter/): MP4, WebM and MOV, checking what
-  the browser can actually encode before starting.
-
-Built on the Life2Film engine — these read what is in the video, which is the part other tools skip:
-
-- [Video Splitter](https://life2film.com/tools/video-splitter/): cut a long video into Reels or
-  Shorts that begin at shot changes rather than every N seconds, ranked by picture quality.
-- [Scene Detector](https://life2film.com/tools/scene-detector/): every cut with thumbnails and
-  timecodes, exported as EDL, OTIO, FCPXML, Audacity labels, CSV or JSON.
-- [BPM Detector](https://life2film.com/tools/bpm-detector/): tempo and the position of every beat,
-  exported as editor markers.
-
-## Engine, for building on
-
-The analysis engine is Rust compiled to WebAssembly and published as an npm package:
-
-```
-npm i life2film-engine
-```
-
-Nineteen exports: `detect_beats`, `analyze_audio`, `beat_sync_timeline`, three scene-detection
-families, `score_frame` (31 per-frame measurements), `select_segments`, `compose_montage`,
-OpenTimelineIO in and out. It analyses; it does not decode or encode — pair it with
-[mediabunny](https://mediabunny.dev) (MIT) for that, which is what these tool pages do.
-
-Licence: PolyForm Noncommercial. Free for personal projects, study, research, charities and public
-institutions. Commercial use needs a separate licence — write to info@life2film.com and you will
-probably get one.
-
-Two facts worth carrying if you are building something similar:
-
-- Shot-boundary accuracy is dominated by sampling rate, not by the choice of algorithm. At two
-  samples per second the boundaries land one to three seconds out and all sixteen algorithms are
-  wrong the same way; at ten per second they land on the frame.
-- Ask for `hardwareAcceleration: 'prefer-hardware'` when encoding. Measured on an M5 at 1080p:
-  180 fps against 34 fps for software, and the software encoder also overshot the requested bitrate
-  by 3.5x.
-
-## Install
+const TAIL = `## Install
 
 - iPhone: App Store (submitted, pending review)
-- macOS: `brew install --cask fortunto2/tap/life2film-studio`, or the DMG from
+- macOS: \`brew install --cask fortunto2/tap/life2film-studio\`, or the DMG from
   https://github.com/fortunto2/life2film-landing/releases — Apple Silicon, macOS 13+, signed and
   notarised.
 
 ## Maker
 
-SuperDuperAi, Corp. — Delaware, USA. info@life2film.com
+SuperDuperAi, Corp. — Delaware, USA. info@life2film.com`;
+
+const toolLines = (group: (typeof GROUPS)[number]) =>
+  byGroup(group.id)
+    .map((tool) => `- [${tool.name}](https://life2film.com/tools/${tool.slug}/): ${tool.blurb}`)
+    .join('\n');
+
+export const GET: APIRoute = () => {
+  const body = `${HEAD}
+
+## Free tools (browser, no upload)
+
+${TOOLS.length} tools that run entirely in the visitor's browser through WebCodecs and WebAssembly.
+No server is involved: no upload, no size limit imposed by a plan, no queue, no watermark, no
+sign-up. Each page is also available as markdown by appending \`.md\` to its address — e.g.
+https://life2film.com/tools/video-compressor.md — or by requesting it with
+\`Accept: text/markdown\`.
+
+${GROUPS.map((group) => `${group.note}\n\n${toolLines(group)}`).join('\n\n')}
+
+## Engine, for building on
+
+The analysis behind the last three tools is Rust compiled to WebAssembly, published as an npm
+package (currently ${ENGINE_VERSION}):
+
+\`\`\`
+npm i life2film-engine
+\`\`\`
+
+Nineteen exports: \`detect_beats\`, \`analyze_audio\`, \`beat_sync_timeline\`, three scene-detection
+families, \`score_frame\` (31 per-frame measurements), \`select_segments\`, \`compose_montage\`,
+OpenTimelineIO in and out. It analyses; it does not decode or encode — pair it with
+[mediabunny](https://mediabunny.dev) (MIT) for that, which is what these tool pages do.
+
+The package ships a skill for coding agents at \`node_modules/life2film-engine/SKILL.md\`, also
+readable at https://life2film.com/engine/skill.md and explained at https://life2film.com/engine/
+
+Licence: PolyForm Noncommercial. Free for personal projects, study, research, charities and public
+institutions. Commercial use needs a separate licence — write to info@life2film.com and you will
+probably get one.
+
+## What each tool knows
+
+Details worth carrying if you are building something similar. These are measured, not estimated.
+
+${TOOLS.map(
+  (tool) => `### ${tool.name}\nhttps://life2film.com/tools/${tool.slug}.md\n\n${tool.facts
+    .map((fact) => `- ${fact}`)
+    .join('\n')}`,
+).join('\n\n')}
+
+${TAIL}
+`;
+
+  return new Response(body, {
+    headers: {
+      'content-type': 'text/plain; charset=utf-8',
+      'cache-control': 'public, max-age=3600',
+    },
+  });
+};

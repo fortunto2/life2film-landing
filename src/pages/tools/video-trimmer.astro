@@ -1,55 +1,8 @@
 ---
 import ToolPage from '../../components/ToolPage.astro';
-
-const faq = [
-  {
-    q: 'Is my video uploaded?',
-    a: 'No. The browser decodes and re-encodes it locally through WebCodecs — the same pipeline it uses to play video. Nothing is sent anywhere, so there is no size limit imposed by a plan, no queue, and no watermark.',
-  },
-  {
-    q: 'Does trimming lose quality?',
-    a: 'Not in the default mode. "Same quality — no re-encode" passes the picture through untouched, so there is no generation loss and it finishes several times faster — measured at 0.2 seconds against 0.6 for a re-encode of the same clip. The trade is size: video is compressed in groups that begin at a keyframe, so when your in-point falls mid-group the file has to carry the frames back to the previous one. Playback still starts exactly where you set it, but the file can be larger than a re-encode of the same range.',
-  },
-  {
-    q: 'When should I re-encode instead?',
-    a: 'When you want the smallest file, or a different format. Re-encoding writes only the frames you selected, so a mid-group cut comes out considerably smaller — in testing, 4.1 MB against 6.7 MB for the same three seconds. It costs one generation of compression, which is not visible at the quality used here.',
-  },
-  {
-    q: 'Can it trim to a target file size?',
-    a: 'Yes — choose "Fit a size" and pick a limit, such as 10 MB for Discord or 25 MB for email. The needed bitrate follows from the length of your selection, so a shorter selection can hold more quality within the same limit. If the first pass misses, it corrects and re-encodes once.',
-  },
-  {
-    q: 'Is the audio kept?',
-    a: 'Yes, in sync, and trimmed to the same range. You can drop it deliberately with the "remove audio" box — useful when a clip is going somewhere the sound is not wanted, and it makes the file smaller.',
-  },
-  {
-    q: 'Which files work?',
-    a: 'MP4 and MOV with H.264, and WebM — whatever your browser can both decode and encode. Camera-native formats such as ProRes or raw usually cannot be opened by a browser at all; transcode a proxy first.',
-  },
-  {
-    q: 'How long can the video be?',
-    a: 'There is no hard cap, but everything happens in a browser tab, so memory is the real limit — the encoded result is held there before it is saved. Files up to a few hundred megabytes are comfortable on a normal laptop; very large ones are better trimmed in passes.',
-  },
-];
 ---
 
-<ToolPage
-  title="Trim Video — cut without re-encoding, in your browser"
-  description="Trim a video without losing quality — the picture is copied through, not re-encoded. Or aim at a file size for Discord or email. Runs in your browser: no upload, no watermark, no sign-up."
-  path="/tools/video-trimmer/"
-  heading="Trim"
-  accent="Video"
-  lede="Drag the handles to the part you want and save it — with the picture copied through untouched, so nothing is lost. Your file never leaves the machine."
-  appName="Video Trimmer"
-  featureList={[
-    'Lossless trimming — copies the video without re-encoding',
-    'Frame-accurate re-encode when the cut point matters',
-    'Trim to a target file size',
-    'Live preview of the selection',
-    'Runs fully client-side — no upload, no watermark',
-  ]}
-  faq={faq}
->
+<ToolPage slug="video-trimmer">
   <div class="tool" slot="tool">
     <label class="drop" id="drop" for="file">
       <input type="file" id="file" accept="video/*" hidden />

@@ -1,82 +1,9 @@
 ---
-import Base from '../../layouts/Base.astro';
-
-const title = 'Scene Detector — split a video into shots without uploading it';
-const description =
-  'Find every cut in a video and get the shot list with timecodes, in your browser. The footage never leaves your machine. Export cuts as EDL, OTIO, FCPXML, Audacity labels, CSV or JSON.';
-
-const faq = [
-  {
-    q: 'Does the video get uploaded?',
-    a: 'No. The browser decodes it locally, a canvas reads the pixels, and WebAssembly compares them. Nothing is sent anywhere — the page has no endpoint to send it to. That is also why there is no file-size limit and no queue.',
-  },
-  {
-    q: 'How does it find the cuts?',
-    a: 'It samples frames across the video and watches how much the picture changes from one sample to the next. A cut is a discontinuity — colour and luminance jump in a single step, rather than drifting the way they do during a pan or a fade. The detector looks for those steps and reports the boundaries between them.',
-  },
-  {
-    q: 'Will it catch dissolves and fades?',
-    a: 'Partly. A hard cut is unambiguous and gets found reliably. A slow dissolve is, by construction, a gradual change — the same shape as a camera move — so it may be reported a little early, a little late, or merged with its neighbour. Fast whip-pans can also read as cuts. Treat the result as a shot list to check, not a verdict.',
-  },
-  {
-    q: 'What is the quality score next to each shot?',
-    a: 'The same per-frame scoring the Life2Film app uses when deciding what to keep: sharpness, exposure, contrast, colourfulness and entropy, combined into one number. It is a rough ranking of which shots are worth a second look, not a judgement of what is interesting.',
-  },
-  {
-    q: 'Which files work?',
-    a: 'Anything the browser can play — MP4 and MOV with H.264, and WebM. Formats a browser cannot decode, such as most ProRes or raw camera files, will not open here; transcode a proxy first.',
-  },
-  {
-    q: 'How long does it take?',
-    a: 'It steps through the video seeking to each sample point, which costs tens of milliseconds each time. A one-minute clip takes a few seconds. Long videos are sampled more coarsely so the wait stays reasonable — the shot list stays accurate to roughly half a second either way.',
-  },
-];
-
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@graph': [
-    {
-      '@type': 'WebApplication',
-      name: 'Scene Detector',
-      url: 'https://life2film.com/tools/scene-detector/',
-      applicationCategory: 'MultimediaApplication',
-      operatingSystem: 'Any browser with WebAssembly',
-      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-      publisher: { '@id': 'https://life2film.com/#org' },
-      featureList: [
-        'Shot boundary detection',
-        'Per-shot quality scoring',
-        'Thumbnails for every shot',
-        'Runs fully client-side — no upload',
-        'Export to EDL, OTIO, FCPXML, Audacity labels, CSV and JSON',
-      ],
-    },
-    {
-      '@type': 'FAQPage',
-      mainEntity: faq.map(({ q, a }) => ({
-        '@type': 'Question',
-        name: q,
-        acceptedAnswer: { '@type': 'Answer', text: a },
-      })),
-    },
-  ],
-};
+import ToolPage from '../../components/ToolPage.astro';
 ---
 
-<Base lang="en" title={title} description={description} basePath="/tools/scene-detector/" localized={false}>
-  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
-
-  <main>
-    <section class="tool-head">
-      <div class="wrap">
-        <a class="back" href="/tools/">← All tools</a>
-        <h1>Scene <span class="gradient-text">Detector</span></h1>
-        <p class="lede">
-          Drop in a video. Get every cut, with a thumbnail and a timecode for each shot — found on
-          your own machine, with nothing uploaded.
-        </p>
-
-        <div class="tool">
+<ToolPage slug="scene-detector">
+        <div class="tool" slot="tool">
           <label class="drop" id="drop" for="file">
             <input type="file" id="file" accept="video/*" hidden />
             <strong>Choose a video file</strong>
@@ -129,15 +56,7 @@ const jsonLd = {
           </div>
         </div>
 
-        <p class="privacy-note muted">
-          The video is decoded by your browser and read frame by frame in a canvas. No request
-          carries it anywhere.
-        </p>
-      </div>
-    </section>
-
-    <section>
-      <div class="wrap prose">
+  <Fragment slot="prose">
         <h2>What a cut looks like to a machine</h2>
         <p>
           Within a single shot, consecutive frames resemble each other: the camera moves, people
@@ -167,41 +86,10 @@ const jsonLd = {
           The <a href="/tools/bpm-detector/">BPM detector</a> is the same engine looking at sound
           instead of pictures.
         </p>
+  </Fragment>
+</ToolPage>
 
-        <h2>Questions</h2>
-        {faq.map(({ q, a }) => (
-          <>
-            <h3 class="q">{q}</h3>
-            <p>{a}</p>
-          </>
-        ))}
-      </div>
-    </section>
-  </main>
-
-  <style>
-    .tool-head { padding-bottom: 40px; }
-    .back { color: var(--muted); text-decoration: none; font-size: 14px; }
-    .back:hover { color: var(--fg); }
-    h1 { margin: 14px 0 12px; }
-    .lede { color: #cfcfd6; max-width: 60ch; margin-bottom: 30px; font-size: 19px; }
-
-    .tool { border: 1px solid var(--line); border-radius: 18px; background: var(--panel); padding: 22px; }
-
-    .drop {
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
-      min-height: 150px; padding: 24px; text-align: center; cursor: pointer;
-      border: 1.5px dashed var(--line); border-radius: 14px;
-      transition: border-color .15s ease, background .15s ease;
-    }
-    .drop:hover, .drop.over { border-color: var(--cyan); background: rgba(0, 242, 224, .04); }
-    .drop strong { font-size: 17px; }
-
-    .status { margin-top: 18px; }
-    .status.err .statustext { color: var(--pink); }
-    .bar { height: 3px; border-radius: 2px; background: #17171c; overflow: hidden; }
-    .bar span { display: block; height: 100%; width: 0; background: var(--grad); transition: width .12s linear; }
-    .statustext { margin-top: 9px; font-size: 15px; color: var(--muted); }
+<style>
 
     .result { margin-top: 20px; }
     .readout { display: flex; flex-wrap: wrap; gap: 28px; align-items: center; margin-bottom: 20px; }
@@ -222,12 +110,6 @@ const jsonLd = {
     }
     select:hover { border-color: var(--cyan); }
     .fps select { padding: 7px 8px; font-size: 13px; }
-    .ghost {
-      padding: 9px 16px; border-radius: 10px; font: inherit; font-size: 14px; cursor: pointer;
-      color: var(--fg); background: transparent; border: 1px solid var(--line);
-    }
-    .ghost:hover { border-color: var(--cyan); color: var(--cyan); }
-    .ghost.primary { border-color: rgba(0,242,224,.4); color: var(--cyan); }
 
     .shots { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); }
     .shot {
@@ -239,12 +121,9 @@ const jsonLd = {
     .shot .len { font-size: 12px; color: var(--muted); }
     .shot .score { height: 3px; border-radius: 2px; background: #17171c; margin-top: 4px; }
     .shot .score span { display: block; height: 100%; background: var(--grad); }
+</style>
 
-    .privacy-note { margin-top: 16px; font-size: 14px; max-width: 62ch; }
-    .prose .q { margin: 28px 0 8px; font-size: 17px; }
-  </style>
-
-  <script>
+<script>
     import { loadEngine } from '../../lib/engine';
     import { openVideo, samplePlan, refinePlan, centerPixel, type VideoSource } from '../../lib/frames';
     import { clock, timecode, render, download, EXTENSION, type Format, type Mark } from '../../lib/timeline-export';
@@ -503,5 +382,5 @@ const jsonLd = {
         `${fileName}-shots.${EXTENSION[format]}`,
       );
     });
-  </script>
-</Base>
+</script>
+</ToolPage>
