@@ -13,8 +13,17 @@ interface Props {
    * it does not have.
    */
   localized?: boolean;
+  /**
+   * Exactly which locales have this page.
+   *
+   * `localized` is the blunt version — all locales or none. Tool pages are translated one at a
+   * time, so they pass the real list and hreflang names only what exists.
+   */
+  hreflangLocales?: Lang[];
 }
-const { lang, title, description, basePath = '/', localized = true } = Astro.props;
+const { lang, title, description, basePath = '/', localized = true, hreflangLocales } = Astro.props;
+
+const alternates = hreflangLocales ?? (localized ? (Object.keys(languages) as Lang[]) : []);
 const langEntries = Object.entries(languages) as [Lang, string][];
 const t = useTranslations(lang);
 
@@ -101,9 +110,9 @@ const jsonLd = {
   <meta property="og:image" content="/img/hero.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="canonical" href={`https://life2film.com${localized ? localePath(lang, basePath) : basePath}`} />
-  {localized && (
+  {alternates.length > 1 && (
     <>
-      {langEntries.map(([code]) => (
+      {alternates.map((code) => (
         <link rel="alternate" hreflang={code} href={`https://life2film.com${localePath(code, basePath)}`} />
       ))}
       <link rel="alternate" hreflang="x-default" href={`https://life2film.com${localePath('en', basePath)}`} />
@@ -157,10 +166,10 @@ const jsonLd = {
         exist and have no redirect. The flag was declared once and honoured in only one of the two
         places that emit a locale URL.
       */}
-      {localized && (
+      {alternates.length > 1 && (
         <div class="langs">
-          {langEntries.map(([code, label]) => (
-            <a class={`lang ${code === lang ? 'on' : ''}`} href={localePath(code, basePath)}>{label}</a>
+          {alternates.map((code) => (
+            <a class={`lang ${code === lang ? 'on' : ''}`} href={localePath(code, basePath)}>{languages[code]}</a>
           ))}
         </div>
       )}

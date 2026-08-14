@@ -2,16 +2,29 @@
 import Base from '../layouts/Base.astro';
 import AgentBlock from './AgentBlock.astro';
 import { TOOL, TOOLS } from '../lib/tools';
+import { TRANSLATIONS, localesFor } from '../lib/tools/index';
+import { CHROME, asTranslation } from '../lib/tools-i18n';
+import { localePath, type Lang } from '../i18n';
 
 interface Props {
   /** Which tool this is. Everything else comes from the registry. */
   slug: string;
+  /** Which language to render it in. Falls back to the English original. */
+  lang?: Lang;
 }
 
-const { slug } = Astro.props;
-const tool = TOOL[slug];
+const { slug, lang = 'en' } = Astro.props;
+const base = TOOL[slug];
 
-if (!tool) throw new Error(`No registry entry for tool "${slug}"`);
+// The words for this locale, or the English original when there is no translation yet.
+const tool = lang === 'en' ? asTranslation(base) : TRANSLATIONS[lang]?.[slug] ?? asTranslation(base);
+const chrome = CHROME[lang];
+const path = localePath(lang, `/tools/${slug}/`);
+
+/** Only the locales that actually have this page — never claim a translation that does not exist. */
+const locales = localesFor(slug);
+
+if (!base) throw new Error(`No registry entry for tool "${slug}"`);
 
 /**
  * The other tools, linked from every page.
@@ -27,8 +40,8 @@ const jsonLd = {
   '@graph': [
     {
       '@type': 'WebApplication',
-      name: tool.appName,
-      url: `https://life2film.com/tools/${tool.slug}/`,
+      name: base.appName,
+      url: `https://life2film.com${path}`,
       applicationCategory: 'MultimediaApplication',
       operatingSystem: 'Any browser with WebCodecs',
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
@@ -47,21 +60,20 @@ const jsonLd = {
 };
 ---
 
-<Base lang="en" title={tool.title} description={tool.description} basePath={`/tools/${tool.slug}/`} localized={false}>
+<Base lang={lang} title={tool.title} description={tool.description} basePath={`/tools/${slug}/`} localized={false} hreflangLocales={locales}>
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
 
   <main>
     <section class="tool-head">
       <div class="wrap">
-        <a class="back" href="/tools/">← All tools</a>
+        <a class="back" href={localePath(lang, '/tools/')}>{chrome.allTools}</a>
         <h1>{tool.heading} <span class="gradient-text">{tool.accent}</span></h1>
         <p class="lede">{tool.lede}</p>
 
         <slot name="tool" />
 
         <p class="privacy-note muted">
-          Your file is read and re-encoded by your own browser. No request carries it anywhere —
-          this page has no upload endpoint to send it to.
+{chrome.privacyNote}
         </p>
       </div>
     </section>
@@ -70,7 +82,7 @@ const jsonLd = {
       <div class="wrap prose">
         <slot name="prose" />
 
-        <h2>Questions</h2>
+        <h2>{chrome.questions}</h2>
         {tool.faq.map(({ q, a }) => (
           <>
             <h3 class="q">{q}</h3>
@@ -78,11 +90,11 @@ const jsonLd = {
           </>
         ))}
 
-        <h2>The other tools</h2>
+        <h2>{chrome.otherTools}</h2>
         <ul class="related">
           {others.map((other) => (
             <li>
-              <a href={`/tools/${other.slug}/`}>{other.name}</a> — {other.blurb}
+              <a href={localePath(lang, `/tools/${other.slug}/`)}>{other.name}</a> — {other.blurb}
             </li>
           ))}
         </ul>
@@ -91,8 +103,8 @@ const jsonLd = {
           Rendered here rather than wired into each page: the registry knows which tools have a
           snippet, so all seven get one instead of the two that happened to import the component.
         */}
-        {tool.code && tool.prompt && tool.agentJob && (
-          <AgentBlock job={tool.agentJob} code={tool.code} prompt={tool.prompt} />
+        {base.code && base.prompt && base.agentJob && (
+          <AgentBlock job={base.agentJob} code={base.code} prompt={base.prompt} />
         )}
       </div>
     </section>

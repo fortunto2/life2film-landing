@@ -1,0 +1,423 @@
+---
+/**
+ * The video-splitter interface: markup and behaviour, with no page metadata.
+ *
+ * Separated from the page so the localised routes can render exactly the same tool. The
+ * words around it come from the registry; this is the part that does the work.
+ */
+---
+
+<div class="tool" slot="tool">
+          <label class="drop" id="drop" for="file">
+            <input type="file" id="file" accept="video/*" hidden />
+            <strong>Choose a video file</strong>
+            <span class="muted">or drag it here — MP4, MOV (H.264), WebM · up to 10 minutes</span>
+          </label>
+
+          <div class="controls" id="controls" hidden>
+            <label class="control">
+              <span class="muted">Clip length</span>
+              <select id="target">
+                <option value="15">~15s — Stories</option>
+                <option value="30" selected>~30s — Reels, TikTok</option>
+                <option value="60">~60s — Shorts</option>
+                <option value="90">~90s — long Reels</option>
+              </select>
+            </label>
+
+            <label class="control checkbox">
+              <input type="checkbox" id="vertical" />
+              <span>Crop to 9:16</span>
+            </label>
+
+            <span class="spacer"></span>
+
+            <button id="downloadAll" type="button" class="ghost primary">Download selected</button>
+          </div>
+
+          <div id="status" class="status" hidden>
+            <div class="bar"><span id="fill"></span></div>
+            <div class="statustext" id="statusText"></div>
+          </div>
+
+          <div id="summary" class="summary" hidden></div>
+          <div class="clips" id="clipGrid"></div>
+        </div>
+
+  <Fragment slot="prose">
+        <h2>Why cut on the shot, not on the clock</h2>
+        <p>
+          A thirty-second rule knows nothing about the video it is cutting. It will end a clip in the
+          middle of a movement and open the next one on the tail of it, and the join is visible to
+          anyone watching — the first second of a clip is the second that decides whether they stay.
+        </p>
+        <p>
+          A shot change is a boundary the footage already contains. Starting there means each clip
+          opens on something new, which is what a person would do by hand. That is the only real
+          difference here, and it is the whole point.
+        </p>
+
+        <h2>What it does not do</h2>
+        <p>
+          It does not read speech, so it cannot find the moment someone says something quotable —
+          tools built around transcription do that, and they do it well. It does not track faces, so
+          the vertical crop takes the centre of the frame and trusts you to look at the previews.
+        </p>
+        <p>
+          What it does have is the picture: where the shots are, and which of them are sharp,
+          well-exposed and worth a viewer's attention. For footage without much talking — travel,
+          action, b-roll, anything shot on a gimbal — that is the information that matters.
+        </p>
+
+        <h2>How it works</h2>
+        <p>
+          The <a href="/tools/scene-detector/">scene detector</a> finds the shot boundaries, the same
+          per-frame scorer that <a href="/">Life2Film</a> uses ranks them, and the clips are grouped
+          so no cut ever lands inside a shot. Encoding uses the browser's own video pipeline, so the
+          output is a normal MP4 with no watermark.
+        </p>
+  </Fragment>
+<style>
+    select {
+      padding: 9px 12px; border-radius: 10px; font: inherit; font-size: 14px; cursor: pointer;
+      color: var(--fg); background: #0a0a0d; border: 1px solid var(--line);
+    }
+    select:hover { border-color: var(--cyan); }
+
+    .summary { margin-top: 18px; font-size: 15px; color: #cfcfd6; }
+    .summary b { color: var(--fg); }
+
+    .clips { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); margin-top: 16px; }
+    .clip {
+      border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #08080a;
+      display: flex; flex-direction: column;
+    }
+    .clip.on { border-color: rgba(0,242,224,.5); }
+    .clip .shell { position: relative; cursor: pointer; }
+    .clip img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #111; }
+    .clip .pick {
+      position: absolute; top: 8px; left: 8px; width: 20px; height: 20px;
+      accent-color: #00f2e0; cursor: pointer;
+    }
+    .clip .rank {
+      position: absolute; top: 8px; right: 8px; padding: 2px 7px; border-radius: 999px;
+      background: rgba(5,5,6,.78); font-size: 11px; letter-spacing: .06em; color: var(--cyan);
+    }
+    .clip .info { padding: 9px 11px; display: grid; gap: 3px; }
+    .clip .tc { font-size: 13px; font-family: ui-monospace, monospace; }
+    .clip .len { font-size: 12px; color: var(--muted); }
+    .clip .act { padding: 0 11px 11px; }
+    .clip .act button {
+      width: 100%; padding: 7px; border-radius: 8px; font: inherit; font-size: 13px; cursor: pointer;
+      color: var(--fg); background: transparent; border: 1px solid var(--line);
+    }
+    .clip .act button:hover:not(:disabled) { border-color: var(--cyan); color: var(--cyan); }
+    .clip .act button:disabled { opacity: .5; cursor: default; }
+</style>
+
+<script>
+    import { loadEngine } from '../../lib/engine';
+    import { openVideo, samplePlan, refinePlan, centerPixel, type VideoSource } from '../../lib/frames';
+    import { groupIntoClips, rankByScore, stars, type Clip, type Shot } from '../../lib/clips';
+    import { clock } from '../../lib/timeline-export';
+
+    const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+    const drop = el<HTMLLabelElement>('drop');
+    const fileInput = el<HTMLInputElement>('file');
+    const statusEl = el<HTMLDivElement>('status');
+    const grid = el<HTMLDivElement>('clipGrid');
+
+    const ANALYSIS_WIDTH = 64;
+    const THUMB_WIDTH = 380;
+    const MAX_MINUTES = 10;
+
+    let shots: Shot[] = [];
+    let clips: Clip[] = [];
+    let sourceFile: File | null = null;
+    let videoDuration = 0;
+    let fileName = 'video';
+    let busy = false;
+
+    function status(message: string, fraction?: number, isError = false) {
+      statusEl.hidden = false;
+      statusEl.classList.toggle('err', isError);
+      el('statusText').textContent = message;
+      if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+    }
+
+    const target = () => Number(el<HTMLSelectElement>('target').value) || 30;
+    const wantsVertical = () => el<HTMLInputElement>('vertical').checked;
+
+    // --- analysis ---
+
+    async function analyse(file: File) {
+      if (busy) return;
+      busy = true;
+      sourceFile = file;
+      fileName = file.name.replace(/\.[^.]+$/, '') || 'video';
+      grid.replaceChildren();
+      el('summary').hidden = true;
+      el('controls').hidden = true;
+
+      let source: VideoSource | null = null;
+
+      try {
+        status('Opening video…', 0.02);
+        source = await openVideo(file);
+        videoDuration = source.duration;
+
+        if (source.duration > MAX_MINUTES * 60) {
+          throw new Error(
+            `That video is ${clock(source.duration)} long. Reading frames means seeking through the ` +
+              `whole file, so anything past ${MAX_MINUTES} minutes takes longer than it is worth.`,
+          );
+        }
+
+        const engine = await loadEngine();
+        const plan = samplePlan(source.duration);
+        const coarseStep = source.duration / plan.length;
+
+        const pixels: Array<{ r: number; g: number; b: number }> = [];
+        const timestamps: number[] = [];
+        const scores: Array<{ timestamp: number; score: number }> = [];
+
+        for (const [i, at] of plan.entries()) {
+          const frame = await source.frameAt(at, ANALYSIS_WIDTH);
+          pixels.push(centerPixel(frame));
+          timestamps.push(at);
+
+          const scored = JSON.parse(
+            engine.score_frame(frame.width, frame.height, frame.rgb24, at, null),
+          ) as { score?: number; error?: string };
+          if (!scored.error) scores.push({ timestamp: at, score: scored.score ?? 0 });
+
+          if (i % 8 === 0) status(`Reading the video — ${i + 1} of ${plan.length} frames`, ((i + 1) / plan.length) * 0.75);
+        }
+
+        status('Finding the shot changes…', 0.8);
+
+        const detected = JSON.parse(
+          engine.detect_scenes_slick(
+            JSON.stringify({ pixels, timestamps, duration: source.duration, algo: 'adjacent_diffs' }),
+          ),
+        ) as { scenes?: Array<[number, number]>; error?: string };
+        if (detected.error) throw new Error(detected.error);
+
+        const ranges = detected.scenes?.length
+          ? detected.scenes
+          : [[0, source.duration] as [number, number]];
+
+        // Refine each boundary at ten times the coarse resolution — a cut reported half a second
+        // late is a clip that opens on the end of the previous shot.
+        const moved = new Map<number, number>();
+        for (const [i, [start]] of ranges.slice(1).entries()) {
+          status(`Placing cut ${i + 1} of ${ranges.length - 1}…`, 0.82 + (i / (ranges.length - 1)) * 0.16);
+          moved.set(start, await refineBoundary(source, start, coarseStep));
+        }
+
+        shots = ranges.map(([start, end]) => {
+          const inside = scores.filter((s) => s.timestamp >= start && s.timestamp < end).map((s) => s.score);
+          inside.sort((a, b) => a - b);
+          return {
+            start: moved.get(start) ?? start,
+            end: moved.get(end) ?? end,
+            score: inside.length ? inside[Math.floor(inside.length / 2)] : 0,
+          };
+        });
+
+        statusEl.hidden = true;
+        el('controls').hidden = false;
+        await rebuild(source);
+      } catch (error) {
+        status(error instanceof Error ? error.message : 'Could not read that file.', 1, true);
+      } finally {
+        source?.release();
+        busy = false;
+      }
+    }
+
+    async function refineBoundary(source: VideoSource, boundary: number, coarseStep: number): Promise<number> {
+      const points = refinePlan(boundary, coarseStep, coarseStep / 10, source.duration);
+      if (points.length < 2) return boundary;
+
+      let previous: { r: number; g: number; b: number } | null = null;
+      let best = boundary;
+      let biggest = -1;
+
+      for (const at of points) {
+        const pixel = centerPixel(await source.frameAt(at, ANALYSIS_WIDTH));
+        if (previous) {
+          const delta =
+            Math.abs(pixel.r - previous.r) + Math.abs(pixel.g - previous.g) + Math.abs(pixel.b - previous.b);
+          if (delta > biggest) {
+            biggest = delta;
+            best = at;
+          }
+        }
+        previous = pixel;
+      }
+      return best;
+    }
+
+    /** Regroup and redraw — cheap, because the shots are already known. */
+    async function rebuild(source: VideoSource) {
+      clips = groupIntoClips(shots, { target: target() });
+      const order = rankByScore(clips);
+      const best = clips.length ? clips[order[0]].score : 0;
+
+      el('summary').hidden = false;
+      el('summary').innerHTML =
+        `<b>${clips.length}</b> clips from <b>${shots.length}</b> shots · ` +
+        `${clock(videoDuration)} of video · best clip is #${order[0] + 1}`;
+
+      grid.replaceChildren();
+
+      for (const [i, clip] of clips.entries()) {
+        const rank = order.indexOf(i) + 1;
+        const card = document.createElement('div');
+        card.className = 'clip on';
+        card.innerHTML = `
+          <div class="shell">
+            <img alt="Clip ${i + 1}" loading="lazy" />
+            <input class="pick" type="checkbox" checked aria-label="Include clip ${i + 1}" />
+            <span class="rank">${'★'.repeat(stars(clip, best))}${rank === 1 ? ' BEST' : ''}</span>
+          </div>
+          <div class="info">
+            <span class="tc">${clock(clip.start)} – ${clock(clip.end)}</span>
+            <span class="len">Clip ${i + 1} · ${(clip.end - clip.start).toFixed(1)}s · ${clip.shots} shot${clip.shots > 1 ? 's' : ''}</span>
+          </div>
+          <div class="act"><button type="button">Download</button></div>`;
+
+        const pick = card.querySelector<HTMLInputElement>('.pick')!;
+        pick.addEventListener('change', () => card.classList.toggle('on', pick.checked));
+        card.querySelector('button')!.addEventListener('click', () => void exportClips([i]));
+        grid.append(card);
+
+        const at = Math.min(clip.start + 0.3, clip.end - 0.05, videoDuration - 0.05);
+        try {
+          card.querySelector('img')!.src = await source.thumbnailAt(Math.max(0, at), THUMB_WIDTH);
+        } catch {
+          // A missing thumbnail does not invalidate the clip it belongs to.
+        }
+      }
+    }
+
+    // --- encoding ---
+
+    /**
+     * Cut the selected clips out of the source and hand them over as MP4s.
+     *
+     * mediabunny drives WebCodecs, so this is the browser's own video pipeline — hardware where
+     * available — rather than a copy of ffmpeg shipped over the wire.
+     */
+    async function exportClips(indices: number[]) {
+      if (busy || !sourceFile || !indices.length) return;
+      busy = true;
+      setButtons(false);
+
+      try {
+        const { Input, Output, Conversion, BufferTarget, Mp4OutputFormat, ALL_FORMATS, BlobSource } =
+          await import('mediabunny');
+
+        for (const [n, index] of indices.entries()) {
+          const clip = clips[index];
+          const label = `clip ${n + 1} of ${indices.length}`;
+          status(`Encoding ${label}…`, n / indices.length);
+
+          const input = new Input({ source: new BlobSource(sourceFile), formats: ALL_FORMATS });
+          const output = new Output({ format: new Mp4OutputFormat(), target: new BufferTarget() });
+
+          const conversion = await Conversion.init({
+            input,
+            output,
+            trim: { start: clip.start, end: clip.end },
+            ...(wantsVertical()
+              ? { video: { width: 1080, height: 1920, fit: 'cover' as const } }
+              : {}),
+          });
+
+          conversion.onProgress = (progress: number) => {
+            status(`Encoding ${label} — ${Math.round(progress * 100)}%`, (n + progress) / indices.length);
+          };
+
+          await conversion.execute();
+
+          const buffer = output.target.buffer;
+          if (!buffer) throw new Error('The encoder produced no data.');
+
+          const url = URL.createObjectURL(new Blob([buffer], { type: 'video/mp4' }));
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${fileName}-clip-${index + 1}${wantsVertical() ? '-9x16' : ''}.mp4`;
+          a.click();
+          URL.revokeObjectURL(url);
+        }
+
+        status(`Done — ${indices.length} clip${indices.length > 1 ? 's' : ''} saved.`, 1);
+        setTimeout(() => { statusEl.hidden = true; }, 4000);
+      } catch (error) {
+        status(
+          error instanceof Error
+            ? `Encoding failed — ${error.message}`
+            : 'Encoding failed.',
+          1,
+          true,
+        );
+      } finally {
+        busy = false;
+        setButtons(true);
+      }
+    }
+
+    function setButtons(enabled: boolean) {
+      el<HTMLButtonElement>('downloadAll').disabled = !enabled;
+      for (const button of grid.querySelectorAll('button')) button.disabled = !enabled;
+    }
+
+    const selected = () =>
+      [...grid.querySelectorAll<HTMLInputElement>('.pick')]
+        .map((box, i) => (box.checked ? i : -1))
+        .filter((i) => i >= 0);
+
+    el<HTMLButtonElement>('downloadAll').addEventListener('click', () => void exportClips(selected()));
+
+    // Regrouping needs the video again for thumbnails, so it reopens the file rather than holding
+    // a decoder alive for the whole session.
+    el<HTMLSelectElement>('target').addEventListener('change', async () => {
+      if (!sourceFile || !shots.length || busy) return;
+      busy = true;
+      const source = await openVideo(sourceFile);
+      try {
+        await rebuild(source);
+      } finally {
+        source.release();
+        busy = false;
+      }
+    });
+
+    // --- input ---
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files?.[0];
+      if (file) void analyse(file);
+    });
+
+    for (const type of ['dragenter', 'dragover']) {
+      drop.addEventListener(type, (e) => {
+        e.preventDefault();
+        drop.classList.add('over');
+      });
+    }
+    for (const type of ['dragleave', 'drop']) {
+      drop.addEventListener(type, (e) => {
+        e.preventDefault();
+        drop.classList.remove('over');
+      });
+    }
+    drop.addEventListener('drop', (e) => {
+      const file = (e as DragEvent).dataTransfer?.files?.[0];
+      if (file) void analyse(file);
+    });
+</script>
+</ToolPage>
