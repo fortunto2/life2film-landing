@@ -33,6 +33,9 @@ export interface EncodeOptions {
   height?: number;
   fit?: 'fill' | 'contain' | 'cover';
   quality?: QualityName;
+  /** Explicit bits per second, used when aiming at a file size. Takes precedence over `quality`. */
+  videoBitrate?: number;
+  audioBitrate?: number;
   /** Drop the picture — used by "extract the audio". */
   discardVideo?: boolean;
   /** Drop the sound — used to make a file smaller when nobody will hear it. */
@@ -127,13 +130,23 @@ export async function encode(file: File, options: EncodeOptions): Promise<Blob> 
         ...(options.width ? { width: options.width } : {}),
         ...(options.height ? { height: options.height } : {}),
         ...(options.fit ? { fit: options.fit } : {}),
-        ...(options.quality ? { bitrate: quality } : {}),
+        // A number aims at a size; a quality name aims at a look. The number wins when both are
+        // given, because a size target is a hard constraint and a quality preference is not.
+        ...(options.videoBitrate
+          ? { bitrate: options.videoBitrate }
+          : options.quality
+            ? { bitrate: quality }
+            : {}),
       };
 
   const audio = options.discardAudio
     ? { discard: true as const }
     : {
-        ...(options.quality && options.container !== 'wav' ? { bitrate: quality } : {}),
+        ...(options.audioBitrate && options.container !== 'wav'
+          ? { bitrate: options.audioBitrate }
+          : options.quality && options.container !== 'wav'
+            ? { bitrate: quality }
+            : {}),
         ...(options.mono ? { numberOfChannels: 1 } : {}),
       };
 
