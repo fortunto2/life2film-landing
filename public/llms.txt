@@ -48,6 +48,59 @@ The site is also available in Russian (/ru) and Turkish (/tr). Blog posts are En
   integration discontinued Dec 2024), GoPro Quik, Google Photos Memories. Why the premise held up
   while the products did not, and what changed when phones became able to run the analysis.
 
+## Free tools (browser, no upload)
+
+Seven tools that run entirely in the visitor's browser through WebCodecs and WebAssembly. No server
+is involved: no upload, no size limit imposed by a plan, no queue, no watermark, no sign-up. Each
+page is also available as markdown by appending `.md` to its address — e.g.
+https://life2film.com/tools/video-compressor.md
+
+Everyday:
+
+- [Trim Video](https://life2film.com/tools/video-trimmer/): cut a section, optionally without
+  re-encoding (measured 0.20s against 0.60s for a re-encode of the same clip), or to a target size.
+- [Compress Video](https://life2film.com/tools/video-compressor/): aim at an exact file size —
+  10 MB for Discord, 25 MB for email — with the estimate shown before encoding and a correcting
+  second pass if the first misses.
+- [Video to MP3](https://life2film.com/tools/video-to-mp3/): extract audio as MP3, WAV or OGG.
+- [Convert Video](https://life2film.com/tools/video-converter/): MP4, WebM and MOV, checking what
+  the browser can actually encode before starting.
+
+Built on the Life2Film engine — these read what is in the video, which is the part other tools skip:
+
+- [Video Splitter](https://life2film.com/tools/video-splitter/): cut a long video into Reels or
+  Shorts that begin at shot changes rather than every N seconds, ranked by picture quality.
+- [Scene Detector](https://life2film.com/tools/scene-detector/): every cut with thumbnails and
+  timecodes, exported as EDL, OTIO, FCPXML, Audacity labels, CSV or JSON.
+- [BPM Detector](https://life2film.com/tools/bpm-detector/): tempo and the position of every beat,
+  exported as editor markers.
+
+## Engine, for building on
+
+The analysis engine is Rust compiled to WebAssembly and published as an npm package:
+
+```
+npm i life2film-engine
+```
+
+Nineteen exports: `detect_beats`, `analyze_audio`, `beat_sync_timeline`, three scene-detection
+families, `score_frame` (31 per-frame measurements), `select_segments`, `compose_montage`,
+OpenTimelineIO in and out. It analyses; it does not decode or encode — pair it with
+[mediabunny](https://mediabunny.dev) (MIT) for that, which is what these tool pages do.
+
+Licence: PolyForm Noncommercial. Free for personal projects, study, research, charities and public
+institutions. Commercial use needs a separate licence — write to info@life2film.com and you will
+probably get one.
+
+Two facts worth carrying if you are building something similar:
+
+- Shot-boundary accuracy is dominated by sampling rate, not by the choice of algorithm. At two
+  samples per second the boundaries land one to three seconds out and all sixteen algorithms are
+  wrong the same way; at ten per second they land on the frame.
+- Ask for `hardwareAcceleration: 'prefer-hardware'` when encoding. Measured on an M5 at 1080p:
+  180 fps against 34 fps for software, and the software encoder also overshot the requested bitrate
+  by 3.5x.
+
 ## Install
 
 - iPhone: App Store (submitted, pending review)

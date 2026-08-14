@@ -1,0 +1,128 @@
+---
+/**
+ * The "take this with you" block.
+ *
+ * These pages are used by two kinds of visitor: someone with a file to convert, and someone whose
+ * agent was told to convert files. The second one does not want a drop zone — they want the code,
+ * or a prompt they can hand to Claude Code or Cursor to build the same thing into their own project.
+ *
+ * Giving that away costs nothing (the engine runs on their machine either way) and is the only
+ * reason a developer would link to this page rather than bookmark it.
+ */
+interface Props {
+  /** What this tool does, phrased as the job an agent would be asked to do. */
+  job: string;
+  /** Runnable snippet — must work as pasted, with no placeholders to fill in. */
+  code: string;
+  /** Instruction to paste into a coding agent. */
+  prompt: string;
+}
+
+const { job, code, prompt } = Astro.props;
+---
+
+<section class="agentblock">
+  <div class="head">
+    <h2>Build this into your own project</h2>
+    <p class="muted">
+      {job} — the same way this page does it, on the user's machine, with no server. Take the code,
+      or hand the prompt to a coding agent.
+    </p>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab on" data-panel="code" type="button" role="tab">Code</button>
+    <button class="tab" data-panel="prompt" type="button" role="tab">Prompt for an agent</button>
+  </div>
+
+  <div class="panel" data-panel="code">
+    <button class="copy" type="button" data-copy="code">Copy</button>
+    <pre><code set:text={code} /></pre>
+  </div>
+
+  <div class="panel" data-panel="prompt" hidden>
+    <button class="copy" type="button" data-copy="prompt">Copy</button>
+    <pre><code set:text={prompt} /></pre>
+  </div>
+
+  <p class="foot muted">
+    The engine is <a href="/llms.txt">documented for agents</a>, and every tool page is available as
+    markdown by adding <code>.md</code> to its address.
+  </p>
+</section>
+
+<style>
+  .agentblock {
+    margin-top: 44px; padding: 22px;
+    border: 1px solid var(--line); border-radius: 16px; background: var(--panel);
+  }
+  .head h2 { font-size: 20px; margin-bottom: 6px; }
+  .head p { font-size: 15px; max-width: 72ch; }
+
+  .tabs { display: flex; gap: 6px; margin: 18px 0 12px; }
+  .tab {
+    padding: 7px 14px; border-radius: 9px; font: inherit; font-size: 13px; cursor: pointer;
+    color: var(--muted); background: transparent; border: 1px solid var(--line);
+  }
+  .tab:hover { color: var(--fg); }
+  .tab.on { color: var(--cyan); border-color: rgba(0,242,224,.45); background: rgba(0,242,224,.05); }
+
+  .panel { position: relative; }
+  .copy {
+    position: absolute; top: 10px; right: 10px; z-index: 1;
+    padding: 5px 11px; border-radius: 8px; font: inherit; font-size: 12px; cursor: pointer;
+    color: var(--muted); background: #0e0e12; border: 1px solid var(--line);
+  }
+  .copy:hover { color: var(--cyan); border-color: var(--cyan); }
+  .copy.done { color: var(--cyan); }
+
+  pre {
+    margin: 0; padding: 16px; overflow-x: auto;
+    border-radius: 12px; background: #08080a; border: 1px solid var(--line);
+  }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px; line-height: 1.65; color: #cfcfd6; white-space: pre;
+  }
+
+  .foot { margin-top: 14px; font-size: 13px; }
+  .foot code { font-size: 12px; background: #08080a; padding: 2px 5px; border-radius: 4px; }
+</style>
+
+<script>
+  for (const block of document.querySelectorAll<HTMLElement>('.agentblock')) {
+    const tabs = block.querySelectorAll<HTMLButtonElement>('.tab');
+    const panels = block.querySelectorAll<HTMLElement>('.panel');
+
+    for (const tab of tabs) {
+      tab.addEventListener('click', () => {
+        for (const other of tabs) other.classList.toggle('on', other === tab);
+        for (const panel of panels) panel.hidden = panel.dataset.panel !== tab.dataset.panel;
+      });
+    }
+
+    for (const button of block.querySelectorAll<HTMLButtonElement>('.copy')) {
+      button.addEventListener('click', async () => {
+        const panel = block.querySelector<HTMLElement>(`.panel[data-panel="${button.dataset.copy}"]`);
+        const text = panel?.querySelector('code')?.textContent ?? '';
+        try {
+          await navigator.clipboard.writeText(text);
+          button.textContent = 'Copied';
+          button.classList.add('done');
+        } catch {
+          // Clipboard is refused without a secure context or a user gesture the browser trusts;
+          // selecting the text is the fallback that always works.
+          const range = document.createRange();
+          range.selectNodeContents(panel!.querySelector('code')!);
+          getSelection()?.removeAllRanges();
+          getSelection()?.addRange(range);
+          button.textContent = 'Selected — press ⌘C';
+        }
+        setTimeout(() => {
+          button.textContent = 'Copy';
+          button.classList.remove('done');
+        }, 2500);
+      });
+    }
+  }
+</script>

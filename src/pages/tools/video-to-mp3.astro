@@ -1,5 +1,49 @@
 ---
 import ToolPage from '../../components/ToolPage.astro';
+import AgentBlock from '../../components/AgentBlock.astro';
+
+const code = `// npm i mediabunny @mediabunny/mp3-encoder
+import { Input, Output, Conversion, BlobSource, BufferTarget, Mp3OutputFormat, ALL_FORMATS } from 'mediabunny';
+import { registerMp3Encoder } from '@mediabunny/mp3-encoder';
+
+registerMp3Encoder();   // LAME compiled to WASM; only needed for MP3 output
+
+export async function extractAudio(file, { bitrate = 192_000, mono = false } = {}) {
+  const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
+  const output = new Output({ format: new Mp3OutputFormat(), target: new BufferTarget() });
+
+  const conversion = await Conversion.init({
+    input,
+    output,
+    video: { discard: true },                      // leave the picture behind
+    audio: { bitrate, ...(mono ? { numberOfChannels: 1 } : {}) },
+  });
+
+  if (!conversion.isValid) throw new Error('No audio track, or it cannot be decoded');
+  await conversion.execute();
+
+  return new Blob([output.target.buffer], { type: 'audio/mpeg' });
+}
+
+const mp3 = await extractAudio(file, { bitrate: 192_000 });`;
+
+const prompt = `Add "extract the audio from a video" to my project. It must run entirely in the browser — the
+files are personal (lectures, interviews, recordings) and must not be uploaded anywhere.
+
+Requirements:
+- Use "mediabunny" for decoding and "@mediabunny/mp3-encoder" for MP3 (LAME compiled to WASM).
+  Import the MP3 encoder lazily — only load it when the user actually picks MP3.
+- Support MP3, WAV and OGG output. Set video: { discard: true } so only the audio is written.
+- WAV has no bitrate to choose: hide that control when WAV is selected, because its size is
+  sampleRate x 2 bytes x channels and nothing else.
+- Predict the output size before converting, and read the real channel count and sample rate off the
+  file to do it — assuming stereo doubles the estimate for a mono source. For Vorbis apply about 0.7
+  to the nominal bitrate, since it runs variable-rate and lands under.
+- Tell the user when a requested bitrate exceeds what the source was recorded at: it makes the file
+  bigger without making it sound better.
+- Fail clearly when the file has no audio track at all, before doing any work.
+
+Reference implementation: https://life2film.com/tools/video-to-mp3/`;
 
 const faq = [
   {
@@ -124,6 +168,12 @@ const faq = [
       the <a href="/tools/video-trimmer/">trimmer</a>. To convert the video itself between formats,
       use the <a href="/tools/video-converter/">converter</a>.
     </p>
+
+    <AgentBlock
+      job="Pulling audio out of a video, locally"
+      code={code}
+      prompt={prompt}
+    />
   </Fragment>
 </ToolPage>
 

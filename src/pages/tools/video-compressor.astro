@@ -1,5 +1,69 @@
 ---
 import ToolPage from '../../components/ToolPage.astro';
+import AgentBlock from '../../components/AgentBlock.astro';
+
+const code = `// npm i mediabunny
+import { Input, Output, Conversion, BlobSource, BufferTarget, Mp4OutputFormat, ALL_FORMATS } from 'mediabunny';
+
+// Size is bitrate x duration, so a target size fixes the bitrate.
+const OVERHEAD = 0.04;               // container headers and packaging
+const AUDIO_BITRATE = 128_000;
+
+export async function compressToSize(file, targetBytes, { width } = {}) {
+  const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
+  const duration = await input.computeDuration();
+
+  // Aim under the wall: a file of exactly 10.00 MB is still refused by a 10 MB limit.
+  const aim = targetBytes * 0.96;
+  const videoBitrate = Math.max(
+    90_000,
+    Math.round((aim * 8 * (1 - OVERHEAD) - AUDIO_BITRATE * duration) / duration),
+  );
+
+  const output = new Output({ format: new Mp4OutputFormat(), target: new BufferTarget() });
+  const conversion = await Conversion.init({
+    input,
+    output,
+    video: {
+      ...(width ? { width } : {}),
+      bitrate: videoBitrate,
+      hardwareAcceleration: 'prefer-hardware',  // 180 fps vs 34 on an M5 at 1080p
+    },
+    audio: { bitrate: AUDIO_BITRATE },
+  });
+
+  if (!conversion.isValid) throw new Error('Cannot convert this file');
+  await conversion.execute();
+
+  return new Blob([output.target.buffer], { type: 'video/mp4' });
+}
+
+// Encoders drift, so measure and correct once if the first pass missed.
+const blob = await compressToSize(file, 10 * 1024 * 1024);
+console.log(blob.size / 1048576, 'MB');`;
+
+const prompt = `Build me a video compressor that runs entirely in the browser — no upload, no server.
+
+Requirements:
+- Use the "mediabunny" npm package, which wraps WebCodecs. Do not use ffmpeg.wasm: it is ~30 MB and
+  needs SharedArrayBuffer, which requires COOP/COEP headers that break third-party scripts.
+- Let the user target a file size (presets: 10 MB Discord, 16 MB WhatsApp, 25 MB email) as well as
+  picking a quality.
+- To hit a size: size = bitrate x duration, so videoBitrate = (targetBytes * 8 * 0.96 - audioBitrate
+  * duration) / duration. Aim at 96% of the limit, because a file of exactly 10.00 MB is still
+  rejected by a 10 MB limit.
+- Encoders do not obey a requested bitrate exactly. Measure the result; if it missed by more than 4%
+  or broke the limit, re-encode once with bitrate * (target / actual), damped to at most a halving
+  or doubling. Stop at two passes.
+- Pass hardwareAcceleration: 'prefer-hardware'. Measured on an M5 at 1080p: 180 fps against 34 fps
+  for software, and the software encoder also overshot the requested bitrate by 3.5x.
+- Show the estimated output size before encoding, and the real before/after afterwards.
+- Refuse impossible targets up front: below about 90 kbps video is unwatchable, so if the target
+  cannot be met at that floor, say so and give the smallest honest size instead of producing junk.
+- Warn when the source is already compressed below what its resolution needs — re-encoding it will
+  make it larger, and only reducing the resolution will help.
+
+Reference implementation: https://life2film.com/tools/video-compressor/`;
 
 const faq = [
   {
@@ -168,6 +232,12 @@ const faq = [
       To shorten a video rather than shrink it, use the <a href="/tools/video-trimmer/">trimmer</a>;
       to change format, the <a href="/tools/video-converter/">converter</a>.
     </p>
+
+    <AgentBlock
+      job="Compressing video to a target file size"
+      code={code}
+      prompt={prompt}
+    />
   </Fragment>
 </ToolPage>
 
