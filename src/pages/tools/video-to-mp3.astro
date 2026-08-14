@@ -1,0 +1,279 @@
+---
+import ToolPage from '../../components/ToolPage.astro';
+
+const faq = [
+  {
+    q: 'Is my video uploaded?',
+    a: 'No. The browser decodes the file and encodes the audio locally, so nothing is sent anywhere. That matters more here than for most conversions: the reason to pull audio out of a video is often that the video is personal — a lecture, an interview, a recording of your own — and it has no business on someone else\'s server to answer a question your laptop can answer.',
+  },
+  {
+    q: 'Which format should I choose?',
+    a: 'MP3 if it is going anywhere at all — every device and app plays it, and at 192 kbps it is transparent for speech and close to it for music. WAV if the audio is going into an editor or a transcription tool, since it is uncompressed and loses nothing. OGG (Vorbis) is smaller than MP3 at the same quality but less widely supported outside browsers and Android.',
+  },
+  {
+    q: 'What bitrate do I need?',
+    a: 'For speech, 96–128 kbps is plenty and halves the file against the default. For music, 192 kbps is the usual sweet spot and 320 is the most MP3 offers. Higher than the source was recorded at gains nothing: converting a 128 kbps podcast to 320 kbps produces a file two and a half times larger that sounds identical.',
+  },
+  {
+    q: 'Why is my WAV file so large?',
+    a: 'Because it is uncompressed — roughly 10 MB per minute in stereo at 44.1 kHz, regardless of what it contains. That is the point of it: nothing is thrown away. If the size is a problem and the audio is not going into an editor, MP3 is a twentieth of the size and you will not hear the difference.',
+  },
+  {
+    q: 'Can I convert just part of the video?',
+    a: 'Not on this page — it converts the whole file. Trim the video first with the trimmer, then convert what comes out, or convert everything and cut the audio in whatever you are taking it into.',
+  },
+  {
+    q: 'Which files work?',
+    a: 'Anything your browser can open: MP4, MOV and WebM video, and most audio files if you are converting between audio formats. Camera-native formats like ProRes, and DRM-protected files, cannot be read by a browser at all.',
+  },
+];
+---
+
+<ToolPage
+  title="Video to MP3 — extract audio in your browser, free"
+  description="Pull the audio out of a video and save it as MP3, WAV or OGG. Runs entirely in your browser — nothing is uploaded, no size limit, no watermark, no sign-up."
+  path="/tools/video-to-mp3/"
+  heading="Video to"
+  accent="MP3"
+  lede="Take the sound out of a video and keep it as MP3, WAV or OGG. Nothing is uploaded — the conversion happens on your machine."
+  appName="Video to MP3 Converter"
+  featureList={[
+    'Extract audio from MP4, MOV and WebM',
+    'MP3, WAV and OGG output',
+    'Choose bitrate, mono and sample rate',
+    'Runs fully client-side — no upload, no watermark',
+  ]}
+  faq={faq}
+>
+  <div class="tool" slot="tool">
+    <label class="drop" id="drop" for="file">
+      <input type="file" id="file" accept="video/*,audio/*" hidden />
+      <strong>Choose a video or audio file</strong>
+      <span class="muted">or drag it here — MP4, MOV, WebM, M4A</span>
+    </label>
+
+    <div id="editor" hidden>
+      <div class="facts" id="facts"></div>
+      <div id="verdict" class="verdict" hidden></div>
+
+      <div class="controls">
+        <label class="control">
+          <span class="muted">Format</span>
+          <select id="container">
+            <option value="mp3" selected>MP3 — plays everywhere</option>
+            <option value="wav">WAV — uncompressed</option>
+            <option value="ogg">OGG — smaller than MP3</option>
+          </select>
+        </label>
+
+        <label class="control" id="bitrateWrap">
+          <span class="muted">Bitrate</span>
+          <select id="bitrate">
+            <option value="320000">320 kbps — maximum</option>
+            <option value="192000" selected>192 kbps — music</option>
+            <option value="128000">128 kbps — general</option>
+            <option value="96000">96 kbps — speech</option>
+            <option value="64000">64 kbps — smallest</option>
+          </select>
+        </label>
+
+        <label class="control checkbox">
+          <input type="checkbox" id="mono" />
+          <span>Mono</span>
+        </label>
+
+        <span class="spacer"></span>
+        <span class="muted" id="estimate"></span>
+        <button id="run" type="button" class="ghost primary">Extract audio</button>
+      </div>
+    </div>
+
+    <div id="status" class="status" hidden>
+      <div class="bar"><span id="fill"></span></div>
+      <div class="statustext" id="statusText"></div>
+    </div>
+  </div>
+
+  <Fragment slot="prose">
+    <h2>What extracting audio actually is</h2>
+    <p>
+      A video file is a container holding separate tracks — picture in one, sound in another. They
+      are already independent, so pulling the audio out is not a conversion in the usual sense: the
+      picture is simply left behind.
+    </p>
+    <p>
+      What happens next depends on the format you choose. WAV takes the decoded audio as it is and
+      writes it uncompressed, which loses nothing and produces a large file. MP3 and OGG re-encode
+      it, which is why the bitrate matters — and why converting a file that was already compressed
+      once cannot recover what the first encoder discarded, no matter how high you set it.
+    </p>
+
+    <h2>Why in the browser</h2>
+    <p>
+      The audio in a video you want to keep is usually the part that is personal: a lecture you
+      recorded, an interview, a rehearsal, something a family member said. Handing that to a website
+      to have it handed back is a strange trade when a laptop can do it in seconds.
+    </p>
+    <p>
+      This page uses WebCodecs for decoding and, for MP3, a LAME encoder compiled to WebAssembly —
+      loaded only if you choose MP3. No file leaves the machine, and there is no size limit because
+      there is nothing to upload to.
+    </p>
+    <p>
+      To take a section rather than the whole file, trim it first with
+      the <a href="/tools/video-trimmer/">trimmer</a>. To convert the video itself between formats,
+      use the <a href="/tools/video-converter/">converter</a>.
+    </p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .verdict {
+    margin-top: 14px; padding: 11px 14px; border-radius: 10px; font-size: 14px;
+    border: 1px solid var(--line); background: #0a0a0d; color: #cfcfd6;
+  }
+  .verdict.warn { border-color: rgba(255,166,29,.4); color: var(--orange); }
+</style>
+
+<script>
+  import {
+    probe, encode, saveBlob, formatBytes, preciseClock,
+    CONTAINER_EXTENSION, type Container, type Probe,
+  } from '../../lib/encode';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+  const drop = el<HTMLLabelElement>('drop');
+  const fileInput = el<HTMLInputElement>('file');
+  const statusEl = el<HTMLDivElement>('status');
+
+  let file: File | null = null;
+  let info: Probe | null = null;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  const container = () => el<HTMLSelectElement>('container').value as Container;
+  const bitrate = () => Number(el<HTMLSelectElement>('bitrate').value) || 192_000;
+  const mono = () => el<HTMLInputElement>('mono').checked;
+
+  function refreshEstimate() {
+    if (!info) return;
+    const format = container();
+
+    // WAV has no bitrate to choose: it is sample rate times bit depth times channels.
+    el('bitrateWrap').hidden = format === 'wav';
+
+    // WAV is arithmetic: sample rate × 2 bytes × channels. The others are lossy, and Vorbis in
+    // particular runs variable-rate and lands consistently under its nominal figure.
+    const channels = mono() ? 1 : info.channels;
+    const bytes =
+      format === 'wav'
+        ? info.duration * info.sampleRate * 2 * channels
+        : (bitrate() * (mono() ? 0.6 : 1) * info.duration * (format === 'ogg' ? 0.7 : 1)) / 8;
+
+    el('estimate').textContent = `≈ ${formatBytes(bytes)}`;
+
+    // Asking for more bits than the source has does not recover anything.
+    const sourceAudioBits = format === 'wav' ? 0 : bitrate();
+    if (sourceAudioBits >= 256_000) {
+      el('verdict').hidden = false;
+      el('verdict').className = 'verdict warn';
+      el('verdict').textContent =
+        'A higher bitrate than the source was recorded at makes the file larger without making it ' +
+        'sound better — the detail the first encoder discarded is gone. 192 kbps is transparent for ' +
+        'most material.';
+    } else {
+      el('verdict').hidden = true;
+    }
+  }
+
+  async function open(chosen: File) {
+    file = chosen;
+    try {
+      status('Reading file…');
+      info = await probe(chosen);
+
+      if (!info.hasAudio) {
+        throw new Error('That file has no audio track — there is nothing to extract.');
+      }
+
+      el('editor').hidden = false;
+      statusEl.hidden = true;
+      el('facts').innerHTML =
+        `<span>Audio: <b>${info.audioCodec ?? 'unknown'}</b></span>` +
+        `<span>Length: <b>${preciseClock(info.duration)}</b></span>` +
+        `<span>File: <b>${formatBytes(info.size)}</b></span>` +
+        (info.width ? `<span>Video: <b>${info.width}×${info.height}</b> (discarded)</span>` : '');
+
+      refreshEstimate();
+    } catch (error) {
+      status(
+        error instanceof Error
+          ? `Could not read that file — ${error.message}`
+          : 'Could not read that file.',
+        1,
+        true,
+      );
+    }
+  }
+
+  for (const id of ['container', 'bitrate', 'mono']) {
+    el(id).addEventListener('change', refreshEstimate);
+  }
+
+  el<HTMLButtonElement>('run').addEventListener('click', async () => {
+    if (!file || !info || busy) return;
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+
+    const format = container();
+    const name = file.name.replace(/\.[^.]+$/, '') || 'audio';
+
+    try {
+      status(format === 'mp3' ? 'Loading the MP3 encoder…' : 'Extracting…', 0);
+
+      const blob = await encode(file, {
+        container: format,
+        discardVideo: true,
+        ...(format === 'wav' ? {} : { audioBitrate: bitrate() }),
+        mono: mono(),
+        onProgress: (p) => status(`Extracting — ${Math.round(p * 100)}%`, p),
+      });
+
+      saveBlob(blob, `${name}.${CONTAINER_EXTENSION[format]}`);
+      status(`Saved — ${formatBytes(blob.size)} ${format.toUpperCase()}.`, 1);
+      setTimeout(() => { statusEl.hidden = true; }, 5000);
+    } catch (error) {
+      status(
+        error instanceof Error ? `Extraction failed — ${error.message}` : 'Extraction failed.',
+        1,
+        true,
+      );
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  fileInput.addEventListener('change', () => {
+    const chosen = fileInput.files?.[0];
+    if (chosen) void open(chosen);
+  });
+
+  for (const type of ['dragenter', 'dragover']) {
+    drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  }
+  for (const type of ['dragleave', 'drop']) {
+    drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  }
+  drop.addEventListener('drop', (e) => {
+    const chosen = (e as DragEvent).dataTransfer?.files?.[0];
+    if (chosen) void open(chosen);
+  });
+</script>
