@@ -1,0 +1,507 @@
+---
+import Base from '../../layouts/Base.astro';
+
+const title = 'Scene Detector — split a video into shots without uploading it';
+const description =
+  'Find every cut in a video and get the shot list with timecodes, in your browser. The footage never leaves your machine. Export cuts as EDL, OTIO, FCPXML, Audacity labels, CSV or JSON.';
+
+const faq = [
+  {
+    q: 'Does the video get uploaded?',
+    a: 'No. The browser decodes it locally, a canvas reads the pixels, and WebAssembly compares them. Nothing is sent anywhere — the page has no endpoint to send it to. That is also why there is no file-size limit and no queue.',
+  },
+  {
+    q: 'How does it find the cuts?',
+    a: 'It samples frames across the video and watches how much the picture changes from one sample to the next. A cut is a discontinuity — colour and luminance jump in a single step, rather than drifting the way they do during a pan or a fade. The detector looks for those steps and reports the boundaries between them.',
+  },
+  {
+    q: 'Will it catch dissolves and fades?',
+    a: 'Partly. A hard cut is unambiguous and gets found reliably. A slow dissolve is, by construction, a gradual change — the same shape as a camera move — so it may be reported a little early, a little late, or merged with its neighbour. Fast whip-pans can also read as cuts. Treat the result as a shot list to check, not a verdict.',
+  },
+  {
+    q: 'What is the quality score next to each shot?',
+    a: 'The same per-frame scoring the Life2Film app uses when deciding what to keep: sharpness, exposure, contrast, colourfulness and entropy, combined into one number. It is a rough ranking of which shots are worth a second look, not a judgement of what is interesting.',
+  },
+  {
+    q: 'Which files work?',
+    a: 'Anything the browser can play — MP4 and MOV with H.264, and WebM. Formats a browser cannot decode, such as most ProRes or raw camera files, will not open here; transcode a proxy first.',
+  },
+  {
+    q: 'How long does it take?',
+    a: 'It steps through the video seeking to each sample point, which costs tens of milliseconds each time. A one-minute clip takes a few seconds. Long videos are sampled more coarsely so the wait stays reasonable — the shot list stays accurate to roughly half a second either way.',
+  },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: 'Scene Detector',
+      url: 'https://life2film.com/tools/scene-detector/',
+      applicationCategory: 'MultimediaApplication',
+      operatingSystem: 'Any browser with WebAssembly',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      publisher: { '@id': 'https://life2film.com/#org' },
+      featureList: [
+        'Shot boundary detection',
+        'Per-shot quality scoring',
+        'Thumbnails for every shot',
+        'Runs fully client-side — no upload',
+        'Export to EDL, OTIO, FCPXML, Audacity labels, CSV and JSON',
+      ],
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: faq.map(({ q, a }) => ({
+        '@type': 'Question',
+        name: q,
+        acceptedAnswer: { '@type': 'Answer', text: a },
+      })),
+    },
+  ],
+};
+---
+
+<Base lang="en" title={title} description={description} basePath="/tools/scene-detector/" localized={false}>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
+
+  <main>
+    <section class="tool-head">
+      <div class="wrap">
+        <a class="back" href="/tools/">← All tools</a>
+        <h1>Scene <span class="gradient-text">Detector</span></h1>
+        <p class="lede">
+          Drop in a video. Get every cut, with a thumbnail and a timecode for each shot — found on
+          your own machine, with nothing uploaded.
+        </p>
+
+        <div class="tool">
+          <label class="drop" id="drop" for="file">
+            <input type="file" id="file" accept="video/*" hidden />
+            <strong>Choose a video file</strong>
+            <span class="muted">or drag it here — MP4, MOV (H.264), WebM</span>
+          </label>
+
+          <div id="status" class="status" hidden>
+            <div class="bar"><span id="fill"></span></div>
+            <div class="statustext" id="statusText"></div>
+          </div>
+
+          <div id="result" class="result" hidden>
+            <div class="readout">
+              <div class="count">
+                <span id="shots">—</span>
+                <em>SHOTS</em>
+              </div>
+              <div class="meta">
+                <div><span id="duration">0:00</span> long</div>
+                <div><span id="average">0:00</span> average shot</div>
+                <div class="muted" id="sampling"></div>
+              </div>
+
+              <div class="export">
+                <select id="format" aria-label="Export format">
+                  <option value="edl">EDL — DaVinci Resolve, Premiere</option>
+                  <option value="otio">OTIO — Resolve, Avid, Premiere</option>
+                  <option value="fcpxml">FCPXML — Final Cut Pro</option>
+                  <option value="labels">Labels — Audacity</option>
+                  <option value="csv">CSV — spreadsheets</option>
+                  <option value="json">JSON — scripts</option>
+                </select>
+                <button id="save" type="button" class="ghost primary">Download</button>
+                <label class="fps">
+                  <span class="muted">fps</span>
+                  <select id="fps" aria-label="Frame rate for timecode">
+                    <option>23.976</option>
+                    <option>24</option>
+                    <option selected>25</option>
+                    <option>29.97</option>
+                    <option>30</option>
+                    <option>50</option>
+                    <option>60</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+
+            <div class="shots" id="shotGrid"></div>
+          </div>
+        </div>
+
+        <p class="privacy-note muted">
+          The video is decoded by your browser and read frame by frame in a canvas. No request
+          carries it anywhere.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap prose">
+        <h2>What a cut looks like to a machine</h2>
+        <p>
+          Within a single shot, consecutive frames resemble each other: the camera moves, people
+          move, light shifts, but the change is gradual. At a cut, everything changes at once — the
+          colour of the picture, its brightness, its structure, all in the space of one frame.
+        </p>
+        <p>
+          So shot detection is the search for discontinuities in an otherwise continuous signal. The
+          hard part is not spotting the jump; it is not mistaking a whip-pan, a flash or a fast
+          dissolve for one. That is why the boundaries here come with thumbnails: the fastest way to
+          check a shot list is to look at it.
+        </p>
+
+        <h2>Why it runs on your machine</h2>
+        <p>
+          Video is heavy. Uploading a gigabyte to answer a question about where the cuts are means
+          waiting on the upload, paying for the transcode and handing the footage over — for an
+          analysis that reads a few hundred small frames.
+        </p>
+        <p>
+          The engine behind <a href="/">Life2Film</a> was built to run on a phone, so it is small
+          enough to run in a tab. The browser already has a video decoder; this page uses it, hands
+          the pixels to the same Rust the app uses, compiled to WebAssembly, and never opens a
+          socket.
+        </p>
+        <p>
+          The <a href="/tools/bpm-detector/">BPM detector</a> is the same engine looking at sound
+          instead of pictures.
+        </p>
+
+        <h2>Questions</h2>
+        {faq.map(({ q, a }) => (
+          <>
+            <h3 class="q">{q}</h3>
+            <p>{a}</p>
+          </>
+        ))}
+      </div>
+    </section>
+  </main>
+
+  <style>
+    .tool-head { padding-bottom: 40px; }
+    .back { color: var(--muted); text-decoration: none; font-size: 14px; }
+    .back:hover { color: var(--fg); }
+    h1 { margin: 14px 0 12px; }
+    .lede { color: #cfcfd6; max-width: 60ch; margin-bottom: 30px; font-size: 19px; }
+
+    .tool { border: 1px solid var(--line); border-radius: 18px; background: var(--panel); padding: 22px; }
+
+    .drop {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+      min-height: 150px; padding: 24px; text-align: center; cursor: pointer;
+      border: 1.5px dashed var(--line); border-radius: 14px;
+      transition: border-color .15s ease, background .15s ease;
+    }
+    .drop:hover, .drop.over { border-color: var(--cyan); background: rgba(0, 242, 224, .04); }
+    .drop strong { font-size: 17px; }
+
+    .status { margin-top: 18px; }
+    .status.err .statustext { color: var(--pink); }
+    .bar { height: 3px; border-radius: 2px; background: #17171c; overflow: hidden; }
+    .bar span { display: block; height: 100%; width: 0; background: var(--grad); transition: width .12s linear; }
+    .statustext { margin-top: 9px; font-size: 15px; color: var(--muted); }
+
+    .result { margin-top: 20px; }
+    .readout { display: flex; flex-wrap: wrap; gap: 28px; align-items: center; margin-bottom: 20px; }
+    .count { display: flex; align-items: baseline; gap: 10px; }
+    .count span {
+      font-size: 56px; font-weight: 700; letter-spacing: -0.04em; line-height: 1;
+      background: var(--grad); -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .count em { font-style: normal; font-size: 13px; color: var(--muted); letter-spacing: .1em; }
+    .meta { font-size: 15px; color: #cfcfd6; display: grid; gap: 2px; }
+
+    .export { display: flex; gap: 8px; align-items: center; margin-left: auto; flex-wrap: wrap; }
+    .fps { display: flex; gap: 6px; align-items: center; font-size: 13px; }
+    select {
+      padding: 9px 12px; border-radius: 10px; font: inherit; font-size: 14px; cursor: pointer;
+      color: var(--fg); background: #0a0a0d; border: 1px solid var(--line);
+    }
+    select:hover { border-color: var(--cyan); }
+    .fps select { padding: 7px 8px; font-size: 13px; }
+    .ghost {
+      padding: 9px 16px; border-radius: 10px; font: inherit; font-size: 14px; cursor: pointer;
+      color: var(--fg); background: transparent; border: 1px solid var(--line);
+    }
+    .ghost:hover { border-color: var(--cyan); color: var(--cyan); }
+    .ghost.primary { border-color: rgba(0,242,224,.4); color: var(--cyan); }
+
+    .shots { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); }
+    .shot {
+      border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #08080a;
+    }
+    .shot img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #111; }
+    .shot .info { padding: 8px 10px; display: grid; gap: 2px; }
+    .shot .tc { font-size: 13px; font-family: ui-monospace, monospace; }
+    .shot .len { font-size: 12px; color: var(--muted); }
+    .shot .score { height: 3px; border-radius: 2px; background: #17171c; margin-top: 4px; }
+    .shot .score span { display: block; height: 100%; background: var(--grad); }
+
+    .privacy-note { margin-top: 16px; font-size: 14px; max-width: 62ch; }
+    .prose .q { margin: 28px 0 8px; font-size: 17px; }
+  </style>
+
+  <script>
+    import { loadEngine } from '../../lib/engine';
+    import { openVideo, samplePlan, refinePlan, centerPixel, type VideoSource } from '../../lib/frames';
+    import { clock, timecode, render, download, EXTENSION, type Format, type Mark } from '../../lib/timeline-export';
+
+    const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+    const drop = el<HTMLLabelElement>('drop');
+    const fileInput = el<HTMLInputElement>('file');
+    const statusEl = el<HTMLDivElement>('status');
+    const resultEl = el<HTMLDivElement>('result');
+    const grid = el<HTMLDivElement>('shotGrid');
+
+    // Frames are analysed at 64 px wide — the same size the desktop pipeline uses. Scene changes
+    // are large-scale events; a bigger frame costs time and finds the same cuts.
+    const ANALYSIS_WIDTH = 64;
+    const THUMB_WIDTH = 320;
+
+    // Every sample is a seek, and a seek is tens of milliseconds. Ten minutes is where the wait
+    // stops being reasonable, and it is also where a browser tab starts holding more decoded
+    // frames than it should.
+    const MAX_MINUTES = 10;
+
+    interface Shot {
+      start: number;
+      end: number;
+      score: number;
+    }
+
+    let shots: Shot[] = [];
+    let videoDuration = 0;
+    let fileName = 'video';
+
+    function status(message: string, fraction?: number, isError = false) {
+      statusEl.hidden = false;
+      statusEl.classList.toggle('err', isError);
+      el('statusText').textContent = message;
+      if (fraction !== undefined) {
+        el('fill').style.width = `${Math.round(fraction * 100)}%`;
+      }
+    }
+
+    async function analyse(file: File) {
+      fileName = file.name.replace(/\.[^.]+$/, '') || 'video';
+      resultEl.hidden = true;
+      grid.replaceChildren();
+      status('Opening video…', 0);
+
+      let source: VideoSource | null = null;
+
+      try {
+        source = await openVideo(file);
+        videoDuration = source.duration;
+
+        if (source.duration > MAX_MINUTES * 60) {
+          throw new Error(
+            `That video is ${clock(source.duration)} long. This tool reads frames one seek at a ` +
+              `time, so anything past ${MAX_MINUTES} minutes takes longer than it is worth — ` +
+              `trim it, or cut a section out first.`,
+          );
+        }
+
+        const engine = await loadEngine();
+        const plan = samplePlan(source.duration);
+        const coarseStep = source.duration / plan.length;
+
+        el('sampling').textContent =
+          `${plan.length} samples · ${(1 / coarseStep).toFixed(1)} per second`;
+
+        const pixels: Array<{ r: number; g: number; b: number }> = [];
+        const timestamps: number[] = [];
+        const scores: Array<{ timestamp: number; score: number }> = [];
+
+        for (const [i, at] of plan.entries()) {
+          const frame = await source.frameAt(at, ANALYSIS_WIDTH);
+          pixels.push(centerPixel(frame));
+          timestamps.push(at);
+
+          const scored = JSON.parse(
+            engine.score_frame(frame.width, frame.height, frame.rgb24, at, null),
+          ) as { score?: number; error?: string };
+          if (!scored.error) scores.push({ timestamp: at, score: scored.score ?? 0 });
+
+          // Reading every sample is the slow part, so the bar tracks it rather than the analysis.
+          if (i % 4 === 0) {
+            status(`Reading frames — ${i + 1} of ${plan.length}`, (i + 1) / plan.length * 0.9);
+          }
+        }
+
+        status('Finding the cuts…', 0.93);
+
+        const detected = JSON.parse(
+          engine.detect_scenes_slick(
+            JSON.stringify({
+              pixels,
+              timestamps,
+              duration: source.duration,
+              algo: 'adjacent_diffs',
+            }),
+          ),
+        ) as { scenes?: Array<[number, number]>; error?: string };
+
+        if (detected.error) throw new Error(detected.error);
+
+        const ranges = detected.scenes?.length ? detected.scenes : [[0, source.duration] as [number, number]];
+
+        // Second pass: the coarse grid can only say which sample the picture changed by, so each
+        // boundary is re-examined at ten times the resolution — but only in the half-second around
+        // it. Cheap, and it is what moves the reported cut from "about right" to "on the frame".
+        const boundaries = ranges.slice(1).map(([start]) => start);
+        const refined = new Map<number, number>();
+
+        for (const [i, boundary] of boundaries.entries()) {
+          status(`Refining cut ${i + 1} of ${boundaries.length}…`, 0.93 + (i / boundaries.length) * 0.06);
+          refined.set(boundary, await refineBoundary(source, boundary, coarseStep));
+        }
+
+        shots = ranges.map(([start, end]) => {
+          const movedStart = refined.get(start) ?? start;
+          const movedEnd = refined.get(end) ?? end;
+          return [movedStart, movedEnd] as [number, number];
+        }).map(([start, end]) => {
+          // Median score of the samples inside the shot — a mean would let one bad frame sink it.
+          const inside = scores.filter((s) => s.timestamp >= start && s.timestamp < end).map((s) => s.score);
+          inside.sort((a, b) => a - b);
+          return {
+            start,
+            end,
+            score: inside.length ? inside[Math.floor(inside.length / 2)] : 0,
+          };
+        });
+
+        el('shots').textContent = String(shots.length);
+        el('duration').textContent = clock(source.duration);
+        el('average').textContent = clock(source.duration / shots.length);
+
+        statusEl.hidden = true;
+        resultEl.hidden = false;
+
+        // Thumbnails come last, from a second pass over shot starts only — a few dozen seeks rather
+        // than a few hundred, so the numbers appear before the pictures do.
+        await renderShots(source);
+      } catch (error) {
+        status(
+          error instanceof Error ? error.message : 'Something went wrong reading that file.',
+          1,
+          true,
+        );
+      } finally {
+        source?.release();
+      }
+    }
+
+    /**
+     * Where exactly did the picture change?
+     *
+     * Walks a tight window around the candidate and returns the instant of the largest
+     * frame-to-frame jump in the centre pixel. No engine call: at this resolution the question is
+     * simply which of twenty adjacent frames differs most from the one before it.
+     */
+    async function refineBoundary(source: VideoSource, boundary: number, coarseStep: number): Promise<number> {
+      const points = refinePlan(boundary, coarseStep, coarseStep / 10, source.duration);
+      if (points.length < 2) return boundary;
+
+      let previous: { r: number; g: number; b: number } | null = null;
+      let best = boundary;
+      let biggest = -1;
+
+      for (const at of points) {
+        const pixel = centerPixel(await source.frameAt(at, ANALYSIS_WIDTH));
+        if (previous) {
+          const delta =
+            Math.abs(pixel.r - previous.r) + Math.abs(pixel.g - previous.g) + Math.abs(pixel.b - previous.b);
+          if (delta > biggest) {
+            biggest = delta;
+            best = at;
+          }
+        }
+        previous = pixel;
+      }
+
+      return best;
+    }
+
+    async function renderShots(source: VideoSource) {
+      const rate = fps();
+      const highest = Math.max(...shots.map((s) => s.score), 1);
+
+      for (const [i, shot] of shots.entries()) {
+        const card = document.createElement('div');
+        card.className = 'shot';
+        card.innerHTML = `
+          <img alt="Shot ${i + 1}" loading="lazy" />
+          <div class="info">
+            <span class="tc">${timecode(shot.start, rate)}</span>
+            <span class="len">Shot ${i + 1} · ${(shot.end - shot.start).toFixed(1)}s</span>
+            <span class="score"><span style="width:${Math.round((shot.score / highest) * 100)}%"></span></span>
+          </div>`;
+        grid.append(card);
+
+        // A shot's first frame is often mid-transition; a moment in gives a truer picture.
+        const at = Math.min(shot.start + 0.25, shot.end - 0.05, source.duration - 0.05);
+        try {
+          card.querySelector('img')!.src = await source.thumbnailAt(Math.max(0, at), THUMB_WIDTH);
+        } catch {
+          // A thumbnail that will not render does not invalidate the cut it belongs to.
+        }
+      }
+    }
+
+    const fps = () => Number(el<HTMLSelectElement>('fps').value) || 25;
+
+    // --- input ---
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files?.[0];
+      if (file) void analyse(file);
+    });
+
+    for (const type of ['dragenter', 'dragover']) {
+      drop.addEventListener(type, (e) => {
+        e.preventDefault();
+        drop.classList.add('over');
+      });
+    }
+    for (const type of ['dragleave', 'drop']) {
+      drop.addEventListener(type, (e) => {
+        e.preventDefault();
+        drop.classList.remove('over');
+      });
+    }
+    drop.addEventListener('drop', (e) => {
+      const file = (e as DragEvent).dataTransfer?.files?.[0];
+      if (file) void analyse(file);
+    });
+
+    // --- export ---
+
+    el<HTMLButtonElement>('save').addEventListener('click', () => {
+      if (!shots.length) return;
+      const format = el<HTMLSelectElement>('format').value as Format;
+      const rate = fps();
+
+      const marks: Mark[] = shots.map((shot, i) => ({
+        start: shot.start,
+        end: shot.end,
+        name: `Shot ${i + 1}`,
+      }));
+
+      download(
+        render(format, marks, {
+          title: `${fileName} shots`,
+          rate,
+          duration: videoDuration,
+          metadata: { shots: shots.length },
+        }),
+        `${fileName}-shots.${EXTENSION[format]}`,
+      );
+    });
+  </script>
+</Base>

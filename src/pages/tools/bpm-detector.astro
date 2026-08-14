@@ -246,27 +246,8 @@ const jsonLd = {
   </style>
 
   <script>
-    // The engine, as the browser sees it. Only the parts this page calls.
-    interface VaWasm {
-      default: (options: { module_or_path: string }) => Promise<unknown>;
-      detect_beats: (samples: Float32Array, rate: number, config: string | null) => string;
-    }
-
-    // The WASM module is 1.2 MB, so it is fetched the moment someone picks a file — not on load.
-    // A page that costs a megabyte before it can be read would rank worse than one that answers late.
-    //
-    // The path is held in a variable rather than written inline: it points into `public/`, which
-    // exists only at runtime, and a literal here makes Rollup try to resolve it at build time.
-    const WASM_URL = '/wasm/va_wasm.js';
-    let wasm: VaWasm | null = null;
-
-    async function loadWasm(): Promise<VaWasm> {
-      if (wasm) return wasm;
-      const mod = (await import(/* @vite-ignore */ WASM_URL)) as VaWasm;
-      await mod.default({ module_or_path: '/wasm/va_wasm_bg.wasm' });
-      wasm = mod;
-      return mod;
-    }
+    import { loadEngine } from '../../lib/engine';
+    import { clock, render, download, EXTENSION, type Format, type Mark } from '../../lib/timeline-export';
 
     const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -286,12 +267,6 @@ const jsonLd = {
       statusEl.hidden = false;
       statusEl.textContent = message;
       statusEl.classList.toggle('err', isError);
-    }
-
-    function clock(seconds: number) {
-      const m = Math.floor(seconds / 60);
-      const s = Math.floor(seconds % 60);
-      return `${m}:${String(s).padStart(2, '0')}`;
     }
 
     /**
@@ -418,11 +393,11 @@ const jsonLd = {
         await ctx.close();
 
         status('Loading analyser…');
-        const mod = await loadWasm();
+        const engine = await loadEngine();
 
         status('Finding the beat…');
         const mono = await toMono(audioBuffer);
-        const raw = mod.detect_beats(mono, 22050, null);
+        const raw = engine.detect_beats(mono, 22050, null);
         const parsed = JSON.parse(raw) as { beats: number[]; bpm: number };
 
         beats = parsed.beats ?? [];
@@ -547,182 +522,26 @@ const jsonLd = {
       };
     });
 
-    // --- exports ---
-
-    function download(content: string, extension: string) {
-      const url = URL.createObjectURL(new Blob([content], { type: 'text/plain' }));
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${fileName}-beats.${extension}`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }
+    // --- export ---
 
     const fps = () => Number(el<HTMLSelectElement>('fps').value) || 25;
 
-    /** Frames are whole numbers; 29.97 and 23.976 are counted at their nominal rate, non-drop. */
-    const frames = (t: number, rate: number) => Math.round(t * rate);
-
-    function timecode(t: number, rate: number): string {
-      const nominal = Math.round(rate);
-      const total = frames(t, rate);
-      const f = total % nominal;
-      const seconds = Math.floor(total / nominal);
-      const pad = (n: number) => String(n).padStart(2, '0');
-      return `${pad(Math.floor(seconds / 3600))}:${pad(Math.floor((seconds % 3600) / 60))}:${pad(seconds % 60)}:${pad(f)}`;
-    }
-
-    /**
-     * CMX 3600 EDL carrying markers.
-     *
-     * Resolve and Premiere both read this: each event is a one-frame cut, and the `|C:` / `|M:`
-     * comment line beneath it is what turns the event into a named, coloured marker.
-     */
-    function toEDL(rate: number): string {
-      const lines = [`TITLE: ${fileName} beats`, 'FCM: NON-DROP FRAME', ''];
-      beats.forEach((t, i) => {
-        const start = timecode(t, rate);
-        const end = timecode(t + 1 / rate, rate);
-        lines.push(
-          `${String(i + 1).padStart(3, '0')}  AX       V     C        ${start} ${end} ${start} ${end}`,
-          ` |C:ResolveColorCyan |M:Beat ${i + 1} |D:1`,
-          '',
-        );
-      });
-      return lines.join('\n');
-    }
-
-    /**
-     * OpenTimelineIO. Markers hang off a Gap that spans the track, because a marker in OTIO belongs
-     * to an item rather than floating on a timeline.
-     */
-    function toOTIO(rate: number): string {
-      const time = (value: number) => ({
-        OTIO_SCHEMA: 'RationalTime.1',
-        rate,
-        value,
-      });
-      const duration = audioBuffer?.duration ?? 0;
-
-      return JSON.stringify(
-        {
-          OTIO_SCHEMA: 'Timeline.1',
-          name: `${fileName} beats`,
-          global_start_time: time(0),
-          metadata: { source: 'life2film.com/tools/bpm-detector', bpm },
-          tracks: {
-            OTIO_SCHEMA: 'Stack.1',
-            name: 'tracks',
-            children: [
-              {
-                OTIO_SCHEMA: 'Track.1',
-                name: 'Beats',
-                kind: 'Video',
-                children: [
-                  {
-                    OTIO_SCHEMA: 'Gap.1',
-                    name: fileName,
-                    source_range: {
-                      OTIO_SCHEMA: 'TimeRange.1',
-                      start_time: time(0),
-                      duration: time(frames(duration, rate)),
-                    },
-                    markers: beats.map((t, i) => ({
-                      OTIO_SCHEMA: 'Marker.2',
-                      name: `Beat ${i + 1}`,
-                      color: 'CYAN',
-                      marked_range: {
-                        OTIO_SCHEMA: 'TimeRange.1',
-                        start_time: time(frames(t, rate)),
-                        duration: time(1),
-                      },
-                      metadata: {},
-                    })),
-                    metadata: {},
-                    effects: [],
-                  },
-                ],
-                markers: [],
-                metadata: {},
-                effects: [],
-              },
-            ],
-            markers: [],
-            metadata: {},
-            effects: [],
-          },
-        },
-        null,
-        2,
-      );
-    }
-
-    /** FCPXML 1.10 — a gap holding markers, which is the lightest thing Final Cut will import. */
-    function toFCPXML(rate: number): string {
-      const nominal = Math.round(rate);
-      // Final Cut writes time as a rational: 1001/30000s covers 29.97 exactly, where a decimal cannot.
-      const isDrop = Math.abs(rate - nominal) > 0.001;
-      const timebase = isDrop ? `${nominal * 1000}` : `${nominal}`;
-      const tick = isDrop ? 1001 : 1;
-      const stamp = (t: number) => `${frames(t, rate) * tick}/${timebase}s`;
-      const total = audioBuffer?.duration ?? 0;
-
-      const markers = beats
-        .map((t, i) => `          <marker start="${stamp(t)}" duration="${tick}/${timebase}s" value="Beat ${i + 1}"/>`)
-        .join('\n');
-
-      return `<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE fcpxml>
-<fcpxml version="1.10">
-  <resources>
-    <format id="r1" name="FFVideoFormat" frameDuration="${tick}/${timebase}s"/>
-  </resources>
-  <library>
-    <event name="${fileName} beats">
-      <project name="${fileName} beats">
-        <sequence format="r1" duration="${stamp(total)}" tcStart="0s" tcFormat="NDF">
-          <spine>
-            <gap name="Beats" offset="0s" start="0s" duration="${stamp(total)}">
-${markers}
-            </gap>
-          </spine>
-        </sequence>
-      </project>
-    </event>
-  </library>
-</fcpxml>
-`;
-    }
-
-    /** Audacity label track: start, end, text — tab separated, seconds as decimals. */
-    function toLabels(): string {
-      return beats.map((t, i) => `${t.toFixed(6)}\t${t.toFixed(6)}\tBeat ${i + 1}`).join('\n');
-    }
-
     el<HTMLButtonElement>('save').addEventListener('click', () => {
       if (!beats.length) return;
-      const rate = fps();
+      const format = el<HTMLSelectElement>('format').value as Format;
 
-      switch (el<HTMLSelectElement>('format').value) {
-        case 'edl':
-          return download(toEDL(rate), 'edl');
-        case 'otio':
-          return download(toOTIO(rate), 'otio');
-        case 'fcpxml':
-          return download(toFCPXML(rate), 'fcpxml');
-        case 'labels':
-          return download(toLabels(), 'txt');
-        case 'csv':
-          return download(
-            ['beat,seconds,timecode', ...beats.map((t, i) => `${i + 1},${t.toFixed(4)},${timecode(t, rate)}`)].join('\n'),
-            'csv',
-          );
-        default:
-          return download(
-            JSON.stringify({ file: fileName, bpm, fps: rate, beats }, null, 2),
-            'json',
-          );
-      }
+      const marks: Mark[] = beats.map((t, i) => ({ start: t, name: `Beat ${i + 1}` }));
+
+      download(
+        render(format, marks, {
+          title: `${fileName} beats`,
+          rate: fps(),
+          duration: audioBuffer?.duration ?? 0,
+          metadata: { bpm },
+        }),
+        `${fileName}-beats.${EXTENSION[format]}`,
+      );
     });
+
   </script>
 </Base>
