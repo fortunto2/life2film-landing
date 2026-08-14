@@ -1,0 +1,352 @@
+---
+import Base from '../layouts/Base.astro';
+import { readFileSync } from 'node:fs';
+
+// The skill ships inside the npm package, and this page shows the same file — read at build time so
+// the two cannot drift. If the package moves, this fails loudly at build rather than serving a
+// stale copy.
+const skill = readFileSync(
+  new URL('../../../life2film/video-analyzer/npm-package/SKILL.md', import.meta.url),
+  'utf-8',
+);
+
+const title = 'life2film-engine — on-device video analysis as a package';
+const description =
+  'Beat detection, shot boundaries and per-frame quality scoring as a WebAssembly package. Runs in the browser or Node with no server, no API key and no upload. Free for noncommercial use.';
+
+const exports_ = [
+  { name: 'detect_beats', does: 'Tempo and the position of every beat, from mono PCM.' },
+  { name: 'analyze_audio', does: 'Silence, sections, spectral flatness, content type.' },
+  { name: 'beat_sync_timeline', does: 'Place cuts on the beat.' },
+  { name: 'detect_scenes_slick', does: 'Shot boundaries from centre pixels — 16 algorithms.' },
+  { name: 'detect_scenes_content', does: 'Shot boundaries from HSV frame deltas.' },
+  { name: 'detect_scenes_features', does: 'Shot boundaries from N-dimensional feature vectors.' },
+  { name: 'score_frame', does: '31 measurements per frame, as one score plus a garbage flag.' },
+  { name: 'score_segments', does: 'Rank segments by the frames inside them.' },
+  { name: 'select_segments', does: 'Choose which segments make the cut, under a duration budget.' },
+  { name: 'compose_montage', does: 'Assemble a timeline from scored segments.' },
+  { name: 'build_otio', does: 'Write OpenTimelineIO.' },
+  { name: 'parse_otio', does: 'Read OpenTimelineIO.' },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'SoftwareApplication',
+      name: 'life2film-engine',
+      applicationCategory: 'DeveloperApplication',
+      operatingSystem: 'Any browser with WebAssembly, or Node 18+',
+      url: 'https://life2film.com/engine/',
+      downloadUrl: 'https://www.npmjs.com/package/life2film-engine',
+      softwareVersion: '0.1.1',
+      publisher: { '@id': 'https://life2film.com/#org' },
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      license: 'https://polyformproject.org/licenses/noncommercial/1.0.0/',
+      featureList: [
+        'Beat and tempo detection',
+        'Shot boundary detection with 16 algorithms',
+        '31 per-frame quality measurements',
+        'OpenTimelineIO import and export',
+        'Runs client-side — no server, no API key',
+      ],
+    },
+  ],
+};
+---
+
+<Base lang="en" title={title} description={description} basePath="/engine/" localized={false}>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
+
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <span class="badge">npm · WebAssembly · noncommercial</span>
+        <h1>life2film<span class="gradient-text">-engine</span></h1>
+        <p class="lede">
+          The analysis behind Life2Film, as a package. Finds the beat in music, the cuts in a video,
+          and scores frames for picture quality — in a browser tab or in Node, with no server, no API
+          key and nothing uploaded.
+        </p>
+
+        <div class="install">
+          <code id="installCmd">npm i life2film-engine</code>
+          <button id="copyInstall" type="button" class="ghost small">Copy</button>
+        </div>
+
+        <div class="links">
+          <a class="btn" href="https://www.npmjs.com/package/life2film-engine">View on npm</a>
+          <a class="ghost link" href="/tools/">See it running →</a>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <h2>What it is for</h2>
+        <div class="grid cols-3 uses">
+          <div class="card">
+            <h3>Cut to music</h3>
+            <p>
+              Get the tempo and every beat position, then place edits where the music turns instead
+              of at fixed intervals.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Find the shots</h3>
+            <p>
+              Detect where a video changes shot, so clips begin at real boundaries rather than on a
+              stopwatch.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Rank the footage</h3>
+            <p>
+              Score frames for sharpness, exposure, contrast and detail, and find what is worth
+              keeping in a long recording.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="skillhead">
+          <div>
+            <h2>Skill for coding agents</h2>
+            <p class="muted">
+              Paste this into Claude Code, Cursor or any agent that reads skills. It covers the API,
+              how to get frames and PCM in a browser, the exports to editors — and the two mistakes
+              that cost the most time.
+            </p>
+          </div>
+          <div class="skillactions">
+            <button id="copySkill" type="button" class="ghost primary">Copy skill</button>
+            <a class="ghost small" href="/engine/skill.md" download="SKILL.md">Download</a>
+          </div>
+        </div>
+
+        <details class="skillbox">
+          <summary>Read it here</summary>
+          <pre><code id="skillText" set:text={skill} /></pre>
+        </details>
+
+        <p class="muted small">
+          It also ships inside the package at <code>node_modules/life2film-engine/SKILL.md</code>,
+          so an agent that installed it can find it without this page.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <h2>With Remotion</h2>
+        <p class="pairnote muted">
+          The natural pairing: this engine decides <em>when</em> things happen, Remotion decides
+          <em>what</em> they look like. Analysis in Node writes a beat grid; a React composition
+          reads it and renders a real MP4. Both halves run locally.
+        </p>
+
+        <div class="pair">
+          <div class="pairstep">
+            <span class="num">1</span>
+            <h3>Analyse</h3>
+            <pre><code>{`import init, { detect_beats } from 'life2film-engine';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
+await init({
+  module_or_path: readFileSync(
+    require.resolve('life2film-engine/va_wasm_bg.wasm'),
+  ),
+});
+
+// mono f32 PCM at 22050 Hz
+const { bpm, beats } = JSON.parse(detect_beats(pcm, 22050, null));
+writeFileSync('beats.json', JSON.stringify({ bpm, beats, duration }));`}</code></pre>
+          </div>
+
+          <div class="pairstep">
+            <span class="num">2</span>
+            <h3>Render</h3>
+            <pre><code>{`import { useCurrentFrame, useVideoConfig, interpolate } from 'remotion';
+
+export const BeatFlash = ({ beats, bpm }) => {
+  const { fps } = useVideoConfig();
+  const seconds = useCurrentFrame() / fps;
+
+  // Which beat are we on, and how long since it fired?
+  const index = beats.findLastIndex((b) => b <= seconds);
+  const since = index >= 0 ? seconds - beats[index] : 1;
+
+  // Decay from each beat — a pulse, not a blink.
+  const pulse = interpolate(since, [0, 0.18], [1, 0], {
+    extrapolateRight: 'clamp',
+  });
+
+  return <Circle scale={1 + pulse * 0.35} glow={pulse} />;
+};`}</code></pre>
+          </div>
+        </div>
+
+        <p class="verified muted">
+          Verified end to end, not sketched: a 128 BPM click track reads back as 128.4 BPM, and in
+          the rendered MP4 the centre pixel measures 154 → 108 → 77 between beats, rising to 189 and
+          210 on the next two. The pulses land on the grid.
+          <code>npx remotion render</code> produces the file; nothing is uploaded at any stage.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap prose">
+        <h2>What it does not do</h2>
+        <p>
+          It does not decode or encode. Bring your own frames and PCM — in a browser,
+          <code>&lt;video&gt;</code> plus a canvas and <code>AudioContext.decodeAudioData</code> are
+          enough, and the tool pages show exactly that. For writing files,
+          <a href="https://mediabunny.dev">mediabunny</a> is excellent and MIT licensed.
+        </p>
+        <p>
+          It reads no speech and tracks no faces. It looks at pictures and sound, which is what makes
+          it useful for footage where nobody is talking.
+        </p>
+
+        <h2>Exports</h2>
+        <table class="api">
+          <tbody>
+            {exports_.map(({ name, does }) => (
+              <tr>
+                <td><code>{name}</code></td>
+                <td>{does}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p class="muted small">
+          Nineteen in total, typed in <code>va_wasm.d.ts</code>. Every one returns a JSON string.
+        </p>
+
+        <h2>Licence</h2>
+        <p>
+          <a href="https://polyformproject.org/licenses/noncommercial/1.0.0/">PolyForm Noncommercial
+          1.0.0</a>. Free for personal projects, study, research, charities, educational institutions
+          and public bodies.
+        </p>
+        <p>
+          Anything commercial — including internal use inside a company — needs a separate licence.
+          Write to <a href="mailto:info@life2film.com">info@life2film.com</a>. This is a real offer
+          rather than a formality: the licence is noncommercial so that the terms are a conversation
+          instead of an assumption.
+        </p>
+        <p>
+          The package ships compiled WebAssembly. The Rust it is built from is not public.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <style>
+    .hero { padding-bottom: 30px; }
+    .hero h1 { margin: 16px 0 14px; }
+    .lede { color: #cfcfd6; max-width: 62ch; font-size: 19px; margin-bottom: 26px; }
+
+    .install {
+      display: inline-flex; align-items: center; gap: 12px;
+      padding: 12px 14px; border-radius: 12px;
+      background: #08080a; border: 1px solid var(--line);
+    }
+    .install code { font-family: ui-monospace, monospace; font-size: 15px; color: var(--cyan); }
+
+    .links { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-top: 24px; }
+    .link { border: none; padding: 0; background: none; color: var(--cyan); text-decoration: none; font-size: 15px; }
+    .link:hover { text-decoration: underline; }
+
+    .uses { margin-top: 20px; }
+    .uses h3 { margin-bottom: 6px; }
+
+    .skillhead { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; justify-content: space-between; }
+    .skillhead h2 { margin-bottom: 8px; }
+    .skillhead p { max-width: 60ch; font-size: 15px; }
+    .skillactions { display: flex; gap: 10px; align-items: center; }
+
+    .ghost {
+      padding: 9px 16px; border-radius: 10px; font: inherit; font-size: 14px; cursor: pointer;
+      color: var(--fg); background: transparent; border: 1px solid var(--line); text-decoration: none;
+    }
+    .ghost:hover { border-color: var(--cyan); color: var(--cyan); }
+    .ghost.primary { border-color: rgba(0,242,224,.4); color: var(--cyan); }
+    .ghost.small { padding: 6px 12px; font-size: 13px; }
+
+    .skillbox { margin-top: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    .skillbox summary {
+      padding: 14px 18px; cursor: pointer; font-size: 15px; color: var(--muted);
+      list-style: none;
+    }
+    .skillbox summary::-webkit-details-marker { display: none; }
+    .skillbox summary::before { content: '▸ '; }
+    .skillbox[open] summary::before { content: '▾ '; }
+    .skillbox summary:hover { color: var(--fg); }
+    .skillbox pre {
+      margin: 0; padding: 0 18px 18px; max-height: 60vh; overflow: auto;
+    }
+    .skillbox code {
+      font-family: ui-monospace, monospace; font-size: 12.5px; line-height: 1.6;
+      color: #cfcfd6; white-space: pre-wrap; word-break: break-word;
+    }
+
+    .api { width: 100%; border-collapse: collapse; margin: 14px 0; }
+    .api td { padding: 9px 0; border-bottom: 1px solid var(--line); vertical-align: top; font-size: 15px; }
+    .api td:first-child { width: 34%; padding-right: 16px; }
+    .api code { color: var(--cyan); font-size: 13.5px; }
+
+    .small { font-size: 13px; }
+
+    .pairnote { max-width: 66ch; font-size: 16px; margin: 10px 0 24px; }
+    .pair { display: grid; gap: 18px; }
+    @media (min-width: 900px) { .pair { grid-template-columns: 1fr 1fr; } }
+    .pairstep {
+      border: 1px solid var(--line); border-radius: 14px; background: var(--panel);
+      padding: 18px; position: relative;
+    }
+    .pairstep .num {
+      position: absolute; top: 16px; right: 18px;
+      font-size: 13px; color: var(--muted); font-family: ui-monospace, monospace;
+    }
+    .pairstep h3 { margin-bottom: 12px; }
+    .pairstep pre {
+      margin: 0; padding: 14px; border-radius: 10px; overflow-x: auto;
+      background: #08080a; border: 1px solid var(--line);
+    }
+    .pairstep code {
+      font-family: ui-monospace, monospace; font-size: 12.5px; line-height: 1.6; color: #cfcfd6;
+    }
+    .verified { max-width: 74ch; font-size: 14px; margin-top: 20px; }
+    .verified code { background: #08080a; padding: 2px 6px; border-radius: 5px; font-size: 13px; }
+  </style>
+
+  <script>
+    async function copy(text: string, button: HTMLButtonElement, label: string) {
+      try {
+        await navigator.clipboard.writeText(text);
+        button.textContent = 'Copied';
+      } catch {
+        button.textContent = 'Press ⌘C';
+      }
+      setTimeout(() => { button.textContent = label; }, 2500);
+    }
+
+    const install = document.getElementById('copyInstall') as HTMLButtonElement;
+    install.addEventListener('click', () =>
+      copy(document.getElementById('installCmd')!.textContent ?? '', install, 'Copy'),
+    );
+
+    const skill = document.getElementById('copySkill') as HTMLButtonElement;
+    skill.addEventListener('click', () => {
+      // The skill lives in a <details> that may be closed; textContent is there regardless.
+      copy(document.getElementById('skillText')!.textContent ?? '', skill, 'Copy skill');
+    });
+  </script>
+</Base>
