@@ -1,0 +1,262 @@
+---
+import ToolPage from '../../components/ToolPage.astro';
+
+const faq = [
+  {
+    q: 'Which conversions are supported?',
+    a: 'Between MP4, WebM and MOV, and from any of them to WAV audio. What actually works depends on your browser, because the encoding is done by the browser itself — Chrome and Edge cover the most ground, Safari handles MP4 and MOV well. The tool checks before it starts and says so if a combination is not available rather than failing halfway through.',
+  },
+  {
+    q: 'Can I extract just the audio?',
+    a: 'Yes — choose WAV and the picture is discarded, leaving the sound as an uncompressed file any editor or transcription tool will accept. WAV is deliberately large; if you need something small, convert and then compress, or keep the original.',
+  },
+  {
+    q: 'Is anything uploaded?',
+    a: 'No. Conversion runs through WebCodecs in your browser. That is the point of doing it this way: converting a large file by uploading it, waiting on a queue and downloading it back is slower than doing it locally, and it puts your footage on a stranger\'s disk in between.',
+  },
+  {
+    q: 'Why can my browser not open a MOV from my camera?',
+    a: 'A .mov file is a container, and what matters is the codec inside it. Browsers handle H.264 and, increasingly, HEVC — but not ProRes, DNxHD or camera-raw formats, which is what professional cameras usually write into a .mov. Those need a real transcode from a desktop tool first.',
+  },
+  {
+    q: 'Does converting lose quality?',
+    a: 'Changing container between MP4 and MOV can often be done without touching the video at all. Changing codec — to WebM, for example — means re-encoding, and re-encoding always costs a little. It is generally invisible for one generation, and it accumulates if you convert the same file repeatedly.',
+  },
+];
+---
+
+<ToolPage
+  title="Video Converter — MP4, WebM, MOV and audio, in your browser"
+  description="Convert video between MP4, WebM and MOV, or pull the audio out as WAV. Everything runs in your browser — no upload, no file size limit, no watermark, no sign-up."
+  path="/tools/video-converter/"
+  heading="Convert"
+  accent="Video"
+  lede="Change format without handing your file to anyone. MP4, WebM, MOV — or pull out just the audio."
+  appName="Video Converter"
+  featureList={[
+    'MP4, WebM and MOV conversion',
+    'Extract audio as WAV',
+    'Optional resize during conversion',
+    'Runs fully client-side — no upload, no watermark',
+  ]}
+  faq={faq}
+>
+  <div class="tool" slot="tool">
+    <label class="drop" id="drop" for="file">
+      <input type="file" id="file" accept="video/*,audio/*" hidden />
+      <strong>Choose a file</strong>
+      <span class="muted">or drag it here — MP4, MOV (H.264), WebM</span>
+    </label>
+
+    <div id="editor" hidden>
+      <div class="facts" id="facts"></div>
+
+      <div class="controls">
+        <label class="control">
+          <span class="muted">Convert to</span>
+          <select id="container">
+            <option value="mp4" selected>MP4 — plays everywhere</option>
+            <option value="webm">WebM — smaller, for the web</option>
+            <option value="mov">MOV — QuickTime</option>
+            <option value="wav">WAV — audio only</option>
+          </select>
+        </label>
+
+        <label class="control" id="resolutionControl">
+          <span class="muted">Resolution</span>
+          <select id="resolution">
+            <option value="0" selected>Keep original</option>
+            <option value="1920">1080p</option>
+            <option value="1280">720p</option>
+            <option value="854">480p</option>
+          </select>
+        </label>
+
+        <span class="spacer"></span>
+        <button id="run" type="button" class="ghost primary">Convert</button>
+      </div>
+
+      <div id="support" class="support muted" hidden></div>
+    </div>
+
+    <div id="status" class="status" hidden>
+      <div class="bar"><span id="fill"></span></div>
+      <div class="statustext" id="statusText"></div>
+    </div>
+  </div>
+
+  <Fragment slot="prose">
+    <h2>Container and codec are not the same thing</h2>
+    <p>
+      An .mp4 is a box. What matters is what is inside it — usually H.264, sometimes HEVC or AV1.
+      Most "this file will not play" problems are about the codec, not the extension, which is why
+      renaming a file never helps and why a .mov from a professional camera can defeat a browser
+      that opens .mov files all day.
+    </p>
+    <p>
+      This tool reads what is actually inside your file and tells you before converting. When a
+      target is not available in your browser, it says so rather than failing partway through a long
+      encode.
+    </p>
+
+    <h2>Which format to pick</h2>
+    <p>
+      <strong>MP4</strong> unless you have a reason not to: every phone, editor and platform accepts
+      it. <strong>WebM</strong> is smaller at the same quality and ideal for a website, but is not
+      universally accepted by apps. <strong>MOV</strong> is what Apple tools expect.
+      <strong>WAV</strong> discards the picture entirely and leaves clean audio for transcription or
+      an editor.
+    </p>
+    <p>
+      To shorten a file, use the <a href="/tools/video-trimmer/">trimmer</a>; to make it smaller
+      without changing its length, the <a href="/tools/video-compressor/">compressor</a>.
+    </p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .support { margin-top: 14px; font-size: 14px; }
+  .support.bad { color: var(--pink); }
+</style>
+
+<script>
+  import {
+    probe, encode, saveBlob, loadMediabunny, formatBytes, preciseClock,
+    CONTAINER_EXTENSION, type Container,
+  } from '../../lib/encode';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+  const drop = el<HTMLLabelElement>('drop');
+  const fileInput = el<HTMLInputElement>('file');
+  const statusEl = el<HTMLDivElement>('status');
+
+  let file: File | null = null;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  /**
+   * Ask the browser whether it can encode into the chosen container before starting.
+   *
+   * Encoding support is per-browser and per-machine, and finding out by failing at 70% of a long
+   * conversion is the worst possible way to learn it.
+   */
+  async function checkSupport(container: Container) {
+    const note = el('support');
+    if (container === 'wav') {
+      note.hidden = false;
+      note.classList.remove('bad');
+      note.textContent = 'WAV keeps only the audio, uncompressed — expect a large file.';
+      return true;
+    }
+
+    try {
+      const library = await loadMediabunny();
+      const format =
+        container === 'mp4'
+          ? new library.Mp4OutputFormat()
+          : container === 'webm'
+            ? new library.WebMOutputFormat()
+            : new library.MovOutputFormat();
+
+      const codec = await library.getFirstEncodableVideoCodec(format.getSupportedVideoCodecs());
+
+      note.hidden = false;
+      note.classList.toggle('bad', !codec);
+      note.textContent = codec
+        ? `Your browser will encode this as ${codec.toUpperCase()}.`
+        : `Your browser cannot encode ${container.toUpperCase()} video. Chrome or Edge usually can.`;
+      return Boolean(codec);
+    } catch {
+      note.hidden = true;
+      return true;
+    }
+  }
+
+  async function open(chosen: File) {
+    file = chosen;
+    try {
+      status('Reading file…');
+      const info = await probe(chosen);
+
+      el('editor').hidden = false;
+      statusEl.hidden = true;
+      el('facts').innerHTML =
+        `<span>Inside: <b>${info.videoCodec ?? 'no video'}${info.hasAudio ? ` + ${info.audioCodec}` : ''}</b></span>` +
+        `<span>Resolution: <b>${info.width ? `${info.width}×${info.height}` : '—'}</b></span>` +
+        `<span>Length: <b>${preciseClock(info.duration)}</b></span>` +
+        `<span>Size: <b>${formatBytes(info.size)}</b></span>`;
+
+      await checkSupport(el<HTMLSelectElement>('container').value as Container);
+    } catch (error) {
+      status(
+        error instanceof Error
+          ? `Could not read that file — ${error.message}. Browsers cannot open ProRes or raw camera formats.`
+          : 'Could not read that file.',
+        1,
+        true,
+      );
+    }
+  }
+
+  el<HTMLSelectElement>('container').addEventListener('change', async (event) => {
+    const container = (event.target as HTMLSelectElement).value as Container;
+    // Resolution is meaningless when the picture is being thrown away.
+    el('resolutionControl').hidden = container === 'wav';
+    if (file) await checkSupport(container);
+  });
+
+  el<HTMLButtonElement>('run').addEventListener('click', async () => {
+    if (!file || busy) return;
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+
+    const container = el<HTMLSelectElement>('container').value as Container;
+    const width = Number(el<HTMLSelectElement>('resolution').value) || undefined;
+    const name = file.name.replace(/\.[^.]+$/, '') || 'file';
+
+    try {
+      status('Converting…', 0);
+      const blob = await encode(file, {
+        container,
+        ...(width && container !== 'wav' ? { width } : {}),
+        onProgress: (p) => status(`Converting — ${Math.round(p * 100)}%`, p),
+      });
+
+      saveBlob(blob, `${name}.${CONTAINER_EXTENSION[container]}`);
+      status(`Saved — ${formatBytes(blob.size)} ${container.toUpperCase()}.`, 1);
+      setTimeout(() => { statusEl.hidden = true; }, 5000);
+    } catch (error) {
+      status(
+        error instanceof Error ? `Conversion failed — ${error.message}` : 'Conversion failed.',
+        1,
+        true,
+      );
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  fileInput.addEventListener('change', () => {
+    const chosen = fileInput.files?.[0];
+    if (chosen) void open(chosen);
+  });
+
+  for (const type of ['dragenter', 'dragover']) {
+    drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  }
+  for (const type of ['dragleave', 'drop']) {
+    drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  }
+  drop.addEventListener('drop', (e) => {
+    const chosen = (e as DragEvent).dataTransfer?.files?.[0];
+    if (chosen) void open(chosen);
+  });
+</script>

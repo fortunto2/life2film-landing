@@ -1,0 +1,269 @@
+---
+import ToolPage from '../../components/ToolPage.astro';
+
+const faq = [
+  {
+    q: 'Is there a file size limit?',
+    a: 'None imposed by us — there is no server to impose one. The practical limit is your browser tab: the compressed result is held in memory before it is saved, so a few hundred megabytes is comfortable on a normal laptop and multi-gigabyte files may run out of room. Compressing in sections is the workaround.',
+  },
+  {
+    q: 'How much smaller will it get?',
+    a: 'It depends entirely on the source. Footage straight from a phone or camera is usually recorded at a bitrate far higher than it needs, and 60–90% reductions are common at settings you would struggle to tell apart. Something already compressed once — a download, a re-upload — has much less left to give, and the tool will tell you the real numbers when it finishes rather than promising them in advance.',
+  },
+  {
+    q: 'What actually makes a video smaller?',
+    a: 'Two things: fewer pixels and fewer bits per pixel. Reducing the resolution is the blunt, reliable lever — 4K to 1080p removes three quarters of the pixels before quality is even considered. Lowering the quality keeps the frame size and spends fewer bits describing each one. Dropping audio helps a little; it is rarely more than a few percent of a video file.',
+  },
+  {
+    q: 'Will it look worse?',
+    a: 'At "medium" on typical footage, not noticeably at normal viewing distance. At "low" you will see it in fast motion and fine texture — sport, foliage, rain, confetti — where compression has the most to hide. Grainy or noisy footage suffers first, because noise is expensive to encode and cheap to destroy.',
+  },
+  {
+    q: 'Is it uploaded anywhere?',
+    a: 'No. Everything runs through WebCodecs in your browser, which is what makes this practical at all — uploading a gigabyte to have a server return 200 MB is slower than doing the work locally, and it hands your footage to someone else on the way.',
+  },
+];
+---
+
+<ToolPage
+  title="Compress Video — make a video smaller without uploading it"
+  description="Reduce a video's file size in your browser. Choose a resolution and quality, see exactly what you saved. No upload, no size limit, no watermark, no sign-up."
+  path="/tools/video-compressor/"
+  heading="Compress"
+  accent="Video"
+  lede="Make a video smaller on your own machine. No upload, so no size limit and no queue."
+  appName="Video Compressor"
+  featureList={[
+    'Resolution and quality control',
+    'Before-and-after size comparison',
+    'Optional audio removal',
+    'Runs fully client-side — no upload, no watermark',
+  ]}
+  faq={faq}
+>
+  <div class="tool" slot="tool">
+    <label class="drop" id="drop" for="file">
+      <input type="file" id="file" accept="video/*" hidden />
+      <strong>Choose a video file</strong>
+      <span class="muted">or drag it here — MP4, MOV (H.264), WebM</span>
+    </label>
+
+    <div id="editor" hidden>
+      <div class="facts" id="facts"></div>
+
+      <div class="controls">
+        <label class="control">
+          <span class="muted">Resolution</span>
+          <select id="resolution">
+            <option value="0">Keep original</option>
+            <option value="1920">1080p</option>
+            <option value="1280" selected>720p</option>
+            <option value="854">480p</option>
+            <option value="640">360p</option>
+          </select>
+        </label>
+
+        <label class="control">
+          <span class="muted">Quality</span>
+          <select id="quality">
+            <option value="high">High — barely touched</option>
+            <option value="medium" selected>Medium — recommended</option>
+            <option value="low">Low — small file</option>
+            <option value="very_low">Very low — smallest</option>
+          </select>
+        </label>
+
+        <label class="control checkbox">
+          <input type="checkbox" id="mute" />
+          <span>Remove audio</span>
+        </label>
+
+        <span class="spacer"></span>
+        <button id="run" type="button" class="ghost primary">Compress</button>
+      </div>
+
+      <div id="outcome" class="outcome" hidden>
+        <div class="sizes">
+          <span class="was" id="was">—</span>
+          <span class="arrow">→</span>
+          <span class="now" id="now">—</span>
+          <span class="saved" id="saved"></span>
+        </div>
+        <div class="controls">
+          <button id="save" type="button" class="ghost primary">Download</button>
+          <span class="muted" id="outcomeNote"></span>
+        </div>
+      </div>
+    </div>
+
+    <div id="status" class="status" hidden>
+      <div class="bar"><span id="fill"></span></div>
+      <div class="statustext" id="statusText"></div>
+    </div>
+  </div>
+
+  <Fragment slot="prose">
+    <h2>Why this can run in a tab at all</h2>
+    <p>
+      Compressing video used to mean a server, because browsers had no way to encode. They do now:
+      WebCodecs exposes the same hardware encoder your phone uses to record, and a laptop chews
+      through 1080p faster than it could have uploaded it.
+    </p>
+    <p>
+      That changes the economics rather than just the privacy. A service that compresses on a server
+      pays for every gigabyte it touches, which is why they cap file sizes, queue free users and
+      stamp watermarks on the output. None of those limits exist here, because none of that cost
+      does.
+    </p>
+
+    <h2>Picking settings</h2>
+    <p>
+      Start with resolution, since it is the honest lever: a 4K clip destined for a phone screen is
+      carrying four times the pixels anyone will see. Then adjust quality only if the file is still
+      bigger than you need. The result is shown against the original before you download it, so the
+      trade is one you can see rather than guess at.
+    </p>
+    <p>
+      To shorten a video instead of shrinking it, use the <a href="/tools/video-trimmer/">trimmer</a>;
+      to change format, the <a href="/tools/video-converter/">converter</a>.
+    </p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  .outcome { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
+  .sizes { display: flex; flex-wrap: wrap; gap: 14px; align-items: baseline; }
+  .was { font-size: 20px; color: var(--muted); text-decoration: line-through; }
+  .arrow { color: var(--muted); }
+  .now {
+    font-size: 34px; font-weight: 700; letter-spacing: -.03em;
+    background: var(--grad); -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .saved { font-size: 15px; color: var(--cyan); }
+</style>
+
+<script>
+  import {
+    probe, encode, saveBlob, formatBytes, preciseClock,
+    type QualityName,
+  } from '../../lib/encode';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+  const drop = el<HTMLLabelElement>('drop');
+  const fileInput = el<HTMLInputElement>('file');
+  const statusEl = el<HTMLDivElement>('status');
+
+  let file: File | null = null;
+  let original = 0;
+  let result: Blob | null = null;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  async function open(chosen: File) {
+    file = chosen;
+    original = chosen.size;
+    result = null;
+    el('outcome').hidden = true;
+
+    try {
+      status('Reading file…');
+      const info = await probe(chosen);
+
+      el('editor').hidden = false;
+      statusEl.hidden = true;
+      el('facts').innerHTML =
+        `<span>Now: <b>${formatBytes(info.size)}</b></span>` +
+        `<span>Resolution: <b>${info.width}×${info.height}</b></span>` +
+        `<span>Length: <b>${preciseClock(info.duration)}</b></span>` +
+        `<span>Codec: <b>${info.videoCodec ?? 'unknown'}${info.hasAudio ? ` + ${info.audioCodec}` : ' · no audio'}</b></span>`;
+
+      // Suggest a sensible target rather than shrinking something already small.
+      const suggested = info.width >= 3000 ? '1920' : info.width >= 1900 ? '1280' : '0';
+      el<HTMLSelectElement>('resolution').value = suggested;
+    } catch (error) {
+      status(
+        error instanceof Error ? `Could not read that file — ${error.message}` : 'Could not read that file.',
+        1,
+        true,
+      );
+    }
+  }
+
+  el<HTMLButtonElement>('run').addEventListener('click', async () => {
+    if (!file || busy) return;
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    el('outcome').hidden = true;
+
+    const width = Number(el<HTMLSelectElement>('resolution').value) || undefined;
+    const quality = el<HTMLSelectElement>('quality').value as QualityName;
+
+    try {
+      status('Compressing…', 0);
+      result = await encode(file, {
+        container: 'mp4',
+        ...(width ? { width } : {}),
+        quality,
+        discardAudio: el<HTMLInputElement>('mute').checked,
+        onProgress: (p) => status(`Compressing — ${Math.round(p * 100)}%`, p),
+      });
+
+      const ratio = 1 - result.size / original;
+      el('was').textContent = formatBytes(original);
+      el('now').textContent = formatBytes(result.size);
+
+      // The honest case: an already-compressed file can come out bigger, and saying so is more
+      // useful than hiding it behind a percentage with a minus sign.
+      el('saved').textContent =
+        ratio > 0.01
+          ? `${Math.round(ratio * 100)}% smaller`
+          : ratio < -0.01
+            ? `${Math.round(-ratio * 100)}% larger — this file was already well compressed`
+            : 'about the same size';
+
+      el('outcomeNote').textContent =
+        ratio <= 0.01 ? 'Try a lower resolution, or keep the original.' : '';
+
+      el('outcome').hidden = false;
+      statusEl.hidden = true;
+    } catch (error) {
+      status(
+        error instanceof Error ? `Compression failed — ${error.message}` : 'Compression failed.',
+        1,
+        true,
+      );
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  el<HTMLButtonElement>('save').addEventListener('click', () => {
+    if (!result || !file) return;
+    saveBlob(result, `${file.name.replace(/\.[^.]+$/, '') || 'video'}-compressed.mp4`);
+  });
+
+  fileInput.addEventListener('change', () => {
+    const chosen = fileInput.files?.[0];
+    if (chosen) void open(chosen);
+  });
+
+  for (const type of ['dragenter', 'dragover']) {
+    drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  }
+  for (const type of ['dragleave', 'drop']) {
+    drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  }
+  drop.addEventListener('drop', (e) => {
+    const chosen = (e as DragEvent).dataTransfer?.files?.[0];
+    if (chosen) void open(chosen);
+  });
+</script>

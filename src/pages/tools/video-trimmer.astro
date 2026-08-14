@@ -1,0 +1,401 @@
+---
+import ToolPage from '../../components/ToolPage.astro';
+
+const faq = [
+  {
+    q: 'Is my video uploaded?',
+    a: 'No. The browser decodes and re-encodes it locally through WebCodecs — the same pipeline it uses to play video. Nothing is sent anywhere, so there is no size limit imposed by a plan, no queue, and no watermark.',
+  },
+  {
+    q: 'Does trimming lose quality?',
+    a: 'The section is re-encoded, so strictly speaking yes — but at the quality setting used here the difference is not visible in normal viewing. Cutting without any re-encoding is only possible on keyframe boundaries, which would move your in-point by up to a few seconds. Landing on the frame you chose is worth more than a theoretical loss you cannot see.',
+  },
+  {
+    q: 'Is the audio kept?',
+    a: 'Yes, in sync, and trimmed to the same range. You can drop it deliberately with the "remove audio" box — useful when a clip is going somewhere the sound is not wanted, and it makes the file smaller.',
+  },
+  {
+    q: 'Which files work?',
+    a: 'MP4 and MOV with H.264, and WebM — whatever your browser can both decode and encode. Camera-native formats such as ProRes or raw usually cannot be opened by a browser at all; transcode a proxy first.',
+  },
+  {
+    q: 'How long can the video be?',
+    a: 'There is no hard cap, but everything happens in a browser tab, so memory is the real limit — the encoded result is held there before it is saved. Files up to a few hundred megabytes are comfortable on a normal laptop; very large ones are better trimmed in passes.',
+  },
+];
+---
+
+<ToolPage
+  title="Trim Video — cut the section you want, in your browser"
+  description="Trim a video down to the part you actually need. Drag the handles, watch the preview, save an MP4. Runs entirely in your browser — nothing is uploaded, no watermark, no sign-up."
+  path="/tools/video-trimmer/"
+  heading="Trim"
+  accent="Video"
+  lede="Drag the handles to the part you want and save it. Your file never leaves the machine."
+  appName="Video Trimmer"
+  featureList={[
+    'Frame-accurate in and out points',
+    'Live preview of the selection',
+    'Keeps audio in sync, or removes it',
+    'Runs fully client-side — no upload, no watermark',
+  ]}
+  faq={faq}
+>
+  <div class="tool" slot="tool">
+    <label class="drop" id="drop" for="file">
+      <input type="file" id="file" accept="video/*" hidden />
+      <strong>Choose a video file</strong>
+      <span class="muted">or drag it here — MP4, MOV (H.264), WebM</span>
+    </label>
+
+    <div id="editor" hidden>
+      <video id="preview" playsinline></video>
+
+      <div class="track" id="track">
+        <div class="selection" id="selection"></div>
+        <button class="handle in" id="handleIn" type="button" aria-label="Start of selection"></button>
+        <button class="handle out" id="handleOut" type="button" aria-label="End of selection"></button>
+        <div class="playhead" id="playhead"></div>
+      </div>
+
+      <div class="times">
+        <label class="control">
+          <span class="muted">In</span>
+          <input type="text" id="inValue" size="7" inputmode="decimal" />
+        </label>
+        <button id="setIn" type="button" class="ghost small">Set to playhead</button>
+
+        <span class="spacer"></span>
+        <span class="muted" id="selectionLength">—</span>
+        <span class="spacer"></span>
+
+        <button id="setOut" type="button" class="ghost small">Set to playhead</button>
+        <label class="control">
+          <span class="muted">Out</span>
+          <input type="text" id="outValue" size="7" inputmode="decimal" />
+        </label>
+      </div>
+
+      <div class="controls">
+        <button id="play" type="button" class="ghost">▶ Play selection</button>
+
+        <label class="control checkbox">
+          <input type="checkbox" id="mute" />
+          <span>Remove audio</span>
+        </label>
+
+        <label class="control">
+          <span class="muted">Format</span>
+          <select id="container">
+            <option value="mp4" selected>MP4</option>
+            <option value="webm">WebM</option>
+            <option value="mov">MOV</option>
+          </select>
+        </label>
+
+        <span class="spacer"></span>
+        <button id="save" type="button" class="ghost primary">Save trimmed video</button>
+      </div>
+
+      <div class="facts" id="facts"></div>
+    </div>
+
+    <div id="status" class="status" hidden>
+      <div class="bar"><span id="fill"></span></div>
+      <div class="statustext" id="statusText"></div>
+    </div>
+  </div>
+
+  <Fragment slot="prose">
+    <h2>Why the handles, not two boxes</h2>
+    <p>
+      Choosing an in-point by typing a number means guessing, checking, and typing again. Dragging a
+      handle while the frame under it updates is the same decision made once. The numbers are still
+      there — you can type into them when you know exactly where the cut goes — but they follow the
+      handles rather than replacing them.
+    </p>
+
+    <h2>What happens to the file</h2>
+    <p>
+      The selection is re-encoded through the browser's own video pipeline, hardware-accelerated
+      where the machine allows, and handed back as a normal MP4. No server is involved at any point:
+      the page has no upload endpoint, and you can confirm it by watching the network tab or by
+      disconnecting once the page has loaded.
+    </p>
+    <p>
+      Trimming is the first thing most footage needs. When a video needs cutting into several pieces
+      instead of one, the <a href="/tools/video-splitter/">splitter</a> does that at the shot
+      changes; to make a file smaller without changing its length, use
+      the <a href="/tools/video-compressor/">compressor</a>.
+    </p>
+  </Fragment>
+</ToolPage>
+
+<style>
+  video {
+    width: 100%; max-height: 46vh; display: block; margin-top: 18px;
+    border-radius: 12px; background: #000;
+  }
+
+  .track {
+    position: relative; height: 46px; margin-top: 14px; border-radius: 10px;
+    background: #0a0a0d; border: 1px solid var(--line); cursor: pointer;
+  }
+  .selection {
+    position: absolute; top: 0; bottom: 0;
+    background: linear-gradient(180deg, rgba(0,242,224,.16), rgba(1,122,255,.16));
+    border-left: 2px solid var(--cyan); border-right: 2px solid var(--cyan);
+  }
+  .handle {
+    position: absolute; top: -3px; width: 14px; height: 52px; padding: 0;
+    border: none; border-radius: 5px; background: var(--cyan); cursor: ew-resize;
+    box-shadow: 0 2px 10px rgba(0,242,224,.35); transform: translateX(-7px);
+  }
+  .handle:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+  .playhead {
+    position: absolute; top: 0; bottom: 0; width: 2px; background: var(--fg);
+    opacity: .85; pointer-events: none;
+  }
+
+  .times { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 14px; }
+  .ghost.small { padding: 5px 10px; font-size: 12px; }
+  #selectionLength { font-family: ui-monospace, monospace; font-size: 14px; }
+
+  @media (max-width: 640px) {
+    .times { flex-wrap: wrap; }
+    .times .spacer { display: none; }
+  }
+</style>
+
+<script>
+  import { probe, encode, saveBlob, formatBytes, preciseClock, CONTAINER_EXTENSION, type Container } from '../../lib/encode';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+  const drop = el<HTMLLabelElement>('drop');
+  const fileInput = el<HTMLInputElement>('file');
+  const video = el<HTMLVideoElement>('preview');
+  const track = el<HTMLDivElement>('track');
+  const statusEl = el<HTMLDivElement>('status');
+
+  let file: File | null = null;
+  let objectUrl: string | null = null;
+  let duration = 0;
+  let inPoint = 0;
+  let outPoint = 0;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  function draw() {
+    const left = (inPoint / duration) * 100;
+    const right = (outPoint / duration) * 100;
+
+    el('selection').style.left = `${left}%`;
+    el('selection').style.width = `${right - left}%`;
+    el('handleIn').style.left = `${left}%`;
+    el('handleOut').style.left = `${right}%`;
+
+    el<HTMLInputElement>('inValue').value = preciseClock(inPoint);
+    el<HTMLInputElement>('outValue').value = preciseClock(outPoint);
+    el('selectionLength').textContent = `${(outPoint - inPoint).toFixed(1)}s selected`;
+  }
+
+  /** Accepts `12.5`, `1:04`, `1:04.5` — whichever way someone happens to think about time. */
+  function parseTime(text: string): number | null {
+    const trimmed = text.trim();
+    if (!trimmed) return null;
+    const parts = trimmed.split(':').map(Number);
+    if (parts.some(Number.isNaN)) return null;
+    const seconds = parts.length === 1 ? parts[0] : parts[0] * 60 + parts[1];
+    return Number.isFinite(seconds) ? Math.max(0, Math.min(duration, seconds)) : null;
+  }
+
+  async function open(chosen: File) {
+    file = chosen;
+    try {
+      status('Reading file…');
+      const info = await probe(chosen);
+
+      duration = info.duration;
+      inPoint = 0;
+      outPoint = duration;
+
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      objectUrl = URL.createObjectURL(chosen);
+      video.src = objectUrl;
+
+      el('editor').hidden = false;
+      statusEl.hidden = true;
+
+      el('facts').innerHTML =
+        `<span>Source: <b>${info.width}×${info.height}</b></span>` +
+        `<span>Length: <b>${preciseClock(info.duration)}</b></span>` +
+        `<span>Size: <b>${formatBytes(info.size)}</b></span>` +
+        `<span>Codec: <b>${info.videoCodec ?? 'unknown'}${info.hasAudio ? ` + ${info.audioCodec}` : ' · no audio'}</b></span>`;
+
+      draw();
+    } catch (error) {
+      status(
+        error instanceof Error
+          ? `Could not read that file — ${error.message}`
+          : 'Could not read that file.',
+        1,
+        true,
+      );
+    }
+  }
+
+  // --- dragging ---
+
+  const positionFromEvent = (clientX: number) => {
+    const box = track.getBoundingClientRect();
+    return Math.max(0, Math.min(1, (clientX - box.left) / box.width)) * duration;
+  };
+
+  let dragging: 'in' | 'out' | null = null;
+
+  const startDrag = (which: 'in' | 'out') => (event: PointerEvent) => {
+    event.preventDefault();
+    dragging = which;
+    (event.target as HTMLElement).setPointerCapture(event.pointerId);
+  };
+
+  el('handleIn').addEventListener('pointerdown', startDrag('in'));
+  el('handleOut').addEventListener('pointerdown', startDrag('out'));
+
+  for (const handle of ['handleIn', 'handleOut']) {
+    el(handle).addEventListener('pointermove', (event) => {
+      if (!dragging || !duration) return;
+      const at = positionFromEvent((event as PointerEvent).clientX);
+
+      // Half a second is the shortest selection worth making, and it stops the handles crossing.
+      if (dragging === 'in') inPoint = Math.min(at, outPoint - 0.5);
+      else outPoint = Math.max(at, inPoint + 0.5);
+
+      inPoint = Math.max(0, inPoint);
+      outPoint = Math.min(duration, outPoint);
+      video.currentTime = dragging === 'in' ? inPoint : outPoint;
+      draw();
+    });
+
+    for (const type of ['pointerup', 'pointercancel']) {
+      el(handle).addEventListener(type, () => { dragging = null; });
+    }
+  }
+
+  // Clicking the track scrubs, which is what a click on a timeline should do.
+  track.addEventListener('click', (event) => {
+    if (dragging || !duration) return;
+    if ((event.target as HTMLElement).classList.contains('handle')) return;
+    video.currentTime = positionFromEvent(event.clientX);
+  });
+
+  video.addEventListener('timeupdate', () => {
+    if (!duration) return;
+    el('playhead').style.left = `${(video.currentTime / duration) * 100}%`;
+  });
+
+  el('setIn').addEventListener('click', () => {
+    inPoint = Math.min(video.currentTime, outPoint - 0.5);
+    draw();
+  });
+  el('setOut').addEventListener('click', () => {
+    outPoint = Math.max(video.currentTime, inPoint + 0.5);
+    draw();
+  });
+
+  for (const [id, apply] of [
+    ['inValue', (v: number) => { inPoint = Math.min(v, outPoint - 0.5); }],
+    ['outValue', (v: number) => { outPoint = Math.max(v, inPoint + 0.5); }],
+  ] as const) {
+    el<HTMLInputElement>(id).addEventListener('change', (event) => {
+      const parsed = parseTime((event.target as HTMLInputElement).value);
+      if (parsed !== null) apply(parsed);
+      draw();
+    });
+  }
+
+  // --- preview ---
+
+  let stopAt: number | null = null;
+
+  el('play').addEventListener('click', () => {
+    if (!video.paused) {
+      video.pause();
+      el('play').textContent = '▶ Play selection';
+      return;
+    }
+    video.currentTime = inPoint;
+    stopAt = outPoint;
+    void video.play();
+    el('play').textContent = '❚❚ Pause';
+  });
+
+  video.addEventListener('timeupdate', () => {
+    if (stopAt !== null && video.currentTime >= stopAt) {
+      video.pause();
+      stopAt = null;
+      el('play').textContent = '▶ Play selection';
+    }
+  });
+
+  video.addEventListener('pause', () => { el('play').textContent = '▶ Play selection'; });
+
+  // --- save ---
+
+  el<HTMLButtonElement>('save').addEventListener('click', async () => {
+    if (!file || busy) return;
+    busy = true;
+    el<HTMLButtonElement>('save').disabled = true;
+
+    const container = el<HTMLSelectElement>('container').value as Container;
+    const name = file.name.replace(/\.[^.]+$/, '') || 'video';
+
+    try {
+      status('Encoding…', 0);
+      const blob = await encode(file, {
+        container,
+        trim: { start: inPoint, end: outPoint },
+        discardAudio: el<HTMLInputElement>('mute').checked,
+        onProgress: (p) => status(`Encoding — ${Math.round(p * 100)}%`, p),
+      });
+
+      saveBlob(blob, `${name}-trimmed.${CONTAINER_EXTENSION[container]}`);
+      status(`Saved — ${formatBytes(blob.size)}, ${(outPoint - inPoint).toFixed(1)}s.`, 1);
+      setTimeout(() => { statusEl.hidden = true; }, 5000);
+    } catch (error) {
+      status(
+        error instanceof Error ? `Encoding failed — ${error.message}` : 'Encoding failed.',
+        1,
+        true,
+      );
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('save').disabled = false;
+    }
+  });
+
+  // --- input ---
+
+  fileInput.addEventListener('change', () => {
+    const chosen = fileInput.files?.[0];
+    if (chosen) void open(chosen);
+  });
+
+  for (const type of ['dragenter', 'dragover']) {
+    drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  }
+  for (const type of ['dragleave', 'drop']) {
+    drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  }
+  drop.addEventListener('drop', (e) => {
+    const chosen = (e as DragEvent).dataTransfer?.files?.[0];
+    if (chosen) void open(chosen);
+  });
+</script>
