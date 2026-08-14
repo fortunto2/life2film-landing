@@ -28,4 +28,5 @@ Allow: /
 User-agent: Google-Extended
 Allow: /
 
+Sitemap: https://life2film.com/sitemap.xml
 Sitemap: https://life2film.com/sitemap-index.xml

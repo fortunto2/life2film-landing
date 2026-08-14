@@ -28,6 +28,14 @@ export interface Tool {
   blurb: string;
 
   // --- page ---
+  /**
+   * How people actually search for this, from Google Autocomplete.
+   *
+   * Every one of these queries is dominated by "online" and "free" — the wording our titles avoided
+   * in favour of "in your browser", which is more accurate and matches nothing anyone types. The
+   * phrase belongs in the title; the accuracy belongs in the page.
+   */
+  searchPhrase: string;
   title: string;
   description: string;
   /** H1, split so the second half picks up the gradient. */
@@ -58,8 +66,9 @@ export const TOOLS: Tool[] = [
     appName: 'Video Trimmer',
     blurb: 'Drag the handles to the part you want, preview it, save it. Audio stays in sync.',
 
-    title: 'Trim Video — cut without re-encoding, in your browser',
-    description: 'Trim a video without losing quality — the picture is copied through, not re-encoded. Or aim at a file size for Discord or email. Runs in your browser: no upload, no watermark, no sign-up.',
+    searchPhrase: 'Trim Video Online',
+    title: 'Trim Video Online — free, without re-encoding | Life2Film',
+    description: 'Free online video trimmer that keeps the original quality: the picture is copied, not re-encoded. Runs in your browser — nothing uploaded, no watermark, no sign-up. Or trim to fit 10 MB for Discord.',
     heading: 'Trim',
     accent: 'Video',
     lede: 'Drag the handles to the part you want and save it — with the picture copied through untouched, so nothing is lost. Your file never leaves the machine.',
@@ -149,8 +158,9 @@ Reference implementation: https://life2film.com/tools/video-trimmer/`,
     appName: 'Video Compressor',
     blurb: 'Make a file smaller and see exactly what it cost. No size limit, because there is no server.',
 
-    title: 'Compress Video — hit an exact file size, in your browser',
-    description: 'Compress a video to a target size — 10 MB for Discord, 25 MB for email — or by quality. Shows the estimate before encoding and runs entirely in your browser. No upload, no limit, no watermark.',
+    searchPhrase: 'Compress Video Online',
+    title: 'Compress Video Online Free — to 10MB for Discord, 25MB for email',
+    description: 'Free online video compressor that hits an exact file size — 10 MB for Discord, 16 MB for WhatsApp, 25 MB for email. Runs in your browser: no upload, no size limit, no watermark, no sign-up.',
     heading: 'Compress',
     accent: 'Video',
     lede: 'Aim at a size — 10 MB for Discord, 25 MB for email — or just turn the quality down. Runs on your machine, so there is no size limit and no queue.',
@@ -268,8 +278,9 @@ Reference implementation: https://life2film.com/tools/video-compressor/`,
     appName: 'Video to MP3 Converter',
     blurb: 'Pull the audio out of a video and keep it as MP3, WAV or OGG.',
 
-    title: 'Video to MP3 — extract audio in your browser, free',
-    description: 'Pull the audio out of a video and save it as MP3, WAV or OGG. Runs entirely in your browser — nothing is uploaded, no size limit, no watermark, no sign-up.',
+    searchPhrase: 'Video to MP3 Converter',
+    title: 'Video to MP3 Converter — free, online, nothing uploaded',
+    description: 'Free online video to MP3 converter. Extract audio from MP4, MOV or WebM as MP3, WAV or OGG, entirely in your browser — no upload, no size limit, no watermark, no sign-up.',
     heading: 'Video to',
     accent: 'MP3',
     lede: 'Take the sound out of a video and keep it as MP3, WAV or OGG. Nothing is uploaded — the conversion happens on your machine.',
@@ -364,8 +375,9 @@ Reference implementation: https://life2film.com/tools/video-to-mp3/`,
     appName: 'Video Converter',
     blurb: 'MP4, WebM and MOV in any direction — or pull the audio out as WAV.',
 
-    title: 'Video Converter — MP4, WebM, MOV and audio, in your browser',
-    description: 'Convert video between MP4, WebM and MOV, or pull the audio out as WAV. Everything runs in your browser — no upload, no file size limit, no watermark, no sign-up.',
+    searchPhrase: 'Video Converter Online',
+    title: 'Video Converter Online Free — MP4, WebM, MOV, no upload',
+    description: 'Free online video converter for MP4, WebM and MOV, or extract the audio as WAV. Converts in your browser using WebCodecs — no upload, no size limit, no watermark, no sign-up.',
     heading: 'Convert',
     accent: 'Video',
     lede: 'Change format without handing your file to anyone. MP4, WebM, MOV — or pull out just the audio.',
@@ -432,8 +444,9 @@ Reference implementation: https://life2film.com/tools/video-converter/`,
     appName: 'Video Splitter',
     blurb: 'Cut a long video into Reels or Shorts that start on a shot change instead of every 30 seconds, ranked by picture quality.',
 
-    title: 'Video Splitter — cut a long video into clips at the scene changes',
-    description: 'Split a long video into Reels, Shorts and TikTok clips that start on a new shot instead of every 30 seconds. Runs in your browser — nothing is uploaded. Optional 9:16 crop.',
+    searchPhrase: 'Split Video Online',
+    title: 'Split Video Online Free — into Reels and Shorts, cut at the scene changes',
+    description: 'Free online video splitter that cuts a long video into parts at its shot changes instead of every 30 seconds, ranked by picture quality. Optional 9:16 crop for Reels, Shorts and TikTok. Nothing is uploaded.',
     heading: 'Video',
     accent: 'Splitter',
     lede: 'Cut a long video into clips that start where the video changes — not every thirty seconds. Everything happens on your machine.',
@@ -516,8 +529,9 @@ Reference implementation: https://life2film.com/tools/video-splitter/`,
     appName: 'BPM Detector',
     blurb: 'Find a track’s tempo and the time of every beat, then send the grid to Resolve, Premiere, Final Cut or Audacity as markers.',
 
-    title: 'BPM Detector — find a song’s tempo without uploading it',
-    description: 'Drop in a track and get its BPM and the position of every beat. Runs entirely in your browser — the audio never leaves your machine. Export the beat grid as EDL, OTIO, FCPXML, Audacity labels, CSV or JSON.',
+    searchPhrase: 'BPM Detector Online',
+    title: 'BPM Detector Online Free — find a song’s tempo and every beat',
+    description: 'Free online BPM finder: get a track’s tempo and the exact time of every beat, in your browser. Export the beat grid to DaVinci Resolve, Premiere, Final Cut or Audacity. Nothing is uploaded.',
     heading: 'BPM',
     accent: 'Detector',
     lede: 'Drop in a track. Get its tempo and the exact time of every beat — computed on your own machine, with nothing uploaded.',
@@ -597,8 +611,9 @@ Reference implementation: https://life2film.com/tools/bpm-detector/`,
     appName: 'Scene Detector',
     blurb: 'Find every cut in a video and get the shot list with thumbnails, timecodes and quality scores.',
 
-    title: 'Scene Detector — split a video into shots without uploading it',
-    description: 'Find every cut in a video and get the shot list with timecodes, in your browser. The footage never leaves your machine. Export cuts as EDL, OTIO, FCPXML, Audacity labels, CSV or JSON.',
+    searchPhrase: 'Scene Detection Online',
+    title: 'Scene Detector Online Free — find every cut in a video',
+    description: 'Free online scene detection: find every shot change in a video with thumbnails and timecodes, then export as EDL, OTIO, FCPXML or CSV. Runs in your browser — nothing uploaded.',
     heading: 'Scene',
     accent: 'Detector',
     lede: 'Drop in a video. Get every cut, with a thumbnail and a timecode for each shot — found on your own machine, with nothing uploaded.',

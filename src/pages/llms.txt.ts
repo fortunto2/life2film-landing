@@ -106,7 +106,7 @@ families, \`score_frame\` (31 per-frame measurements), \`select_segments\`, \`co
 OpenTimelineIO in and out. It analyses; it does not decode or encode — pair it with
 [mediabunny](https://mediabunny.dev) (MIT) for that, which is what these tool pages do.
 
-The package ships a skill for coding agents at \`node_modules/life2film-engine/SKILL.md\`, also
+Everything below, plus the full skill, in one document: https://life2film.com/llms-full.txt\n\nThe package ships a skill for coding agents at \`node_modules/life2film-engine/SKILL.md\`, also
 readable at https://life2film.com/engine/skill.md and explained at https://life2film.com/engine/
 
 Licence: PolyForm Noncommercial. Free for personal projects, study, research, charities and public
