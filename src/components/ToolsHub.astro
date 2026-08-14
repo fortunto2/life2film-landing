@@ -1,0 +1,116 @@
+---
+import Base from '../layouts/Base.astro';
+import { GROUPS, TOOLS, byGroup } from '../lib/tools';
+import { TRANSLATIONS } from '../lib/tools/index';
+import { HUB, CHROME } from '../lib/tools-i18n';
+import { localePath, languages, type Lang } from '../i18n';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'en' } = Astro.props;
+const words = HUB[lang];
+const chrome = CHROME[lang];
+
+/** A card's words come from the translation when there is one. */
+const card = (slug: string) => {
+  const translated = lang === 'en' ? undefined : TRANSLATIONS[lang]?.[slug];
+  const base = TOOLS.find((tool) => tool.slug === slug)!;
+  return { name: translated ? base.name : base.name, blurb: translated?.blurb ?? base.blurb };
+};
+
+/** Locales that have at least one tool translated — the hub exists wherever the tools do. */
+const locales = ['en', ...(Object.keys(TRANSLATIONS) as Lang[])] as Lang[];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Life2Film Tools',
+  url: `https://life2film.com${localePath(lang, '/tools/')}`,
+  description: words.description,
+  publisher: { '@id': 'https://life2film.com/#org' },
+  hasPart: TOOLS.map((tool) => ({
+    '@type': 'WebApplication',
+    name: tool.appName,
+    url: `https://life2film.com${localePath(lang, `/tools/${tool.slug}/`)}`,
+    applicationCategory: 'MultimediaApplication',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  })),
+};
+---
+
+<Base
+  lang={lang}
+  title={words.title}
+  description={words.description}
+  basePath="/tools/"
+  localized={false}
+  hreflangLocales={locales}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
+
+  <main>
+    <section>
+      <div class="wrap">
+        <h1>{words.heading}</h1>
+        <p class="lede">{words.lede}</p>
+
+        {GROUPS.map((group) => (
+          <div class="group">
+            <h2 class="grouphead">{words.groups[group.id].name}</h2>
+            <p class="groupnote muted">{words.groups[group.id].note}</p>
+            <div class="grid cols-2 tools">
+              {byGroup(group.id).map((tool) => (
+                <a class="card tool" href={localePath(lang, `/tools/${tool.slug}/`)}>
+                  <h3>{card(tool.slug).name}</h3>
+                  <p>{card(tool.slug).blurb}</p>
+                  <span class="go">{words.open}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap prose">
+        <h2>{words.whyTitle}</h2>
+        <Fragment set:html={words.whyBody} />
+
+        <h2>{words.engineTitle}</h2>
+        <p>{words.engineBody}</p>
+        <pre class="install"><code>npm i life2film-engine</code></pre>
+        <p>
+          <Fragment set:html={words.licenceNote} />
+        </p>
+        <p>
+          <Fragment set:html={words.markdownNote} />
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <style>
+    h1 { margin-bottom: 14px; }
+    .lede { color: #cfcfd6; max-width: 58ch; margin-bottom: 34px; font-size: 19px; }
+    .group { margin-bottom: 44px; }
+    .grouphead { font-size: 22px; margin-bottom: 4px; }
+    .groupnote { font-size: 15px; margin-bottom: 18px; }
+    .tools { align-items: stretch; }
+    .tool {
+      display: flex; flex-direction: column; gap: 8px;
+      text-decoration: none; color: inherit;
+      transition: border-color .15s ease, transform .15s ease;
+    }
+    a.tool:hover { border-color: var(--cyan); transform: translateY(-2px); }
+    .tool h3 { margin-top: 4px; }
+    .go { margin-top: auto; padding-top: 10px; font-size: 14px; color: var(--cyan); }
+    .install {
+      margin: 14px 0; padding: 14px 16px; border-radius: 10px;
+      background: #08080a; border: 1px solid var(--line); overflow-x: auto;
+    }
+    .install code { font-family: ui-monospace, monospace; font-size: 14px; color: var(--cyan); }
+  </style>
+</Base>

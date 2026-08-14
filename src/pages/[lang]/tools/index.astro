@@ -1,0 +1,17 @@
+---
+import ToolsHub from '../../../components/ToolsHub.astro';
+import { TRANSLATIONS } from '../../../lib/tools/index';
+import type { Lang } from '../../../i18n';
+
+/** The hub exists in every locale that has at least one translated tool. */
+export function getStaticPaths() {
+  return Object.keys(TRANSLATIONS).map((lang) => ({
+    params: { lang },
+    props: { lang: lang as Lang },
+  }));
+}
+
+const { lang } = Astro.props;
+---
+
+<ToolsHub lang={lang} />
