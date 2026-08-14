@@ -11,6 +11,9 @@ importers:
       '@astrojs/sitemap':
         specifier: ^3.7.3
         version: 3.7.3
+      '@mediabunny/mp3-encoder':
+        specifier: ^1.54.0
+        version: 1.54.0(mediabunny@1.54.0)
       astro:
         specifier: ^5.0.0
         version: 5.18.2(@types/node@24.13.3)(rollup@4.62.3)(typescript@5.9.3)
@@ -519,6 +522,11 @@ packages:
 
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
+
+  '@mediabunny/mp3-encoder@1.54.0':
+    resolution: {integrity: sha512-x8dBt05UV/FB+Z9abvpcK5hEI9g4cdzWWyZFzXxcAkQdDUQzk7Y7xaJsY8FVUT2iooFWVdtlSw/i/jCmGnNmrQ==}
+    peerDependencies:
+      mediabunny: ^1.0.0
 
   '@oslojs/encoding@1.1.0':
     resolution: {integrity: sha512-70wQhgYmndg4GCPxPPxPGevRKqTIJ2Nh4OkiMWmDAVYsTQ+Ta7Sq+rPevXyXGdzr30/qZBnyOalCszoMxlyldQ==}
@@ -2144,6 +2152,10 @@ snapshots:
     optional: true
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
+
+  '@mediabunny/mp3-encoder@1.54.0(mediabunny@1.54.0)':
+    dependencies:
+      mediabunny: 1.54.0
 
   '@oslojs/encoding@1.1.0': {}
 

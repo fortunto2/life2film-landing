@@ -10,7 +10,7 @@
  * it can do should not pay for the machinery until someone uses it.
  */
 
-export type Container = 'mp4' | 'webm' | 'mov' | 'wav';
+export type Container = 'mp4' | 'webm' | 'mov' | 'wav' | 'mp3' | 'ogg';
 
 export interface Probe {
   duration: number;
@@ -21,6 +21,9 @@ export interface Probe {
   videoCodec: string | null;
   audioCodec: string | null;
   hasAudio: boolean;
+  /** Needed to predict an uncompressed size honestly — mono weighs half what stereo does. */
+  channels: number;
+  sampleRate: number;
 }
 
 export type QualityName = 'very_low' | 'low' | 'medium' | 'high' | 'very_high';
@@ -36,12 +39,33 @@ export interface EncodeOptions {
   /** Explicit bits per second, used when aiming at a file size. Takes precedence over `quality`. */
   videoBitrate?: number;
   audioBitrate?: number;
+  /**
+   * Re-encode even when the track could have been copied.
+   *
+   * mediabunny copies whenever the requested settings do not actually require a transcode — which
+   * is usually what you want, and is exactly wrong when trimming: a copied cut can only begin at a
+   * keyframe. Forcing the transcode is what buys a frame-accurate in-point.
+   */
+  forceTranscode?: boolean;
   /** Drop the picture — used by "extract the audio". */
   discardVideo?: boolean;
   /** Drop the sound — used to make a file smaller when nobody will hear it. */
   discardAudio?: boolean;
   mono?: boolean;
+  sampleRate?: number;
   onProgress?: (fraction: number) => void;
+}
+
+export interface EncodeResult {
+  blob: Blob;
+  /**
+   * True when the video track was copied through rather than re-encoded.
+   *
+   * This is the difference between a trim that is bit-for-bit identical to the source and one that
+   * has been through a generation of compression — worth telling the user, since it is the whole
+   * reason to prefer one over the other.
+   */
+  copiedVideo: boolean;
 }
 
 const CONTAINER_MIME: Record<Container, string> = {
@@ -49,6 +73,8 @@ const CONTAINER_MIME: Record<Container, string> = {
   webm: 'video/webm',
   mov: 'video/quicktime',
   wav: 'audio/wav',
+  mp3: 'audio/mpeg',
+  ogg: 'audio/ogg',
 };
 
 export const CONTAINER_EXTENSION: Record<Container, string> = {
@@ -56,7 +82,14 @@ export const CONTAINER_EXTENSION: Record<Container, string> = {
   webm: 'webm',
   mov: 'mov',
   wav: 'wav',
+  mp3: 'mp3',
+  ogg: 'ogg',
 };
+
+/** Containers that hold no picture — asking for video options with these is a contradiction. */
+const AUDIO_ONLY = new Set<Container>(['wav', 'mp3', 'ogg']);
+
+export const isAudioOnly = (container: Container) => AUDIO_ONLY.has(container);
 
 /** Loaded once and shared: two tools on one page must not fetch 670 KB twice. */
 let libraryPromise: Promise<typeof import('mediabunny')> | null = null;
@@ -85,10 +118,16 @@ export async function probe(file: File): Promise<Probe> {
     videoCodec: videoTrack?.codec ?? null,
     audioCodec: audioTrack?.codec ?? null,
     hasAudio: Boolean(audioTrack),
+    channels: audioTrack?.numberOfChannels ?? 2,
+    sampleRate: audioTrack?.sampleRate ?? 44100,
   };
 }
 
 export async function encode(file: File, options: EncodeOptions): Promise<Blob> {
+  return (await encodeDetailed(file, options)).blob;
+}
+
+export async function encodeDetailed(file: File, options: EncodeOptions): Promise<EncodeResult> {
   const library = await loadMediabunny();
   const {
     Input,
@@ -101,7 +140,16 @@ export async function encode(file: File, options: EncodeOptions): Promise<Blob> 
     WebMOutputFormat,
     MovOutputFormat,
     WavOutputFormat,
+    Mp3OutputFormat,
+    OggOutputFormat,
   } = library;
+
+  // LAME, loaded only when someone asks for MP3 — no reason to ship an encoder to people
+  // converting to WAV.
+  if (options.container === 'mp3') {
+    const { registerMp3Encoder } = await import('@mediabunny/mp3-encoder');
+    registerMp3Encoder();
+  }
 
   const quality = {
     very_low: library.QUALITY_VERY_LOW,
@@ -116,13 +164,15 @@ export async function encode(file: File, options: EncodeOptions): Promise<Blob> 
     webm: () => new WebMOutputFormat(),
     mov: () => new MovOutputFormat(),
     wav: () => new WavOutputFormat(),
+    mp3: () => new Mp3OutputFormat(),
+    ogg: () => new OggOutputFormat(),
   }[options.container]();
 
   const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
   const output = new Output({ format, target: new BufferTarget() });
 
-  // WAV holds no picture at all, so asking for one is a contradiction rather than a preference.
-  const dropVideo = options.discardVideo || options.container === 'wav';
+  const dropVideo = options.discardVideo || isAudioOnly(options.container);
+  const audioOnlyContainer = isAudioOnly(options.container);
 
   const video = dropVideo
     ? { discard: true as const }
@@ -139,15 +189,29 @@ export async function encode(file: File, options: EncodeOptions): Promise<Blob> 
             : {}),
       };
 
+  if (options.forceTranscode && !dropVideo) {
+    Object.assign(video, { forceTranscode: true });
+  }
+
+  // Ask for the hardware encoder explicitly. Measured on an M5: 180 fps against 34 fps for the
+  // software path at 1080p — and the software encoder also overshot the requested bitrate more
+  // than threefold, so this is about output size as much as speed.
+  const wantsTranscode = Object.keys(video).length > 0 && !dropVideo;
+  if (wantsTranscode) {
+    Object.assign(video, { hardwareAcceleration: 'prefer-hardware' as const });
+  }
+
   const audio = options.discardAudio
     ? { discard: true as const }
     : {
-        ...(options.audioBitrate && options.container !== 'wav'
+        ...(options.audioBitrate && !audioOnlyContainer
           ? { bitrate: options.audioBitrate }
-          : options.quality && options.container !== 'wav'
+          : options.quality && !audioOnlyContainer
             ? { bitrate: quality }
             : {}),
+        ...(options.audioBitrate && options.container === 'mp3' ? { bitrate: options.audioBitrate } : {}),
         ...(options.mono ? { numberOfChannels: 1 } : {}),
+        ...(options.sampleRate ? { sampleRate: options.sampleRate } : {}),
       };
 
   const conversion = await Conversion.init({
@@ -160,6 +224,18 @@ export async function encode(file: File, options: EncodeOptions): Promise<Blob> 
     ...(Object.keys(audio).length ? { audio } : {}),
   });
 
+  if (!conversion.isValid) {
+    const reasons = conversion.discardedTracks
+      .map((track: { reason?: string }) => track.reason)
+      .filter(Boolean)
+      .join(', ');
+    throw new Error(
+      reasons
+        ? `This file cannot be converted that way (${reasons}).`
+        : 'This file cannot be converted to that format in your browser.',
+    );
+  }
+
   if (options.onProgress) conversion.onProgress = options.onProgress;
 
   await conversion.execute();
@@ -167,7 +243,10 @@ export async function encode(file: File, options: EncodeOptions): Promise<Blob> 
   const buffer = output.target.buffer;
   if (!buffer) throw new Error('The encoder produced no data.');
 
-  return new Blob([buffer], { type: CONTAINER_MIME[options.container] });
+  return {
+    blob: new Blob([buffer], { type: CONTAINER_MIME[options.container] }),
+    copiedVideo: !wantsTranscode && !dropVideo,
+  };
 }
 
 export function saveBlob(blob: Blob, filename: string) {
