@@ -89,6 +89,18 @@ export function reasonableBitrate(width: number): number {
   return 700_000;
 }
 
+/** What the size-fitting loop is doing, for the page to phrase. */
+export interface SizeProgress {
+  pass: 'first' | 'second';
+  fraction: number;
+  /** Present when a pass starts. */
+  kbps?: number;
+  /** Present while a pass runs. */
+  percent?: number;
+  /** Present when the second pass starts: what the first one weighed. */
+  previousBytes?: number;
+}
+
 export interface Preset {
   label: string;
   bytes: number;
@@ -137,7 +149,14 @@ export async function encodeToTargetSize(options: {
   duration: number;
   audioBitrate: number;
   run: (videoBitrate: number, onProgress: (fraction: number) => void) => Promise<Blob>;
-  onStatus?: (message: string, fraction: number) => void;
+  /**
+   * Progress, as facts rather than a sentence.
+   *
+   * This used to emit English text, which meant a Russian page reported 'Encoding at 6314 kbps…'
+   * halfway through. A library has no business choosing words: it reports what happened and the
+   * page, which knows its language, says it.
+   */
+  onStatus?: (event: SizeProgress) => void;
 }): Promise<Blob> {
   const { targetBytes, duration, audioBitrate, run, onStatus } = options;
 
@@ -145,8 +164,10 @@ export async function encodeToTargetSize(options: {
   const aim = targetBytes * 0.96;
   const budget = budgetFor({ targetBytes: aim, duration, audioBitrate });
 
-  onStatus?.(`Encoding at ${Math.round(budget.videoBitrate / 1000)} kbps…`, 0);
-  const first = await run(budget.videoBitrate, (p) => onStatus?.(`Encoding — ${Math.round(p * 100)}%`, p * 0.5));
+  onStatus?.({ pass: 'first', fraction: 0, kbps: Math.round(budget.videoBitrate / 1000) });
+  const first = await run(budget.videoBitrate, (p) =>
+    onStatus?.({ pass: 'first', fraction: p * 0.5, percent: Math.round(p * 100) }),
+  );
 
   const missedBy = Math.abs(first.size - aim) / aim;
   if (first.size <= targetBytes && missedBy <= 0.04) return first;
@@ -158,11 +179,10 @@ export async function encodeToTargetSize(options: {
     Math.abs(corrected - budget.videoBitrate) / budget.videoBitrate > 0.02 && corrected > MIN_VIDEO_BITRATE;
   if (!worthRetrying) return first;
 
-  onStatus?.(
-    `First pass came out ${Math.round(first.size / MB * 10) / 10} MB — retrying at ${Math.round(corrected / 1000)} kbps…`,
-    0.5,
+  onStatus?.({ pass: 'second', fraction: 0.5, kbps: Math.round(corrected / 1000), previousBytes: first.size });
+  const second = await run(corrected, (p) =>
+    onStatus?.({ pass: 'second', fraction: 0.5 + p * 0.5, percent: Math.round(p * 100) }),
   );
-  const second = await run(corrected, (p) => onStatus?.(`Second pass — ${Math.round(p * 100)}%`, 0.5 + p * 0.5));
 
   // Keep whichever satisfies the limit; when both do, prefer the larger, since bigger means better
   // picture.

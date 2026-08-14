@@ -365,3 +365,160 @@ export const HUB: Record<Lang, HubWords> = {
       'Buradaki her sayfa markdown olarak da var: adresin sonuna <code>.md</code> ekleyin ya da <code>Accept: text/markdown</code> başlığıyla isteyin. <a href="/llms.txt">Ajanlar için site özeti</a> her şeyi tek dosyada listeler.',
   },
 };
+
+/**
+ * Strings the tools say while they work.
+ *
+ * These live in the client scripts, so they reach the browser through a data attribute rather than
+ * an import — see `strings.ts`. Without them a page reads in the right language until you press the
+ * button, and then switches to English, which is worse than not translating it at all.
+ *
+ * `{n}`, `{size}` and `{time}` are substituted at runtime.
+ */
+export interface ToolStatus {
+  reading: string;
+  decoding: string;
+  loadingAnalyser: string;
+  working: string;
+  encoding: string;
+  secondPass: string;
+  saved: string;
+  smaller: string;
+  larger: string;
+  sameSize: string;
+  failed: string;
+  cannotRead: string;
+  noAudio: string;
+  fits: string;
+  stillOver: string;
+  tryLower: string;
+}
+
+export const STATUS: Record<Lang, ToolStatus> = {
+  en: {
+    reading: 'Reading file…',
+    decoding: 'Decoding audio…',
+    loadingAnalyser: 'Loading analyser…',
+    working: 'Working — {n}%',
+    encoding: 'Encoding — {n}%',
+    secondPass: 'Second pass — {n}%',
+    saved: 'Saved — {size}.',
+    smaller: '{n}% smaller',
+    larger: '{n}% larger — this file was already well compressed',
+    sameSize: 'about the same size',
+    failed: 'Failed — {reason}',
+    cannotRead: 'Could not read that file — {reason}',
+    noAudio: 'That file has no audio track, so there is nothing to extract.',
+    fits: 'Fits {size} with {spare} to spare.',
+    stillOver: 'Still {over} over {size} — try a lower resolution.',
+    tryLower: 'Try a lower resolution, or keep the original.',
+  },
+  es: {
+    reading: 'Leyendo el archivo…',
+    decoding: 'Decodificando el audio…',
+    loadingAnalyser: 'Cargando el analizador…',
+    working: 'Trabajando: {n}%',
+    encoding: 'Codificando: {n}%',
+    secondPass: 'Segunda pasada: {n}%',
+    saved: 'Guardado: {size}.',
+    smaller: '{n}% más pequeño',
+    larger: '{n}% más grande: este archivo ya estaba bien comprimido',
+    sameSize: 'prácticamente el mismo tamaño',
+    failed: 'Falló: {reason}',
+    cannotRead: 'No se pudo leer el archivo: {reason}',
+    noAudio: 'Ese archivo no tiene pista de audio, así que no hay nada que extraer.',
+    fits: 'Cabe en {size} con {spare} de margen.',
+    stillOver: 'Todavía {over} por encima de {size}: prueba una resolución menor.',
+    tryLower: 'Prueba una resolución menor, o quédate con el original.',
+  },
+  pt: {
+    reading: 'Lendo o arquivo…',
+    decoding: 'Decodificando o áudio…',
+    loadingAnalyser: 'Carregando o analisador…',
+    working: 'Trabalhando: {n}%',
+    encoding: 'Codificando: {n}%',
+    secondPass: 'Segunda passagem: {n}%',
+    saved: 'Salvo: {size}.',
+    smaller: '{n}% menor',
+    larger: '{n}% maior: este arquivo já estava bem comprimido',
+    sameSize: 'praticamente o mesmo tamanho',
+    failed: 'Falhou: {reason}',
+    cannotRead: 'Não foi possível ler o arquivo: {reason}',
+    noAudio: 'Esse arquivo não tem faixa de áudio, então não há o que extrair.',
+    fits: 'Cabe em {size} com {spare} de folga.',
+    stillOver: 'Ainda {over} acima de {size}: tente uma resolução menor.',
+    tryLower: 'Tente uma resolução menor, ou fique com o original.',
+  },
+  id: {
+    reading: 'Membaca berkas…',
+    decoding: 'Mendekode audio…',
+    loadingAnalyser: 'Memuat penganalisis…',
+    working: 'Memproses: {n}%',
+    encoding: 'Mengodekan: {n}%',
+    secondPass: 'Lintasan kedua: {n}%',
+    saved: 'Tersimpan: {size}.',
+    smaller: '{n}% lebih kecil',
+    larger: '{n}% lebih besar: berkas ini memang sudah terkompres dengan baik',
+    sameSize: 'kira-kira sama besarnya',
+    failed: 'Gagal: {reason}',
+    cannotRead: 'Tidak bisa membaca berkas itu: {reason}',
+    noAudio: 'Berkas itu tidak punya jalur audio, jadi tidak ada yang bisa diambil.',
+    fits: 'Muat dalam {size} dengan sisa {spare}.',
+    stillOver: 'Masih {over} di atas {size}: coba resolusi lebih rendah.',
+    tryLower: 'Coba resolusi lebih rendah, atau pakai yang asli.',
+  },
+  ar: {
+    reading: 'جارٍ قراءة الملف…',
+    decoding: 'جارٍ فك ترميز الصوت…',
+    loadingAnalyser: 'جارٍ تحميل المحلّل…',
+    working: 'جارٍ العمل: {n}%',
+    encoding: 'جارٍ الترميز: {n}%',
+    secondPass: 'التمريرة الثانية: {n}%',
+    saved: 'حُفظ: {size}.',
+    smaller: 'أصغر بنسبة {n}%',
+    larger: 'أكبر بنسبة {n}%: هذا الملف كان مضغوطًا جيدًا أصلًا',
+    sameSize: 'الحجم نفسه تقريبًا',
+    failed: 'أخفق: {reason}',
+    cannotRead: 'تعذّرت قراءة هذا الملف: {reason}',
+    noAudio: 'لا يحتوي هذا الملف على مسار صوتي، فلا شيء لاستخراجه.',
+    fits: 'يسع في {size} مع فائض {spare}.',
+    stillOver: 'ما زال يتجاوز {size} بمقدار {over}: جرّب دقة أقل.',
+    tryLower: 'جرّب دقة أقل، أو أبقِ الملف الأصلي.',
+  },
+  ru: {
+    reading: 'Читаем файл…',
+    decoding: 'Декодируем звук…',
+    loadingAnalyser: 'Загружаем анализатор…',
+    working: 'Работаем: {n}%',
+    encoding: 'Кодируем: {n}%',
+    secondPass: 'Второй проход: {n}%',
+    saved: 'Сохранено: {size}.',
+    smaller: 'на {n}% меньше',
+    larger: 'на {n}% больше: этот файл уже был хорошо сжат',
+    sameSize: 'примерно тот же размер',
+    failed: 'Не получилось: {reason}',
+    cannotRead: 'Не удалось прочитать файл: {reason}',
+    noAudio: 'В этом файле нет звуковой дорожки, извлекать нечего.',
+    fits: 'Помещается в {size}, запас {spare}.',
+    stillOver: 'Всё ещё на {over} больше {size}: попробуйте меньшее разрешение.',
+    tryLower: 'Попробуйте меньшее разрешение или оставьте оригинал.',
+  },
+  tr: {
+    reading: 'Dosya okunuyor…',
+    decoding: 'Ses çözülüyor…',
+    loadingAnalyser: 'Çözümleyici yükleniyor…',
+    working: 'Çalışıyor: %{n}',
+    encoding: 'Kodlanıyor: %{n}',
+    secondPass: 'İkinci geçiş: %{n}',
+    saved: 'Kaydedildi: {size}.',
+    smaller: '%{n} daha küçük',
+    larger: '%{n} daha büyük: bu dosya zaten iyi sıkıştırılmıştı',
+    sameSize: 'aşağı yukarı aynı boyut',
+    failed: 'Başarısız: {reason}',
+    cannotRead: 'Bu dosya okunamadı: {reason}',
+    noAudio: 'Bu dosyada ses kanalı yok, çıkarılacak bir şey de yok.',
+    fits: '{size} içine {spare} boşlukla sığıyor.',
+    stillOver: '{size} sınırını hâlâ {over} aşıyor: daha düşük bir çözünürlük deneyin.',
+    tryLower: 'Daha düşük bir çözünürlük deneyin ya da özgün dosyayı saklayın.',
+  },
+};

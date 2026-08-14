@@ -1,5 +1,5 @@
 ---
-import { CHROME } from '../../lib/tools-i18n';
+import { CHROME, STATUS } from '../../lib/tools-i18n';
 import type { Lang } from '../../i18n';
 
 interface Props {
@@ -8,6 +8,7 @@ interface Props {
 
 const { lang = 'en' } = Astro.props;
 const chrome = CHROME[lang];
+const status = STATUS[lang];
 
 /**
  * The video-compressor interface: markup and behaviour, with no page metadata.
@@ -18,6 +19,7 @@ const chrome = CHROME[lang];
 ---
 
 <div class="tool" slot="tool">
+    <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
     <label class="drop" id="drop" for="file">
       <input type="file" id="file" accept="video/*" hidden />
       <strong>{chrome.chooseVideo}</strong>
@@ -167,6 +169,7 @@ const chrome = CHROME[lang];
 </style>
 
 <script>
+  import { toolStrings, fill } from '../../lib/strings';
   import { probe, encode, saveBlob, formatBytes, preciseClock, type QualityName, type Probe } from '../../lib/encode';
   import {
     budgetFor, bytesFor, sourceBitrate, reasonableBitrate,
@@ -174,6 +177,7 @@ const chrome = CHROME[lang];
   } from '../../lib/bitrate';
 
   const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const say = toolStrings();
   const MB = 1024 * 1024;
 
   const drop = el<HTMLLabelElement>('drop');
@@ -286,7 +290,7 @@ const chrome = CHROME[lang];
     el('outcome').hidden = true;
 
     try {
-      status('Reading file…');
+      status(say.reading);
       info = await probe(chosen);
 
       el('editor').hidden = false;
@@ -305,7 +309,7 @@ const chrome = CHROME[lang];
       refreshEstimate();
     } catch (error) {
       status(
-        error instanceof Error ? `Could not read that file — ${error.message}` : 'Could not read that file.',
+        fill(say.cannotRead, { reason: error instanceof Error ? error.message : '?' }),
         1,
         true,
       );
@@ -350,11 +354,7 @@ const chrome = CHROME[lang];
       result = mode === 'size' ? await compressToSize(file, info) : await compressByQuality(file, info);
       showOutcome();
     } catch (error) {
-      status(
-        error instanceof Error ? `Compression failed — ${error.message}` : 'Compression failed.',
-        1,
-        true,
-      );
+      status(fill(say.failed, { reason: error instanceof Error ? error.message : '?' }), 1, true);
     } finally {
       busy = false;
       el<HTMLButtonElement>('run').disabled = false;
@@ -363,14 +363,14 @@ const chrome = CHROME[lang];
 
   async function compressByQuality(source: File, probed: Probe): Promise<Blob> {
     const width = Number(el<HTMLSelectElement>('resolution').value) || undefined;
-    status('Compressing…', 0);
+    status(fill(say.encoding, { n: 0 }), 0);
 
     return encode(source, {
       container: 'mp4',
       ...(width ? { width } : {}),
       quality: el<HTMLSelectElement>('quality').value as QualityName,
       discardAudio: muted(),
-      onProgress: (p) => status(`Compressing — ${Math.round(p * 100)}%`, p),
+      onProgress: (p) => status(fill(say.encoding, { n: Math.round(p * 100) }), p),
     });
   }
 
@@ -397,7 +397,13 @@ const chrome = CHROME[lang];
       targetBytes: target,
       duration: probed.duration,
       audioBitrate: audioCost(),
-      onStatus: status,
+      onStatus: (event) =>
+        status(
+          fill(event.pass === 'second' ? say.secondPass : say.encoding, {
+            n: event.percent ?? 0,
+          }),
+          event.fraction,
+        ),
       run: (videoBitrate, onProgress) =>
         encode(source, {
           container: 'mp4',
@@ -419,19 +425,19 @@ const chrome = CHROME[lang];
     el('now').textContent = formatBytes(result.size);
     el('saved').textContent =
       ratio > 0.01
-        ? `${Math.round(ratio * 100)}% smaller`
+        ? fill(say.smaller, { n: Math.round(ratio * 100) })
         : ratio < -0.01
-          ? `${Math.round(-ratio * 100)}% larger — this file was already well compressed`
-          : 'about the same size';
+          ? fill(say.larger, { n: Math.round(-ratio * 100) })
+          : say.sameSize;
 
     if (mode === 'size') {
       const target = targetBytes();
       el('outcomeNote').textContent =
         result.size <= target
-          ? `Fits ${formatBytes(target)} with ${formatBytes(target - result.size)} to spare.`
-          : `Still ${formatBytes(result.size - target)} over ${formatBytes(target)} — try a lower resolution.`;
+          ? fill(say.fits, { size: formatBytes(target), spare: formatBytes(target - result.size) })
+          : fill(say.stillOver, { over: formatBytes(result.size - target), size: formatBytes(target) });
     } else {
-      el('outcomeNote').textContent = ratio <= 0.01 ? 'Try a lower resolution, or keep the original.' : '';
+      el('outcomeNote').textContent = ratio <= 0.01 ? say.tryLower : '';
     }
 
     el('outcome').hidden = false;
