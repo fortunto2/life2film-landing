@@ -17,6 +17,7 @@
     "mediabunny": "^1.54.0"
   },
   "devDependencies": {
+    "life2film-engine": "^0.1.2",
     "vitest": "^4.1.10"
   }
 }

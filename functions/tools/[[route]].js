@@ -5,8 +5,10 @@
  * the contract: an agent that requests the ordinary URL with `Accept: text/markdown` gets the
  * markdown, without having to know the convention or parse HTML to find out.
  *
- * Scoped to /tools/ deliberately. A site-wide middleware would run on every request to a site that
- * is otherwise pure static files, and the rest of the pages have no markdown twin to serve.
+ * Scoped to /tools/ deliberately. A site-wide function would run on every request to a site that is
+ * otherwise pure static files — including the home page, where it would add a Worker invocation to
+ * the critical path of every visit to serve a minority of requests. The home page is covered by
+ * /llms.txt instead, which is the conventional discovery path and costs nothing.
  */
 export async function onRequest(context) {
   const { request, next } = context;
@@ -19,10 +21,12 @@ export async function onRequest(context) {
   if (!wantsMarkdown) return next();
 
   const url = new URL(request.url);
-  // /tools/video-compressor/ and /tools/video-compressor both map to /tools/video-compressor.md
   const slug = url.pathname.replace(/^\/tools\/?/, '').replace(/\/$/, '');
 
-  if (!slug) return next();
+  // `/tools/` itself has no twin, and `/tools/x.md` is already the markdown — asking for its own
+  // `.md.md` would 404 and fall through, costing two asset lookups to serve a static file that
+  // needed none.
+  if (!slug || slug.endsWith('.md')) return next();
 
   const markdown = await context.env.ASSETS.fetch(
     new Request(new URL(`/tools/${slug}.md`, url), request),

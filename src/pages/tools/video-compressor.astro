@@ -250,12 +250,6 @@ const faq = [
   .mode:hover { color: var(--fg); }
   .mode.on { color: var(--cyan); border-color: rgba(0,242,224,.45); background: rgba(0,242,224,.05); }
 
-  .verdict {
-    margin-top: 14px; padding: 11px 14px; border-radius: 10px; font-size: 14px;
-    border: 1px solid var(--line); background: #0a0a0d; color: #cfcfd6;
-  }
-  .verdict.warn { border-color: rgba(255,166,29,.4); color: var(--orange); }
-  .verdict.bad { border-color: rgba(250,63,165,.4); color: var(--pink); }
 
   .estimate { font-size: 14px; }
 
@@ -274,13 +268,12 @@ const faq = [
 <script>
   import { probe, encode, saveBlob, formatBytes, preciseClock, type QualityName, type Probe } from '../../lib/encode';
   import {
-    budgetFor, bytesFor, correctBitrate, sourceBitrate, reasonableBitrate,
-    SIZE_PRESETS, MIN_VIDEO_BITRATE,
+    budgetFor, bytesFor, sourceBitrate, reasonableBitrate,
+    encodeToTargetSize, presetOptions, parseTarget, AUDIO_BITRATE,
   } from '../../lib/bitrate';
 
   const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
   const MB = 1024 * 1024;
-  const AUDIO_BITRATE = 128_000;
 
   const drop = el<HTMLLabelElement>('drop');
   const fileInput = el<HTMLInputElement>('file');
@@ -292,10 +285,7 @@ const faq = [
   let busy = false;
   let mode: 'size' | 'quality' = 'size';
 
-  // Presets plus a custom entry, built once.
-  el('preset').innerHTML =
-    SIZE_PRESETS.map((p, i) => `<option value="${p.bytes}"${i === 0 ? ' selected' : ''}>${p.label}</option>`).join('') +
-    '<option value="custom">Custom…</option>';
+  el('preset').innerHTML = presetOptions();
 
   function status(message: string, fraction?: number, isError = false) {
     statusEl.hidden = false;
@@ -307,12 +297,8 @@ const faq = [
   const muted = () => el<HTMLInputElement>('mute').checked;
   const audioCost = () => (muted() || !info?.hasAudio ? 0 : AUDIO_BITRATE);
 
-  function targetBytes(): number {
-    const value = el<HTMLSelectElement>('preset').value;
-    if (value !== 'custom') return Number(value);
-    const mb = parseFloat(el<HTMLInputElement>('customSize').value.replace(',', '.'));
-    return Number.isFinite(mb) && mb > 0 ? mb * MB : 10 * MB;
-  }
+  const targetBytes = () =>
+    parseTarget(el<HTMLSelectElement>('preset').value, el<HTMLInputElement>('customSize').value);
 
   /**
    * Resolution that suits the bitrate we are about to spend.
@@ -444,10 +430,12 @@ const faq = [
     refreshEstimate();
   });
 
-  for (const id of ['customSize', 'sizeResolution', 'resolution', 'quality', 'mute']) {
+  // `change` on selects and checkboxes, `input` only on the free-text field — both fire for one
+  // action on a select, so every estimate (and its verdict) was computed twice.
+  for (const id of ['sizeResolution', 'resolution', 'quality', 'mute']) {
     el(id).addEventListener('change', refreshEstimate);
-    el(id).addEventListener('input', refreshEstimate);
   }
+  el('customSize').addEventListener('input', refreshEstimate);
 
   // --- compressing ---
 
@@ -494,54 +482,31 @@ const faq = [
    */
   async function compressToSize(source: File, probed: Probe): Promise<Blob> {
     const target = targetBytes();
-    // Aim at 96% of the wall: a file of exactly 10.00 MB is still refused by a 10 MB limit.
-    const aim = target * 0.96;
-
-    let budget = budgetFor({ targetBytes: aim, duration: probed.duration, audioBitrate: audioCost() });
-    const width =
-      Number(el<HTMLSelectElement>('sizeResolution').value) || autoWidth(budget.videoBitrate, probed.width);
-
-    status(`Encoding at ${Math.round(budget.videoBitrate / 1000)} kbps…`, 0);
-
-    let blob = await encode(source, {
-      container: 'mp4',
-      width: Math.min(width, probed.width),
-      videoBitrate: budget.videoBitrate,
-      audioBitrate: AUDIO_BITRATE,
-      discardAudio: muted(),
-      onProgress: (p) => status(`Encoding — ${Math.round(p * 100)}%`, p * 0.5),
+    const budget = budgetFor({
+      targetBytes: target * 0.96,
+      duration: probed.duration,
+      audioBitrate: audioCost(),
     });
+    const width = Math.min(
+      Number(el<HTMLSelectElement>('sizeResolution').value) || autoWidth(budget.videoBitrate, probed.width),
+      probed.width,
+    );
 
-    const missedBy = Math.abs(blob.size - aim) / aim;
-    const overTarget = blob.size > target;
-
-    if (overTarget || missedBy > 0.04) {
-      const corrected = correctBitrate(budget.videoBitrate, blob.size, aim);
-
-      // No point re-encoding at a bitrate we are already at, or below the floor.
-      if (Math.abs(corrected - budget.videoBitrate) / budget.videoBitrate > 0.02 && corrected > MIN_VIDEO_BITRATE) {
-        status(
-          `First pass came out ${formatBytes(blob.size)} — retrying at ${Math.round(corrected / 1000)} kbps…`,
-          0.5,
-        );
-
-        const second = await encode(source, {
+    return encodeToTargetSize({
+      targetBytes: target,
+      duration: probed.duration,
+      audioBitrate: audioCost(),
+      onStatus: status,
+      run: (videoBitrate, onProgress) =>
+        encode(source, {
           container: 'mp4',
-          width: Math.min(width, probed.width),
-          videoBitrate: corrected,
+          width,
+          videoBitrate,
           audioBitrate: AUDIO_BITRATE,
           discardAudio: muted(),
-          onProgress: (p) => status(`Second pass — ${Math.round(p * 100)}%`, 0.5 + p * 0.5),
-        });
-
-        // Keep whichever actually satisfies the limit; prefer the larger of the two when both do,
-        // since bigger means better picture.
-        const bothFit = second.size <= target && blob.size <= target;
-        blob = bothFit ? (second.size > blob.size ? second : blob) : second.size <= target ? second : blob;
-      }
-    }
-
-    return blob;
+          onProgress,
+        }),
+    });
   }
 
   function showOutcome() {

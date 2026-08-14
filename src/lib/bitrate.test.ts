@@ -3,6 +3,8 @@ import {
   budgetFor,
   bytesFor,
   correctBitrate,
+  encodeToTargetSize,
+  parseTarget,
   sourceBitrate,
   reasonableBitrate,
   MIN_VIDEO_BITRATE,
@@ -103,6 +105,83 @@ describe('reading the source', () => {
     const values = widths.map(reasonableBitrate);
     for (let i = 1; i < values.length; i++) {
       expect(values[i]).toBeGreaterThan(values[i - 1]);
+    }
+  });
+});
+
+describe('two-pass size targeting', () => {
+  /** A fake encoder that misses the requested bitrate by a fixed factor, like a real one does. */
+  const encoder = (drift: number, duration: number) => {
+    const calls: number[] = [];
+    return {
+      calls,
+      run: async (videoBitrate: number) => {
+        calls.push(videoBitrate);
+        return { size: bytesFor(videoBitrate, duration) * drift } as Blob;
+      },
+    };
+  };
+
+  test('a first pass that lands close enough is kept, without a second encode', async () => {
+    const { run, calls } = encoder(1, 60);
+    const blob = await encodeToTargetSize({
+      targetBytes: 10 * MB, duration: 60, audioBitrate: 0, run,
+    });
+    expect(calls).toHaveLength(1);
+    expect(blob.size).toBeLessThanOrEqual(10 * MB);
+  });
+
+  test('an overshoot is corrected and the result comes in under the limit', async () => {
+    // This is the case the whole function exists for: rate control ran 25% hot.
+    const { run, calls } = encoder(1.25, 60);
+    const blob = await encodeToTargetSize({
+      targetBytes: 10 * MB, duration: 60, audioBitrate: 0, run,
+    });
+    expect(calls).toHaveLength(2);
+    expect(calls[1]).toBeLessThan(calls[0]);
+    expect(blob.size).toBeLessThanOrEqual(10 * MB);
+  });
+
+  test('never more than two passes, however badly the encoder behaves', async () => {
+    const { run, calls } = encoder(3, 60);
+    await encodeToTargetSize({ targetBytes: 10 * MB, duration: 60, audioBitrate: 0, run });
+    expect(calls.length).toBeLessThanOrEqual(2);
+  });
+
+  test('audio is charged against the budget, leaving less for video', async () => {
+    const silent = encoder(1, 60);
+    const noisy = encoder(1, 60);
+    await encodeToTargetSize({ targetBytes: 10 * MB, duration: 60, audioBitrate: 0, run: silent.run });
+    await encodeToTargetSize({ targetBytes: 10 * MB, duration: 60, audioBitrate: 192_000, run: noisy.run });
+    expect(noisy.calls[0]).toBeLessThan(silent.calls[0]);
+  });
+
+  test('progress is reported through both passes without going backwards', async () => {
+    const seen: number[] = [];
+    const { run } = encoder(1.25, 60);
+    await encodeToTargetSize({
+      targetBytes: 10 * MB, duration: 60, audioBitrate: 0, run,
+      onStatus: (_, fraction) => seen.push(fraction),
+    });
+    expect(seen.length).toBeGreaterThan(1);
+    expect(seen).toEqual([...seen].sort((a, b) => a - b));
+    expect(Math.max(...seen)).toBeLessThanOrEqual(1);
+  });
+});
+
+describe('reading a target from the controls', () => {
+  test('a preset value passes through', () => {
+    expect(parseTarget(String(25 * MB), '')).toBe(25 * MB);
+  });
+
+  test('custom megabytes are parsed, including a comma decimal', () => {
+    expect(parseTarget('custom', '7.5')).toBeCloseTo(7.5 * MB, 0);
+    expect(parseTarget('custom', '7,5')).toBeCloseTo(7.5 * MB, 0);
+  });
+
+  test('nonsense in the custom field falls back rather than producing NaN', () => {
+    for (const text of ['', 'abc', '-3', '0']) {
+      expect(parseTarget('custom', text)).toBe(10 * MB);
     }
   });
 });

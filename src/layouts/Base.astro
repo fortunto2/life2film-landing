@@ -151,11 +151,19 @@ const jsonLd = {
         <a href={'/blog/'}>{t('navBlog')}</a>
         <a href={localePath(lang, '/support')}>{t('navSupport')}</a>
       </div>
-      <div class="langs">
-        {langEntries.map(([code, label]) => (
-          <a class={`lang ${code === lang ? 'on' : ''}`} href={localePath(code, basePath)}>{label}</a>
-        ))}
-      </div>
+      {/*
+        The switcher follows `localized` too. It used to render regardless, so every English-only
+        page offered six buttons pointing at /ru/tools/…, /es/engine/… and so on — pages that do not
+        exist and have no redirect. The flag was declared once and honoured in only one of the two
+        places that emit a locale URL.
+      */}
+      {localized && (
+        <div class="langs">
+          {langEntries.map(([code, label]) => (
+            <a class={`lang ${code === lang ? 'on' : ''}`} href={localePath(code, basePath)}>{label}</a>
+          ))}
+        </div>
+      )}
     </div>
   </nav>
 

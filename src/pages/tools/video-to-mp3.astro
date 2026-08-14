@@ -84,7 +84,7 @@ const faq = [
   featureList={[
     'Extract audio from MP4, MOV and WebM',
     'MP3, WAV and OGG output',
-    'Choose bitrate, mono and sample rate',
+    'Choose bitrate and mono',
     'Runs fully client-side — no upload, no watermark',
   ]}
   faq={faq}
@@ -178,11 +178,6 @@ const faq = [
 </ToolPage>
 
 <style>
-  .verdict {
-    margin-top: 14px; padding: 11px 14px; border-radius: 10px; font-size: 14px;
-    border: 1px solid var(--line); background: #0a0a0d; color: #cfcfd6;
-  }
-  .verdict.warn { border-color: rgba(255,166,29,.4); color: var(--orange); }
 </style>
 
 <script>
@@ -219,13 +214,20 @@ const faq = [
     // WAV has no bitrate to choose: it is sample rate times bit depth times channels.
     el('bitrateWrap').hidden = format === 'wav';
 
-    // WAV is arithmetic: sample rate × 2 bytes × channels. The others are lossy, and Vorbis in
-    // particular runs variable-rate and lands consistently under its nominal figure.
+    // WAV is arithmetic: sample rate × 2 bytes × channels. The lossy formats are estimated from
+    // their nominal bitrate.
+    //
+    // There used to be a 0.7 factor here for Vorbis, on the theory that variable-rate encoding
+    // lands under the nominal figure. Measured, it does not behave that way: at 64 kbps the file
+    // came out at exactly the nominal rate and at 320 kbps at 80% of it. A guessed constant that
+    // is wrong in both directions is worse than none, so the estimate now states the nominal rate
+    // and errs high at the top end — where being told a file will be smaller than it is would be
+    // the more annoying mistake.
     const channels = mono() ? 1 : info.channels;
     const bytes =
       format === 'wav'
         ? info.duration * info.sampleRate * 2 * channels
-        : (bitrate() * (mono() ? 0.6 : 1) * info.duration * (format === 'ogg' ? 0.7 : 1)) / 8;
+        : (bitrate() * (mono() ? 0.6 : 1) * info.duration) / 8;
 
     el('estimate').textContent = `≈ ${formatBytes(bytes)}`;
 
