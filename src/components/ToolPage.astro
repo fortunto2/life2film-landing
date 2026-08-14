@@ -1,0 +1,134 @@
+---
+import Base from '../layouts/Base.astro';
+
+export interface FaqEntry {
+  q: string;
+  a: string;
+}
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  /** Shown as the H1, with the second word picking up the gradient. */
+  heading: string;
+  accent: string;
+  lede: string;
+  faq: FaqEntry[];
+  /** Extra JSON-LD entries — the WebApplication block is built here. */
+  featureList: string[];
+  appName: string;
+}
+
+const { title, description, path, heading, accent, lede, faq, featureList, appName } = Astro.props;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebApplication',
+      name: appName,
+      url: `https://life2film.com${path}`,
+      applicationCategory: 'MultimediaApplication',
+      operatingSystem: 'Any browser with WebCodecs',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      publisher: { '@id': 'https://life2film.com/#org' },
+      featureList,
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: faq.map(({ q, a }) => ({
+        '@type': 'Question',
+        name: q,
+        acceptedAnswer: { '@type': 'Answer', text: a },
+      })),
+    },
+  ],
+};
+---
+
+<Base lang="en" title={title} description={description} basePath={path} localized={false}>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
+
+  <main>
+    <section class="tool-head">
+      <div class="wrap">
+        <a class="back" href="/tools/">← All tools</a>
+        <h1>{heading} <span class="gradient-text">{accent}</span></h1>
+        <p class="lede">{lede}</p>
+
+        <slot name="tool" />
+
+        <p class="privacy-note muted">
+          Your file is read and re-encoded by your own browser. No request carries it anywhere —
+          this page has no upload endpoint to send it to.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap prose">
+        <slot name="prose" />
+
+        <h2>Questions</h2>
+        {faq.map(({ q, a }) => (
+          <>
+            <h3 class="q">{q}</h3>
+            <p>{a}</p>
+          </>
+        ))}
+      </div>
+    </section>
+  </main>
+
+  <style is:global>
+    .tool-head { padding-bottom: 40px; }
+    .tool-head .back { color: var(--muted); text-decoration: none; font-size: 14px; }
+    .tool-head .back:hover { color: var(--fg); }
+    .tool-head h1 { margin: 14px 0 12px; }
+    .tool-head .lede { color: #cfcfd6; max-width: 60ch; margin-bottom: 30px; font-size: 19px; }
+
+    .tool { border: 1px solid var(--line); border-radius: 18px; background: var(--panel); padding: 22px; }
+
+    .drop {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+      min-height: 150px; padding: 24px; text-align: center; cursor: pointer;
+      border: 1.5px dashed var(--line); border-radius: 14px;
+      transition: border-color .15s ease, background .15s ease;
+    }
+    .drop:hover, .drop.over { border-color: var(--cyan); background: rgba(0, 242, 224, .04); }
+    .drop strong { font-size: 17px; }
+
+    .controls { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; margin-top: 18px; }
+    .control { display: flex; gap: 8px; align-items: center; font-size: 14px; }
+    .control.checkbox { cursor: pointer; }
+    .control input[type=checkbox] { width: 16px; height: 16px; accent-color: #00f2e0; }
+    .spacer { flex: 1; }
+
+    .tool select, .tool input[type=text] {
+      padding: 9px 12px; border-radius: 10px; font: inherit; font-size: 14px; cursor: pointer;
+      color: var(--fg); background: #0a0a0d; border: 1px solid var(--line);
+    }
+    .tool select:hover { border-color: var(--cyan); }
+
+    .ghost {
+      padding: 9px 16px; border-radius: 10px; font: inherit; font-size: 14px; cursor: pointer;
+      color: var(--fg); background: transparent; border: 1px solid var(--line);
+    }
+    .ghost:hover:not(:disabled) { border-color: var(--cyan); color: var(--cyan); }
+    .ghost:disabled { opacity: .45; cursor: default; }
+    .ghost.primary { border-color: rgba(0,242,224,.4); color: var(--cyan); }
+
+    .status { margin-top: 18px; }
+    .status.err .statustext { color: var(--pink); }
+    .bar { height: 3px; border-radius: 2px; background: #17171c; overflow: hidden; }
+    .bar span { display: block; height: 100%; width: 0; background: var(--grad); transition: width .12s linear; }
+    .statustext { margin-top: 9px; font-size: 15px; color: var(--muted); }
+
+    .facts { display: flex; flex-wrap: wrap; gap: 22px; margin-top: 18px; font-size: 15px; color: #cfcfd6; }
+    .facts b { color: var(--fg); }
+
+    .privacy-note { margin-top: 16px; font-size: 14px; max-width: 62ch; }
+    .prose .q { margin: 28px 0 8px; font-size: 17px; }
+  </style>
+</Base>
