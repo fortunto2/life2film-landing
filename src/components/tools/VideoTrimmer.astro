@@ -1,0 +1,575 @@
+---
+/**
+ * The video-trimmer interface: markup and behaviour, with no page metadata.
+ *
+ * Separated from the page so the localised routes can render exactly the same tool. The
+ * words around it come from the registry; this is the part that does the work.
+ */
+---
+
+<div class="tool" slot="tool">
+    <label class="drop" id="drop" for="file">
+      <input type="file" id="file" accept="video/*" hidden />
+      <strong>Choose a video file</strong>
+      <span class="muted">or drag it here — MP4, MOV (H.264), WebM</span>
+    </label>
+
+    <div id="editor" hidden>
+      <video id="preview" playsinline></video>
+
+      <div class="track" id="track">
+        <div class="selection" id="selection"></div>
+        <button class="handle in" id="handleIn" type="button" aria-label="Start of selection"></button>
+        <button class="handle out" id="handleOut" type="button" aria-label="End of selection"></button>
+        <div class="playhead" id="playhead"></div>
+      </div>
+
+      <div class="times">
+        <label class="control">
+          <span class="muted">In</span>
+          <input type="text" id="inValue" size="7" inputmode="decimal" />
+        </label>
+        <button id="setIn" type="button" class="ghost small">Set to playhead</button>
+
+        <span class="spacer"></span>
+        <span class="muted" id="selectionLength">—</span>
+        <span class="spacer"></span>
+
+        <button id="setOut" type="button" class="ghost small">Set to playhead</button>
+        <label class="control">
+          <span class="muted">Out</span>
+          <input type="text" id="outValue" size="7" inputmode="decimal" />
+        </label>
+      </div>
+
+      <div class="controls">
+        <button id="play" type="button" class="ghost">▶ Play selection</button>
+
+        <label class="control">
+          <span class="muted">Output</span>
+          <select id="mode">
+            <option value="copy" selected>Same quality — no re-encode</option>
+            <option value="reencode">Re-encode</option>
+            <option value="size">Fit a size</option>
+          </select>
+        </label>
+
+        <label class="control" id="targetWrap" hidden>
+          <select id="preset"></select>
+        </label>
+
+        <label class="control" id="customWrap" hidden>
+          <span class="muted">MB</span>
+          <input type="text" id="customSize" size="5" inputmode="decimal" value="10" />
+        </label>
+
+        <label class="control checkbox">
+          <input type="checkbox" id="mute" />
+          <span>Remove audio</span>
+        </label>
+
+        <label class="control" id="formatWrap">
+          <span class="muted">Format</span>
+          <select id="container">
+            <option value="mp4" selected>MP4</option>
+            <option value="webm">WebM</option>
+            <option value="mov">MOV</option>
+          </select>
+        </label>
+
+        <span class="spacer"></span>
+        <span class="muted" id="estimate"></span>
+        <button id="save" type="button" class="ghost primary">Save trimmed video</button>
+      </div>
+
+      <div id="modeNote" class="modenote muted"></div>
+      <div class="facts" id="facts"></div>
+    </div>
+
+    <div id="status" class="status" hidden>
+      <div class="bar"><span id="fill"></span></div>
+      <div class="statustext" id="statusText"></div>
+    </div>
+  </div>
+
+  <Fragment slot="prose">
+    <h2>Why the handles, not two boxes</h2>
+    <p>
+      Choosing an in-point by typing a number means guessing, checking, and typing again. Dragging a
+      handle while the frame under it updates is the same decision made once. The numbers are still
+      there — you can type into them when you know exactly where the cut goes — but they follow the
+      handles rather than replacing them.
+    </p>
+
+    <h2>Copy or re-encode</h2>
+    <p>
+      Video is not stored as a sequence of independent pictures. It is stored in groups that begin
+      with one complete frame — a keyframe — followed by frames that describe only what changed.
+      That is why a cut is not simply a matter of deleting bytes: everything after the in-point
+      depends on what came before it.
+    </p>
+    <p>
+      Copying keeps those groups intact and hands them over as they are, which is why nothing is
+      lost and why it is quick. When the in-point lands mid-group, the frames back to the previous
+      keyframe come along for the ride — playback still starts where you asked, but the file
+      carries them. Re-encoding writes only your selection, producing a smaller file at the cost of
+      one generation of compression.
+    </p>
+    <p>
+      Either way it runs through the browser's own video pipeline, hardware-accelerated where the
+      machine allows. No server is involved at any point: the page has no upload endpoint, and you
+      can confirm it by watching the network tab or by disconnecting once the page has loaded.
+    </p>
+    <p>
+      Trimming is the first thing most footage needs. When a video needs cutting into several pieces
+      instead of one, the <a href="/tools/video-splitter/">splitter</a> does that at the shot
+      changes; to make a file smaller without changing its length, use
+      the <a href="/tools/video-compressor/">compressor</a>.
+    </p>
+  </Fragment>
+<style>
+  video {
+    width: 100%; max-height: 46vh; display: block; margin-top: 18px;
+    border-radius: 12px; background: #000;
+  }
+
+  .track {
+    position: relative; height: 46px; margin-top: 14px; border-radius: 10px;
+    background: #0a0a0d; border: 1px solid var(--line); cursor: pointer;
+  }
+  .selection {
+    position: absolute; top: 0; bottom: 0;
+    background: linear-gradient(180deg, rgba(0,242,224,.16), rgba(1,122,255,.16));
+    border-left: 2px solid var(--cyan); border-right: 2px solid var(--cyan);
+  }
+  .handle {
+    position: absolute; top: -3px; width: 14px; height: 52px; padding: 0;
+    border: none; border-radius: 5px; background: var(--cyan); cursor: ew-resize;
+    box-shadow: 0 2px 10px rgba(0,242,224,.35); transform: translateX(-7px);
+  }
+  .handle:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+  .playhead {
+    position: absolute; top: 0; bottom: 0; width: 2px; background: var(--fg);
+    opacity: .85; pointer-events: none;
+  }
+
+  .times { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 14px; }
+  .ghost.small { padding: 5px 10px; font-size: 12px; }
+  #selectionLength { font-family: ui-monospace, monospace; font-size: 14px; }
+
+  .modenote { margin-top: 12px; font-size: 14px; max-width: 70ch; }
+  .modenote.warn { color: var(--orange); }
+
+  @media (max-width: 640px) {
+    .times { flex-wrap: wrap; }
+    .times .spacer { display: none; }
+  }
+</style>
+
+<script>
+  import {
+    probe, encodeDetailed, saveBlob, formatBytes, preciseClock,
+    CONTAINER_EXTENSION, type Container, type Probe,
+  } from '../../lib/encode';
+  import {
+    budgetFor, encodeToTargetSize, presetOptions, parseTarget, AUDIO_BITRATE, reasonableBitrate,
+  } from '../../lib/bitrate';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+  const drop = el<HTMLLabelElement>('drop');
+  const fileInput = el<HTMLInputElement>('file');
+  const video = el<HTMLVideoElement>('preview');
+  const track = el<HTMLDivElement>('track');
+  const statusEl = el<HTMLDivElement>('status');
+
+  const MB = 1024 * 1024;
+
+  let file: File | null = null;
+  let info: Probe | null = null;
+  let objectUrl: string | null = null;
+  let duration = 0;
+  let inPoint = 0;
+  let outPoint = 0;
+  let busy = false;
+
+  el('preset').innerHTML = presetOptions();
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  function draw() {
+    const left = (inPoint / duration) * 100;
+    const right = (outPoint / duration) * 100;
+
+    el('selection').style.left = `${left}%`;
+    el('selection').style.width = `${right - left}%`;
+    el('handleIn').style.left = `${left}%`;
+    el('handleOut').style.left = `${right}%`;
+
+    el<HTMLInputElement>('inValue').value = preciseClock(inPoint);
+    el<HTMLInputElement>('outValue').value = preciseClock(outPoint);
+    el('selectionLength').textContent = `${(outPoint - inPoint).toFixed(1)}s selected`;
+    // Only the number depends on the handles. The mode note and the control visibility do not, and
+    // rewriting a 250-character paragraph on every pointermove invalidated layout ~120 times a
+    // second on the same frame that also seeks the video.
+    refreshSizeEstimate();
+  }
+
+  const mode = () => el<HTMLSelectElement>('mode').value as 'copy' | 'reencode' | 'size';
+  const selectionLength = () => Math.max(0.1, outPoint - inPoint);
+
+  const targetBytes = () =>
+    parseTarget(el<HTMLSelectElement>('preset').value, el<HTMLInputElement>('customSize').value);
+
+  const NOTES = {
+    copy:
+      'The picture is passed through untouched — no generation loss, and several times faster. ' +
+      'When your in-point does not fall on a keyframe, the file carries the frames back to the ' +
+      'previous one so playback still starts exactly where you set it, which makes it larger ' +
+      'than a re-encode would be.',
+    size: 'Re-encoded to land under the target, correcting once if the first pass misses.',
+    reencode:
+      'Re-encoded at a normal quality — frame-accurate at the in-point, one generation of compression.',
+  };
+
+  /**
+   * The size readout, which is the only thing that moves with the handles.
+   *
+   * Split from the mode UI below because `draw()` calls this on every pointermove — up to 120 times
+   * a second while dragging, on the same frame that seeks the video.
+   */
+  function refreshSizeEstimate() {
+    if (!info) return;
+    const current = mode();
+    const share = selectionLength() / info.duration;
+
+    if (current === 'copy') {
+      // Copied video keeps the source bitrate, so the size follows the selection length directly.
+      el('estimate').textContent = `≈ ${formatBytes(info.size * share)}`;
+      el<HTMLButtonElement>('save').disabled = false;
+      return;
+    }
+
+    if (current === 'reencode') {
+      el('estimate').textContent = `≈ ${formatBytes(info.size * share * 0.6)}`;
+      el<HTMLButtonElement>('save').disabled = false;
+      return;
+    }
+
+    const target = targetBytes();
+    const budget = budgetFor({
+      targetBytes: target * 0.96,
+      duration: selectionLength(),
+      audioBitrate: el<HTMLInputElement>('mute').checked || !info.hasAudio ? 0 : AUDIO_BITRATE,
+    });
+
+    if (!budget.achievable) {
+      el('estimate').textContent = '';
+      el<HTMLButtonElement>('save').disabled = true;
+      return;
+    }
+
+    el('estimate').textContent = `≈ ${formatBytes(target)} at ${Math.round(budget.videoBitrate / 1000)} kbps`;
+    el<HTMLButtonElement>('save').disabled = false;
+  }
+
+  /** Which controls are visible and what the note says — changes only when a control does. */
+  function refreshEstimate() {
+    if (!info) return;
+    const current = mode();
+    const note = el('modeNote');
+
+    el('targetWrap').hidden = current !== 'size';
+    el('customWrap').hidden = current !== 'size' || el<HTMLSelectElement>('preset').value !== 'custom';
+    // Copying only works into a container that already holds this codec, so format is fixed there.
+    el('formatWrap').hidden = current === 'copy';
+
+    refreshSizeEstimate();
+
+    // An unreachable target is the one case where the note depends on the selection, so it is
+    // recomputed here from what the estimate just decided.
+    const impossible = current === 'size' && el<HTMLButtonElement>('save').disabled;
+    note.classList.toggle('warn', impossible);
+    note.textContent = impossible
+      ? `${formatBytes(targetBytes())} is not possible for a ${selectionLength().toFixed(1)}s clip. ` +
+        'Shorten the selection or raise the target.'
+      : NOTES[current];
+  }
+
+  /** Accepts `12.5`, `1:04`, `1:04.5` — whichever way someone happens to think about time. */
+  function parseTime(text: string): number | null {
+    const trimmed = text.trim();
+    if (!trimmed) return null;
+    const parts = trimmed.split(':').map(Number);
+    if (parts.some(Number.isNaN)) return null;
+    const seconds = parts.length === 1 ? parts[0] : parts[0] * 60 + parts[1];
+    return Number.isFinite(seconds) ? Math.max(0, Math.min(duration, seconds)) : null;
+  }
+
+  async function open(chosen: File) {
+    file = chosen;
+    try {
+      status('Reading file…');
+      info = await probe(chosen);
+
+      duration = info.duration;
+      inPoint = 0;
+      outPoint = duration;
+
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      objectUrl = URL.createObjectURL(chosen);
+      video.src = objectUrl;
+
+      el('editor').hidden = false;
+      statusEl.hidden = true;
+
+      el('facts').innerHTML =
+        `<span>Source: <b>${info.width}×${info.height}</b></span>` +
+        `<span>Length: <b>${preciseClock(info.duration)}</b></span>` +
+        `<span>Size: <b>${formatBytes(info.size)}</b></span>` +
+        `<span>Codec: <b>${info.videoCodec ?? 'unknown'}${info.hasAudio ? ` + ${info.audioCodec}` : ' · no audio'}</b></span>`;
+
+      draw();
+    } catch (error) {
+      status(
+        error instanceof Error
+          ? `Could not read that file — ${error.message}`
+          : 'Could not read that file.',
+        1,
+        true,
+      );
+    }
+  }
+
+  // --- dragging ---
+
+  const positionFromEvent = (clientX: number) => {
+    const box = track.getBoundingClientRect();
+    return Math.max(0, Math.min(1, (clientX - box.left) / box.width)) * duration;
+  };
+
+  let dragging: 'in' | 'out' | null = null;
+
+  const startDrag = (which: 'in' | 'out') => (event: PointerEvent) => {
+    event.preventDefault();
+    dragging = which;
+    (event.target as HTMLElement).setPointerCapture(event.pointerId);
+  };
+
+  el('handleIn').addEventListener('pointerdown', startDrag('in'));
+  el('handleOut').addEventListener('pointerdown', startDrag('out'));
+
+  for (const handle of ['handleIn', 'handleOut']) {
+    el(handle).addEventListener('pointermove', (event) => {
+      if (!dragging || !duration) return;
+      const at = positionFromEvent((event as PointerEvent).clientX);
+
+      // Half a second is the shortest selection worth making, and it stops the handles crossing.
+      if (dragging === 'in') inPoint = Math.min(at, outPoint - 0.5);
+      else outPoint = Math.max(at, inPoint + 0.5);
+
+      inPoint = Math.max(0, inPoint);
+      outPoint = Math.min(duration, outPoint);
+      video.currentTime = dragging === 'in' ? inPoint : outPoint;
+      draw();
+    });
+
+    for (const type of ['pointerup', 'pointercancel']) {
+      el(handle).addEventListener(type, () => { dragging = null; });
+    }
+  }
+
+  // Clicking the track scrubs, which is what a click on a timeline should do.
+  track.addEventListener('click', (event) => {
+    if (dragging || !duration) return;
+    if ((event.target as HTMLElement).classList.contains('handle')) return;
+    video.currentTime = positionFromEvent(event.clientX);
+  });
+
+  video.addEventListener('timeupdate', () => {
+    if (!duration) return;
+    el('playhead').style.left = `${(video.currentTime / duration) * 100}%`;
+  });
+
+  el('setIn').addEventListener('click', () => {
+    inPoint = Math.min(video.currentTime, outPoint - 0.5);
+    draw();
+  });
+  el('setOut').addEventListener('click', () => {
+    outPoint = Math.max(video.currentTime, inPoint + 0.5);
+    draw();
+  });
+
+  for (const [id, apply] of [
+    ['inValue', (v: number) => { inPoint = Math.min(v, outPoint - 0.5); }],
+    ['outValue', (v: number) => { outPoint = Math.max(v, inPoint + 0.5); }],
+  ] as const) {
+    el<HTMLInputElement>(id).addEventListener('change', (event) => {
+      const parsed = parseTime((event.target as HTMLInputElement).value);
+      if (parsed !== null) apply(parsed);
+      draw();
+    });
+  }
+
+  // --- preview ---
+
+  let stopAt: number | null = null;
+
+  el('play').addEventListener('click', () => {
+    if (!video.paused) {
+      video.pause();
+      el('play').textContent = '▶ Play selection';
+      return;
+    }
+    video.currentTime = inPoint;
+    stopAt = outPoint;
+    void video.play();
+    el('play').textContent = '❚❚ Pause';
+  });
+
+  video.addEventListener('timeupdate', () => {
+    if (stopAt !== null && video.currentTime >= stopAt) {
+      video.pause();
+      stopAt = null;
+      el('play').textContent = '▶ Play selection';
+    }
+  });
+
+  video.addEventListener('pause', () => { el('play').textContent = '▶ Play selection'; });
+
+  // --- save ---
+
+  el<HTMLButtonElement>('save').addEventListener('click', async () => {
+    if (!file || !info || busy) return;
+    busy = true;
+    el<HTMLButtonElement>('save').disabled = true;
+
+    const current = mode();
+    const muted = el<HTMLInputElement>('mute').checked;
+    const trim = { start: inPoint, end: outPoint };
+    const name = file.name.replace(/\.[^.]+$/, '') || 'video';
+
+    // Copying can only go into a container that already accepts the source codec. MP4 holds H.264
+    // and HEVC, which is what a browser can open anyway, so it is the safe destination.
+    const container: Container =
+      current === 'copy' ? 'mp4' : (el<HTMLSelectElement>('container').value as Container);
+
+    try {
+      let blob: Blob;
+      let copied = false;
+
+      if (current === 'size') {
+        blob = await trimToSize(file, trim, container, muted);
+      } else {
+        status(current === 'copy' ? 'Copying…' : 'Encoding…', 0);
+        const result = await encodeDetailed(file, {
+          container,
+          trim,
+          discardAudio: muted,
+          // 'copy' passes no video options, which lets the track through untouched. 'reencode'
+          // must force the transcode: mediabunny would otherwise notice that "high quality" does
+          // not require re-encoding this file and copy it anyway — losing the frame-accurate
+          // in-point that is the entire reason to pick this mode.
+          ...(current === 'reencode' ? { quality: 'high' as const, forceTranscode: true } : {}),
+          onProgress: (p) =>
+            status(`${current === 'copy' ? 'Copying' : 'Encoding'} — ${Math.round(p * 100)}%`, p),
+        });
+        blob = result.blob;
+        copied = result.copiedVideo;
+      }
+
+      saveBlob(blob, `${name}-trimmed.${CONTAINER_EXTENSION[container]}`);
+
+      status(
+        `Saved — ${formatBytes(blob.size)}, ${selectionLength().toFixed(1)}s` +
+          (copied ? ', copied without re-encoding.' : '.'),
+        1,
+      );
+      setTimeout(() => { statusEl.hidden = true; }, 6000);
+    } catch (error) {
+      status(
+        error instanceof Error ? `Failed — ${error.message}` : 'Failed.',
+        1,
+        true,
+      );
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('save').disabled = false;
+    }
+  });
+
+  /**
+   * Fit the selection into a size.
+   *
+   * Picks a resolution for the bitrate first, exactly as the compressor does — this copy used to
+   * pass no width at all, so trimming a 4K clip to 10 MB spent a 480p bitrate on 4K frames, which
+   * is the failure `autoWidth` exists to prevent.
+   */
+  async function trimToSize(
+    source: File,
+    trim: { start: number; end: number },
+    container: Container,
+    silent: boolean,
+  ): Promise<Blob> {
+    const length = selectionLength();
+    const audioBitrate = silent || !info?.hasAudio ? 0 : AUDIO_BITRATE;
+    const target = targetBytes();
+    const budget = budgetFor({ targetBytes: target * 0.96, duration: length, audioBitrate });
+    const width = info ? Math.min(autoWidth(budget.videoBitrate, info.width), info.width) : undefined;
+
+    return encodeToTargetSize({
+      targetBytes: target,
+      duration: length,
+      audioBitrate,
+      onStatus: (message, fraction) => status(message, fraction),
+      run: (videoBitrate, onProgress) =>
+        encodeDetailed(source, {
+          container,
+          trim,
+          ...(width ? { width } : {}),
+          videoBitrate,
+          audioBitrate: AUDIO_BITRATE,
+          discardAudio: silent,
+          onProgress,
+        }).then((r) => r.blob),
+    });
+  }
+
+  /** Resolution that suits the bitrate being spent — same ladder the compressor uses. */
+  function autoWidth(videoBitrate: number, sourceWidth: number): number {
+    for (const width of [3840, 2560, 1920, 1280, 854, 640]) {
+      if (width <= sourceWidth && videoBitrate >= reasonableBitrate(width) * 0.55) return width;
+    }
+    return Math.min(640, sourceWidth);
+  }
+
+  // `change` on selects and checkboxes, `input` only on the free-text field: both events fire for
+  // one action on a select, which ran every recompute twice.
+  for (const id of ['mode', 'preset', 'mute', 'container']) {
+    el(id).addEventListener('change', refreshEstimate);
+  }
+  el('customSize').addEventListener('input', refreshEstimate);
+
+  // --- input ---
+
+  fileInput.addEventListener('change', () => {
+    const chosen = fileInput.files?.[0];
+    if (chosen) void open(chosen);
+  });
+
+  for (const type of ['dragenter', 'dragover']) {
+    drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  }
+  for (const type of ['dragleave', 'drop']) {
+    drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  }
+  drop.addEventListener('drop', (e) => {
+    const chosen = (e as DragEvent).dataTransfer?.files?.[0];
+    if (chosen) void open(chosen);
+  });
+</script>

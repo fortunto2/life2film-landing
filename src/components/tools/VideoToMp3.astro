@@ -1,0 +1,241 @@
+---
+/**
+ * The video-to-mp3 interface: markup and behaviour, with no page metadata.
+ *
+ * Separated from the page so the localised routes can render exactly the same tool. The
+ * words around it come from the registry; this is the part that does the work.
+ */
+---
+
+<div class="tool" slot="tool">
+    <label class="drop" id="drop" for="file">
+      <input type="file" id="file" accept="video/*,audio/*" hidden />
+      <strong>Choose a video or audio file</strong>
+      <span class="muted">or drag it here — MP4, MOV, WebM, M4A</span>
+    </label>
+
+    <div id="editor" hidden>
+      <div class="facts" id="facts"></div>
+      <div id="verdict" class="verdict" hidden></div>
+
+      <div class="controls">
+        <label class="control">
+          <span class="muted">Format</span>
+          <select id="container">
+            <option value="mp3" selected>MP3 — plays everywhere</option>
+            <option value="wav">WAV — uncompressed</option>
+            <option value="ogg">OGG — smaller than MP3</option>
+          </select>
+        </label>
+
+        <label class="control" id="bitrateWrap">
+          <span class="muted">Bitrate</span>
+          <select id="bitrate">
+            <option value="320000">320 kbps — maximum</option>
+            <option value="192000" selected>192 kbps — music</option>
+            <option value="128000">128 kbps — general</option>
+            <option value="96000">96 kbps — speech</option>
+            <option value="64000">64 kbps — smallest</option>
+          </select>
+        </label>
+
+        <label class="control checkbox">
+          <input type="checkbox" id="mono" />
+          <span>Mono</span>
+        </label>
+
+        <span class="spacer"></span>
+        <span class="muted" id="estimate"></span>
+        <button id="run" type="button" class="ghost primary">Extract audio</button>
+      </div>
+    </div>
+
+    <div id="status" class="status" hidden>
+      <div class="bar"><span id="fill"></span></div>
+      <div class="statustext" id="statusText"></div>
+    </div>
+  </div>
+
+  <Fragment slot="prose">
+    <h2>What extracting audio actually is</h2>
+    <p>
+      A video file is a container holding separate tracks — picture in one, sound in another. They
+      are already independent, so pulling the audio out is not a conversion in the usual sense: the
+      picture is simply left behind.
+    </p>
+    <p>
+      What happens next depends on the format you choose. WAV takes the decoded audio as it is and
+      writes it uncompressed, which loses nothing and produces a large file. MP3 and OGG re-encode
+      it, which is why the bitrate matters — and why converting a file that was already compressed
+      once cannot recover what the first encoder discarded, no matter how high you set it.
+    </p>
+
+    <h2>Why in the browser</h2>
+    <p>
+      The audio in a video you want to keep is usually the part that is personal: a lecture you
+      recorded, an interview, a rehearsal, something a family member said. Handing that to a website
+      to have it handed back is a strange trade when a laptop can do it in seconds.
+    </p>
+    <p>
+      This page uses WebCodecs for decoding and, for MP3, a LAME encoder compiled to WebAssembly —
+      loaded only if you choose MP3. No file leaves the machine, and there is no size limit because
+      there is nothing to upload to.
+    </p>
+    <p>
+      To take a section rather than the whole file, trim it first with
+      the <a href="/tools/video-trimmer/">trimmer</a>. To convert the video itself between formats,
+      use the <a href="/tools/video-converter/">converter</a>.
+    </p>
+  </Fragment>
+<style>
+</style>
+
+<script>
+  import {
+    probe, encode, saveBlob, formatBytes, preciseClock,
+    CONTAINER_EXTENSION, type Container, type Probe,
+  } from '../../lib/encode';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+  const drop = el<HTMLLabelElement>('drop');
+  const fileInput = el<HTMLInputElement>('file');
+  const statusEl = el<HTMLDivElement>('status');
+
+  let file: File | null = null;
+  let info: Probe | null = null;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  const container = () => el<HTMLSelectElement>('container').value as Container;
+  const bitrate = () => Number(el<HTMLSelectElement>('bitrate').value) || 192_000;
+  const mono = () => el<HTMLInputElement>('mono').checked;
+
+  function refreshEstimate() {
+    if (!info) return;
+    const format = container();
+
+    // WAV has no bitrate to choose: it is sample rate times bit depth times channels.
+    el('bitrateWrap').hidden = format === 'wav';
+
+    // WAV is arithmetic: sample rate × 2 bytes × channels. The lossy formats are estimated from
+    // their nominal bitrate.
+    //
+    // There used to be a 0.7 factor here for Vorbis, on the theory that variable-rate encoding
+    // lands under the nominal figure. Measured, it does not behave that way: at 64 kbps the file
+    // came out at exactly the nominal rate and at 320 kbps at 80% of it. A guessed constant that
+    // is wrong in both directions is worse than none, so the estimate now states the nominal rate
+    // and errs high at the top end — where being told a file will be smaller than it is would be
+    // the more annoying mistake.
+    const channels = mono() ? 1 : info.channels;
+    const bytes =
+      format === 'wav'
+        ? info.duration * info.sampleRate * 2 * channels
+        : (bitrate() * (mono() ? 0.6 : 1) * info.duration) / 8;
+
+    el('estimate').textContent = `≈ ${formatBytes(bytes)}`;
+
+    // Asking for more bits than the source has does not recover anything.
+    const sourceAudioBits = format === 'wav' ? 0 : bitrate();
+    if (sourceAudioBits >= 256_000) {
+      el('verdict').hidden = false;
+      el('verdict').className = 'verdict warn';
+      el('verdict').textContent =
+        'A higher bitrate than the source was recorded at makes the file larger without making it ' +
+        'sound better — the detail the first encoder discarded is gone. 192 kbps is transparent for ' +
+        'most material.';
+    } else {
+      el('verdict').hidden = true;
+    }
+  }
+
+  async function open(chosen: File) {
+    file = chosen;
+    try {
+      status('Reading file…');
+      info = await probe(chosen);
+
+      if (!info.hasAudio) {
+        throw new Error('That file has no audio track — there is nothing to extract.');
+      }
+
+      el('editor').hidden = false;
+      statusEl.hidden = true;
+      el('facts').innerHTML =
+        `<span>Audio: <b>${info.audioCodec ?? 'unknown'}</b></span>` +
+        `<span>Length: <b>${preciseClock(info.duration)}</b></span>` +
+        `<span>File: <b>${formatBytes(info.size)}</b></span>` +
+        (info.width ? `<span>Video: <b>${info.width}×${info.height}</b> (discarded)</span>` : '');
+
+      refreshEstimate();
+    } catch (error) {
+      status(
+        error instanceof Error
+          ? `Could not read that file — ${error.message}`
+          : 'Could not read that file.',
+        1,
+        true,
+      );
+    }
+  }
+
+  for (const id of ['container', 'bitrate', 'mono']) {
+    el(id).addEventListener('change', refreshEstimate);
+  }
+
+  el<HTMLButtonElement>('run').addEventListener('click', async () => {
+    if (!file || !info || busy) return;
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+
+    const format = container();
+    const name = file.name.replace(/\.[^.]+$/, '') || 'audio';
+
+    try {
+      status(format === 'mp3' ? 'Loading the MP3 encoder…' : 'Extracting…', 0);
+
+      const blob = await encode(file, {
+        container: format,
+        discardVideo: true,
+        ...(format === 'wav' ? {} : { audioBitrate: bitrate() }),
+        mono: mono(),
+        onProgress: (p) => status(`Extracting — ${Math.round(p * 100)}%`, p),
+      });
+
+      saveBlob(blob, `${name}.${CONTAINER_EXTENSION[format]}`);
+      status(`Saved — ${formatBytes(blob.size)} ${format.toUpperCase()}.`, 1);
+      setTimeout(() => { statusEl.hidden = true; }, 5000);
+    } catch (error) {
+      status(
+        error instanceof Error ? `Extraction failed — ${error.message}` : 'Extraction failed.',
+        1,
+        true,
+      );
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  fileInput.addEventListener('change', () => {
+    const chosen = fileInput.files?.[0];
+    if (chosen) void open(chosen);
+  });
+
+  for (const type of ['dragenter', 'dragover']) {
+    drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  }
+  for (const type of ['dragleave', 'drop']) {
+    drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  }
+  drop.addEventListener('drop', (e) => {
+    const chosen = (e as DragEvent).dataTransfer?.files?.[0];
+    if (chosen) void open(chosen);
+  });
+</script>

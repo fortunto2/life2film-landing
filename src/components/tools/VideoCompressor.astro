@@ -1,0 +1,451 @@
+---
+/**
+ * The video-compressor interface: markup and behaviour, with no page metadata.
+ *
+ * Separated from the page so the localised routes can render exactly the same tool. The
+ * words around it come from the registry; this is the part that does the work.
+ */
+---
+
+<div class="tool" slot="tool">
+    <label class="drop" id="drop" for="file">
+      <input type="file" id="file" accept="video/*" hidden />
+      <strong>Choose a video file</strong>
+      <span class="muted">or drag it here — MP4, MOV (H.264), WebM</span>
+    </label>
+
+    <div id="editor" hidden>
+      <div class="facts" id="facts"></div>
+      <div id="verdict" class="verdict" hidden></div>
+
+      <div class="modes" role="tablist">
+        <button id="modeSize" type="button" class="mode on" role="tab">Fit a size</button>
+        <button id="modeQuality" type="button" class="mode" role="tab">Pick a quality</button>
+      </div>
+
+      <div class="controls" id="sizeControls">
+        <label class="control">
+          <span class="muted">Target</span>
+          <select id="preset"></select>
+        </label>
+
+        <label class="control" id="customWrap" hidden>
+          <span class="muted">MB</span>
+          <input type="text" id="customSize" size="5" inputmode="decimal" value="10" />
+        </label>
+
+        <label class="control">
+          <span class="muted">Resolution</span>
+          <select id="sizeResolution">
+            <option value="0" selected>Auto</option>
+            <option value="1920">1080p</option>
+            <option value="1280">720p</option>
+            <option value="854">480p</option>
+            <option value="640">360p</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="controls" id="qualityControls" hidden>
+        <label class="control">
+          <span class="muted">Resolution</span>
+          <select id="resolution">
+            <option value="0">Keep original</option>
+            <option value="1920">1080p</option>
+            <option value="1280" selected>720p</option>
+            <option value="854">480p</option>
+            <option value="640">360p</option>
+          </select>
+        </label>
+
+        <label class="control">
+          <span class="muted">Quality</span>
+          <select id="quality">
+            <option value="high">High — barely touched</option>
+            <option value="medium" selected>Medium — recommended</option>
+            <option value="low">Low — small file</option>
+            <option value="very_low">Very low — smallest</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="controls">
+        <label class="control checkbox">
+          <input type="checkbox" id="mute" />
+          <span>Remove audio</span>
+        </label>
+
+        <span class="spacer"></span>
+        <span class="estimate muted" id="estimate"></span>
+        <button id="run" type="button" class="ghost primary">Compress</button>
+      </div>
+
+      <div id="outcome" class="outcome" hidden>
+        <div class="sizes">
+          <span class="was" id="was">—</span>
+          <span class="arrow">→</span>
+          <span class="now" id="now">—</span>
+          <span class="saved" id="saved"></span>
+        </div>
+        <div class="controls">
+          <button id="save" type="button" class="ghost primary">Download</button>
+          <span class="muted" id="outcomeNote"></span>
+        </div>
+      </div>
+    </div>
+
+    <div id="status" class="status" hidden>
+      <div class="bar"><span id="fill"></span></div>
+      <div class="statustext" id="statusText"></div>
+    </div>
+  </div>
+
+  <Fragment slot="prose">
+    <h2>Size is arithmetic, not a slider</h2>
+    <p>
+      A video file weighs its bitrate times its length. So "make this fit in 10 MB" has an exact
+      answer the moment you know how long the video is — there is no reason to make someone drag a
+      quality slider, encode, check, and try again.
+    </p>
+    <p>
+      Encoders do not hit a requested bitrate precisely; rate control drifts depending on what is in
+      the frame, and a noisy handheld shot overshoots where a locked-off one comes in under. Rather
+      than pad the target with a safety margin and always deliver something needlessly small, the
+      first result is measured and — if it missed — a second pass runs with the correction applied.
+    </p>
+
+    <h2>Why this can run in a tab at all</h2>
+    <p>
+      Compressing video used to require a server, because browsers could not encode. They can now:
+      WebCodecs exposes the same hardware encoder your phone uses to record, and a laptop gets
+      through 1080p faster than it could have uploaded it.
+    </p>
+    <p>
+      That changes the economics, not just the privacy. A service compressing on a server pays for
+      every gigabyte it touches, which is why they cap file sizes, queue free users and watermark the
+      output. None of those limits are here, because none of that cost is.
+    </p>
+    <p>
+      To shorten a video rather than shrink it, use the <a href="/tools/video-trimmer/">trimmer</a>;
+      to change format, the <a href="/tools/video-converter/">converter</a>.
+    </p>
+  </Fragment>
+<style>
+  .modes { display: flex; gap: 6px; margin-top: 20px; }
+  .mode {
+    padding: 8px 15px; border-radius: 10px; font: inherit; font-size: 14px; cursor: pointer;
+    color: var(--muted); background: transparent; border: 1px solid var(--line);
+  }
+  .mode:hover { color: var(--fg); }
+  .mode.on { color: var(--cyan); border-color: rgba(0,242,224,.45); background: rgba(0,242,224,.05); }
+
+
+  .estimate { font-size: 14px; }
+
+  .outcome { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line); }
+  .sizes { display: flex; flex-wrap: wrap; gap: 14px; align-items: baseline; }
+  .was { font-size: 20px; color: var(--muted); text-decoration: line-through; }
+  .arrow { color: var(--muted); }
+  .now {
+    font-size: 34px; font-weight: 700; letter-spacing: -.03em;
+    background: var(--grad); -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .saved { font-size: 15px; color: var(--cyan); }
+</style>
+
+<script>
+  import { probe, encode, saveBlob, formatBytes, preciseClock, type QualityName, type Probe } from '../../lib/encode';
+  import {
+    budgetFor, bytesFor, sourceBitrate, reasonableBitrate,
+    encodeToTargetSize, presetOptions, parseTarget, AUDIO_BITRATE,
+  } from '../../lib/bitrate';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const MB = 1024 * 1024;
+
+  const drop = el<HTMLLabelElement>('drop');
+  const fileInput = el<HTMLInputElement>('file');
+  const statusEl = el<HTMLDivElement>('status');
+
+  let file: File | null = null;
+  let info: Probe | null = null;
+  let result: Blob | null = null;
+  let busy = false;
+  let mode: 'size' | 'quality' = 'size';
+
+  el('preset').innerHTML = presetOptions();
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  const muted = () => el<HTMLInputElement>('mute').checked;
+  const audioCost = () => (muted() || !info?.hasAudio ? 0 : AUDIO_BITRATE);
+
+  const targetBytes = () =>
+    parseTarget(el<HTMLSelectElement>('preset').value, el<HTMLInputElement>('customSize').value);
+
+  /**
+   * Resolution that suits the bitrate we are about to spend.
+   *
+   * Squeezing 1080p into a bitrate meant for 480p looks far worse than sending 480p at a bitrate it
+   * can carry — the encoder has to throw away detail everywhere instead of starting with less of it.
+   */
+  function autoWidth(videoBitrate: number, sourceWidth: number): number {
+    for (const width of [3840, 2560, 1920, 1280, 854, 640]) {
+      if (width <= sourceWidth && videoBitrate >= reasonableBitrate(width) * 0.55) return width;
+    }
+    return Math.min(640, sourceWidth);
+  }
+
+  /** What the current settings would produce — shown before anything is encoded. */
+  function refreshEstimate() {
+    if (!info) return;
+
+    if (mode === 'size') {
+      const target = targetBytes();
+      const budget = budgetFor({ targetBytes: target, duration: info.duration, audioBitrate: audioCost() });
+
+      if (!budget.achievable) {
+        el('estimate').textContent = '';
+        setVerdict(
+          `${formatBytes(target)} is not possible for ${preciseClock(info.duration)} of video — ` +
+            `the smallest watchable result is about ${formatBytes(budget.floorBytes)}.`,
+          'bad',
+        );
+        el<HTMLButtonElement>('run').disabled = true;
+        return;
+      }
+
+      el<HTMLButtonElement>('run').disabled = false;
+      const chosen = Number(el<HTMLSelectElement>('sizeResolution').value) ||
+        autoWidth(budget.videoBitrate, info.width);
+      el('estimate').textContent =
+        `≈ ${formatBytes(target)} at ${Math.round(budget.videoBitrate / 1000)} kbps, ${chosen}p wide`;
+      describeSource();
+      return;
+    }
+
+    // Quality mode: mediabunny picks the bitrate internally, so the honest thing is a range rather
+    // than a precise figure. These multipliers come from its own quality ladder.
+    const width = Number(el<HTMLSelectElement>('resolution').value) || info.width;
+    const quality = el<HTMLSelectElement>('quality').value as QualityName;
+    const factor = { very_high: 1.6, high: 1.0, medium: 0.55, low: 0.3, very_low: 0.16 }[quality] ?? 0.55;
+    const estimate = bytesFor(reasonableBitrate(width) * factor + audioCost(), info.duration);
+
+    el<HTMLButtonElement>('run').disabled = false;
+    el('estimate').textContent = `≈ ${formatBytes(estimate)}`;
+    describeSource();
+  }
+
+  function setVerdict(text: string, kind: '' | 'warn' | 'bad' = '') {
+    const node = el('verdict');
+    node.hidden = !text;
+    node.textContent = text;
+    node.classList.toggle('warn', kind === 'warn');
+    node.classList.toggle('bad', kind === 'bad');
+  }
+
+  /** Say up front when compressing this file is a bad trade. */
+  function describeSource() {
+    if (!info) return;
+    const current = sourceBitrate(info.size, info.duration);
+    const expected = reasonableBitrate(info.width);
+
+    if (current < expected * 0.5) {
+      setVerdict(
+        `This file is already at ${Math.round(current / 1000)} kbps for ${info.width}×${info.height} — ` +
+          `well below what that resolution usually needs. Re-encoding may make it larger, not smaller. ` +
+          `Reducing the resolution is the only reliable saving left.`,
+        'warn',
+      );
+    } else {
+      setVerdict('');
+    }
+  }
+
+  async function open(chosen: File) {
+    file = chosen;
+    result = null;
+    el('outcome').hidden = true;
+
+    try {
+      status('Reading file…');
+      info = await probe(chosen);
+
+      el('editor').hidden = false;
+      statusEl.hidden = true;
+
+      const bitrate = sourceBitrate(info.size, info.duration);
+      el('facts').innerHTML =
+        `<span>Now: <b>${formatBytes(info.size)}</b></span>` +
+        `<span>Resolution: <b>${info.width}×${info.height}</b></span>` +
+        `<span>Length: <b>${preciseClock(info.duration)}</b></span>` +
+        `<span>Bitrate: <b>${(bitrate / 1_000_000).toFixed(1)} Mbps</b></span>`;
+
+      el<HTMLSelectElement>('resolution').value =
+        info.width >= 3000 ? '1920' : info.width >= 1900 ? '1280' : '0';
+
+      refreshEstimate();
+    } catch (error) {
+      status(
+        error instanceof Error ? `Could not read that file — ${error.message}` : 'Could not read that file.',
+        1,
+        true,
+      );
+    }
+  }
+
+  // --- modes ---
+
+  function setMode(next: 'size' | 'quality') {
+    mode = next;
+    el('modeSize').classList.toggle('on', next === 'size');
+    el('modeQuality').classList.toggle('on', next === 'quality');
+    el('sizeControls').hidden = next !== 'size';
+    el('qualityControls').hidden = next !== 'quality';
+    refreshEstimate();
+  }
+
+  el('modeSize').addEventListener('click', () => setMode('size'));
+  el('modeQuality').addEventListener('click', () => setMode('quality'));
+
+  el<HTMLSelectElement>('preset').addEventListener('change', () => {
+    el('customWrap').hidden = el<HTMLSelectElement>('preset').value !== 'custom';
+    refreshEstimate();
+  });
+
+  // `change` on selects and checkboxes, `input` only on the free-text field — both fire for one
+  // action on a select, so every estimate (and its verdict) was computed twice.
+  for (const id of ['sizeResolution', 'resolution', 'quality', 'mute']) {
+    el(id).addEventListener('change', refreshEstimate);
+  }
+  el('customSize').addEventListener('input', refreshEstimate);
+
+  // --- compressing ---
+
+  el<HTMLButtonElement>('run').addEventListener('click', async () => {
+    if (!file || !info || busy) return;
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    el('outcome').hidden = true;
+
+    try {
+      result = mode === 'size' ? await compressToSize(file, info) : await compressByQuality(file, info);
+      showOutcome();
+    } catch (error) {
+      status(
+        error instanceof Error ? `Compression failed — ${error.message}` : 'Compression failed.',
+        1,
+        true,
+      );
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  async function compressByQuality(source: File, probed: Probe): Promise<Blob> {
+    const width = Number(el<HTMLSelectElement>('resolution').value) || undefined;
+    status('Compressing…', 0);
+
+    return encode(source, {
+      container: 'mp4',
+      ...(width ? { width } : {}),
+      quality: el<HTMLSelectElement>('quality').value as QualityName,
+      discardAudio: muted(),
+      onProgress: (p) => status(`Compressing — ${Math.round(p * 100)}%`, p),
+    });
+  }
+
+  /**
+   * Aim at a size, then correct once if the encoder missed.
+   *
+   * Two passes is the ceiling: a third would rarely improve on the second and doubles the wait
+   * again. Anything within 4% of the target counts as hit — that is inside the noise of rate
+   * control, and the target itself is set below the real limit.
+   */
+  async function compressToSize(source: File, probed: Probe): Promise<Blob> {
+    const target = targetBytes();
+    const budget = budgetFor({
+      targetBytes: target * 0.96,
+      duration: probed.duration,
+      audioBitrate: audioCost(),
+    });
+    const width = Math.min(
+      Number(el<HTMLSelectElement>('sizeResolution').value) || autoWidth(budget.videoBitrate, probed.width),
+      probed.width,
+    );
+
+    return encodeToTargetSize({
+      targetBytes: target,
+      duration: probed.duration,
+      audioBitrate: audioCost(),
+      onStatus: status,
+      run: (videoBitrate, onProgress) =>
+        encode(source, {
+          container: 'mp4',
+          width,
+          videoBitrate,
+          audioBitrate: AUDIO_BITRATE,
+          discardAudio: muted(),
+          onProgress,
+        }),
+    });
+  }
+
+  function showOutcome() {
+    if (!result || !file) return;
+    const original = file.size;
+    const ratio = 1 - result.size / original;
+
+    el('was').textContent = formatBytes(original);
+    el('now').textContent = formatBytes(result.size);
+    el('saved').textContent =
+      ratio > 0.01
+        ? `${Math.round(ratio * 100)}% smaller`
+        : ratio < -0.01
+          ? `${Math.round(-ratio * 100)}% larger — this file was already well compressed`
+          : 'about the same size';
+
+    if (mode === 'size') {
+      const target = targetBytes();
+      el('outcomeNote').textContent =
+        result.size <= target
+          ? `Fits ${formatBytes(target)} with ${formatBytes(target - result.size)} to spare.`
+          : `Still ${formatBytes(result.size - target)} over ${formatBytes(target)} — try a lower resolution.`;
+    } else {
+      el('outcomeNote').textContent = ratio <= 0.01 ? 'Try a lower resolution, or keep the original.' : '';
+    }
+
+    el('outcome').hidden = false;
+    statusEl.hidden = true;
+  }
+
+  el<HTMLButtonElement>('save').addEventListener('click', () => {
+    if (!result || !file) return;
+    saveBlob(result, `${file.name.replace(/\.[^.]+$/, '') || 'video'}-compressed.mp4`);
+  });
+
+  // --- input ---
+
+  fileInput.addEventListener('change', () => {
+    const chosen = fileInput.files?.[0];
+    if (chosen) void open(chosen);
+  });
+
+  for (const type of ['dragenter', 'dragover']) {
+    drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  }
+  for (const type of ['dragleave', 'drop']) {
+    drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  }
+  drop.addEventListener('drop', (e) => {
+    const chosen = (e as DragEvent).dataTransfer?.files?.[0];
+    if (chosen) void open(chosen);
+  });
+</script>

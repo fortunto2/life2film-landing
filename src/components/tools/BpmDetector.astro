@@ -1,0 +1,431 @@
+---
+/**
+ * The bpm-detector interface: markup and behaviour, with no page metadata.
+ *
+ * Separated from the page so the localised routes can render exactly the same tool. The
+ * words around it come from the registry; this is the part that does the work.
+ */
+---
+
+<div class="tool" slot="tool">
+          <label class="drop" id="drop" for="file">
+            <input type="file" id="file" accept="audio/*,video/*" hidden />
+            <strong id="dropTitle">Choose an audio file</strong>
+            <span class="muted" id="dropHint">or drag it here — MP3, WAV, M4A, FLAC, OGG</span>
+          </label>
+
+          <div id="status" class="status" hidden></div>
+
+          <div id="result" class="result" hidden>
+            <div class="readout">
+              <div class="bpm">
+                <span id="bpm">—</span>
+                <em>BPM</em>
+              </div>
+              <div class="meta">
+                <div><span id="beatCount">0</span> beats</div>
+                <div><span id="duration">0:00</span> long</div>
+                <div class="muted" id="alt"></div>
+              </div>
+            </div>
+
+            <canvas id="wave" height="120" aria-label="Waveform with detected beats"></canvas>
+            <div class="scrubline">
+              <span class="muted" id="window">—</span>
+              <span class="muted hint">drag the waveform to move through the track</span>
+            </div>
+
+            <div class="actions">
+              <button id="play" type="button" class="ghost">▶ Play with clicks</button>
+
+              <div class="export">
+                <select id="format" aria-label="Export format">
+                  <option value="edl">EDL — DaVinci Resolve, Premiere</option>
+                  <option value="otio">OTIO — Resolve, Avid, Premiere</option>
+                  <option value="fcpxml">FCPXML — Final Cut Pro</option>
+                  <option value="labels">Labels — Audacity</option>
+                  <option value="csv">CSV — spreadsheets</option>
+                  <option value="json">JSON — scripts</option>
+                </select>
+                <button id="save" type="button" class="ghost primary">Download</button>
+              </div>
+
+              <label class="fps">
+                <span class="muted">fps</span>
+                <select id="fps" aria-label="Frame rate for timecode">
+                  <option>23.976</option>
+                  <option>24</option>
+                  <option selected>25</option>
+                  <option>29.97</option>
+                  <option>30</option>
+                  <option>50</option>
+                  <option>60</option>
+                </select>
+              </label>
+            </div>
+          </div>
+        </div>
+
+  <Fragment slot="prose">
+        <h2>What it measures</h2>
+        <p>
+          Tempo detection starts by finding <em>onsets</em> — the moments when energy rises sharply
+          across the spectrum, which is what a drum hit, a plucked string or a syllable looks like to
+          a machine. Those moments form a jagged curve over time. A steady pulse shows up as a
+          repeating pattern in that curve, and the strongest period is the tempo.
+        </p>
+        <p>
+          Knowing the tempo is not the same as knowing where the beats fall, so a second pass places
+          a grid: it searches for the sequence of beat positions that both lands on strong onsets and
+          stays evenly spaced, trading one against the other. That is why the beats returned here sit
+          on the music rather than on a metronome started at zero.
+        </p>
+
+        <h2>Why it runs in your browser</h2>
+        <p>
+          Every comparable tool asks you to upload the track first. That is a consequence of how they
+          are built, not a requirement of the problem — the analysis is a few million floating-point
+          operations, which a phone does without noticing.
+        </p>
+        <p>
+          This one is the montage engine from <a href="/">Life2Film</a>, compiled to WebAssembly.
+          The same code decides where to cut when the app assembles a video, and it runs on your
+          device there for the same reason it does here: sending someone’s footage to a server to
+          answer a question the device can answer is a cost, not a feature.
+        </p>
+  </Fragment>
+<style>
+
+    .status { margin-top: 16px; font-size: 15px; color: var(--muted); }
+    .status.err { color: var(--pink); }
+
+    .result { margin-top: 20px; }
+    .readout { display: flex; flex-wrap: wrap; gap: 28px; align-items: baseline; margin-bottom: 18px; }
+    .bpm { display: flex; align-items: baseline; gap: 10px; }
+    .bpm span {
+      font-size: 62px; font-weight: 700; letter-spacing: -0.04em; line-height: 1;
+      background: var(--grad); -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .bpm em { font-style: normal; font-size: 15px; color: var(--muted); letter-spacing: .08em; }
+    .meta { font-size: 15px; color: #cfcfd6; display: grid; gap: 2px; }
+
+    canvas { width: 100%; height: 120px; display: block; border-radius: 10px; background: #08080a; }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; align-items: center; }
+
+    .export { display: flex; gap: 8px; align-items: center; margin-left: auto; }
+    .fps { display: flex; gap: 6px; align-items: center; font-size: 13px; }
+    select {
+      padding: 9px 12px; border-radius: 10px; font: inherit; font-size: 14px; cursor: pointer;
+      color: var(--fg); background: #0a0a0d; border: 1px solid var(--line);
+    }
+    select:hover { border-color: var(--cyan); }
+    .fps select { padding: 7px 8px; font-size: 13px; }
+
+    .scrubline { display: flex; gap: 14px; justify-content: space-between; margin-top: 8px; font-size: 13px; }
+    .scrubline .hint { opacity: .7; }
+    canvas { cursor: grab; touch-action: pan-y; }
+    canvas:active { cursor: grabbing; }
+</style>
+
+<script>
+    import { loadEngine } from '../../lib/engine';
+    import { clock, render, download, EXTENSION, type Format, type Mark } from '../../lib/timeline-export';
+
+    const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+    const drop = el<HTMLLabelElement>('drop');
+    const fileInput = el<HTMLInputElement>('file');
+    const statusEl = el<HTMLDivElement>('status');
+    const resultEl = el<HTMLDivElement>('result');
+    const canvas = el<HTMLCanvasElement>('wave');
+
+    let beats: number[] = [];
+    let bpm = 0;
+    let peaks: number[] = [];
+    let audioBuffer: AudioBuffer | null = null;
+    let fileName = 'track';
+
+    function status(message: string, isError = false) {
+      statusEl.hidden = false;
+      statusEl.textContent = message;
+      statusEl.classList.toggle('err', isError);
+    }
+
+    /**
+     * Down-mix to mono at a reduced rate. Beat tracking works on the onset envelope, which lives far
+     * below 11 kHz — analysing at the source rate would cost several times the memory and time for a
+     * result that does not change.
+     */
+    async function toMono(buffer: AudioBuffer, rate = 22050): Promise<Float32Array> {
+      const frames = Math.ceil((buffer.duration * rate));
+      const offline = new OfflineAudioContext(1, frames, rate);
+      const source = offline.createBufferSource();
+      source.buffer = buffer;
+      source.connect(offline.destination);
+      source.start();
+      const rendered = await offline.startRendering();
+      return rendered.getChannelData(0);
+    }
+
+    /**
+     * The canvas shows a window, not the whole track.
+     *
+     * Drawing four minutes at once puts a beat every two or three pixels: the result is a solid
+     * block that proves nothing. The point of showing beats over a waveform is to let someone see
+     * that the marks land on the hits — and that is only visible at a few seconds per screen.
+     */
+    const WINDOW_SECONDS = 16;
+    let viewStart = 0;
+
+    function viewLength(): number {
+      return Math.min(WINDOW_SECONDS, audioBuffer?.duration ?? WINDOW_SECONDS);
+    }
+
+    /** Peak envelope over one window — one value per pixel column, computed from the source samples. */
+    function envelope(samples: Float32Array, rate: number, from: number, length: number, columns: number): number[] {
+      const first = Math.floor(from * rate);
+      const total = Math.floor(length * rate);
+      const step = Math.max(1, Math.floor(total / columns));
+      const out: number[] = [];
+      for (let i = 0; i < columns; i++) {
+        let peak = 0;
+        const start = first + i * step;
+        const end = Math.min(start + step, samples.length);
+        for (let j = start; j < end; j += 3) {
+          const v = Math.abs(samples[j]);
+          if (v > peak) peak = v;
+        }
+        out.push(peak);
+      }
+      return out;
+    }
+
+    function refreshPeaks() {
+      if (!audioBuffer) return;
+      peaks = envelope(
+        audioBuffer.getChannelData(0),
+        audioBuffer.sampleRate,
+        viewStart,
+        viewLength(),
+        Math.round(canvas.clientWidth),
+      );
+    }
+
+    function draw() {
+      if (!audioBuffer) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      const dpr = window.devicePixelRatio || 1;
+      const width = canvas.clientWidth;
+      const height = 120;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, width, height);
+
+      const mid = height / 2;
+      ctx.strokeStyle = 'rgba(207,207,214,.5)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      peaks.forEach((peak, i) => {
+        const h = Math.max(1, peak * (height * 0.88));
+        ctx.moveTo(i + 0.5, mid - h / 2);
+        ctx.lineTo(i + 0.5, mid + h / 2);
+      });
+      ctx.stroke();
+
+      const length = viewLength();
+      const end = viewStart + length;
+
+      ctx.strokeStyle = 'rgba(0,242,224,.9)';
+      ctx.fillStyle = 'rgba(0,242,224,.9)';
+      ctx.font = '10px ui-monospace, monospace';
+      ctx.beginPath();
+      for (const t of beats) {
+        if (t < viewStart || t > end) continue;
+        const x = ((t - viewStart) / length) * width;
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+      }
+      ctx.stroke();
+
+      el('window').textContent = `${clock(viewStart)}–${clock(end)} of ${clock(audioBuffer.duration)}`;
+    }
+
+    function setView(seconds: number) {
+      if (!audioBuffer) return;
+      const max = Math.max(0, audioBuffer.duration - viewLength());
+      viewStart = Math.min(max, Math.max(0, seconds));
+      refreshPeaks();
+      draw();
+    }
+
+    async function analyse(file: File) {
+      fileName = file.name.replace(/\.[^.]+$/, '') || 'track';
+      resultEl.hidden = true;
+      status('Reading file…');
+
+      try {
+        const bytes = await file.arrayBuffer();
+        status('Decoding audio…');
+
+        const ctx = new AudioContext();
+        audioBuffer = await ctx.decodeAudioData(bytes);
+        await ctx.close();
+
+        status('Loading analyser…');
+        const engine = await loadEngine();
+
+        status('Finding the beat…');
+        const mono = await toMono(audioBuffer);
+        const raw = engine.detect_beats(mono, 22050, null);
+        const parsed = JSON.parse(raw) as { beats: number[]; bpm: number };
+
+        beats = parsed.beats ?? [];
+        bpm = parsed.bpm ?? 0;
+
+        if (!beats.length) {
+          status('No steady pulse found. Speech, ambient and free-tempo recordings often have none.', true);
+          return;
+        }
+
+        el('bpm').textContent = bpm.toFixed(1);
+        el('beatCount').textContent = String(beats.length);
+        el('duration').textContent = clock(audioBuffer.duration);
+        el('alt').textContent = `also valid as ${(bpm / 2).toFixed(1)} or ${(bpm * 2).toFixed(1)} BPM`;
+
+        statusEl.hidden = true;
+        resultEl.hidden = false;
+
+        // Only now does the canvas have a width. Measuring it while the panel was still hidden
+        // gave zero columns and drew an empty waveform under a correct set of beats.
+        viewStart = 0;
+        refreshPeaks();
+        draw();
+      } catch (error) {
+        status(
+          `Could not read that file — ${error instanceof Error ? error.message : 'unknown error'}. ` +
+            'Browsers only decode the formats they ship with.',
+          true,
+        );
+      }
+    }
+
+    // --- input ---
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files?.[0];
+      if (file) void analyse(file);
+    });
+
+    for (const type of ['dragenter', 'dragover']) {
+      drop.addEventListener(type, (e) => {
+        e.preventDefault();
+        drop.classList.add('over');
+      });
+    }
+    for (const type of ['dragleave', 'drop']) {
+      drop.addEventListener(type, (e) => {
+        e.preventDefault();
+        drop.classList.remove('over');
+      });
+    }
+    drop.addEventListener('drop', (e) => {
+      const file = (e as DragEvent).dataTransfer?.files?.[0];
+      if (file) void analyse(file);
+    });
+
+    window.addEventListener('resize', () => {
+      if (!audioBuffer || resultEl.hidden) return;
+      refreshPeaks();
+      draw();
+    });
+
+    // Drag the waveform to move through the track — one screen is sixteen seconds, and a four-minute
+    // song is fifteen screens.
+    let dragFrom: { x: number; start: number } | null = null;
+
+    canvas.addEventListener('pointerdown', (e) => {
+      if (!audioBuffer) return;
+      dragFrom = { x: e.clientX, start: viewStart };
+      canvas.setPointerCapture(e.pointerId);
+    });
+
+    canvas.addEventListener('pointermove', (e) => {
+      if (!dragFrom || !audioBuffer) return;
+      const secondsPerPixel = viewLength() / canvas.clientWidth;
+      setView(dragFrom.start - (e.clientX - dragFrom.x) * secondsPerPixel);
+    });
+
+    for (const type of ['pointerup', 'pointercancel']) {
+      canvas.addEventListener(type, () => {
+        dragFrom = null;
+      });
+    }
+
+    // --- playback with a click on every beat, which is how you actually verify a grid ---
+
+    let playCtx: AudioContext | null = null;
+
+    el<HTMLButtonElement>('play').addEventListener('click', async () => {
+      const button = el<HTMLButtonElement>('play');
+
+      if (playCtx) {
+        await playCtx.close();
+        playCtx = null;
+        button.textContent = '▶ Play with clicks';
+        return;
+      }
+      if (!audioBuffer) return;
+
+      playCtx = new AudioContext();
+      const source = playCtx.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(playCtx.destination);
+
+      const startAt = playCtx.currentTime + 0.1;
+      for (const t of beats) {
+        const osc = playCtx.createOscillator();
+        const gain = playCtx.createGain();
+        osc.frequency.value = 1500;
+        gain.gain.setValueAtTime(0.28, startAt + t);
+        gain.gain.exponentialRampToValueAtTime(0.001, startAt + t + 0.05);
+        osc.connect(gain).connect(playCtx.destination);
+        osc.start(startAt + t);
+        osc.stop(startAt + t + 0.05);
+      }
+
+      source.start(startAt);
+      button.textContent = '■ Stop';
+      source.onended = () => {
+        button.textContent = '▶ Play with clicks';
+        playCtx = null;
+      };
+    });
+
+    // --- export ---
+
+    const fps = () => Number(el<HTMLSelectElement>('fps').value) || 25;
+
+    el<HTMLButtonElement>('save').addEventListener('click', () => {
+      if (!beats.length) return;
+      const format = el<HTMLSelectElement>('format').value as Format;
+
+      const marks: Mark[] = beats.map((t, i) => ({ start: t, name: `Beat ${i + 1}` }));
+
+      download(
+        render(format, marks, {
+          title: `${fileName} beats`,
+          rate: fps(),
+          duration: audioBuffer?.duration ?? 0,
+          metadata: { bpm },
+        }),
+        `${fileName}-beats.${EXTENSION[format]}`,
+      );
+    });
+
+</script>
+</ToolPage>
