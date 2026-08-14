@@ -1,0 +1,127 @@
+---
+import Base from '../../layouts/Base.astro';
+
+const title = 'Free video tools that run in your browser — Life2Film';
+const description =
+  'Small, single-purpose tools built on the Life2Film montage engine, compiled to WebAssembly. Beat detection, scene splitting and more — your files stay on your machine.';
+
+// One entry per tool. `live: false` describes what is being built rather than pretending it exists —
+// a page that lists a link to nowhere is worse than one that says "not yet".
+const tools = [
+  {
+    href: '/tools/bpm-detector/',
+    name: 'BPM Detector',
+    blurb:
+      'Find a track’s tempo and the time of every beat, then send the grid to Resolve, Premiere, Final Cut or Audacity as markers.',
+    tag: 'Audio',
+    live: true,
+  },
+  {
+    href: '/tools/scene-detector/',
+    name: 'Scene Detector',
+    blurb:
+      'Split a video into shots and get the cut points, without sending the footage anywhere.',
+    tag: 'Video',
+    live: false,
+  },
+  {
+    href: '/tools/beat-sync/',
+    name: 'Beat-Sync Montage',
+    blurb:
+      'Hand it clips and a track — it cuts them to the beat and renders an MP4 in the browser.',
+    tag: 'Video',
+    live: false,
+  },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Life2Film Tools',
+  url: 'https://life2film.com/tools/',
+  description,
+  publisher: { '@id': 'https://life2film.com/#org' },
+  hasPart: tools
+    .filter((tool) => tool.live)
+    .map((tool) => ({
+      '@type': 'WebApplication',
+      name: tool.name,
+      url: `https://life2film.com${tool.href}`,
+      applicationCategory: 'MultimediaApplication',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    })),
+};
+---
+
+<Base lang="en" title={title} description={description} basePath="/tools/" localized={false}>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
+
+  <main>
+    <section>
+      <div class="wrap">
+        <h1>Tools</h1>
+        <p class="lede">
+          Pieces of the Life2Film engine, each doing one thing, each running on your own machine.
+          Nothing uploads — which is also why they are free and have no limits.
+        </p>
+
+        <div class="grid cols-2 tools">
+          {tools.map((tool) =>
+            tool.live ? (
+              <a class="card tool" href={tool.href}>
+                <span class="badge">{tool.tag}</span>
+                <h3>{tool.name}</h3>
+                <p>{tool.blurb}</p>
+                <span class="go">Open →</span>
+              </a>
+            ) : (
+              <div class="card tool soon">
+                <span class="badge">{tool.tag}</span>
+                <h3>{tool.name}</h3>
+                <p>{tool.blurb}</p>
+                <span class="go muted">In progress</span>
+              </div>
+            ),
+          )}
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap prose">
+        <h2>Why these exist</h2>
+        <p>
+          <a href="/">Life2Film</a> analyses footage and assembles it into a montage. That engine is
+          a set of separable parts — one finds the beat in music, another finds the cuts in a video,
+          another decides which moments are worth keeping.
+        </p>
+        <p>
+          Each part is useful on its own, and each is small enough to run in a browser tab. So rather
+          than describe what the engine does, these pages let you run it.
+        </p>
+        <p>
+          The whole thing works without a server. Your file is read into memory, analysed by
+          WebAssembly compiled from the same Rust the app uses, and forgotten when you close the tab.
+          There is no account, no queue and no upload — not as a privacy promise, but as a fact about
+          how the page is built.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <style>
+    h1 { margin-bottom: 14px; }
+    .lede { color: #cfcfd6; max-width: 58ch; margin-bottom: 34px; font-size: 19px; }
+    .tools { align-items: stretch; }
+    .tool {
+      display: flex; flex-direction: column; gap: 8px;
+      text-decoration: none; color: inherit;
+      transition: border-color .15s ease, transform .15s ease;
+    }
+    a.tool:hover { border-color: var(--cyan); transform: translateY(-2px); }
+    .tool .badge { align-self: flex-start; }
+    .tool h3 { margin-top: 4px; }
+    .go { margin-top: auto; padding-top: 10px; font-size: 14px; color: var(--cyan); }
+    .soon { opacity: .62; }
+  </style>
+</Base>
