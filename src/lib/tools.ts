@@ -56,6 +56,16 @@ export interface Tool {
   prompt?: string;
   /** How the job is phrased above the snippet. */
   agentJob?: string;
+
+  /**
+   * An article on this site that explains what the tool does, when there is one.
+   *
+   * The tools cross-link to each other and the blog links to nothing at all, so a post sits with
+   * one inbound link from the index and no way for a reader on the matching tool to find it.
+   * English only: the posts are not translated, and pointing a Turkish page at English prose is
+   * worse than pointing at nothing.
+   */
+  reading?: { href: string; title: string; note: string };
 }
 
 export const TOOLS: Tool[] = [
@@ -525,6 +535,11 @@ Reference implementation: https://life2film.com/tools/video-splitter/`,
   {
     slug: 'bpm-detector',
     group: 'engine',
+    reading: {
+      href: '/blog/cut-video-to-the-beat/',
+      title: 'How to cut video to the beat, by hand and automatically',
+      note: 'What the grid is for once you have it: where cuts belong, and why an edit that ignores the downbeat reads as amateur.',
+    },
     name: 'BPM Detector',
     appName: 'BPM Detector',
     blurb: 'Find a track’s tempo and the time of every beat, then send the grid to Resolve, Premiere, Final Cut or Audacity as markers.',

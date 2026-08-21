@@ -44,6 +44,10 @@ For a one-minute montage this is about twenty minutes of work, and it is worth d
 least once. After that you know what the automatic tools are supposed to be doing, and you can tell
 when they got it wrong.
 
+If step three is the part you want to skip, the [BPM detector](/tools/bpm-detector/) gives you the
+tempo and the time of every beat, and exports the grid as markers for Resolve, Premiere, Final Cut
+or Audacity. You still choose the shots; you just stop tapping.
+
 ## What the automatic tools do
 
 Beat detection is a solved signal-processing problem. The software computes an onset envelope (how
@@ -78,7 +82,7 @@ peaks by hand at 2 a.m. does not.
 
 ## Trying it
 
-In Life2Film, pick a track and the edits land on its downbeats. Tempo and beat positions come from
+In [Life2Film](/), pick a track and the edits land on its downbeats. Tempo and beat positions come from
 analysing the audio on the phone, and the same analysis decides where in each clip to cut. If you
 disagree with a placement, ask for a different length or a different mood and it re-cuts.
 

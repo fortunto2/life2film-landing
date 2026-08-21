@@ -18,8 +18,17 @@ interface Props {
    * Canonical is a property of the URL a page is built at, never of whether siblings exist.
    */
   locales?: Lang[];
+  /**
+   * Extra schema.org nodes for this page, appended to the site-wide graph.
+   *
+   * The graph below describes the organisation, the site and the two apps — true on every page
+   * and therefore saying nothing about any particular one. A blog post is a different kind of
+   * thing, with an author and a date, and Google has no way to know that from a page whose only
+   * markup calls the whole site a MobileApplication.
+   */
+  schema?: Record<string, unknown>[];
 }
-const { lang, title, description, basePath = '/', locales, image = '/img/og.png' } = Astro.props;
+const { lang, title, description, basePath = '/', locales, image = '/img/og.png', schema = [] } = Astro.props;
 
 const SITE = 'https://life2film.com';
 
@@ -91,6 +100,7 @@ const jsonLd = {
         'Direct import from the Apple Photos library',
       ],
     },
+    ...schema,
   ],
 };
 ---

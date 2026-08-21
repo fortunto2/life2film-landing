@@ -11,12 +11,35 @@ const { post } = Astro.props as { post: CollectionEntry<'blog'> };
 const { Content } = await render(post);
 const fmt = (d: Date) =>
   d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+const url = `https://life2film.com/blog/${post.id}/`;
+
+/*
+ * Without this a post carried only the site-wide graph, which says the page is a
+ * MobileApplication called Life2Film — the same claim the pricing page makes. Nothing told
+ * Google the page is an article, who wrote it or when, and those are exactly the fields it
+ * reads when deciding whether a page deserves the query behind it.
+ */
+const article = {
+  '@type': 'BlogPosting',
+  '@id': `${url}#article`,
+  headline: post.data.title,
+  description: post.data.description,
+  datePublished: post.data.date.toISOString(),
+  dateModified: (post.data.updated ?? post.data.date).toISOString(),
+  inLanguage: 'en',
+  mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+  author: { '@id': 'https://life2film.com/#org' },
+  publisher: { '@id': 'https://life2film.com/#org' },
+  isPartOf: { '@id': 'https://life2film.com/#website' },
+};
 ---
 <Base
   lang="en"
   title={`${post.data.title} — Life2Film`}
   description={post.data.description}
   basePath={`/blog/${post.id}`}
+  schema={[article]}
 >
   <main>
     <section>

@@ -95,6 +95,17 @@ const jsonLd = {
           </>
         ))}
 
+        {lang === 'en' && base.reading && (
+          <>
+            <h2>Further reading</h2>
+            <ul class="related">
+              <li>
+                <a href={base.reading.href}>{base.reading.title}</a> — {base.reading.note}
+              </li>
+            </ul>
+          </>
+        )}
+
         <h2>{chrome.otherTools}</h2>
         <ul class="related">
           {others.map((other) => (
