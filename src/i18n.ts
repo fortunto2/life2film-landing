@@ -67,6 +67,9 @@ export const ui = {
 
     navAbout: 'About',
     aboutTitle: 'About Life2Film',
+    aboutMetaTitle: 'About Life2Film — why the montage runs on your iPhone',
+    aboutMetaDesc:
+      'Why we built an editor that picks the moments for you, and why the analysis stays on your iPhone: there is no server to send your footage to.',
     aboutQuote:
       'Collect experiences, not things. One day you wake up and realise your possessions carry no meaning. Only memories keep their value.',
     aboutP1:
@@ -142,6 +145,9 @@ export const ui = {
     footerRights: 'Todos los derechos reservados.',
 
     aboutTitle: 'Sobre Life2Film',
+    aboutMetaTitle: 'Sobre Life2Film — por qué el montaje se hace en tu iPhone',
+    aboutMetaDesc:
+      'Por qué creamos un editor que elige los momentos por ti y por qué el análisis se queda en tu iPhone: no hay servidor al que enviar tus vídeos.',
     aboutQuote:
       'Colecciona experiencias, no cosas. Un día despiertas y te das cuenta de que lo que posees no significa nada. Solo los recuerdos conservan su valor.',
     aboutP1:
@@ -217,6 +223,9 @@ export const ui = {
     footerRights: 'Todos os direitos reservados.',
 
     aboutTitle: 'Sobre o Life2Film',
+    aboutMetaTitle: 'Sobre o Life2Film — por que a montagem roda no seu iPhone',
+    aboutMetaDesc:
+      'Por que criamos um editor que escolhe os momentos sozinho e por que a análise fica no seu iPhone: não há servidor para onde enviar seus vídeos.',
     aboutQuote:
       'Junte experiências, não coisas. Um dia você acorda e percebe que o que você tem não significa nada. Só as lembranças mantêm o valor.',
     aboutP1:
@@ -292,6 +301,9 @@ export const ui = {
     footerRights: 'Seluruh hak dilindungi.',
 
     aboutTitle: 'Tentang Life2Film',
+    aboutMetaTitle: 'Tentang Life2Film — kenapa proses editing berjalan di iPhone',
+    aboutMetaDesc:
+      'Kenapa kami membuat editor yang memilih momen sendiri, dan kenapa analisisnya tetap di iPhone Anda: tidak ada server tempat mengirim rekaman.',
     aboutQuote:
       'Kumpulkan pengalaman, bukan barang. Suatu hari Anda bangun dan sadar bahwa harta yang dimiliki tidak berarti apa-apa. Hanya kenangan yang nilainya bertahan.',
     aboutP1:
@@ -367,6 +379,9 @@ export const ui = {
     footerRights: 'جميع الحقوق محفوظة.',
 
     aboutTitle: 'عن Life2Film',
+    aboutMetaTitle: 'عن Life2Film — لماذا يجري المونتاج على جهاز iPhone نفسه',
+    aboutMetaDesc:
+      'لماذا صنعنا محرّرًا يختار اللحظات بنفسه، ولماذا يبقى التحليل على جهاز iPhone: لا يوجد خادم تُرسل إليه مقاطعك.',
     aboutQuote:
       'اجمع التجارب لا الأشياء. في يوم ما تستيقظ فتدرك أن ما تملكه بلا معنى. الذكريات وحدها تحتفظ بقيمتها.',
     aboutP1:
@@ -441,6 +456,9 @@ export const ui = {
 
     navAbout: 'О проекте',
     aboutTitle: 'О Life2Film',
+    aboutMetaTitle: 'О Life2Film — почему монтаж идёт на самом iPhone',
+    aboutMetaDesc:
+      'Зачем монтаж, который сам выбирает моменты, и почему анализ идёт на iPhone: записи никуда не уходят, отправлять их просто некуда.',
     aboutQuote:
       'Собирайте впечатления, а не вещи. Однажды вы проснётесь и поймёте, что имущество не имеет значения. Ценность со временем сохраняют только воспоминания.',
     aboutP1:
@@ -515,6 +533,9 @@ export const ui = {
 
     navAbout: 'Hakkında',
     aboutTitle: 'Life2Film hakkında',
+    aboutMetaTitle: "Life2Film hakkında — kurgu neden iPhone'unuzda çalışır",
+    aboutMetaDesc:
+      "Anları kendi seçen bir kurgu aracını neden yaptık ve analiz neden iPhone'unuzda kalıyor: görüntülerinizi göndereceğimiz bir sunucu yok.",
     aboutQuote:
       'Eşya değil, deneyim biriktirin. Bir gün uyanır ve sahip olduklarınızın bir anlam taşımadığını fark edersiniz. Zamanla değerini koruyan tek şey anılardır.',
     aboutP1:
