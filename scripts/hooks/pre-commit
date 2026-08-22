@@ -1,0 +1,39 @@
+#!/bin/sh
+# A file over a thousand lines may be edited, not grown.
+#
+# The rule comes from the app's harness ("No file >1000 LOC — split into
+# directory module") and holds here for the same reason it holds there: a
+# file nobody can hold in their head is where three people collide. Nothing
+# checked it in this repository at all.
+#
+# A ratchet, not a wall. Fixing those is not this hook's business and
+# blocking every commit until they are fixed is how a hook gets bypassed —
+# after which it checks nothing at all. An oversized file may be edited; it
+# is refused only when the commit makes it longer, so the set can only
+# shrink. Generated code is exempt: nobody chooses its length.
+#
+# Install with `make hooks`.
+set -e
+
+fail=0
+oversized=$(git diff --cached --name-only --diff-filter=ACM |
+    grep -E '\.(ts|tsx|js|jsx|astro|svelte|vue|css)$' | grep -vE 'node_modules/|\.min\.|generated/|\.d\.ts$' |
+    while read -r f; do
+        [ -f "$f" ] || continue
+        now=$(wc -l < "$f" | tr -d ' ')
+        [ "$now" -gt 1000 ] || continue
+        was=$(git show "HEAD:$f" 2>/dev/null | wc -l | tr -d ' ')
+        [ -z "$was" ] && was=0
+        [ "$now" -gt "$was" ] && echo "$f — $was → $now lines"
+    done)
+
+if [ -n "$oversized" ]; then
+    echo "FAIL a file over 1000 lines got longer:"
+    printf '     %s\n' "$oversized"
+    echo "     Split it into a directory module."
+    echo "     Existing offenders may be edited — they may not grow."
+    fail=1
+fi
+
+[ "$fail" -eq 0 ] || { echo "harness guards failed"; exit 1; }
+exit 0
