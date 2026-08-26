@@ -18,7 +18,7 @@ const chrome = CHROME[lang];
 ---
 
 <div class="tool" slot="tool">
-          <label class="drop" id="drop" for="file">
+          <label class="drop" id="drop" for="file" data-sda-event="file_chosen" data-sda-placement="dropzone">
             <input type="file" id="file" accept="video/*" hidden />
             <strong>{chrome.chooseVideo}</strong>
             <span class="muted">{chrome.dragHint} — MP4, MOV (H.264), WebM</span>
@@ -50,7 +50,7 @@ const chrome = CHROME[lang];
                   <option value="csv">CSV — spreadsheets</option>
                   <option value="json">JSON — scripts</option>
                 </select>
-                <button id="save" type="button" class="ghost primary">Download</button>
+                <button id="save" type="button" class="ghost primary" data-sda-event="result_saved" data-sda-placement="result">Download</button>
                 <label class="fps">
                   <span class="muted">fps</span>
                   <select id="fps" aria-label="Frame rate for timecode">

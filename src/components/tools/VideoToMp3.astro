@@ -20,7 +20,7 @@ const status = STATUS[lang];
 
 <div class="tool" slot="tool">
     <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
-    <label class="drop" id="drop" for="file">
+    <label class="drop" id="drop" for="file" data-sda-event="file_chosen" data-sda-placement="dropzone">
       <input type="file" id="file" accept="video/*,audio/*" hidden />
       <strong>{chrome.chooseFile}</strong>
       <span class="muted">{chrome.dragHint} — MP4, MOV, WebM, M4A</span>
@@ -58,7 +58,7 @@ const status = STATUS[lang];
 
         <span class="spacer"></span>
         <span class="muted" id="estimate"></span>
-        <button id="run" type="button" class="ghost primary">Extract audio</button>
+        <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">Extract audio</button>
       </div>
     </div>
 

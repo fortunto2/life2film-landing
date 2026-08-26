@@ -20,7 +20,7 @@ const status = STATUS[lang];
 
 <div class="tool" slot="tool">
     <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
-          <label class="drop" id="drop" for="file">
+          <label class="drop" id="drop" for="file" data-sda-event="file_chosen" data-sda-placement="dropzone">
             <input type="file" id="file" accept="audio/*,video/*" hidden />
             <strong>{chrome.chooseFile}</strong>
             <span class="muted">{chrome.dragHint} — MP3, WAV, M4A, FLAC, OGG</span>
@@ -59,7 +59,7 @@ const status = STATUS[lang];
                   <option value="csv">CSV — spreadsheets</option>
                   <option value="json">JSON — scripts</option>
                 </select>
-                <button id="save" type="button" class="ghost primary">Download</button>
+                <button id="save" type="button" class="ghost primary" data-sda-event="result_saved" data-sda-placement="result">Download</button>
               </div>
 
               <label class="fps">
