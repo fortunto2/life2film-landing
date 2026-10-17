@@ -4,35 +4,42 @@ import type { Lang } from './i18n';
 export const legal = {
   en: {
     privTitle: 'Privacy Policy',
-    privUpdated: 'Last updated: July 30, 2026',
+    privUpdated: 'Last updated: October 17, 2026',
     privIntro:
       'Life2Film turns videos you already have into a montage. Those videos are personal, so the app is built to keep them where they are: on your device.',
     privStaysT: 'What stays on your device',
     privStaysP:
-      "Your videos and photos are read, analysed and edited locally. Scene detection, face grouping, quality scoring and the montage itself run on your iPhone using Apple's Vision framework and the app's own on-device engine.",
-    privStays1: 'Original video and photo files are never uploaded.',
-    privStays2: 'Rendered montages are saved to your device and shared only when you choose to.',
-    privStays3: 'The photo-library index the app builds is stored locally and removed with the app.',
-    privLeavesT: 'What leaves your device',
+      "Your videos and photos are read, analysed and edited locally. Scene detection, face detection, quality scoring, speech recognition and the montage itself run on your iPhone using Apple's frameworks and the app's own on-device engine.",
+    privStays1: 'Original video and photo files are never uploaded. Neither are frames or sound.',
+    privStays2: 'Rendered films are saved to your device and shared only when you choose to.',
+    privStays3: 'The photo-library index and the analysis cache are stored locally and removed with the app. Words the app recognised in your clips stay on the phone.',
+    privLeavesT: 'The chat agent',
     privLeavesP:
-      'When you ask the AI director for a cut, the app sends a text description of the clips (timings, short scene labels, and your instruction) to the language-model provider you configured. No video, no photos, no audio.',
-    privLeavesList: 'Supported providers, chosen by you in Settings:',
+      'The chat agent is optional and off until you open it. When it answers, the app sends text only — the question you typed and the agent’s own notes about your library (counts, dates, file names). Never your footage, frames or sound.',
+    privLeavesList: 'It can answer in one of three ways, chosen in Settings:',
+    privWay1:
+      'Apple’s on-device model (Apple Intelligence, where the phone has it). Nothing leaves the device.',
+    privWay2:
+      'Our model, included with Pro Monthly and Pro Yearly. The request goes to agent.life2film.com with your subscription’s signed App Store transaction, so our server can check it is live. We keep a daily request count under a one-way hash of it and nothing that identifies you — no Apple ID, no device id, no IP address. If usage analytics is on (below), we also keep the question you typed, cut to 500 characters, with no identifier, for 30 days, to learn what people ask the agent; switch analytics off and nothing is kept. The model runs on Cloudflare Workers AI, which does not train on it, and the gateway in front of it keeps no prompt and no reply.',
+    privWay3:
+      'Your own API key — OpenAI, Google Gemini, OpenRouter, a Cloudflare gateway or any OpenAI-compatible endpoint. Requests go with your key, directly from your device to that provider. We do not proxy them and never see their contents; each provider processes the request under its own privacy policy, so please review the one you use.',
     privLeavesP2:
-      'Requests are made with your API key, directly from your device to that provider. We do not proxy them and never see their contents. Each provider processes the request under its own privacy policy and retention terms, so please review the one you use. If you configure no provider, the app runs its deterministic pipeline and sends nothing at all.',
+      'Payment for Pro goes through your Apple ID; we never learn who bought. The only thing our server ever sees is the subscription’s signed transaction described above, and only when you use the agent on our model.',
     privKeyT: 'Your API key',
     privKeyP:
       'The key you enter is stored on your device and used only to authenticate requests to the provider you selected. It is never sent to us or to anyone else.',
     privNotT: 'What we do not do',
     privSiteT: 'This website',
     privSiteP:
-      'The points above describe the app. This website is separate: it uses Google Analytics to count visits and see which pages people read, with IP anonymisation on and Google advertising signals off. It also runs our own counter, on infrastructure we operate rather than a third party’s — it sets no cookie and stores nothing in your browser, because the identifier it counts you by is derived at our edge from your IP address, browser type and today’s date, is never sent back to you, and changes at midnight UTC. Your IP address itself is never stored, and the code is public. That measurement applies to the site only. The app itself carries no analytics of any kind.',
+      'The points above describe the app. This website is separate: it uses Google Analytics to count visits and see which pages people read, with IP anonymisation on and Google advertising signals off. It also runs our own counter, on infrastructure we operate rather than a third party’s — it sets no cookie and stores nothing in your browser, because the identifier it counts you by is derived at our edge from your IP address, browser type and today’s date, is never sent back to you, and changes at midnight UTC. Your IP address itself is never stored, and the code is public. That measurement applies to the site only; the app’s own usage counter is described above.',
     privNot1: 'No account or sign-in is required to use the app.',
-    privNot2: 'No analytics, tracking or advertising SDKs inside the app (see the website note below).',
-    privNot3: 'No selling or sharing of personal data. We do not receive it in the first place.',
+    privNot2:
+      'No advertising, no tracking across apps or sites, no third-party SDKs for those purposes. The app’s own usage counter — a film started, a film saved, which preset — is anonymous: no footage, no words, no identifiers that could link the events to you, never used for ads, and Settings → About → Analytics switches it off.',
+    privNot3: 'No selling or sharing of personal data.',
     privNot4: 'No training of any model on your content.',
     privPermT: 'Permissions',
     privPermP:
-      'Photo library, to read the videos and photos you want in a montage and to save the result. Without it the app has nothing to edit.',
+      'Photo library, to read the videos and photos you want in a film and to save the result — without it the app has nothing to edit. Speech recognition, for the Vlog preset, on the device, only when you choose it. Bluetooth and local network, only when you connect a DJI Osmo Pocket camera from the gallery.',
     privKidsT: 'Children',
     privKidsP:
       'Life2Film is not directed at children under 13 and does not knowingly collect information from them.',
@@ -54,42 +61,49 @@ export const legal = {
     supA2Link: 'privacy policy',
     supQ3: 'Do I need an API key?',
     supA3:
-      'Only for the AI director. Without one the app still builds montages with its deterministic pipeline. With one, requests go straight from your device to the provider you chose.',
+      'No. The montage needs nothing. The chat agent answers on Apple’s on-device model where the phone has it, or on our model with Pro Monthly or Pro Yearly — the first week is free. Your own API key is a third option, under Settings → Agent → Advanced.',
     supQ4: 'Why does the app ask for photo access?',
     supA4: 'It edits videos already in your library. Without access there is nothing to work with.',
   },
 
   ru: {
     privTitle: 'Политика конфиденциальности',
-    privUpdated: 'Обновлено: 30 июля 2026',
+    privUpdated: 'Обновлено: 17 октября 2026',
     privIntro:
       'Life2Film собирает монтаж из видео, которые у вас уже есть. Эти записи личные, поэтому приложение устроено так, чтобы они оставались там, где лежат: на вашем устройстве.',
     privStaysT: 'Что остаётся на устройстве',
     privStaysP:
-      'Ваши видео и фото читаются, анализируются и монтируются локально. Разбор сцен, группировка лиц, оценка качества и сама сборка идут на самом iPhone — через фреймворк Apple Vision и собственный движок приложения.',
-    privStays1: 'Исходные видео и фотографии никуда не загружаются.',
-    privStays2: 'Готовые монтажи сохраняются на устройстве и уходят дальше, только если вы сами их отправите.',
-    privStays3: 'Индекс медиатеки, который строит приложение, хранится локально и удаляется вместе с ним.',
-    privLeavesT: 'Что уходит с устройства',
+      'Ваши видео и фото читаются, анализируются и монтируются локально. Разбор сцен, поиск лиц, оценка качества, распознавание речи и сама сборка идут на самом iPhone — через фреймворки Apple и собственный движок приложения.',
+    privStays1: 'Исходные видео и фотографии никуда не загружаются. Кадры и звук — тоже.',
+    privStays2: 'Готовые фильмы сохраняются на устройстве и уходят дальше, только если вы сами их отправите.',
+    privStays3: 'Индекс медиатеки и кэш анализа хранятся локально и удаляются вместе с приложением. Слова, которые приложение распознало в ваших клипах, остаются на телефоне.',
+    privLeavesT: 'Чат-агент',
     privLeavesP:
-      'Когда вы просите ИИ-режиссёра собрать монтаж, приложение отправляет текстовое описание клипов — тайминги, короткие метки сцен и вашу формулировку — тому провайдеру языковой модели, которого вы настроили. Ни видео, ни фотографий, ни звука.',
-    privLeavesList: 'Поддерживаемые провайдеры, которых вы выбираете в настройках:',
+      'Чат-агент необязателен и выключен, пока вы его не откроете. Когда он отвечает, приложение отправляет только текст — ваш вопрос и собственные заметки агента о вашей медиатеке (количества, даты, имена файлов). Никогда не видео, не кадры и не звук.',
+    privLeavesList: 'Отвечать он может одним из трёх способов, выбор — в настройках:',
+    privWay1:
+      'Модель Apple на самом устройстве (Apple Intelligence, где телефон её поддерживает). С устройства не уходит ничего.',
+    privWay2:
+      'Наша модель — входит в Pro на месяц и на год. Запрос уходит на agent.life2film.com вместе с подписанной транзакцией App Store вашей подписки, чтобы сервер проверил, что она действует. Мы храним дневной счётчик запросов под односторонним хэшем этой транзакции и ничего, что вас идентифицирует: ни Apple ID, ни идентификатора устройства, ни IP-адреса. Если включена аналитика использования (ниже), мы также храним набранный вами вопрос, обрезанный до 500 символов, без идентификатора, 30 дней — чтобы понимать, о чём люди спрашивают агента; выключите аналитику, и не хранится ничего. Модель работает на Cloudflare Workers AI, которая на этом не обучается, а шлюз перед ней не сохраняет ни запрос, ни ответ.',
+    privWay3:
+      'Ваш собственный API-ключ — OpenAI, Google Gemini, OpenRouter, шлюз Cloudflare или любой OpenAI-совместимый адрес. Запросы уходят с вашим ключом напрямую с устройства к провайдеру. Мы их не проксируем и содержимого не видим; каждый провайдер обрабатывает запрос по собственной политике — стоит прочитать ту, что относится к выбранному вами.',
     privLeavesP2:
-      'Запросы уходят с вашим API-ключом напрямую с устройства к провайдеру. Мы их не проксируем и содержимого не видим. Каждый провайдер обрабатывает запрос по собственной политике и своим срокам хранения — стоит прочитать ту, что относится к выбранному вами. Если провайдер не настроен, приложение работает по детерминированному пайплайну и не отправляет ничего.',
+      'Оплата Pro идёт через ваш Apple ID; мы никогда не узнаём, кто купил. Единственное, что видит наш сервер, — описанная выше подписанная транзакция подписки, и только когда вы пользуетесь агентом на нашей модели.',
     privKeyT: 'Ваш API-ключ',
     privKeyP:
       'Введённый ключ хранится на устройстве и используется только для авторизации запросов к выбранному провайдеру. Нам или кому-то ещё он не передаётся.',
     privNotT: 'Чего мы не делаем',
     privSiteT: 'Про этот сайт',
     privSiteP:
-      'Всё сказанное выше относится к приложению. Сайт — отдельная история: на нём стоит Google Analytics, чтобы считать визиты и видеть, какие страницы читают. IP анонимизируется, рекламные сигналы Google отключены. Ещё на сайте работает наш собственный счётчик — на нашей инфраструктуре, а не у стороннего сервиса. Он не ставит cookie и ничего не хранит в браузере: идентификатор вычисляется на нашем крае из IP-адреса, типа браузера и сегодняшней даты, вам он никогда не передаётся и меняется в полночь UTC. Сам IP-адрес нигде не сохраняется, а код счётчика открыт. Всё это касается только сайта — в самом приложении никакой аналитики нет.',
+      'Всё сказанное выше относится к приложению. Сайт — отдельная история: на нём стоит Google Analytics, чтобы считать визиты и видеть, какие страницы читают. IP анонимизируется, рекламные сигналы Google отключены. Ещё на сайте работает наш собственный счётчик — на нашей инфраструктуре, а не у стороннего сервиса. Он не ставит cookie и ничего не хранит в браузере: идентификатор вычисляется на нашем крае из IP-адреса, типа браузера и сегодняшней даты, вам он никогда не передаётся и меняется в полночь UTC. Сам IP-адрес нигде не сохраняется, а код счётчика открыт. Всё это касается только сайта; собственный счётчик приложения описан выше.',
     privNot1: 'Аккаунт и вход не нужны.',
-    privNot2: 'В приложении нет аналитики, трекинга и рекламных SDK (про сайт — ниже).',
-    privNot3: 'Мы не продаём и не передаём персональные данные — мы их попросту не получаем.',
+    privNot2:
+      'Никакой рекламы, никакого трекинга между приложениями и сайтами, никаких сторонних SDK для этого. Собственный счётчик приложения — фильм начат, фильм сохранён, какой пресет — анонимный: без видео, без слов, без идентификаторов, по которым события можно связать с вами; для рекламы не используется; выключается в Настройки → О приложении → Аналитика.',
+    privNot3: 'Мы не продаём и не передаём персональные данные.',
     privNot4: 'На вашем контенте не обучается никакая модель.',
     privPermT: 'Разрешения',
     privPermP:
-      'Медиатека — чтобы прочитать видео и фото для монтажа и сохранить результат. Без доступа приложению не с чем работать.',
+      'Медиатека — чтобы прочитать видео и фото для фильма и сохранить результат; без доступа приложению не с чем работать. Распознавание речи — для пресета «Влог», на устройстве и только когда вы его выбрали. Bluetooth и локальная сеть — только когда вы подключаете камеру DJI Osmo Pocket из галереи.',
     privKidsT: 'Дети',
     privKidsP:
       'Life2Film не предназначен для детей младше 13 лет и не собирает намеренно информацию о них.',
@@ -111,42 +125,49 @@ export const legal = {
     supA2Link: 'политике конфиденциальности',
     supQ3: 'Нужен ли API-ключ?',
     supA3:
-      'Только для ИИ-режиссёра. Без него приложение всё равно собирает монтаж по детерминированному пайплайну. С ключом запросы идут прямо с устройства к выбранному вами провайдеру.',
+      'Нет. Монтажу не нужно ничего. Чат-агент отвечает на модели Apple прямо на устройстве, где телефон её поддерживает, или на нашей модели с Pro на месяц или на год — первая неделя бесплатно. Собственный API-ключ — третий вариант, в Настройки → Агент → Дополнительно.',
     supQ4: 'Зачем приложение просит доступ к фото?',
     supA4: 'Оно монтирует видео, которые уже лежат в вашей медиатеке. Без доступа работать не с чем.',
   },
 
   tr: {
     privTitle: 'Gizlilik Politikası',
-    privUpdated: 'Son güncelleme: 30 Temmuz 2026',
+    privUpdated: 'Son güncelleme: 17 Ekim 2026',
     privIntro:
       'Life2Film hâlihazırda sahip olduğunuz videolardan bir kurgu çıkarır. Bu videolar kişiseldir; bu yüzden uygulama onları bulundukları yerde, yani cihazınızda tutacak şekilde tasarlandı.',
     privStaysT: 'Cihazınızda kalanlar',
     privStaysP:
-      "Videolarınız ve fotoğraflarınız yerel olarak okunur, analiz edilir ve kurgulanır. Sahne algılama, yüz gruplama, kalite puanlaması ve kurgunun kendisi iPhone'unuzda çalışır: Apple'ın Vision çerçevesi ve uygulamanın kendi cihaz içi motoruyla.",
-    privStays1: 'Orijinal video ve fotoğraf dosyaları hiçbir zaman yüklenmez.',
-    privStays2: 'Oluşturulan kurgular cihazınıza kaydedilir ve yalnızca siz paylaşmayı seçerseniz dışarı çıkar.',
-    privStays3: 'Uygulamanın oluşturduğu kitaplık dizini yerel olarak saklanır ve uygulamayla birlikte silinir.',
-    privLeavesT: 'Cihazınızdan çıkanlar',
+      "Videolarınız ve fotoğraflarınız yerel olarak okunur, analiz edilir ve kurgulanır. Sahne algılama, yüz algılama, kalite puanlaması, konuşma tanıma ve kurgunun kendisi iPhone'unuzda çalışır: Apple'ın çerçeveleri ve uygulamanın kendi cihaz içi motoruyla.",
+    privStays1: 'Orijinal video ve fotoğraf dosyaları hiçbir zaman yüklenmez. Kareler ve ses de yüklenmez.',
+    privStays2: 'Oluşturulan filmler cihazınıza kaydedilir ve yalnızca siz paylaşmayı seçerseniz dışarı çıkar.',
+    privStays3: 'Kitaplık dizini ve analiz önbelleği yerel olarak saklanır ve uygulamayla birlikte silinir. Uygulamanın kliplerinizde tanıdığı sözler telefonda kalır.',
+    privLeavesT: 'Sohbet asistanı',
     privLeavesP:
-      'Yapay zekâ yönetmenden bir kurgu istediğinizde uygulama, kliplerin metin açıklamasını — süreler, kısa sahne etiketleri ve sizin isteğiniz — yapılandırdığınız dil modeli sağlayıcısına gönderir. Video yok, fotoğraf yok, ses yok.',
-    privLeavesList: 'Ayarlardan seçtiğiniz desteklenen sağlayıcılar:',
+      'Sohbet asistanı isteğe bağlıdır ve siz açana kadar kapalıdır. Yanıt verirken uygulama yalnızca metin gönderir: yazdığınız soru ve asistanın kitaplığınız hakkındaki kendi notları (sayılar, tarihler, dosya adları). Görüntüleriniz, kareler ya da ses asla gönderilmez.',
+    privLeavesList: 'Üç şekilde yanıt verebilir; seçim Ayarlar’da:',
+    privWay1:
+      'Apple’ın cihaz içi modeli (Apple Intelligence, telefonun desteklediği yerde). Cihazdan hiçbir şey çıkmaz.',
+    privWay2:
+      'Bizim modelimiz — Aylık ve Yıllık Pro’ya dahildir. İstek, aboneliğinizin imzalı App Store işlemiyle birlikte agent.life2film.com adresine gider; sunucumuz böylece aboneliğin geçerli olduğunu doğrular. Bu işlemin tek yönlü özeti altında günlük bir istek sayacı tutarız ve sizi tanımlayan hiçbir şey tutmayız: Apple ID yok, cihaz kimliği yok, IP adresi yok. Kullanım analitiği açıksa (aşağıda), yazdığınız soruyu 500 karaktere kısaltılmış hâlde, kimliksiz, 30 gün boyunca da saklarız — insanların asistana ne sorduğunu öğrenmek için; analitiği kapatın, hiçbir şey saklanmaz. Model Cloudflare Workers AI üzerinde çalışır, bununla eğitilmez ve önündeki ağ geçidi ne isteği ne de yanıtı saklar.',
+    privWay3:
+      'Kendi API anahtarınız — OpenAI, Google Gemini, OpenRouter, bir Cloudflare ağ geçidi ya da OpenAI uyumlu herhangi bir uç nokta. İstekler sizin anahtarınızla doğrudan cihazınızdan sağlayıcıya gider. Bunları biz aktarmayız ve içeriklerini görmeyiz; her sağlayıcı isteği kendi gizlilik politikasına göre işler, kullandığınızınkini incelemeniz iyi olur.',
     privLeavesP2:
-      'İstekler sizin API anahtarınızla, doğrudan cihazınızdan sağlayıcıya gider. Bunları biz aktarmayız ve içeriklerini görmeyiz. Her sağlayıcı isteği kendi gizlilik politikası ve saklama koşullarına göre işler; kullandığınızınkini incelemeniz iyi olur. Hiçbir sağlayıcı yapılandırmazsanız uygulama deterministik hattını çalıştırır ve hiçbir şey göndermez.',
+      'Pro ödemesi Apple Kimliğiniz üzerinden geçer; kimin aldığını asla öğrenmeyiz. Sunucumuzun gördüğü tek şey, yukarıda anlatılan imzalı abonelik işlemidir — o da yalnızca asistanı bizim modelimizle kullandığınızda.',
     privKeyT: 'API anahtarınız',
     privKeyP:
       'Girdiğiniz anahtar cihazınızda saklanır ve yalnızca seçtiğiniz sağlayıcıya yapılan isteklerin kimlik doğrulaması için kullanılır. Bize ya da başka birine hiçbir zaman gönderilmez.',
     privNotT: 'Yapmadıklarımız',
     privSiteT: 'Bu web sitesi',
     privSiteP:
-      'Yukarıdakiler uygulamayı anlatıyor. Bu web sitesi ayrı: ziyaretleri saymak ve hangi sayfaların okunduğunu görmek için Google Analytics kullanıyor; IP anonimleştirmesi açık, Google reklam sinyalleri kapalı. Ayrıca üçüncü bir tarafın değil, kendi altyapımızda çalışan kendi sayacımızı kullanıyoruz: çerez bırakmaz ve tarayıcınızda hiçbir şey saklamaz, çünkü sizi saydığı tanımlayıcı IP adresiniz, tarayıcı türünüz ve bugünün tarihinden uç sunucumuzda türetilir, size hiçbir zaman geri gönderilmez ve UTC gece yarısında değişir. IP adresinizin kendisi hiçbir yerde saklanmaz ve kodu açıktır. Bu ölçüm yalnızca siteyle ilgili — uygulamanın kendisinde hiçbir analitik yok.',
+      'Yukarıdakiler uygulamayı anlatıyor. Bu web sitesi ayrı: ziyaretleri saymak ve hangi sayfaların okunduğunu görmek için Google Analytics kullanıyor; IP anonimleştirmesi açık, Google reklam sinyalleri kapalı. Ayrıca üçüncü bir tarafın değil, kendi altyapımızda çalışan kendi sayacımızı kullanıyoruz: çerez bırakmaz ve tarayıcınızda hiçbir şey saklamaz, çünkü sizi saydığı tanımlayıcı IP adresiniz, tarayıcı türünüz ve bugünün tarihinden uç sunucumuzda türetilir, size hiçbir zaman geri gönderilmez ve UTC gece yarısında değişir. IP adresinizin kendisi hiçbir yerde saklanmaz ve kodu açıktır. Bu ölçüm yalnızca siteyle ilgilidir; uygulamanın kendi kullanım sayacı yukarıda anlatıldı.',
     privNot1: 'Uygulamayı kullanmak için hesap ya da giriş gerekmez.',
-    privNot2: 'Uygulamanın içinde analitik, izleme veya reklam SDK’sı yok (site için aşağıya bakın).',
-    privNot3: 'Kişisel veri satmıyor ya da paylaşmıyoruz — zaten bize ulaşmıyor.',
+    privNot2:
+      'Reklam yok, uygulamalar ve siteler arasında izleme yok, bu amaçlarla üçüncü taraf SDK yok. Uygulamanın kendi kullanım sayacı — bir film başlatıldı, bir film kaydedildi, hangi ön ayar — anonimdir: görüntü yok, söz yok, olayları size bağlayabilecek kimlik yok; reklam için kullanılmaz ve Ayarlar → Hakkında → Analitik’ten kapatılır.',
+    privNot3: 'Kişisel veri satmıyor ya da paylaşmıyoruz.',
     privNot4: 'İçeriğiniz üzerinde hiçbir model eğitilmiyor.',
     privPermT: 'İzinler',
     privPermP:
-      'Fotoğraf kitaplığı — kurguya girecek video ve fotoğrafları okumak ve sonucu kaydetmek için. Bu izin olmadan uygulamanın kurgulayacağı bir şey olmaz.',
+      'Fotoğraf kitaplığı — filme girecek video ve fotoğrafları okumak ve sonucu kaydetmek için; bu izin olmadan uygulamanın kurgulayacağı bir şey olmaz. Konuşma tanıma — Vlog ön ayarı için, cihazda ve yalnızca siz seçtiğinizde. Bluetooth ve yerel ağ — yalnızca galeriden bir DJI Osmo Pocket kamera bağladığınızda.',
     privKidsT: 'Çocuklar',
     privKidsP:
       "Life2Film 13 yaş altı çocuklara yönelik değildir ve onlardan bilerek bilgi toplamaz.",
@@ -168,7 +189,7 @@ export const legal = {
     supA2Link: 'gizlilik politikasında',
     supQ3: 'API anahtarı gerekiyor mu?',
     supA3:
-      'Yalnızca yapay zekâ yönetmen için. Anahtar olmadan da uygulama deterministik hattıyla kurgu yapar. Anahtarla istekler doğrudan cihazınızdan seçtiğiniz sağlayıcıya gider.',
+      'Hayır. Kurgu için hiçbir şey gerekmez. Sohbet asistanı, telefonun desteklediği yerde Apple’ın cihaz içi modeliyle, ya da Aylık veya Yıllık Pro ile bizim modelimizle yanıt verir — ilk hafta ücretsiz. Kendi API anahtarınız üçüncü seçenektir: Ayarlar → Asistan → Gelişmiş.',
     supQ4: 'Uygulama neden fotoğraf erişimi istiyor?',
     supA4: 'Kitaplığınızdaki videoları kurguluyor. Erişim olmadan çalışacağı bir şey yok.',
   },
