@@ -90,7 +90,7 @@ const jsonLd = {
       processorRequirements: 'Apple Silicon',
       url: 'https://life2film.com/studio/',
       downloadUrl: 'https://github.com/fortunto2/life2film-landing/releases',
-      softwareVersion: '0.1.1',
+      softwareVersion: '0.2.0',
       publisher: { '@id': 'https://life2film.com/#org' },
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       featureList: [
@@ -109,6 +109,9 @@ const jsonLd = {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Safari on iPhone shows its own "Open / Get" banner for the app. `ct` makes those installs
+       visible in App Store Connect as site-banner, beside site-hero and tool-<slug>. -->
+  <meta name="apple-itunes-app" content="app-id=6761656888, affiliate-data=pt=128499174&ct=site-banner" />
   <title>{title}</title>
   <meta name="description" content={description} />
   <meta property="og:title" content={title} />
