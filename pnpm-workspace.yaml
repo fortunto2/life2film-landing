@@ -1,0 +1,9 @@
+allowBuilds:
+  esbuild: set this to true or false
+  sharp: set this to true or false
+# pnpm 11 refuses packages published less than a day ago (minimumReleaseAge, a supply-chain guard).
+# life2film-engine is our own build from the sibling repository, published minutes before it is
+# installed here, so every release of it would be refused. Excluded by name; the guard stays on for
+# everything else.
+minimumReleaseAgeExclude:
+  - life2film-engine
