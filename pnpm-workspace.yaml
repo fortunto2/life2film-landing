@@ -7,3 +7,9 @@ allowBuilds:
 # everything else.
 minimumReleaseAgeExclude:
   - life2film-engine
+
+# The build scripts pnpm 11 asks about interactively (`pnpm approve-builds`); approved here so an
+# install from a script does not stop to ask. esbuild downloads its binary, sharp builds libvips.
+onlyBuiltDependencies:
+  - esbuild
+  - sharp
