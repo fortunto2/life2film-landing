@@ -29,6 +29,28 @@ export interface Budget {
   floorBytes: number;
 }
 
+/**
+ * Where to aim for a limit: under it. A file of exactly 10.00 MB is still refused by a 10 MB limit,
+ * and the encoders overshoot. One constant, used by the fitting loop AND by every estimate a page
+ * shows, so the kbps on screen is the kbps that gets encoded.
+ */
+export const aimFor = (targetBytes: number) => targetBytes * 0.96;
+
+/**
+ * Resolution that suits the bitrate being spent, keyed on the LONG edge.
+ *
+ * Squeezing 1080p into a bitrate meant for 480p looks far worse than sending 480p at a bitrate it
+ * can carry. Keyed on the long edge because a 1080×1920 Reel is 1080p, not 1080-wide: judged by its
+ * width it fell into the 800-tier, never kept its resolution, and was budgeted as a quarter of what
+ * it is. Returns a long edge; `encode` maps it onto whichever axis is longer.
+ */
+export function autoLongEdge(videoBitrate: number, sourceLongEdge: number): number {
+  for (const edge of [3840, 2560, 1920, 1280, 854, 640]) {
+    if (edge <= sourceLongEdge && videoBitrate >= reasonableBitrate(edge) * 0.55) return edge;
+  }
+  return Math.min(640, sourceLongEdge);
+}
+
 export function budgetFor({ targetBytes, duration, audioBitrate }: BudgetInput): Budget {
   const floorBytes = bytesFor(MIN_VIDEO_BITRATE + audioBitrate, duration);
 
@@ -80,12 +102,12 @@ export function sourceBitrate(sizeBytes: number, duration: number): number {
  * and re-encoding it will make it larger, not smaller. Figures are the low end of common streaming
  * ladders — deliberately conservative, since the goal is to catch the obviously-pointless case.
  */
-export function reasonableBitrate(width: number): number {
-  if (width >= 3800) return 20_000_000;
-  if (width >= 2500) return 10_000_000;
-  if (width >= 1900) return 5_000_000;
-  if (width >= 1200) return 2_500_000;
-  if (width >= 800) return 1_200_000;
+export function reasonableBitrate(longEdge: number): number {
+  if (longEdge >= 3800) return 20_000_000;
+  if (longEdge >= 2500) return 10_000_000;
+  if (longEdge >= 1900) return 5_000_000;
+  if (longEdge >= 1200) return 2_500_000;
+  if (longEdge >= 800) return 1_200_000;
   return 700_000;
 }
 
@@ -168,8 +190,7 @@ export async function encodeToTargetSize(options: {
   const { targetBytes, duration, audioBitrate, run, onStatus, maxVideoBitrate } = options;
   const cap = (bitrate: number) => (maxVideoBitrate ? Math.min(bitrate, maxVideoBitrate) : bitrate);
 
-  // Aim under the wall: a file of exactly 10.00 MB is still refused by a 10 MB limit.
-  const aim = targetBytes * 0.96;
+  const aim = aimFor(targetBytes);
   const budget = budgetFor({ targetBytes: aim, duration, audioBitrate });
   const firstBitrate = cap(budget.videoBitrate);
 
@@ -193,7 +214,9 @@ export async function encodeToTargetSize(options: {
     onStatus?.({ pass: 'second', fraction: 0.5 + p * 0.5, percent: Math.round(p * 100) }),
   );
 
-  // Keep whichever satisfies the limit; when both do, prefer the larger, since bigger means better
-  // picture.
-  return second.size <= targetBytes && (first.size > targetBytes || second.size > first.size) ? second : first;
+  // The largest that fits; when neither fits, the smaller. The old expression returned `first`
+  // whenever the second pass also missed, which by construction is the larger of the two.
+  const fits = [first, second].filter((b) => b.size <= targetBytes);
+  if (fits.length) return fits.reduce((a, b) => (b.size > a.size ? b : a));
+  return second.size < first.size ? second : first;
 }

@@ -178,7 +178,12 @@ const chrome = CHROME[lang];
       }
     }
 
+    let busy = false;
+
     async function analyse(file: File) {
+      // Two drops used to run two analyses on the same module state and one grid.
+      if (busy) return;
+      busy = true;
       fileName = file.name.replace(/\.[^.]+$/, '') || 'video';
       resultEl.hidden = true;
       grid.replaceChildren();
@@ -243,8 +248,9 @@ const chrome = CHROME[lang];
         const ranges = detected.scenes?.length ? detected.scenes : [[0, source.duration] as [number, number]];
 
         // Second pass: the coarse grid can only say which sample the picture changed by, so each
-        // boundary is re-examined at ten times the resolution — but only in the half-second around
-        // it. Cheap, and it is what moves the reported cut from "about right" to "on the frame".
+        // boundary is re-examined by `refineBoundary` — a wide pass at the coarse step, bounded by
+        // the midpoints to the neighbouring cuts, then a fine pass at a tenth of it. It is what
+        // moves the reported cut from "about right" to "on the frame".
         const boundaries = ranges.slice(1).map(([start]) => start);
         const refined = new Map<number, number>();
 
@@ -294,6 +300,7 @@ const chrome = CHROME[lang];
         );
       } finally {
         source?.release();
+        busy = false;
       }
     }
 

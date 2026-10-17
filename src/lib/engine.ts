@@ -44,7 +44,12 @@ export function loadEngine(): Promise<Engine> {
     const module = (await import(/* @vite-ignore */ URL_JS)) as Module;
     await module.default({ module_or_path: URL_WASM });
     return module;
-  })();
+  })().catch((error: unknown) => {
+    // A failed fetch must not be cached as a permanent failure: dropping the file again is the
+    // natural retry, and it has to be allowed to work.
+    loading = null;
+    throw error;
+  });
 
   return loading;
 }

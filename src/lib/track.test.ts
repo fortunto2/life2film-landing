@@ -26,6 +26,17 @@ describe('track', () => {
     expect(stub.q.map((a) => Array.from(a))).toEqual([['file_chosen', { via: 'drop' }, undefined]]);
   });
 
+  test('the app offer still fires when the counter throws', () => {
+    const fired: string[] = [];
+    host.window = {
+      sda: () => { throw new Error('boom'); },
+      dispatchEvent: (e: Event) => { fired.push(e.type); return true; },
+    } as unknown as typeof host.window;
+    (globalThis as unknown as { CustomEvent?: unknown }).CustomEvent ??= class { type: string; constructor(t: string) { this.type = t; } };
+    track('result_saved');
+    expect(fired).toEqual(['tool:saved']);
+  });
+
   test('never throws into the tool', () => {
     host.window = { sda: () => { throw new Error('boom'); } };
     expect(() => track('x')).not.toThrow();

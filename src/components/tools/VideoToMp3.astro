@@ -156,9 +156,11 @@ const status = STATUS[lang];
 
     el('estimate').textContent = `≈ ${formatBytes(bytes)}`;
 
-    // Asking for more bits than the source has does not recover anything.
-    const sourceAudioBits = format === 'wav' ? 0 : bitrate();
-    if (sourceAudioBits >= 256_000) {
+    // Asking for more bits than the source has does not recover anything. The source's audio
+    // bitrate is only knowable for an audio-only file (size × 8 / duration); with video in the
+    // file the audio share is unknown, so the warning stays quiet rather than guessing.
+    const sourceAudioBits = info.width ? 0 : (info.size * 8) / info.duration;
+    if (format !== 'wav' && sourceAudioBits > 0 && bitrate() > sourceAudioBits * 1.25) {
       el('verdict').hidden = false;
       el('verdict').className = 'verdict warn';
       el('verdict').textContent =

@@ -188,7 +188,7 @@ const status = STATUS[lang];
     CONTAINER_EXTENSION, type Container, type Probe,
   } from '../../lib/encode';
   import {
-    budgetFor, encodeToTargetSize, presetOptions, parseTarget, AUDIO_BITRATE, reasonableBitrate,
+    budgetFor, encodeToTargetSize, presetOptions, parseTarget, AUDIO_BITRATE, aimFor, autoLongEdge, sourceBitrate,
   } from '../../lib/bitrate';
 
   const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -279,7 +279,7 @@ const status = STATUS[lang];
 
     const target = targetBytes();
     const budget = budgetFor({
-      targetBytes: target * 0.96,
+      targetBytes: aimFor(target),
       duration: selectionLength(),
       audioBitrate: el<HTMLInputElement>('mute').checked || !info.hasAudio ? 0 : AUDIO_BITRATE,
     });
@@ -322,8 +322,9 @@ const status = STATUS[lang];
     const trimmed = text.trim();
     if (!trimmed) return null;
     const parts = trimmed.split(':').map(Number);
-    if (parts.some(Number.isNaN)) return null;
-    const seconds = parts.length === 1 ? parts[0] : parts[0] * 60 + parts[1];
+    if (parts.some(Number.isNaN) || parts.length > 3) return null;
+    // 12.5 · 1:04.5 · 1:02:03 — hours used to be read as minutes.
+    const seconds = parts.reduce((total, part) => total * 60 + part, 0);
     return Number.isFinite(seconds) ? Math.max(0, Math.min(duration, seconds)) : null;
   }
 
@@ -507,7 +508,11 @@ const status = STATUS[lang];
 
       status(
         `Saved — ${formatBytes(blob.size)}, ${selectionLength().toFixed(1)}s` +
-          (copied ? ', copied without re-encoding.' : '.'),
+          (copied
+            ? ', copied without re-encoding.'
+            : current === 'copy'
+              ? '. Re-encoded: the browser can only copy a cut that starts at the beginning of the file.'
+              : '.'),
         1,
       );
       setTimeout(() => { statusEl.hidden = true; }, 6000);
@@ -540,13 +545,16 @@ const status = STATUS[lang];
     const length = selectionLength();
     const audioBitrate = silent || !info?.hasAudio ? 0 : AUDIO_BITRATE;
     const target = targetBytes();
-    const budget = budgetFor({ targetBytes: target * 0.96, duration: length, audioBitrate });
-    const width = info ? Math.min(autoWidth(budget.videoBitrate, info.width), info.width) : undefined;
+    const budget = budgetFor({ targetBytes: aimFor(target), duration: length, audioBitrate });
+    const width = info ? autoLongEdge(budget.videoBitrate, Math.max(info.width, info.height)) : undefined;
+    // The source's own video bitrate is the most worth spending — a size target is a ceiling.
+    const sourceVideo = info ? Math.max(0, sourceBitrate(info.size, info.duration) - (info.hasAudio ? AUDIO_BITRATE : 0)) : 0;
 
     return encodeToTargetSize({
       targetBytes: target,
       duration: length,
       audioBitrate,
+      maxVideoBitrate: sourceVideo > 0 ? Math.round(sourceVideo * 0.97) : undefined,
       onStatus: (event) =>
         status(
           fill(event.pass === 'second' ? say.secondPass : say.encoding, {
@@ -565,14 +573,6 @@ const status = STATUS[lang];
           onProgress,
         }).then((r) => r.blob),
     });
-  }
-
-  /** Resolution that suits the bitrate being spent — same ladder the compressor uses. */
-  function autoWidth(videoBitrate: number, sourceWidth: number): number {
-    for (const width of [3840, 2560, 1920, 1280, 854, 640]) {
-      if (width <= sourceWidth && videoBitrate >= reasonableBitrate(width) * 0.55) return width;
-    }
-    return Math.min(640, sourceWidth);
   }
 
   // `change` on selects and checkboxes, `input` only on the free-text field: both events fire for

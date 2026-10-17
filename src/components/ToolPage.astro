@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import AgentBlock from './AgentBlock.astro';
 import { TOOL, TOOLS } from '../lib/tools';
-import { TRANSLATIONS, localesFor } from '../lib/tools/index';
+import { TRANSLATIONS, localesFor, toolPath } from '../lib/tools/index';
 import { CHROME, asTranslation } from '../lib/tools-i18n';
 import { localePath, type Lang } from '../i18n';
 
@@ -144,7 +144,7 @@ const jsonLd = {
         <ul class="related">
           {others.map((other) => (
             <li>
-              <a href={localePath(lang, `/tools/${other.slug}/`)}>{other.name}</a> — {other.blurb}
+              <a href={toolPath(lang, other.slug)}>{other.name}</a> — {other.blurb}
             </li>
           ))}
         </ul>

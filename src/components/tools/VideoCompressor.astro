@@ -173,7 +173,7 @@ const status = STATUS[lang];
   import { toolStrings, fill } from '../../lib/strings';
   import { probe, encode, saveBlob, formatBytes, preciseClock, type QualityName, type Probe } from '../../lib/encode';
   import {
-    budgetFor, bytesFor, sourceBitrate, reasonableBitrate,
+    budgetFor, bytesFor, sourceBitrate, reasonableBitrate, aimFor, autoLongEdge,
     encodeToTargetSize, presetOptions, parseTarget, AUDIO_BITRATE,
   } from '../../lib/bitrate';
 
@@ -211,12 +211,8 @@ const status = STATUS[lang];
    * Squeezing 1080p into a bitrate meant for 480p looks far worse than sending 480p at a bitrate it
    * can carry — the encoder has to throw away detail everywhere instead of starting with less of it.
    */
-  function autoWidth(videoBitrate: number, sourceWidth: number): number {
-    for (const width of [3840, 2560, 1920, 1280, 854, 640]) {
-      if (width <= sourceWidth && videoBitrate >= reasonableBitrate(width) * 0.55) return width;
-    }
-    return Math.min(640, sourceWidth);
-  }
+  const longEdge = () => (info ? Math.max(info.width, info.height) : 0);
+  const autoWidth = (videoBitrate: number, _sourceWidth: number) => autoLongEdge(videoBitrate, longEdge());
 
   /** What the current settings would produce — shown before anything is encoded. */
   function refreshEstimate() {
@@ -224,7 +220,8 @@ const status = STATUS[lang];
 
     if (mode === 'size') {
       const target = targetBytes();
-      const budget = budgetFor({ targetBytes: target, duration: info.duration, audioBitrate: audioCost() });
+      // The same aim the encoder uses, so the kbps shown is the kbps spent.
+      const budget = budgetFor({ targetBytes: aimFor(target), duration: info.duration, audioBitrate: audioCost() });
 
       if (!budget.achievable) {
         el('estimate').textContent = '';
@@ -281,7 +278,7 @@ const status = STATUS[lang];
   function describeSource() {
     if (!info) return;
     const current = sourceBitrate(info.size, info.duration);
-    const expected = reasonableBitrate(info.width);
+    const expected = reasonableBitrate(longEdge());
 
     if (current < expected * 0.5) {
       setVerdict(
@@ -296,6 +293,9 @@ const status = STATUS[lang];
   }
 
   async function open(chosen: File) {
+    // A file dropped mid-encode used to replace `file` while `result` was still the old file's,
+    // so the outcome ratio and the download name belonged to the new one.
+    if (busy) return;
     file = chosen;
     result = null;
     el('outcome').hidden = true;
@@ -401,14 +401,12 @@ const status = STATUS[lang];
   async function compressToSize(source: File, probed: Probe): Promise<Blob> {
     const target = targetBytes();
     const budget = budgetFor({
-      targetBytes: target * 0.96,
+      targetBytes: aimFor(target),
       duration: probed.duration,
       audioBitrate: audioCost(),
     });
-    const width = Math.min(
-      Number(el<HTMLSelectElement>('sizeResolution').value) || autoWidth(budget.videoBitrate, probed.width),
-      probed.width,
-    );
+    // A long edge; `encode` maps it onto the longer axis and never scales up.
+    const width = Number(el<HTMLSelectElement>('sizeResolution').value) || autoWidth(budget.videoBitrate, probed.width);
 
     // The source's own video bitrate is the most worth spending: asking for more makes the file
     // larger, not better. Measured on production: 4.1 MB in, "fit 10 MB", 8.0 MB out.

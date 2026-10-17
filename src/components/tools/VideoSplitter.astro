@@ -162,7 +162,7 @@ const fill = (t: string, n: number) => t.replace('{n}', String(n));
 <script>
     import { fileChosen, toolFailed, track } from '../../lib/track';
   import { toolStrings } from '../../lib/strings';
-    import { saveBlob } from '../../lib/encode';
+    import { encode, saveBlob } from '../../lib/encode';
     import { loadEngine } from '../../lib/engine';
     import { openVideo, samplePlan, centerPixel, refineBoundary, type VideoSource } from '../../lib/frames';
     import { equalClips, groupIntoClips, rankByScore, stars, type Clip, type Shot } from '../../lib/clips';
@@ -208,6 +208,9 @@ const fill = (t: string, n: number) => t.replace('{n}', String(n));
     }
 
     function start(file: File) {
+      // The guard comes BEFORE anything is overwritten: a file dropped mid-export used to replace
+      // `sourceFile`, and the remaining clips were cut from the new file at the old timestamps.
+      if (busy) return;
       syncModeUI();
       sourceFile = file;
       fileName = file.name.replace(/\.[^.]+$/, '') || 'video';
@@ -410,37 +413,30 @@ const fill = (t: string, n: number) => t.replace('{n}', String(n));
       busy = true;
       setButtons(false);
 
-      try {
-        const { Input, Output, Conversion, BufferTarget, Mp4OutputFormat, ALL_FORMATS, BlobSource } =
-          await import('mediabunny');
+      // Pinned for the whole export: `start()` is guarded by `busy`, but reading module state per
+      // iteration is still one dropped file away from cutting the wrong video.
+      const file = sourceFile;
+      const name = fileName;
+      const kind = mode() === 'scenes' ? 'clip' : 'part';
+      const vertical = wantsVertical();
 
+      try {
         for (const [n, index] of indices.entries()) {
           const clip = clips[index];
-          const label = `clip ${n + 1} of ${indices.length}`;
+          const label = `${kind} ${n + 1} of ${indices.length}`;
           status(`Encoding ${label}…`, n / indices.length);
 
-          const input = new Input({ source: new BlobSource(sourceFile), formats: ALL_FORMATS });
-          const output = new Output({ format: new Mp4OutputFormat(), target: new BufferTarget() });
-
-          const conversion = await Conversion.init({
-            input,
-            output,
+          // Through `encode`, not mediabunny by hand: the H.264-first codec choice, the hardware
+          // hint and the readable "cannot encode" reasons all live there.
+          const blob = await encode(file, {
+            container: 'mp4',
             trim: { start: clip.start, end: clip.end },
-            ...(wantsVertical()
-              ? { video: { width: 1080, height: 1920, fit: 'cover' as const } }
-              : {}),
+            ...(vertical ? { width: 1080, height: 1920, fit: 'cover' as const } : {}),
+            onProgress: (progress) =>
+              status(`Encoding ${label} — ${Math.round(progress * 100)}%`, (n + progress) / indices.length),
           });
 
-          conversion.onProgress = (progress: number) => {
-            status(`Encoding ${label} — ${Math.round(progress * 100)}%`, (n + progress) / indices.length);
-          };
-
-          await conversion.execute();
-
-          const buffer = output.target.buffer;
-          if (!buffer) throw new Error('The encoder produced no data.');
-
-          saveBlob(new Blob([buffer], { type: 'video/mp4' }), `${fileName}-${mode() === 'scenes' ? 'clip' : 'part'}-${index + 1}${wantsVertical() ? '-9x16' : ''}.mp4`);
+          saveBlob(blob, `${name}-${kind}-${index + 1}${vertical ? '-9x16' : ''}.mp4`);
         }
 
         track(
@@ -481,15 +477,25 @@ const fill = (t: string, n: number) => t.replace('{n}', String(n));
     // a decoder alive for the whole session.
     el<HTMLSelectElement>('target').addEventListener('change', async () => {
       if (!sourceFile || !shots.length || busy) return;
+      await regroup();
+    });
+
+    /** Reopen and redraw; `busy` is released on every path, including a reopen that fails. */
+    async function regroup() {
+      if (!sourceFile) return;
       busy = true;
-      const source = await openVideo(sourceFile);
+      let source: VideoSource | null = null;
       try {
+        source = await openVideo(sourceFile);
         await rebuild(source);
+      } catch (error) {
+        toolFailed('open', error, sourceFile);
+        status(error instanceof Error ? error.message : 'Could not reopen that file.', 1, true);
       } finally {
-        source.release();
+        source?.release();
         busy = false;
       }
-    });
+    }
 
     // Switching mode or part size: scenes need the analysis once, the clock never does.
     for (const id of ['mode', 'parts', 'every']) {
@@ -497,14 +503,7 @@ const fill = (t: string, n: number) => t.replace('{n}', String(n));
         syncModeUI();
         if (!sourceFile || busy) return;
         if (mode() === 'scenes' && !shots.length) return void analyse(sourceFile);
-        busy = true;
-        const source = await openVideo(sourceFile);
-        try {
-          await rebuild(source);
-        } finally {
-          source.release();
-          busy = false;
-        }
+        await regroup();
       });
     }
 

@@ -29,6 +29,11 @@ const MAX_REASON = 160;
 
 export function track(name: string, props?: Props, metrics?: Metrics): void {
   if (typeof window === 'undefined') return;
+  // The page reacts to a finished result (ToolPage shows the app offer then). Dispatched BEFORE the
+  // analytics call and outside its try: a throwing counter must not hide the offer.
+  if (name === 'result_saved') {
+    try { window.dispatchEvent(new CustomEvent('tool:saved')); } catch { /* no DOM, nothing to show */ }
+  }
   const w = window as unknown as { sda?: Sda };
   try {
     if (!w.sda) {
@@ -37,9 +42,6 @@ export function track(name: string, props?: Props, metrics?: Metrics): void {
       w.sda = stub;
     }
     w.sda(name, props, metrics);
-    // The page reacts to a finished result (ToolPage shows the app offer then), without every tool
-    // having to know about it.
-    if (name === 'result_saved') window.dispatchEvent(new CustomEvent('tool:saved'));
   } catch {
     // Analytics never breaks a tool.
   }

@@ -280,18 +280,23 @@ const status = STATUS[lang];
       draw();
     }
 
+    let busy = false;
+
     async function analyse(file: File) {
+      if (busy) return;
+      busy = true;
       fileName = file.name.replace(/\.[^.]+$/, '') || 'track';
       resultEl.hidden = true;
       status(say.reading);
 
+      // Closed in `finally`: an undecodable file used to leave the context open, and Safari allows
+      // about four at once before `new AudioContext()` starts throwing.
+      const ctx = new AudioContext();
       try {
         const bytes = await file.arrayBuffer();
         status(say.decoding);
 
-        const ctx = new AudioContext();
         audioBuffer = await ctx.decodeAudioData(bytes);
-        await ctx.close();
 
         status(say.loadingAnalyser);
         const engine = await loadEngine();
@@ -335,6 +340,9 @@ const status = STATUS[lang];
             'Browsers only decode the formats they ship with.',
           true,
         );
+      } finally {
+        void ctx.close();
+        busy = false;
       }
     }
 
@@ -424,9 +432,12 @@ const status = STATUS[lang];
 
       source.start(startAt);
       button.textContent = '■ Stop';
+      const ctx = playCtx;
       source.onended = () => {
         button.textContent = '▶ Play with clicks';
-        playCtx = null;
+        // A context left open per playback is a leak; Safari runs out after about four.
+        if (playCtx === ctx) playCtx = null;
+        void ctx.close();
       };
     });
 

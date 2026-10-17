@@ -32,7 +32,12 @@ export type QualityName = 'very_low' | 'low' | 'medium' | 'high' | 'very_high';
 export interface EncodeOptions {
   container: Container;
   trim?: { start: number; end: number };
-  /** Longest edge of the output, or the exact box when `fit` is given. */
+  /**
+   * Longest edge of the output, or the exact box when `fit` is given.
+   *
+   * Honoured as written: mediabunny's `width` is the horizontal edge after rotation, so a portrait
+   * source is sized by `height` instead, and nothing is ever scaled UP past the source.
+   */
   width?: number;
   height?: number;
   fit?: 'fill' | 'contain' | 'cover';
@@ -232,20 +237,38 @@ export async function encodeDetailed(file: File, options: EncodeOptions): Promis
     !dropVideo &&
     Boolean(options.width || options.height || options.fit || videoBitrate || options.forceTranscode);
 
+  const sourceTrack = dropVideo ? null : await input.getPrimaryVideoTrack();
   // A source codec the container should not carry (VP9 into MP4) forces a transcode even when
   // nothing else asked for one; otherwise the "conversion" is a remux that plays only in Chrome.
-  const sourceCodec = dropVideo ? null : ((await input.getPrimaryVideoTrack())?.codec ?? null);
+  const sourceCodec = sourceTrack?.codec ?? null;
   const foreign = Boolean(sourceCodec && !copyableCodecs(options.container).includes(sourceCodec));
-  const reencode = transcode || foreign;
+  // mediabunny 1.54 cannot copy a trim whose in-point is past the first packet (conversion.js:
+  // `needsTranscode` when `firstTimestamp < trim.start`), so it re-encodes, silently and without
+  // our codec and hardware hints. Knowing that up front lets us pass the hints and tell the truth.
+  const trimmedStart = (options.trim?.start ?? 0) > 0.001;
+  const reencode = transcode || foreign || (trimmedStart && !dropVideo);
   const codec = reencode && !dropVideo ? await encodableCodec(options.container) : null;
+
+  // "Longest edge", literally, and never upward. A 1080×1920 Reel asked for "720p" used to come out
+  // 1280×2276: 2.8× the pixels, a forced transcode, a larger file.
+  const srcW = sourceTrack?.displayWidth ?? 0;
+  const srcH = sourceTrack?.displayHeight ?? 0;
+  const portrait = srcH > srcW;
+  const box = options.fit
+    ? { width: options.width, height: options.height }
+    : options.width
+      ? portrait
+        ? { height: Math.min(options.width, srcH || options.width) }
+        : { width: Math.min(options.width, srcW || options.width) }
+      : {};
 
   const video = dropVideo
     ? { discard: true as const }
     : reencode
       ? {
           ...(codec && { codec }),
-          ...(options.width && { width: options.width }),
-          ...(options.height && { height: options.height }),
+          ...(box.width && { width: box.width }),
+          ...(box.height && { height: box.height }),
           ...(options.fit && { fit: options.fit }),
           ...(videoBitrate && { bitrate: videoBitrate }),
           ...(options.forceTranscode && { forceTranscode: true }),
@@ -260,7 +283,9 @@ export async function encodeDetailed(file: File, options: EncodeOptions): Promis
   // container here has one. Testing `isAudioOnly` instead used to lump MP3 and OGG in with WAV, and
   // a second spread bolted the bitrate back on for MP3 only — leaving OGG silently unset while the
   // page that offers an OGG bitrate predicted a size based on it.
-  const audioBitrate = options.container === 'wav' ? undefined : options.audioBitrate ?? quality;
+  // Only an explicit audio bitrate re-encodes the sound. Inheriting the VIDEO quality name here made
+  // mediabunny transcode AAC into AAC on every "pick a quality" compression: slower, lossy, pointless.
+  const audioBitrate = options.container === 'wav' ? undefined : options.audioBitrate;
 
   const audio = options.discardAudio
     ? { discard: true as const }
@@ -310,7 +335,9 @@ export function saveBlob(blob: Blob, filename: string) {
   a.href = url;
   a.download = filename;
   a.click();
-  URL.revokeObjectURL(url);
+  // The download resolves the blob URL asynchronously; revoking it on the next line raced that in
+  // browsers that do not snapshot the blob at click time.
+  setTimeout(() => URL.revokeObjectURL(url), 10_000);
 }
 
 export function formatBytes(bytes: number): string {

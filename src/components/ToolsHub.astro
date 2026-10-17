@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { GROUPS, TOOLS, byGroup } from '../lib/tools';
-import { TRANSLATIONS } from '../lib/tools/index';
+import { TRANSLATIONS, toolPath } from '../lib/tools/index';
 import { HUB } from '../lib/tools-i18n';
 import { localePath, type Lang } from '../i18n';
 
@@ -34,7 +34,7 @@ const jsonLd = {
   hasPart: TOOLS.map((tool) => ({
     '@type': 'WebApplication',
     name: tool.appName,
-    url: `https://life2film.com${localePath(lang, `/tools/${tool.slug}/`)}`,
+    url: `https://life2film.com${toolPath(lang, tool.slug)}`,
     applicationCategory: 'MultimediaApplication',
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   })),
@@ -62,7 +62,7 @@ const jsonLd = {
             <p class="groupnote muted">{words.groups[group.id].note}</p>
             <div class="grid cols-2 tools">
               {byGroup(group.id).map((tool) => (
-                <a class="card tool" href={localePath(lang, `/tools/${tool.slug}/`)}>
+                <a class="card tool" href={toolPath(lang, tool.slug)}>
                   <h3>{tool.name}</h3>
                   <p>{blurbFor(tool.slug, tool.blurb)}</p>
                   <span class="go">{words.open}</span>

@@ -105,7 +105,7 @@ const fill = (t: string, n: number | string) => t.replace('{n}', String(n));
 
 <script>
   import { fileChosen, toolFailed, track } from '../../lib/track';
-  import { toolStrings } from '../../lib/strings';
+  import { toolStrings, fill } from '../../lib/strings';
   import { saveBlob, formatBytes, preciseClock } from '../../lib/encode';
   import { openVideo, frameTimes, type VideoSource } from '../../lib/frames';
   import { zipStored } from '../../lib/zip';
@@ -113,8 +113,6 @@ const fill = (t: string, n: number | string) => t.replace('{n}', String(n));
   const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
   const say = toolStrings();
   const w = JSON.parse(el('words').dataset.strings!) as Record<string, string>;
-  const fill = (t: string, values: Record<string, string | number>) =>
-    t.replace(/\{(\w+)\}/g, (whole, key) => (key in values ? String(values[key]) : whole));
 
   const drop = el<HTMLLabelElement>('drop');
   const fileInput = el<HTMLInputElement>('file');
@@ -136,9 +134,17 @@ const fill = (t: string, n: number | string) => t.replace('{n}', String(n));
     if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
   }
 
+  /** Preview URLs pin their blobs until revoked; a new run must let the old frames go. */
+  function clearPreviews() {
+    for (const img of grid.querySelectorAll('img')) URL.revokeObjectURL(img.src);
+    grid.replaceChildren();
+  }
+
   async function open(chosen: File) {
+    if (busy) return;
     file = chosen;
     images = [];
+    clearPreviews();
     el('result').hidden = true;
     let source: VideoSource | null = null;
     try {
@@ -164,7 +170,7 @@ const fill = (t: string, n: number | string) => t.replace('{n}', String(n));
     busy = true;
     el<HTMLButtonElement>('run').disabled = true;
     el('result').hidden = true;
-    grid.replaceChildren();
+    clearPreviews();
     images = [];
 
     const type = el<HTMLSelectElement>('format').value as 'image/jpeg' | 'image/png';
@@ -227,9 +233,10 @@ const fill = (t: string, n: number | string) => t.replace('{n}', String(n));
     busy = true;
     try {
       status(w.zipping, 0.5);
-      const entries = await Promise.all(
-        images.map(async ({ name, blob }) => ({ name, data: new Uint8Array(await blob.arrayBuffer()) })),
-      );
+      // One at a time: reading all 600 at once held every frame twice (Blob and buffer) before the
+      // archive even started.
+      const entries = [];
+      for (const { name, blob } of images) entries.push({ name, data: new Uint8Array(await blob.arrayBuffer()) });
       const zip = zipStored(entries);
       const base = file.name.replace(/\.[^.]+$/, '') || 'video';
       saveBlob(new Blob([zip], { type: 'application/zip' }), `${base}-frames.zip`);

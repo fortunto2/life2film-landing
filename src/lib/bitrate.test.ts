@@ -247,3 +247,14 @@ describe('a file that already fits', () => {
     expect(asked[0]).toBe(budgetFor({ targetBytes: 10 * MB * 0.96, duration: 60, audioBitrate: 0 }).videoBitrate);
   });
 });
+
+describe('choosing between two passes', () => {
+  test('when neither fits, the smaller one is returned', async () => {
+    let n = 0;
+    const blob = await encodeToTargetSize({
+      targetBytes: 10 * MB, duration: 60, audioBitrate: 0,
+      run: async () => new Blob([new Uint8Array((++n === 1 ? 30 : 15) * MB)]),
+    });
+    expect(blob.size).toBe(15 * MB);
+  });
+});

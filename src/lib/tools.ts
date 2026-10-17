@@ -96,7 +96,7 @@ export const TOOLS: Tool[] = [
   },
   {
     q: 'Does trimming lose quality?',
-    a: 'Not in the default mode. "Same quality: no re-encode" passes the picture through untouched, so there is no generation loss and it finishes several times faster, measured at 0.2 seconds against 0.6 for a re-encode of the same clip. The trade is size: video is compressed in groups that begin at a keyframe, so when your in-point falls mid-group the file has to carry the frames back to the previous one. Playback still starts exactly where you set it, but the file can be larger than a re-encode of the same range.',
+    a: 'Not when the picture is copied. "Same quality: no re-encode" passes the video through untouched when the cut starts at the beginning of the file, so there is no generation loss and it finishes several times faster: 0.2 seconds against 0.6 for a re-encode of the same clip. When the in-point is later in the file, the browser pipeline cannot copy from mid-stream and re-encodes at high quality instead; the status line says which happened.',
   },
   {
     q: 'When should I re-encode instead?',
@@ -124,8 +124,7 @@ export const TOOLS: Tool[] = [
     facts: [
       'Three modes: copy (no re-encode), re-encode (smaller file), and fit a target size.',
       'Copying passes the picture through untouched: measured 0.20s against 0.60s for a re-encode of the same 3 seconds.',
-      'Playback always starts exactly where you set it, a copied cut does NOT snap to a keyframe.',
-      'A copied mid-group cut carries frames back to the previous keyframe, so it is larger: 6.7 MB copied against 4.1 MB re-encoded on a file with keyframes 8 seconds apart.',
+      'A copy is only possible when the cut starts at the beginning of the file (mediabunny 1.54 re-encodes any trim whose in-point is past the first packet); the result reports which happened.',
       'Re-encoding requires forceTranscode: true, or mediabunny will correctly decide the transcode is unnecessary and copy instead.',
       'Accepts times as 12.5, 1:04 or 1:04.5.',
     ],
