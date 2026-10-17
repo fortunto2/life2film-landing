@@ -551,6 +551,7 @@ Reference implementation: https://life2film.com/tools/video-converter/`,
     facts: [
       'Shot boundaries come from the Life2Film engine (Rust compiled to WebAssembly), not from a timer.',
       'Sampling rate dominates accuracy: at 2 samples/second boundaries land 1-3 seconds out; at 10/second they land on the frame. All sixteen detection algorithms were wrong the same way at the low rate.',
+      'Two detectors run over the same samples — the centre-column one and feature_cosine over 37 per-frame measurements — and a cut needs both to agree. Measured: on 5 minutes with 29 cuts, 29 boundaries, each on its frame; the column detector alone gave 67.',
       'Uses a coarse pass to find candidates, then a tight pass at ten times the resolution around each one.',
       'Clips never cut inside a shot; short tails are absorbed into the previous clip.',
       'Optional 9:16 crop takes the centre of the frame, there is no face tracking.',
