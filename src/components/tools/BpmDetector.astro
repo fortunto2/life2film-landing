@@ -20,7 +20,7 @@ const status = STATUS[lang];
 
 <div class="tool" slot="tool">
     <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
-          <label class="drop" id="drop" for="file" data-sda-event="file_chosen" data-sda-placement="dropzone">
+          <label class="drop" id="drop" for="file">
             <input type="file" id="file" accept="audio/*,video/*" hidden />
             <strong>{chrome.chooseFile}</strong>
             <span class="muted">{chrome.dragHint} — MP3, WAV, M4A, FLAC, OGG</span>
@@ -59,7 +59,7 @@ const status = STATUS[lang];
                   <option value="csv">CSV — spreadsheets</option>
                   <option value="json">JSON — scripts</option>
                 </select>
-                <button id="save" type="button" class="ghost primary" data-sda-event="result_saved" data-sda-placement="result">Download</button>
+                <button id="save" type="button" class="ghost primary">Download</button>
               </div>
 
               <label class="fps">
@@ -144,6 +144,7 @@ const status = STATUS[lang];
 </style>
 
 <script>
+    import { fileChosen, toolFailed, track } from '../../lib/track';
   import { toolStrings } from '../../lib/strings';
     import { loadEngine } from '../../lib/engine';
     import { clock, render, download, EXTENSION, type Format, type Mark } from '../../lib/timeline-export';
@@ -304,6 +305,7 @@ const status = STATUS[lang];
         bpm = parsed.bpm ?? 0;
 
         if (!beats.length) {
+          toolFailed('analyse', 'no steady pulse');
           status('No steady pulse found. Speech, ambient and free-tempo recordings often have none.', true);
           return;
         }
@@ -321,7 +323,13 @@ const status = STATUS[lang];
         viewStart = 0;
         refreshPeaks();
         draw();
+        track('result_shown', { placement: 'result' }, {
+          bpm: Math.round(bpm * 10) / 10,
+          beats: beats.length,
+          duration_s: Math.round(audioBuffer.duration),
+        });
       } catch (error) {
+        toolFailed('open', error, file);
         status(
           `Could not read that file — ${error instanceof Error ? error.message : 'unknown error'}. ` +
             'Browsers only decode the formats they ship with.',
@@ -334,7 +342,7 @@ const status = STATUS[lang];
 
     fileInput.addEventListener('change', () => {
       const file = fileInput.files?.[0];
-      if (file) void analyse(file);
+      if (file) { fileChosen(file, 'picker'); void analyse(file); }
     });
 
     for (const type of ['dragenter', 'dragover']) {
@@ -351,7 +359,7 @@ const status = STATUS[lang];
     }
     drop.addEventListener('drop', (e) => {
       const file = (e as DragEvent).dataTransfer?.files?.[0];
-      if (file) void analyse(file);
+      if (file) { fileChosen(file, 'drop'); void analyse(file); }
     });
 
     window.addEventListener('resize', () => {
@@ -441,6 +449,7 @@ const status = STATUS[lang];
         }),
         `${fileName}-beats.${EXTENSION[format]}`,
       );
+      track('result_saved', { placement: 'result', format }, { beats: beats.length });
     });
 
 </script>

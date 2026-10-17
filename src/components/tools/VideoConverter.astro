@@ -20,7 +20,7 @@ const status = STATUS[lang];
 
 <div class="tool" slot="tool">
     <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
-    <label class="drop" id="drop" for="file" data-sda-event="file_chosen" data-sda-placement="dropzone">
+    <label class="drop" id="drop" for="file">
       <input type="file" id="file" accept="video/*,audio/*" hidden />
       <strong>{chrome.chooseFile}</strong>
       <span class="muted">{chrome.dragHint} — MP4, MOV (H.264), WebM</span>
@@ -98,6 +98,7 @@ const status = STATUS[lang];
 </style>
 
 <script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
   import { toolStrings, fill } from '../../lib/strings';
   import {
     probe, encode, saveBlob, loadMediabunny, formatBytes, preciseClock,
@@ -175,6 +176,7 @@ const status = STATUS[lang];
 
       await checkSupport(el<HTMLSelectElement>('container').value as Container);
     } catch (error) {
+      toolFailed('open', error, chosen);
       status(
         error instanceof Error
           ? `Could not read that file — ${error.message}. Browsers cannot open ProRes or raw camera formats.`
@@ -210,9 +212,11 @@ const status = STATUS[lang];
       });
 
       saveBlob(blob, `${name}.${CONTAINER_EXTENSION[container]}`);
+      track('result_saved', { placement: 'result', format: container }, { size_mb: Math.round(blob.size / 104_857.6) / 10 });
       status(`Saved — ${formatBytes(blob.size)} ${container.toUpperCase()}.`, 1);
       setTimeout(() => { statusEl.hidden = true; }, 5000);
     } catch (error) {
+      toolFailed('run', error, file);
       status(
         error instanceof Error ? `Conversion failed — ${error.message}` : 'Conversion failed.',
         1,
@@ -226,7 +230,7 @@ const status = STATUS[lang];
 
   fileInput.addEventListener('change', () => {
     const chosen = fileInput.files?.[0];
-    if (chosen) void open(chosen);
+    if (chosen) { fileChosen(chosen, 'picker'); void open(chosen); }
   });
 
   for (const type of ['dragenter', 'dragover']) {
@@ -237,6 +241,6 @@ const status = STATUS[lang];
   }
   drop.addEventListener('drop', (e) => {
     const chosen = (e as DragEvent).dataTransfer?.files?.[0];
-    if (chosen) void open(chosen);
+    if (chosen) { fileChosen(chosen, 'drop'); void open(chosen); }
   });
 </script>

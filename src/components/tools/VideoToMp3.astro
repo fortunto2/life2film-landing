@@ -20,7 +20,7 @@ const status = STATUS[lang];
 
 <div class="tool" slot="tool">
     <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
-    <label class="drop" id="drop" for="file" data-sda-event="file_chosen" data-sda-placement="dropzone">
+    <label class="drop" id="drop" for="file">
       <input type="file" id="file" accept="video/*,audio/*" hidden />
       <strong>{chrome.chooseFile}</strong>
       <span class="muted">{chrome.dragHint} — MP4, MOV, WebM, M4A</span>
@@ -103,6 +103,7 @@ const status = STATUS[lang];
 )}
 
 <script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
   import { toolStrings, fill } from '../../lib/strings';
   import {
     probe, encode, saveBlob, formatBytes, preciseClock,
@@ -189,6 +190,7 @@ const status = STATUS[lang];
 
       refreshEstimate();
     } catch (error) {
+      toolFailed('open', error, chosen);
       status(
         error instanceof Error
           ? `Could not read that file — ${error.message}`
@@ -223,9 +225,11 @@ const status = STATUS[lang];
       });
 
       saveBlob(blob, `${name}.${CONTAINER_EXTENSION[format]}`);
+      track('result_saved', { placement: 'result', format }, { size_mb: Math.round(blob.size / 104_857.6) / 10 });
       status(`Saved — ${formatBytes(blob.size)} ${format.toUpperCase()}.`, 1);
       setTimeout(() => { statusEl.hidden = true; }, 5000);
     } catch (error) {
+      toolFailed('run', error, file);
       status(
         error instanceof Error ? `Extraction failed — ${error.message}` : 'Extraction failed.',
         1,
@@ -239,7 +243,7 @@ const status = STATUS[lang];
 
   fileInput.addEventListener('change', () => {
     const chosen = fileInput.files?.[0];
-    if (chosen) void open(chosen);
+    if (chosen) { fileChosen(chosen, 'picker'); void open(chosen); }
   });
 
   for (const type of ['dragenter', 'dragover']) {
@@ -250,6 +254,6 @@ const status = STATUS[lang];
   }
   drop.addEventListener('drop', (e) => {
     const chosen = (e as DragEvent).dataTransfer?.files?.[0];
-    if (chosen) void open(chosen);
+    if (chosen) { fileChosen(chosen, 'drop'); void open(chosen); }
   });
 </script>

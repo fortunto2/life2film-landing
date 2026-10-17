@@ -80,6 +80,24 @@ const jsonLd = {
         <p class="privacy-note muted">
 {chrome.privacyNote}
         </p>
+
+        {/*
+          The only way from a tool to the app, and counted from both ends under ONE name, like the
+          home page's `site-hero`: `ct` tells App Store Connect which tool an install came from,
+          `data-sda-placement` tells our counter the click happened. Per tool, because "which tool
+          feeds the app" is the question this exists to answer.
+        */}
+        <p class="app-pitch">
+          <span>{chrome.appPitch}</span>
+          <a
+            class="ghost primary"
+            href={`https://apps.apple.com/app/id6761656888?pt=128499174&ct=tool-${slug}&mt=8`}
+            target="_blank"
+            rel="noopener"
+            data-sda-event="app_store_opened"
+            data-sda-placement={`tool-${slug}`}
+          >{chrome.appCta}</a>
+        </p>
       </div>
     </section>
 
@@ -181,6 +199,12 @@ const jsonLd = {
     .verdict.bad { border-color: rgba(250,63,165,.4); color: var(--pink); }
 
     .privacy-note { margin-top: 16px; font-size: 14px; max-width: 62ch; }
+    .app-pitch {
+      display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: center; margin-top: 18px;
+      padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; font-size: 15px; color: #cfcfd6;
+    }
+    .app-pitch span { flex: 1 1 32ch; }
+    .app-pitch a { text-decoration: none; white-space: nowrap; }
     .prose .q { margin: 28px 0 8px; font-size: 17px; }
 
     .related { padding-left: 0; list-style: none; }

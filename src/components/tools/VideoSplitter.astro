@@ -20,7 +20,7 @@ const status = STATUS[lang];
 
 <div class="tool" slot="tool">
     <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
-          <label class="drop" id="drop" for="file" data-sda-event="file_chosen" data-sda-placement="dropzone">
+          <label class="drop" id="drop" for="file">
             <input type="file" id="file" accept="video/*" hidden />
             <strong>{chrome.chooseVideo}</strong>
             <span class="muted">{chrome.dragHint} — MP4, MOV (H.264), WebM · up to 10 minutes</span>
@@ -44,7 +44,7 @@ const status = STATUS[lang];
 
             <span class="spacer"></span>
 
-            <button id="downloadAll" type="button" class="ghost primary" data-sda-event="result_saved" data-sda-placement="result">Download selected</button>
+            <button id="downloadAll" type="button" class="ghost primary">Download selected</button>
           </div>
 
           <div id="status" class="status" hidden>
@@ -130,6 +130,7 @@ const status = STATUS[lang];
 </style>
 
 <script>
+    import { fileChosen, toolFailed, track } from '../../lib/track';
   import { toolStrings } from '../../lib/strings';
     import { saveBlob } from '../../lib/encode';
     import { loadEngine } from '../../lib/engine';
@@ -246,7 +247,13 @@ const status = STATUS[lang];
         statusEl.hidden = true;
         el('controls').hidden = false;
         await rebuild(source);
+        track('result_shown', { placement: 'result' }, {
+          clips: clips.length,
+          shots: shots.length,
+          duration_s: Math.round(videoDuration),
+        });
       } catch (error) {
+        toolFailed('analyse', error, file);
         status(error instanceof Error ? error.message : 'Could not read that file.', 1, true);
       } finally {
         source?.release();
@@ -343,9 +350,15 @@ const status = STATUS[lang];
           saveBlob(new Blob([buffer], { type: 'video/mp4' }), `${fileName}-clip-${index + 1}${wantsVertical() ? '-9x16' : ''}.mp4`);
         }
 
+        track(
+          'result_saved',
+          { placement: indices.length === 1 && clips.length > 1 ? 'clip' : 'result', vertical: String(wantsVertical()) },
+          { clips: indices.length },
+        );
         status(`Done — ${indices.length} clip${indices.length > 1 ? 's' : ''} saved.`, 1);
         setTimeout(() => { statusEl.hidden = true; }, 4000);
       } catch (error) {
+        toolFailed('save', error, sourceFile);
         status(
           error instanceof Error
             ? `Encoding failed — ${error.message}`
@@ -389,7 +402,7 @@ const status = STATUS[lang];
 
     fileInput.addEventListener('change', () => {
       const file = fileInput.files?.[0];
-      if (file) void analyse(file);
+      if (file) { fileChosen(file, 'picker'); void analyse(file); }
     });
 
     for (const type of ['dragenter', 'dragover']) {
@@ -406,6 +419,6 @@ const status = STATUS[lang];
     }
     drop.addEventListener('drop', (e) => {
       const file = (e as DragEvent).dataTransfer?.files?.[0];
-      if (file) void analyse(file);
+      if (file) { fileChosen(file, 'drop'); void analyse(file); }
     });
 </script>

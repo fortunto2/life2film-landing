@@ -42,6 +42,9 @@ export interface ToolChrome {
   copied: string;
   promptTab: string;
   codeTab: string;
+  /** The one line under every tool that points at the app. */
+  appPitch: string;
+  appCta: string;
 }
 
 export const CHROME: Record<Lang, ToolChrome> = {
@@ -60,6 +63,9 @@ export const CHROME: Record<Lang, ToolChrome> = {
     copied: 'Copied',
     promptTab: 'Prompt for an agent',
     codeTab: 'Code',
+    appPitch:
+      'These tools do one step by hand. Life2Film, our iPhone app, cuts your whole camera roll into a film on its own, on the device.',
+    appCta: 'Get Life2Film for iPhone',
   },
   es: {
     allTools: '← Todas las herramientas',
@@ -76,6 +82,9 @@ export const CHROME: Record<Lang, ToolChrome> = {
     copied: 'Copiado',
     promptTab: 'Instrucción para un agente',
     codeTab: 'Código',
+    appPitch:
+      'Estas herramientas hacen un paso a mano. Life2Film, nuestra app para iPhone, monta toda tu galería en una película por sí sola, en el propio dispositivo.',
+    appCta: 'Descargar Life2Film para iPhone',
   },
   pt: {
     allTools: '← Todas as ferramentas',
@@ -92,6 +101,9 @@ export const CHROME: Record<Lang, ToolChrome> = {
     copied: 'Copiado',
     promptTab: 'Instrução para um agente',
     codeTab: 'Código',
+    appPitch:
+      'Estas ferramentas fazem um passo à mão. A Life2Film, a nossa app para iPhone, monta a sua galeria inteira num filme sozinha, no próprio aparelho.',
+    appCta: 'Obter a Life2Film para iPhone',
   },
   id: {
     allTools: '← Semua alat',
@@ -108,6 +120,9 @@ export const CHROME: Record<Lang, ToolChrome> = {
     copied: 'Tersalin',
     promptTab: 'Perintah untuk agen',
     codeTab: 'Kode',
+    appPitch:
+      'Alat ini mengerjakan satu langkah secara manual. Life2Film, aplikasi iPhone kami, menyunting seluruh galeri Anda menjadi film secara otomatis, langsung di perangkat.',
+    appCta: 'Unduh Life2Film untuk iPhone',
   },
   ar: {
     allTools: '← كل الأدوات',
@@ -124,6 +139,9 @@ export const CHROME: Record<Lang, ToolChrome> = {
     copied: 'تم النسخ',
     promptTab: 'تعليمات لوكيل برمجي',
     codeTab: 'الشيفرة',
+    appPitch:
+      'هذه الأدوات تنجز خطوة واحدة يدويًا. أما Life2Film، تطبيقنا للآيفون، فيحوّل مكتبة صورك كلها إلى فيلم تلقائيًا، على الجهاز نفسه.',
+    appCta: 'حمّل Life2Film للآيفون',
   },
   ru: {
     allTools: '← Все инструменты',
@@ -140,6 +158,9 @@ export const CHROME: Record<Lang, ToolChrome> = {
     copied: 'Скопировано',
     promptTab: 'Промпт для агента',
     codeTab: 'Код',
+    appPitch:
+      'Эти инструменты делают один шаг вручную. Life2Film, наше приложение для iPhone, само монтирует фильм из всей галереи, прямо на телефоне.',
+    appCta: 'Скачать Life2Film для iPhone',
   },
   tr: {
     allTools: '← Tüm araçlar',
@@ -156,6 +177,9 @@ export const CHROME: Record<Lang, ToolChrome> = {
     copied: 'Kopyalandı',
     promptTab: 'Bir ajan için komut',
     codeTab: 'Kod',
+    appPitch:
+      'Bu araçlar tek bir adımı elle yapar. iPhone uygulamamız Life2Film ise tüm galerinizi cihazın üzerinde, kendi kendine bir filme dönüştürür.',
+    appCta: "iPhone için Life2Film'i indir",
   },
 };
 

@@ -20,7 +20,7 @@ const status = STATUS[lang];
 
 <div class="tool" slot="tool">
     <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
-    <label class="drop" id="drop" for="file" data-sda-event="file_chosen" data-sda-placement="dropzone">
+    <label class="drop" id="drop" for="file">
       <input type="file" id="file" accept="video/*" hidden />
       <strong>{chrome.chooseVideo}</strong>
       <span class="muted">{chrome.dragHint} — MP4, MOV (H.264), WebM</span>
@@ -100,7 +100,7 @@ const status = STATUS[lang];
           <span class="saved" id="saved"></span>
         </div>
         <div class="controls">
-          <button id="save" type="button" class="ghost primary" data-sda-event="result_saved" data-sda-placement="result">Download</button>
+          <button id="save" type="button" class="ghost primary">Download</button>
           <span class="muted" id="outcomeNote"></span>
         </div>
       </div>
@@ -169,6 +169,7 @@ const status = STATUS[lang];
 </style>
 
 <script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
   import { toolStrings, fill } from '../../lib/strings';
   import { probe, encode, saveBlob, formatBytes, preciseClock, type QualityName, type Probe } from '../../lib/encode';
   import {
@@ -307,6 +308,7 @@ const status = STATUS[lang];
 
       refreshEstimate();
     } catch (error) {
+      toolFailed('open', error, chosen);
       status(
         fill(say.cannotRead, { reason: error instanceof Error ? error.message : '?' }),
         1,
@@ -352,7 +354,12 @@ const status = STATUS[lang];
     try {
       result = mode === 'size' ? await compressToSize(file, info) : await compressByQuality(file);
       showOutcome();
+      track('result_shown', { placement: 'result', mode }, {
+        size_mb: Math.round(result.size / 104_857.6) / 10,
+        ratio: Math.round((result.size / file.size) * 100) / 100,
+      });
     } catch (error) {
+      toolFailed('run', error, file);
       status(fill(say.failed, { reason: error instanceof Error ? error.message : '?' }), 1, true);
     } finally {
       busy = false;
@@ -446,13 +453,14 @@ const status = STATUS[lang];
   el<HTMLButtonElement>('save').addEventListener('click', () => {
     if (!result || !file) return;
     saveBlob(result, `${file.name.replace(/\.[^.]+$/, '') || 'video'}-compressed.mp4`);
+    track('result_saved', { placement: 'result', mode }, { size_mb: Math.round(result.size / 104_857.6) / 10 });
   });
 
   // --- input ---
 
   fileInput.addEventListener('change', () => {
     const chosen = fileInput.files?.[0];
-    if (chosen) void open(chosen);
+    if (chosen) { fileChosen(chosen, 'picker'); void open(chosen); }
   });
 
   for (const type of ['dragenter', 'dragover']) {
@@ -463,6 +471,6 @@ const status = STATUS[lang];
   }
   drop.addEventListener('drop', (e) => {
     const chosen = (e as DragEvent).dataTransfer?.files?.[0];
-    if (chosen) void open(chosen);
+    if (chosen) { fileChosen(chosen, 'drop'); void open(chosen); }
   });
 </script>

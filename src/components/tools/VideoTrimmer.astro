@@ -20,7 +20,7 @@ const status = STATUS[lang];
 
 <div class="tool" slot="tool">
     <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
-    <label class="drop" id="drop" for="file" data-sda-event="file_chosen" data-sda-placement="dropzone">
+    <label class="drop" id="drop" for="file">
       <input type="file" id="file" accept="video/*" hidden />
       <strong>{chrome.chooseVideo}</strong>
       <span class="muted">{chrome.dragHint} — MP4, MOV (H.264), WebM</span>
@@ -91,7 +91,7 @@ const status = STATUS[lang];
 
         <span class="spacer"></span>
         <span class="muted" id="estimate"></span>
-        <button id="save" type="button" class="ghost primary" data-sda-event="result_saved" data-sda-placement="result">Save trimmed video</button>
+        <button id="save" type="button" class="ghost primary">Save trimmed video</button>
       </div>
 
       <div id="modeNote" class="modenote muted"></div>
@@ -181,6 +181,7 @@ const status = STATUS[lang];
 </style>
 
 <script>
+  import { fileChosen, toolFailed, track as report } from '../../lib/track';
   import { toolStrings, fill } from '../../lib/strings';
   import {
     probe, encodeDetailed, saveBlob, formatBytes, preciseClock,
@@ -351,6 +352,7 @@ const status = STATUS[lang];
 
       draw();
     } catch (error) {
+      toolFailed('open', error, chosen);
       status(
         error instanceof Error
           ? `Could not read that file — ${error.message}`
@@ -498,6 +500,10 @@ const status = STATUS[lang];
       }
 
       saveBlob(blob, `${name}-trimmed.${CONTAINER_EXTENSION[container]}`);
+      report('result_saved', { placement: 'result', mode: current, format: container }, {
+        size_mb: Math.round(blob.size / 104_857.6) / 10,
+        seconds: Math.round(selectionLength() * 10) / 10,
+      });
 
       status(
         `Saved — ${formatBytes(blob.size)}, ${selectionLength().toFixed(1)}s` +
@@ -506,6 +512,7 @@ const status = STATUS[lang];
       );
       setTimeout(() => { statusEl.hidden = true; }, 6000);
     } catch (error) {
+      toolFailed('run', error, file);
       status(
         error instanceof Error ? `Failed — ${error.message}` : 'Failed.',
         1,
@@ -579,7 +586,7 @@ const status = STATUS[lang];
 
   fileInput.addEventListener('change', () => {
     const chosen = fileInput.files?.[0];
-    if (chosen) void open(chosen);
+    if (chosen) { fileChosen(chosen, 'picker'); void open(chosen); }
   });
 
   for (const type of ['dragenter', 'dragover']) {
@@ -590,6 +597,6 @@ const status = STATUS[lang];
   }
   drop.addEventListener('drop', (e) => {
     const chosen = (e as DragEvent).dataTransfer?.files?.[0];
-    if (chosen) void open(chosen);
+    if (chosen) { fileChosen(chosen, 'drop'); void open(chosen); }
   });
 </script>

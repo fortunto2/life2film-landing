@@ -18,7 +18,7 @@ const chrome = CHROME[lang];
 ---
 
 <div class="tool" slot="tool">
-          <label class="drop" id="drop" for="file" data-sda-event="file_chosen" data-sda-placement="dropzone">
+          <label class="drop" id="drop" for="file">
             <input type="file" id="file" accept="video/*" hidden />
             <strong>{chrome.chooseVideo}</strong>
             <span class="muted">{chrome.dragHint} — MP4, MOV (H.264), WebM</span>
@@ -50,7 +50,7 @@ const chrome = CHROME[lang];
                   <option value="csv">CSV — spreadsheets</option>
                   <option value="json">JSON — scripts</option>
                 </select>
-                <button id="save" type="button" class="ghost primary" data-sda-event="result_saved" data-sda-placement="result">Download</button>
+                <button id="save" type="button" class="ghost primary">Download</button>
                 <label class="fps">
                   <span class="muted">fps</span>
                   <select id="fps" aria-label="Frame rate for timecode">
@@ -138,6 +138,7 @@ const chrome = CHROME[lang];
 </style>
 
 <script>
+    import { fileChosen, toolFailed, track } from '../../lib/track';
     import type { Shot } from '../../lib/clips';
     import { loadEngine } from '../../lib/engine';
     import { openVideo, samplePlan, centerPixel, refineBoundary, type VideoSource } from '../../lib/frames';
@@ -271,11 +272,16 @@ const chrome = CHROME[lang];
 
         statusEl.hidden = true;
         resultEl.hidden = false;
+        track('result_shown', { placement: 'result' }, {
+          shots: shots.length,
+          duration_s: Math.round(source.duration),
+        });
 
         // Thumbnails come last, from a second pass over shot starts only — a few dozen seeks rather
         // than a few hundred, so the numbers appear before the pictures do.
         await renderShots(source);
       } catch (error) {
+        toolFailed('analyse', error, file);
         status(
           error instanceof Error ? error.message : 'Something went wrong reading that file.',
           1,
@@ -318,7 +324,7 @@ const chrome = CHROME[lang];
 
     fileInput.addEventListener('change', () => {
       const file = fileInput.files?.[0];
-      if (file) void analyse(file);
+      if (file) { fileChosen(file, 'picker'); void analyse(file); }
     });
 
     for (const type of ['dragenter', 'dragover']) {
@@ -335,7 +341,7 @@ const chrome = CHROME[lang];
     }
     drop.addEventListener('drop', (e) => {
       const file = (e as DragEvent).dataTransfer?.files?.[0];
-      if (file) void analyse(file);
+      if (file) { fileChosen(file, 'drop'); void analyse(file); }
     });
 
     // --- export ---
@@ -360,5 +366,6 @@ const chrome = CHROME[lang];
         }),
         `${fileName}-shots.${EXTENSION[format]}`,
       );
+      track('result_saved', { placement: 'result', format }, { shots: shots.length });
     });
 </script>
