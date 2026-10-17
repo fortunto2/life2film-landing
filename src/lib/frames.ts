@@ -22,6 +22,8 @@ export interface VideoSource {
   frameAt(seconds: number, size: number): Promise<Frame>;
   /** Same instant as a data URL, for showing the user what was found. */
   thumbnailAt(seconds: number, width: number): Promise<string>;
+  /** Same instant as an image file, `width` 0 meaning the video's own size. */
+  imageAt(seconds: number, width: number, type: 'image/jpeg' | 'image/png', quality?: number): Promise<Blob>;
   release(): void;
 }
 
@@ -123,6 +125,13 @@ export function openVideo(file: File): Promise<VideoSource> {
         async thumbnailAt(seconds, thumbWidth) {
           const drawn = await drawScaled(seconds, thumbWidth);
           return drawn.toDataURL('image/jpeg', 0.72);
+        },
+
+        async imageAt(seconds, imageWidth, type, quality = 0.92) {
+          const drawn = await drawScaled(seconds, imageWidth || width);
+          return new Promise<Blob>((done, failed) =>
+            drawn.toBlob((blob) => (blob ? done(blob) : failed(new Error('The browser could not encode the frame.'))), type, quality),
+          );
         },
 
         release() {
@@ -276,4 +285,19 @@ export async function refineBoundary(
       hi: Math.min(source.duration, (boundary + neighbours.next) / 2),
     },
   );
+}
+
+/**
+ * When to take each frame: one every `interval` seconds from the start, at most `max` of them.
+ *
+ * The cap is memory, not politeness: a thousand full-HD JPEGs is a quarter of a gigabyte held in
+ * a tab before the archive is written. Past it the interval widens rather than the video being
+ * silently cut short, and the caller is told the interval it actually got.
+ */
+export function frameTimes(duration: number, interval: number, max = 600): { times: number[]; interval: number } {
+  if (!(duration > 0) || !(interval > 0)) return { times: [], interval };
+  const step = Math.max(interval, duration / max);
+  const count = Math.min(max, Math.floor(duration / step + 1e-9) + 1);
+  const times = Array.from({ length: count }, (_, i) => Math.min(i * step, Math.max(0, duration - 0.05)));
+  return { times, interval: step };
 }

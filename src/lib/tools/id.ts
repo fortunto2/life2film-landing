@@ -162,7 +162,7 @@ export const id: ToolTranslations = {
 
   'video-splitter': {
     searchPhrase: 'Membagi video online',
-    title: 'Bagi Video Online Gratis — jadi Reels dan Shorts, dipotong di pergantian adegan',
+    title: 'Bagi Video Jadi Beberapa Bagian Online Gratis — sama rata atau per adegan',
     description:
       'Pembagi video online gratis yang memotong video panjang menjadi bagian-bagian pada pergantian shot, bukan setiap 30 detik, lalu mengurutkannya berdasarkan kualitas gambar. Pemangkasan 9:16 opsional untuk Reels, Shorts dan TikTok. Tidak ada yang diunggah.',
     heading: 'Bagi',

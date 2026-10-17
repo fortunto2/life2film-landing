@@ -102,9 +102,7 @@ package (currently ${ENGINE_VERSION}):
 npm i life2film-engine
 \`\`\`
 
-Nineteen exports: \`detect_beats\`, \`analyze_audio\`, \`beat_sync_timeline\`, three scene-detection
-families, \`score_frame\` (31 per-frame measurements), \`select_segments\`, \`compose_montage\`,
-OpenTimelineIO in and out. It analyses; it does not decode or encode — pair it with
+Three exports: \`detect_beats\`, \`detect_scenes_slick\` and \`score_frame\`. It analyses; it does not decode or encode — pair it with
 [mediabunny](https://mediabunny.dev) (MIT) for that, which is what these tool pages do.
 
 Everything below, plus the full skill, in one document: https://life2film.com/llms-full.txt\n\nThe package ships a skill for coding agents at \`node_modules/life2film-engine/SKILL.md\`, also

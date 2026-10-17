@@ -37,6 +37,9 @@ export function track(name: string, props?: Props, metrics?: Metrics): void {
       w.sda = stub;
     }
     w.sda(name, props, metrics);
+    // The page reacts to a finished result (ToolPage shows the app offer then), without every tool
+    // having to know about it.
+    if (name === 'result_saved') window.dispatchEvent(new CustomEvent('tool:saved'));
   } catch {
     // Analytics never breaks a tool.
   }

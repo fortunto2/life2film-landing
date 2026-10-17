@@ -1,0 +1,264 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+/** The tool's own words. Russian and English: those are the two pages that exist. */
+const WORDS = {
+  en: {
+    hint: 'MP4, MOV (H.264), WebM · up to 600 frames per run',
+    every: 'One frame', format: 'Format', size: 'Size', original: 'original size',
+    run: 'Extract frames', saveAll: 'Download all as ZIP', save: 'Save',
+    perSecond: '{n} per second', everyN: 'every {n} s', taking: 'Taking frame {i} of {n}…',
+    summary: '<b>{n}</b> frames, one every {step} s', widened: ' — widened to stay under 600 frames',
+    zipping: 'Packing the archive…', saved: 'Saved {n} frames.', shown: 'Showing the first {n}.',
+  },
+  ru: {
+    hint: 'MP4, MOV (H.264), WebM · до 600 кадров за раз',
+    every: 'Кадр', format: 'Формат', size: 'Размер', original: 'исходный размер',
+    run: 'Разбить на кадры', saveAll: 'Скачать все одним ZIP', save: 'Сохранить',
+    perSecond: '{n} в секунду', everyN: 'каждые {n} с', taking: 'Кадр {i} из {n}…',
+    summary: 'Кадров: <b>{n}</b>, по одному каждые {step} с', widened: ' — шаг увеличен, чтобы уложиться в 600 кадров',
+    zipping: 'Собираю архив…', saved: 'Сохранено кадров: {n}.', shown: 'Показаны первые {n}.',
+  },
+};
+const words = lang === 'ru' ? WORDS.ru : WORDS.en;
+const fill = (t: string, n: number | string) => t.replace('{n}', String(n));
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-strings={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="video/*" hidden />
+    <strong>{chrome.chooseVideo}</strong>
+    <span class="muted">{chrome.dragHint} — {words.hint}</span>
+  </label>
+
+  <div id="editor" hidden>
+    <div class="facts" id="facts"></div>
+
+    <div class="controls">
+      <label class="control">
+        <span class="muted">{words.every}</span>
+        <select id="interval">
+          {[0.1, 0.2, 0.5].map((s) => <option value={s}>{fill(words.perSecond, Math.round(1 / s))}</option>)}
+          <option value="1" selected>{fill(words.perSecond, 1)}</option>
+          {[2, 5, 10, 30].map((s) => <option value={s}>{fill(words.everyN, s)}</option>)}
+        </select>
+      </label>
+
+      <label class="control">
+        <span class="muted">{words.format}</span>
+        <select id="format">
+          <option value="image/jpeg" selected>JPG</option>
+          <option value="image/png">PNG</option>
+        </select>
+      </label>
+
+      <label class="control">
+        <span class="muted">{words.size}</span>
+        <select id="width">
+          <option value="0" selected>{words.original}</option>
+          <option value="1920">1920 px</option>
+          <option value="1280">1280 px</option>
+          <option value="640">640 px</option>
+        </select>
+      </label>
+
+      <span class="spacer"></span>
+      <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+    </div>
+  </div>
+
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+
+  <div id="result" hidden>
+    <div class="controls">
+      <div class="summary" id="summary"></div>
+      <span class="spacer"></span>
+      <button id="saveAll" type="button" class="ghost primary">{words.saveAll}</button>
+    </div>
+    <div class="frames" id="frames"></div>
+  </div>
+</div>
+
+<style>
+  .summary { font-size: 15px; color: #cfcfd6; }
+  .summary :global(b) { color: var(--fg); }
+  .frames { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); margin-top: 16px; }
+  .frames :global(figure) { margin: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #08080a; }
+  .frames :global(img) { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #111; }
+  .frames :global(figcaption) { display: flex; justify-content: space-between; align-items: center; padding: 6px 9px; font-size: 12px; font-family: ui-monospace, monospace; color: var(--muted); }
+  .frames :global(figcaption button) { font: inherit; font-size: 12px; color: var(--cyan); background: none; border: 0; cursor: pointer; padding: 0; }
+</style>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { toolStrings } from '../../lib/strings';
+  import { saveBlob, formatBytes, preciseClock } from '../../lib/encode';
+  import { openVideo, frameTimes, type VideoSource } from '../../lib/frames';
+  import { zipStored } from '../../lib/zip';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const say = toolStrings();
+  const w = JSON.parse(el('words').dataset.strings!) as Record<string, string>;
+  const fill = (t: string, values: Record<string, string | number>) =>
+    t.replace(/\{(\w+)\}/g, (whole, key) => (key in values ? String(values[key]) : whole));
+
+  const drop = el<HTMLLabelElement>('drop');
+  const fileInput = el<HTMLInputElement>('file');
+  const statusEl = el<HTMLDivElement>('status');
+  const grid = el<HTMLDivElement>('frames');
+
+  /** Thumbnails cost memory too; the archive gets every frame, the page shows the first ones. */
+  const PREVIEW = 120;
+
+  let file: File | null = null;
+  let duration = 0;
+  let images: { name: string; blob: Blob }[] = [];
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  async function open(chosen: File) {
+    file = chosen;
+    images = [];
+    el('result').hidden = true;
+    let source: VideoSource | null = null;
+    try {
+      status(say.reading);
+      source = await openVideo(chosen);
+      duration = source.duration;
+      el('facts').innerHTML =
+        `<span>${source.width}×${source.height}</span>` +
+        `<span>${preciseClock(duration)}</span>` +
+        `<span>${formatBytes(chosen.size)}</span>`;
+      el('editor').hidden = false;
+      statusEl.hidden = true;
+    } catch (error) {
+      toolFailed('open', error, chosen);
+      status(error instanceof Error ? error.message : 'Could not read that file.', 1, true);
+    } finally {
+      source?.release();
+    }
+  }
+
+  el<HTMLButtonElement>('run').addEventListener('click', async () => {
+    if (!file || busy) return;
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    el('result').hidden = true;
+    grid.replaceChildren();
+    images = [];
+
+    const type = el<HTMLSelectElement>('format').value as 'image/jpeg' | 'image/png';
+    const width = Number(el<HTMLSelectElement>('width').value) || 0;
+    const asked = Number(el<HTMLSelectElement>('interval').value) || 1;
+    const { times, interval } = frameTimes(duration, asked);
+    const ext = type === 'image/png' ? 'png' : 'jpg';
+    const base = file.name.replace(/\.[^.]+$/, '') || 'video';
+    const digits = String(times.length).length;
+
+    let source: VideoSource | null = null;
+    try {
+      source = await openVideo(file);
+      for (const [i, at] of times.entries()) {
+        if (i % 4 === 0) status(fill(w.taking, { i: i + 1, n: times.length }), i / times.length);
+        const blob = await source.imageAt(at, width, type);
+        const name = `${base}-${String(i + 1).padStart(digits, '0')}-${at.toFixed(2).replace('.', '_')}s.${ext}`;
+        images.push({ name, blob });
+
+        if (i < PREVIEW) {
+          const figure = document.createElement('figure');
+          const img = document.createElement('img');
+          img.loading = 'lazy';
+          img.alt = `${preciseClock(at)}`;
+          img.src = URL.createObjectURL(blob);
+          const caption = document.createElement('figcaption');
+          caption.innerHTML = `<span>${preciseClock(at)}</span><button type="button">${w.save}</button>`;
+          caption.querySelector('button')!.addEventListener('click', () => {
+            saveBlob(blob, name);
+            track('result_saved', { placement: 'frame', format: ext }, { frames: 1 });
+          });
+          figure.append(img, caption);
+          grid.append(figure);
+        }
+      }
+
+      const step = Math.round(interval * 100) / 100;
+      el('summary').innerHTML =
+        fill(w.summary, { n: images.length, step }) +
+        (interval > asked + 1e-9 ? w.widened : '') +
+        (images.length > PREVIEW ? `. ${fill(w.shown, { n: PREVIEW })}` : '');
+      el('result').hidden = false;
+      statusEl.hidden = true;
+      track('result_shown', { placement: 'result', format: ext }, {
+        frames: images.length,
+        duration_s: Math.round(duration),
+      });
+    } catch (error) {
+      toolFailed('run', error, file);
+      status(error instanceof Error ? error.message : 'Failed.', 1, true);
+    } finally {
+      source?.release();
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  el<HTMLButtonElement>('saveAll').addEventListener('click', async () => {
+    if (!images.length || !file || busy) return;
+    busy = true;
+    try {
+      status(w.zipping, 0.5);
+      const entries = await Promise.all(
+        images.map(async ({ name, blob }) => ({ name, data: new Uint8Array(await blob.arrayBuffer()) })),
+      );
+      const zip = zipStored(entries);
+      const base = file.name.replace(/\.[^.]+$/, '') || 'video';
+      saveBlob(new Blob([zip], { type: 'application/zip' }), `${base}-frames.zip`);
+      track('result_saved', { placement: 'result', format: entries[0].name.split('.').pop() ?? 'jpg' }, {
+        frames: entries.length,
+        size_mb: Math.round(zip.length / 104_857.6) / 10,
+      });
+      status(fill(w.saved, { n: entries.length }), 1);
+      setTimeout(() => { statusEl.hidden = true; }, 4000);
+    } catch (error) {
+      toolFailed('save', error, file);
+      status(error instanceof Error ? error.message : 'Failed.', 1, true);
+    } finally {
+      busy = false;
+    }
+  });
+
+  fileInput.addEventListener('change', () => {
+    const chosen = fileInput.files?.[0];
+    if (chosen) { fileChosen(chosen, 'picker'); void open(chosen); }
+  });
+  for (const type of ['dragenter', 'dragover']) {
+    drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  }
+  for (const type of ['dragleave', 'drop']) {
+    drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  }
+  drop.addEventListener('drop', (e) => {
+    const chosen = (e as DragEvent).dataTransfer?.files?.[0];
+    if (chosen) { fileChosen(chosen, 'drop'); void open(chosen); }
+  });
+</script>

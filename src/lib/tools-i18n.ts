@@ -45,6 +45,8 @@ export interface ToolChrome {
   /** The one line under every tool that points at the app. */
   appPitch: string;
   appCta: string;
+  /** Shown once a result is saved: the moment the app's pitch is most true. */
+  appAfter: string;
 }
 
 export const CHROME: Record<Lang, ToolChrome> = {
@@ -66,6 +68,8 @@ export const CHROME: Record<Lang, ToolChrome> = {
     appPitch:
       'These tools do one step by hand. Life2Film, our iPhone app, cuts your whole camera roll into a film on its own, on the device.',
     appCta: 'Get Life2Film for iPhone',
+    appAfter:
+      'Saved. Life2Film does the whole edit by itself: it picks the best moments from your camera roll and cuts them to music, on iPhone.',
   },
   es: {
     allTools: '← Todas las herramientas',
@@ -85,6 +89,8 @@ export const CHROME: Record<Lang, ToolChrome> = {
     appPitch:
       'Estas herramientas hacen un paso a mano. Life2Film, nuestra app para iPhone, monta toda tu galería en una película por sí sola, en el propio dispositivo.',
     appCta: 'Descargar Life2Film para iPhone',
+    appAfter:
+      'Guardado. Life2Film hace todo el montaje solo: elige los mejores momentos de tu galería y los monta con música, en el iPhone.',
   },
   pt: {
     allTools: '← Todas as ferramentas',
@@ -104,6 +110,8 @@ export const CHROME: Record<Lang, ToolChrome> = {
     appPitch:
       'Estas ferramentas fazem um passo à mão. A Life2Film, a nossa app para iPhone, monta a sua galeria inteira num filme sozinha, no próprio aparelho.',
     appCta: 'Obter a Life2Film para iPhone',
+    appAfter:
+      'Guardado. A Life2Film faz a montagem inteira sozinha: escolhe os melhores momentos da sua galeria e monta-os com música, no iPhone.',
   },
   id: {
     allTools: '← Semua alat',
@@ -123,6 +131,8 @@ export const CHROME: Record<Lang, ToolChrome> = {
     appPitch:
       'Alat ini mengerjakan satu langkah secara manual. Life2Film, aplikasi iPhone kami, menyunting seluruh galeri Anda menjadi film secara otomatis, langsung di perangkat.',
     appCta: 'Unduh Life2Film untuk iPhone',
+    appAfter:
+      'Tersimpan. Life2Film mengerjakan seluruh suntingan sendiri: memilih momen terbaik dari galeri Anda dan menyusunnya dengan musik, di iPhone.',
   },
   ar: {
     allTools: '← كل الأدوات',
@@ -142,6 +152,8 @@ export const CHROME: Record<Lang, ToolChrome> = {
     appPitch:
       'هذه الأدوات تنجز خطوة واحدة يدويًا. أما Life2Film، تطبيقنا للآيفون، فيحوّل مكتبة صورك كلها إلى فيلم تلقائيًا، على الجهاز نفسه.',
     appCta: 'حمّل Life2Film للآيفون',
+    appAfter:
+      'تم الحفظ. يتولى Life2Film المونتاج كله بنفسه: يختار أفضل اللحظات من مكتبتك ويركّبها على الموسيقى، على الآيفون.',
   },
   ru: {
     allTools: '← Все инструменты',
@@ -161,6 +173,8 @@ export const CHROME: Record<Lang, ToolChrome> = {
     appPitch:
       'Эти инструменты делают один шаг вручную. Life2Film, наше приложение для iPhone, само монтирует фильм из всей галереи, прямо на телефоне.',
     appCta: 'Скачать Life2Film для iPhone',
+    appAfter:
+      'Сохранено. Life2Film делает весь монтаж сам: выбирает лучшие моменты из галереи и складывает их под музыку, прямо на iPhone.',
   },
   tr: {
     allTools: '← Tüm araçlar',
@@ -180,6 +194,8 @@ export const CHROME: Record<Lang, ToolChrome> = {
     appPitch:
       'Bu araçlar tek bir adımı elle yapar. iPhone uygulamamız Life2Film ise tüm galerinizi cihazın üzerinde, kendi kendine bir filme dönüştürür.',
     appCta: "iPhone için Life2Film'i indir",
+    appAfter:
+      "Kaydedildi. Life2Film tüm kurguyu kendisi yapar: galerinizden en iyi anları seçer ve müzikle birleştirir, iPhone'da.",
   },
 };
 

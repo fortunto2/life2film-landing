@@ -77,6 +77,22 @@ const jsonLd = {
 
         <slot name="tool" />
 
+        {/* Revealed by `tool:saved` (see lib/track.ts): the offer at the moment the result exists. */}
+        <p class="app-after" id="appAfter" hidden>
+          <span>{chrome.appAfter}</span>
+          <a
+            class="ghost primary"
+            href={`https://apps.apple.com/app/id6761656888?pt=128499174&ct=tool-${slug}-result&mt=8`}
+            target="_blank"
+            rel="noopener"
+            data-sda-event="app_store_opened"
+            data-sda-placement={`tool-${slug}-result`}
+          >{chrome.appCta}</a>
+        </p>
+        <script is:inline>
+          addEventListener('tool:saved', () => { const n = document.getElementById('appAfter'); if (n) n.hidden = false; });
+        </script>
+
         <p class="privacy-note muted">
 {chrome.privacyNote}
         </p>
@@ -152,6 +168,9 @@ const jsonLd = {
     .tool-head .lede { color: #cfcfd6; max-width: 60ch; margin-bottom: 30px; font-size: 19px; }
 
     .tool { border: 1px solid var(--line); border-radius: 18px; background: var(--panel); padding: 22px; }
+    /* `.controls` and `.control` set display, which beats the browser's own [hidden] rule: every
+       control panel was on screen before a file was chosen, all modes at once. */
+    .tool [hidden] { display: none !important; }
 
     .drop {
       display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
@@ -204,6 +223,14 @@ const jsonLd = {
       padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; font-size: 15px; color: #cfcfd6;
     }
     .app-pitch span { flex: 1 1 32ch; }
+    .app-after {
+      display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: center; margin-top: 14px;
+      padding: 14px 16px; border: 1px solid rgba(0,242,224,.45); border-radius: 14px;
+      background: rgba(0,242,224,.05); font-size: 15px; color: var(--fg);
+    }
+    .app-after[hidden] { display: none; }
+    .app-after span { flex: 1 1 32ch; }
+    .app-after a { text-decoration: none; white-space: nowrap; }
     .app-pitch a { text-decoration: none; white-space: nowrap; }
     .prose .q { margin: 28px 0 8px; font-size: 17px; }
 

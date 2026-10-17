@@ -8,17 +8,8 @@ const description =
 
 const exports_ = [
   { name: 'detect_beats', does: 'Tempo and the position of every beat, from mono PCM.' },
-  { name: 'analyze_audio', does: 'Silence, sections, spectral flatness, content type.' },
-  { name: 'beat_sync_timeline', does: 'Place cuts on the beat.' },
-  { name: 'detect_scenes_slick', does: 'Shot boundaries from centre pixels — 16 algorithms.' },
-  { name: 'detect_scenes_content', does: 'Shot boundaries from HSV frame deltas.' },
-  { name: 'detect_scenes_features', does: 'Shot boundaries from N-dimensional feature vectors.' },
-  { name: 'score_frame', does: '31 measurements per frame, as one score plus a garbage flag.' },
-  { name: 'score_segments', does: 'Rank segments by the frames inside them.' },
-  { name: 'select_segments', does: 'Choose which segments make the cut, under a duration budget.' },
-  { name: 'compose_montage', does: 'Assemble a timeline from scored segments.' },
-  { name: 'build_otio', does: 'Write OpenTimelineIO.' },
-  { name: 'parse_otio', does: 'Read OpenTimelineIO.' },
+  { name: 'detect_scenes_slick', does: 'Shot boundaries from centre-column pixels — 16 algorithms.' },
+  { name: 'score_frame', does: 'Per-frame picture measurements, as one score plus a garbage flag.' },
 ];
 
 const jsonLd = {
@@ -223,7 +214,8 @@ export const BeatFlash = ({ beats, bpm }) => {
           </tbody>
         </table>
         <p class="muted small">
-          Nineteen in total, typed in <code>va_wasm.d.ts</code>. Every one returns a JSON string.
+          Three, typed in <code>va_wasm.d.ts</code>. Every one returns a JSON string. Montage assembly
+          and segment selection stay in the Life2Film app.
         </p>
 
         <h2>Licence</h2>

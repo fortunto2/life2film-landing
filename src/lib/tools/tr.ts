@@ -162,7 +162,7 @@ export const tr: ToolTranslations = {
 
   'video-splitter': {
     searchPhrase: 'Video bölme online',
-    title: 'Video Bölme Online Ücretsiz — Reels ve Shorts olarak, sahne değişimlerinden',
+    title: 'Videoyu Parçalara Bölme Online Ücretsiz — eşit parçalar ya da sahne değişimleri',
     description:
       'Uzun bir videoyu her 30 saniyede bir yerine plan değişimlerinden parçalara bölen ve görüntü kalitesine göre sıralayan ücretsiz çevrimiçi video bölücü. Reels, Shorts ve TikTok için isteğe bağlı 9:16 kırpma. Hiçbir şey yüklenmez.',
     heading: 'Video',

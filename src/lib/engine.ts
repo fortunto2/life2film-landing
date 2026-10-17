@@ -1,9 +1,9 @@
 /**
  * The Life2Film engine as the browser sees it.
  *
- * `va-wasm` is built from the same Rust that drives the app and the desktop Studio; `public/wasm/`
- * holds the output (see the README there for how to rebuild it). Only the exports the tool pages
- * call are typed here — the full surface is in `va_wasm.d.ts`.
+ * `va-wasm` is built from the same Rust that drives the app and the desktop Studio, but `public/wasm/`
+ * holds the SITE build (`make wasm-site`, see docs/wasm.md): these three functions and nothing else,
+ * so the montage logic never ships in a file every visitor downloads.
  */
 
 export interface Engine {
@@ -27,7 +27,7 @@ interface Module extends Engine {
   default: (options: { module_or_path: string }) => Promise<unknown>;
 }
 
-// The module is 1.2 MB (about 410 KB compressed), so it loads on first use rather than on page
+// The module is 479 KB (it was 1.2 MB with the whole engine in it), so it loads on first use rather than on page
 // load: a page that costs a megabyte before it can be read would rank worse than one that answers
 // a moment later.
 //

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { groupIntoClips, rankByScore, stars, type Shot } from './clips';
+import { equalClips, groupIntoClips, rankByScore, stars, type Shot } from './clips';
 
 /** Shots back to back, each `length` long, all scoring the same unless given otherwise. */
 function run(lengths: number[], scores?: number[]): Shot[] {
@@ -96,5 +96,31 @@ describe('ranking', () => {
     const clips = groupIntoClips(run([10]), { target: 10 });
     expect(stars(clips[0], 0)).toBeGreaterThanOrEqual(1);
     expect(stars({ ...clips[0], score: 0 }, 1)).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe('equal parts', () => {
+  test('N parts cover the video exactly, edge to edge', () => {
+    const clips = equalClips(100, { parts: 3 });
+    expect(clips).toHaveLength(3);
+    expect(clips[0].start).toBe(0);
+    expect(clips[2].end).toBe(100);
+    for (let i = 1; i < clips.length; i++) expect(clips[i].start).toBe(clips[i - 1].end);
+    for (const clip of clips) expect(clip.end - clip.start).toBeCloseTo(100 / 3, 6);
+  });
+
+  test('every N seconds leaves the remainder as the last part', () => {
+    const clips = equalClips(95, { every: 30 });
+    expect(clips.map((c) => [c.start, c.end])).toEqual([[0, 30], [30, 60], [60, 90], [90, 95]]);
+  });
+
+  test('a tail under two seconds joins the previous part instead of becoming its own file', () => {
+    const clips = equalClips(61, { every: 30 });
+    expect(clips.map((c) => [c.start, c.end])).toEqual([[0, 30], [30, 61]]);
+  });
+
+  test('asking for more pieces than the video can hold still gives at least one part', () => {
+    expect(equalClips(5, { every: 30 })).toEqual([{ start: 0, end: 5, shots: 1, score: 0 }]);
+    expect(equalClips(0, { parts: 3 })).toEqual([]);
   });
 });

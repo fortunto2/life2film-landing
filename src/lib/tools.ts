@@ -448,25 +448,80 @@ Reference implementation: https://life2film.com/tools/video-converter/`,
     agentJob: 'Converting video between formats in the browser',
   },
   {
+    slug: 'video-to-frames',
+    group: 'everyday',
+    name: 'Video to Frames',
+    appName: 'Video to Frames',
+    blurb: 'Pull frames out of a video as JPG or PNG, one a second or ten, and download them all as one ZIP.',
+
+    searchPhrase: 'Video to Frames Online',
+    title: 'Video to Frames Online Free | extract every frame as JPG or PNG, download as ZIP',
+    description: 'Split a video into frames online: take 10 per second, one a second or one every N seconds, as JPG or PNG at full resolution, and download them all in one ZIP. Runs in your browser: nothing uploaded, no watermark.',
+    heading: 'Video to',
+    accent: 'Frames',
+    lede: 'Turn a video into still images: pick how often, pick the format, download every frame in one archive. The file never leaves your machine.',
+    featureList: [
+      'From 10 frames per second to one every 30 seconds',
+      'JPG or PNG, at the original resolution or scaled down',
+      'All frames in one ZIP, or save any single frame',
+      'Runs fully client-side: no upload, no watermark',
+    ],
+    faq: [
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. The browser decodes it and draws each frame onto a canvas, and the images are written on your machine. Nothing is sent anywhere.',
+      },
+      {
+        q: 'How many frames can I take?',
+        a: 'Up to 600 per run. They are held in the tab until the archive is written, and six hundred full-HD JPEGs is already around 150 MB. If the interval you pick would give more, it is widened to fit and the page says so, rather than quietly stopping halfway through the video.',
+      },
+      {
+        q: 'JPG or PNG?',
+        a: 'JPG for almost everything: a tenth of the size and no visible difference on video frames, which were lossy to begin with. PNG when the frame is going into further editing and you want no second round of compression.',
+      },
+      {
+        q: 'Are the frames exact?',
+        a: 'Each one is the frame the browser shows at that instant, at the video\'s own resolution unless you choose a smaller size. File names carry the time in seconds, so you can find any frame again in the video.',
+      },
+    ],
+
+    summary: 'Extract still frames from a video at a chosen interval, as JPG or PNG, and download them as a ZIP, in the browser.',
+    facts: [
+      'Frames are drawn from <video> onto a canvas at the chosen instants; no WebCodecs needed.',
+      'At most 600 frames per run; a finer interval is widened to fit, and the page reports the interval used.',
+      'The ZIP is written without compression: the images are already compressed.',
+      'File names carry the timestamp, e.g. clip-007-6_00s.jpg.',
+    ],
+  },
+  {
     slug: 'video-splitter',
     group: 'engine',
     name: 'Video Splitter',
     appName: 'Video Splitter',
     blurb: 'Cut a long video into Reels or Shorts that start on a shot change instead of every 30 seconds, ranked by picture quality.',
 
-    searchPhrase: 'Split Video Online',
-    title: 'Split Video Online Free | into Reels and Shorts, cut at the scene changes',
-    description: 'Free online video splitter that cuts a long video into parts at its shot changes instead of every 30 seconds, ranked by picture quality. Optional 9:16 crop for Reels, Shorts and TikTok. Nothing is uploaded.',
+    searchPhrase: 'Split Video Into Parts Online',
+    title: 'Split Video Into Parts Online Free | equal parts or at the scene changes',
+    description: 'Split a video into 2, 3 or more equal parts, into pieces every N seconds, or at its shot changes for Reels and Shorts. Any length, no quality loss, no watermark. Nothing is uploaded.',
     heading: 'Video',
     accent: 'Splitter',
-    lede: 'Cut a long video into clips that start where the video changes, not every thirty seconds. Everything happens on your machine.',
+    lede: 'Split a video into equal parts, into pieces every N seconds, or into clips that start where the picture changes. Everything happens on your machine.',
     featureList: [
-        'Cuts on scene changes, not on a fixed interval',
+        'Equal parts or every N seconds, for videos of any length',
+        'Or cut on scene changes, so no clip starts mid-movement',
         'Clips ranked by picture quality',
         'Optional 9:16 crop for Reels, Shorts and TikTok',
         'Runs fully client-side: no upload, no watermark',
       ],
     faq: [
+  {
+    q: 'How do I split a video into 2 or 3 equal parts?',
+    a: 'Choose "into equal parts" and the number of parts. No analysis is needed, so the parts appear at once, and the picture is copied rather than re-encoded, so nothing is lost. "Every N seconds" cuts pieces of a set length instead; the last one is shorter.',
+  },
+  {
+    q: 'Can it split a long video?',
+    a: 'Yes. Only the scene-change mode stops at 10 minutes, because it has to look at the frames. Equal parts and every-N-seconds work on any length; the browser memory is the limit.',
+  },
   {
     q: 'How is this different from other video splitters?',
     a: 'Most cut every N seconds, so a clip can start halfway through a sentence and end mid-gesture. This one finds the cuts the video already has (the shot changes) and builds clips out of whole shots. You still choose roughly how long a clip should be; the boundaries land on the nearest real change instead of on a stopwatch.',

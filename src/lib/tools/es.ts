@@ -165,7 +165,7 @@ export const es: ToolTranslations = {
 
   'video-splitter': {
     searchPhrase: 'Dividir vídeo online',
-    title: 'Dividir Vídeo Online Gratis — en Reels y Shorts, cortando por escenas',
+    title: 'Dividir Vídeo en Partes Online Gratis — partes iguales o por escenas',
     description:
       'Divisor de vídeo online y gratuito que corta un vídeo largo en partes por sus cambios de plano en vez de cada 30 segundos, ordenadas por calidad de imagen. Recorte 9:16 opcional para Reels, Shorts y TikTok. No se sube nada.',
     heading: 'Dividir',

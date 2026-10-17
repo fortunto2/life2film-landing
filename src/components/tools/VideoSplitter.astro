@@ -1,5 +1,6 @@
 ---
 import { CHROME, STATUS } from '../../lib/tools-i18n';
+import { SPLITTER } from '../../lib/splitter-i18n';
 import type { Lang } from '../../i18n';
 
 interface Props {
@@ -9,6 +10,8 @@ interface Props {
 const { lang = 'en' } = Astro.props;
 const chrome = CHROME[lang];
 const status = STATUS[lang];
+const sp = SPLITTER[lang];
+const fill = (t: string, n: number) => t.replace('{n}', String(n));
 
 /**
  * The video-splitter interface: markup and behaviour, with no page metadata.
@@ -20,15 +23,40 @@ const status = STATUS[lang];
 
 <div class="tool" slot="tool">
     <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+    <span id="sp" data-strings={JSON.stringify(sp)} hidden></span>
           <label class="drop" id="drop" for="file">
             <input type="file" id="file" accept="video/*" hidden />
             <strong>{chrome.chooseVideo}</strong>
-            <span class="muted">{chrome.dragHint} — MP4, MOV (H.264), WebM · up to 10 minutes</span>
+            <span class="muted">{chrome.dragHint} — {sp.hint}</span>
           </label>
 
           <div class="controls" id="controls" hidden>
             <label class="control">
-              <span class="muted">Clip length</span>
+              <span class="muted">{sp.splitBy}</span>
+              <select id="mode">
+                <option value="scenes" selected>{sp.byScenes}</option>
+                <option value="parts">{sp.byParts}</option>
+                <option value="every">{sp.byEvery}</option>
+              </select>
+            </label>
+
+            <label class="control" id="partsWrap" hidden>
+              <select id="parts">
+                {[2, 3, 4, 5, 6, 8, 10].map((n) => <option value={n} selected={n === 2}>{fill(sp.parts, n)}</option>)}
+              </select>
+            </label>
+
+            <label class="control" id="everyWrap" hidden>
+              <span class="muted">{sp.every}</span>
+              <select id="every">
+                {[15, 30, 60, 120, 300, 600, 900].map((n) => (
+                  <option value={n} selected={n === 60}>{n < 60 ? `${n} ${sp.seconds}` : `${n / 60} ${sp.minutes}`}</option>
+                ))}
+              </select>
+            </label>
+
+            <label class="control" id="targetWrap">
+              <span class="muted">{sp.clipLength}</span>
               <select id="target">
                 <option value="15">~15s — Stories</option>
                 <option value="30" selected>~30s — Reels, TikTok</option>
@@ -39,12 +67,12 @@ const status = STATUS[lang];
 
             <label class="control checkbox">
               <input type="checkbox" id="vertical" />
-              <span>Crop to 9:16</span>
+              <span>{sp.crop}</span>
             </label>
 
             <span class="spacer"></span>
 
-            <button id="downloadAll" type="button" class="ghost primary">Download selected</button>
+            <button id="downloadAll" type="button" class="ghost primary">{sp.downloadSelected}</button>
           </div>
 
           <div id="status" class="status" hidden>
@@ -91,12 +119,14 @@ const status = STATUS[lang];
         </p>
     </Fragment>
 )}
-<style>
-    select {
+{/* Global: the cards are built with innerHTML, so they never get Astro's scoping attribute and
+    scoped rules never matched them. Only this tool's CSS loads on its page. */}
+<style is:global>
+    .tool select {
       padding: 9px 12px; border-radius: 10px; font: inherit; font-size: 14px; cursor: pointer;
       color: var(--fg); background: #0a0a0d; border: 1px solid var(--line);
     }
-    select:hover { border-color: var(--cyan); }
+    .tool select:hover { border-color: var(--cyan); }
 
     .summary { margin-top: 18px; font-size: 15px; color: #cfcfd6; }
     .summary b { color: var(--fg); }
@@ -135,11 +165,13 @@ const status = STATUS[lang];
     import { saveBlob } from '../../lib/encode';
     import { loadEngine } from '../../lib/engine';
     import { openVideo, samplePlan, centerPixel, refineBoundary, type VideoSource } from '../../lib/frames';
-    import { groupIntoClips, rankByScore, stars, type Clip, type Shot } from '../../lib/clips';
+    import { equalClips, groupIntoClips, rankByScore, stars, type Clip, type Shot } from '../../lib/clips';
+    import type { SplitterChrome } from '../../lib/splitter-i18n';
     import { clock } from '../../lib/timeline-export';
 
     const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
   const say = toolStrings();
+    const sp = JSON.parse(document.getElementById('sp')!.dataset.strings!) as SplitterChrome;
 
     const drop = el<HTMLLabelElement>('drop');
     const fileInput = el<HTMLInputElement>('file');
@@ -166,6 +198,49 @@ const status = STATUS[lang];
 
     const target = () => Number(el<HTMLSelectElement>('target').value) || 30;
     const wantsVertical = () => el<HTMLInputElement>('vertical').checked;
+    type Mode = 'scenes' | 'parts' | 'every';
+    const mode = () => el<HTMLSelectElement>('mode').value as Mode;
+
+    function syncModeUI() {
+      el('targetWrap').hidden = mode() !== 'scenes';
+      el('partsWrap').hidden = mode() !== 'parts';
+      el('everyWrap').hidden = mode() !== 'every';
+    }
+
+    function start(file: File) {
+      syncModeUI();
+      sourceFile = file;
+      fileName = file.name.replace(/\.[^.]+$/, '') || 'video';
+      shots = [];
+      void (mode() === 'scenes' ? analyse(file) : showEqual(file));
+    }
+
+    /** Cut on the clock: no analysis, so no length limit and no engine download. */
+    async function showEqual(file: File, note?: string) {
+      if (busy) return;
+      busy = true;
+      grid.replaceChildren();
+      let source: VideoSource | null = null;
+      try {
+        status(say.reading, 0.1);
+        source = await openVideo(file);
+        videoDuration = source.duration;
+        el('controls').hidden = false;
+        await rebuild(source);
+        track('result_shown', { placement: 'result', mode: mode() }, {
+          clips: clips.length,
+          duration_s: Math.round(videoDuration),
+        });
+        if (note) status(note, 1);
+        else statusEl.hidden = true;
+      } catch (error) {
+        toolFailed('open', error, file);
+        status(error instanceof Error ? error.message : 'Could not read that file.', 1, true);
+      } finally {
+        source?.release();
+        busy = false;
+      }
+    }
 
     // --- analysis ---
 
@@ -179,17 +254,21 @@ const status = STATUS[lang];
       el('controls').hidden = true;
 
       let source: VideoSource | null = null;
+      let switched = false;
 
       try {
         status(say.reading, 0.02);
         source = await openVideo(file);
         videoDuration = source.duration;
 
+        // Reading frames means seeking through the whole file, so past ten minutes the scene pass
+        // takes longer than it is worth. Rather than refuse — «разделить большое видео на части» is
+        // a real query — switch to cutting on the clock, which needs no analysis at all.
         if (source.duration > MAX_MINUTES * 60) {
-          throw new Error(
-            `That video is ${clock(source.duration)} long. Reading frames means seeking through the ` +
-              `whole file, so anything past ${MAX_MINUTES} minutes takes longer than it is worth.`,
-          );
+          el<HTMLSelectElement>('mode').value = 'every';
+          syncModeUI();
+          switched = true;
+          return;
         }
 
         const engine = await loadEngine();
@@ -251,7 +330,7 @@ const status = STATUS[lang];
         statusEl.hidden = true;
         el('controls').hidden = false;
         await rebuild(source);
-        track('result_shown', { placement: 'result' }, {
+        track('result_shown', { placement: 'result', mode: 'scenes' }, {
           clips: clips.length,
           shots: shots.length,
           duration_s: Math.round(videoDuration),
@@ -262,19 +341,29 @@ const status = STATUS[lang];
       } finally {
         source?.release();
         busy = false;
+        if (switched) void showEqual(file, sp.tooLong);
       }
     }
 
     /** Regroup and redraw — cheap, because the shots are already known. */
     async function rebuild(source: VideoSource) {
-      clips = groupIntoClips(shots, { target: target() });
+      const scenes = mode() === 'scenes';
+      clips = scenes
+        ? groupIntoClips(shots, { target: target() })
+        : equalClips(
+            videoDuration,
+            mode() === 'parts'
+              ? { parts: Number(el<HTMLSelectElement>('parts').value) || 2 }
+              : { every: Number(el<HTMLSelectElement>('every').value) || 60 },
+          );
       const order = rankByScore(clips);
       const best = clips.length ? clips[order[0]].score : 0;
 
       el('summary').hidden = false;
-      el('summary').innerHTML =
-        `<b>${clips.length}</b> clips from <b>${shots.length}</b> shots · ` +
-        `${clock(videoDuration)} of video · best clip is #${order[0] + 1}`;
+      el('summary').innerHTML = scenes
+        ? `<b>${clips.length}</b> clips from <b>${shots.length}</b> shots · ` +
+          `${clock(videoDuration)} of video · best clip is #${order[0] + 1}`
+        : sp.summaryParts.replace('{n}', String(clips.length)).replace('{length}', clock(videoDuration));
 
       grid.replaceChildren();
 
@@ -286,13 +375,13 @@ const status = STATUS[lang];
           <div class="shell">
             <img alt="Clip ${i + 1}" loading="lazy" />
             <input class="pick" type="checkbox" checked aria-label="Include clip ${i + 1}" />
-            <span class="rank">${'★'.repeat(stars(clip, best))}${rank === 1 ? ' BEST' : ''}</span>
+            ${scenes ? `<span class="rank">${'★'.repeat(stars(clip, best))}${rank === 1 ? ' BEST' : ''}</span>` : ''}
           </div>
           <div class="info">
             <span class="tc">${clock(clip.start)} – ${clock(clip.end)}</span>
-            <span class="len">Clip ${i + 1} · ${(clip.end - clip.start).toFixed(1)}s · ${clip.shots} shot${clip.shots > 1 ? 's' : ''}</span>
+            <span class="len">#${i + 1} · ${(clip.end - clip.start).toFixed(1)}s${scenes ? ` · ${clip.shots} shot${clip.shots > 1 ? 's' : ''}` : ''}</span>
           </div>
-          <div class="act"><button type="button">Download</button></div>`;
+          <div class="act"><button type="button">${sp.download}</button></div>`;
 
         const pick = card.querySelector<HTMLInputElement>('.pick')!;
         pick.addEventListener('change', () => card.classList.toggle('on', pick.checked));
@@ -351,12 +440,12 @@ const status = STATUS[lang];
           const buffer = output.target.buffer;
           if (!buffer) throw new Error('The encoder produced no data.');
 
-          saveBlob(new Blob([buffer], { type: 'video/mp4' }), `${fileName}-clip-${index + 1}${wantsVertical() ? '-9x16' : ''}.mp4`);
+          saveBlob(new Blob([buffer], { type: 'video/mp4' }), `${fileName}-${mode() === 'scenes' ? 'clip' : 'part'}-${index + 1}${wantsVertical() ? '-9x16' : ''}.mp4`);
         }
 
         track(
           'result_saved',
-          { placement: indices.length === 1 && clips.length > 1 ? 'clip' : 'result', vertical: String(wantsVertical()) },
+          { placement: indices.length === 1 && clips.length > 1 ? 'clip' : 'result', mode: mode(), vertical: String(wantsVertical()) },
           { clips: indices.length },
         );
         status(`Done — ${indices.length} clip${indices.length > 1 ? 's' : ''} saved.`, 1);
@@ -402,11 +491,30 @@ const status = STATUS[lang];
       }
     });
 
+    // Switching mode or part size: scenes need the analysis once, the clock never does.
+    for (const id of ['mode', 'parts', 'every']) {
+      el<HTMLSelectElement>(id).addEventListener('change', async () => {
+        syncModeUI();
+        if (!sourceFile || busy) return;
+        if (mode() === 'scenes' && !shots.length) return void analyse(sourceFile);
+        busy = true;
+        const source = await openVideo(sourceFile);
+        try {
+          await rebuild(source);
+        } finally {
+          source.release();
+          busy = false;
+        }
+      });
+    }
+
+    syncModeUI();
+
     // --- input ---
 
     fileInput.addEventListener('change', () => {
       const file = fileInput.files?.[0];
-      if (file) { fileChosen(file, 'picker'); void analyse(file); }
+      if (file) { fileChosen(file, 'picker'); start(file); }
     });
 
     for (const type of ['dragenter', 'dragover']) {
@@ -423,6 +531,6 @@ const status = STATUS[lang];
     }
     drop.addEventListener('drop', (e) => {
       const file = (e as DragEvent).dataTransfer?.files?.[0];
-      if (file) { fileChosen(file, 'drop'); void analyse(file); }
+      if (file) { fileChosen(file, 'drop'); start(file); }
     });
 </script>

@@ -103,7 +103,9 @@ const chrome = CHROME[lang];
         </p>
     </Fragment>
 )}
-<style>
+{/* Global: the cards are built with innerHTML, so they never get Astro's scoping attribute and
+    scoped rules never matched them. Only this tool's CSS loads on its page. */}
+<style is:global>
 
     .result { margin-top: 20px; }
     .readout { display: flex; flex-wrap: wrap; gap: 28px; align-items: center; margin-bottom: 20px; }
@@ -118,11 +120,11 @@ const chrome = CHROME[lang];
 
     .export { display: flex; gap: 8px; align-items: center; margin-left: auto; flex-wrap: wrap; }
     .fps { display: flex; gap: 6px; align-items: center; font-size: 13px; }
-    select {
+    .tool select {
       padding: 9px 12px; border-radius: 10px; font: inherit; font-size: 14px; cursor: pointer;
       color: var(--fg); background: #0a0a0d; border: 1px solid var(--line);
     }
-    select:hover { border-color: var(--cyan); }
+    .tool select:hover { border-color: var(--cyan); }
     .fps select { padding: 7px 8px; font-size: 13px; }
 
     .shots { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); }

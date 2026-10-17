@@ -118,3 +118,33 @@ export function stars(clip: Clip, best: number): number {
   if (best <= 0) return 3;
   return Math.max(1, Math.min(5, Math.round((clip.score / best) * 5)));
 }
+
+/**
+ * Cut on the clock instead of on the picture: N equal parts, or a part every N seconds.
+ *
+ * What people actually search for — «разделить видео на 2 части», "split video into equal parts" —
+ * and the only mode that needs no analysis, so it has no length limit. A tail shorter than
+ * `minTail` is folded into the previous part: nobody wants a 0.4-second file.
+ */
+export function equalClips(
+  duration: number,
+  by: { parts: number } | { every: number },
+  minTail = 2,
+): Clip[] {
+  if (!(duration > 0)) return [];
+  const piece = 'parts' in by ? duration / Math.max(1, Math.round(by.parts)) : Math.max(0.5, by.every);
+  const count = 'parts' in by ? Math.max(1, Math.round(by.parts)) : Math.ceil(duration / piece - 1e-9);
+
+  const clips: Clip[] = [];
+  for (let i = 0; i < count; i++) {
+    const start = i * piece;
+    const end = i === count - 1 ? duration : Math.min(duration, (i + 1) * piece);
+    clips.push({ start, end, shots: 1, score: 0 });
+  }
+  const last = clips[clips.length - 1];
+  if (clips.length > 1 && last.end - last.start < minTail) {
+    clips.pop();
+    clips[clips.length - 1].end = duration;
+  }
+  return clips;
+}
