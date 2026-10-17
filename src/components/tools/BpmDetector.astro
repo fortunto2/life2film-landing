@@ -304,13 +304,16 @@ const status = STATUS[lang];
         status('Finding the beat…');
         const mono = await toMono(audioBuffer);
         const raw = engine.detect_beats(mono, 22050, null);
-        const parsed = JSON.parse(raw) as { beats: number[]; bpm: number };
+        const parsed = JSON.parse(raw) as { beats: number[]; bpm: number; pulse_strength?: number };
 
         beats = parsed.beats ?? [];
         bpm = parsed.bpm ?? 0;
 
-        if (!beats.length) {
-          toolFailed('analyse', 'no steady pulse');
+        // The engine always finds SOME tempo: a pure tone came back as 69.8 BPM. `pulse_strength`
+        // says whether there was a pulse to find; measured, a tone is 0.00, noise 0.13, music 0.5+.
+        const pulse = parsed.pulse_strength ?? 1;
+        if (!beats.length || pulse < 0.2) {
+          toolFailed('analyse', `no steady pulse (${pulse.toFixed(2)})`);
           status('No steady pulse found. Speech, ambient and free-tempo recordings often have none.', true);
           return;
         }

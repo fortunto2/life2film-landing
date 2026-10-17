@@ -7,7 +7,11 @@
  */
 
 export interface Engine {
-  /** PCM in, `{ beats: number[], bpm: number }` out. */
+  /**
+   * PCM in, `{ beats, bpm, confidence, pulse_strength, beats_per_bar, downbeats }` out.
+   * `pulse_strength` (0..1) is how much pulse there is at all: a tone and noise score under 0.15,
+   * music over 0.4. `confidence` is only how clearly the tempo beat its octave rivals.
+   */
   detect_beats: (samples: Float32Array, rate: number, config: string | null) => string;
 
   /** RGB24 frame in, `{ score, features, is_garbage }` out. */
