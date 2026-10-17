@@ -16,15 +16,17 @@ The full engine (selection, montage composition, OTIO, weights) is the `full` ca
 is never built for the web. Until October 2026 it was: eighteen exports, 1.26 MB, with symbol
 names. Now 479 KB, symbol names stripped, local paths remapped.
 
-## Rebuilding
+## Updating
+
+The npm package `life2film-engine` (0.2.0 and later) IS the site build, so it is the source:
 
 ```bash
-cd ~/startups/active/life2film/video-analyzer
-make wasm-site            # prints the exports; must be exactly the three above
-cp pkg-site/va_wasm.js pkg-site/va_wasm_bg.wasm ~/startups/active/life2film-landing/public/wasm/
+pnpm add -D life2film-engine@latest && pnpm wasm   # copies its js + wasm into public/wasm/
 ```
 
-The same build is the npm package `life2film-engine` from 0.2.0 (`npm-package/` in that repo).
+To build a new version of it: `make wasm-site` in `life2film/video-analyzer` (must print exactly
+the three exports above), copy `pkg-site/*` into `npm-package/`, bump, `npm publish --auth-type=web`
+from a real terminal (the account's second factor is a security key).
 
 Committed rather than fetched at build time: the site deploys as static files, and a tool page
 that breaks when a sibling repository moves is not a tool page.
