@@ -1,0 +1,11 @@
+# Cloudflare Pages config for life2film.com — bindings the Functions under
+# functions/ need. `pnpm run deploy` (wrangler pages deploy) reads it.
+name = "life2film-site"
+pages_build_output_dir = "dist"
+compatibility_date = "2025-10-01"
+
+# Invite-link counters: `clicks:<CODE>` and `since:<CODE>`, nothing else — no
+# identity, no IP. Read back by GET /api/r/<CODE>.
+[[kv_namespaces]]
+binding = "REFERRALS"
+id = "9d94d2ba23ea40a699581c3dccb1e4e7"
