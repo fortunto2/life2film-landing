@@ -240,6 +240,17 @@ const status = STATUS[lang];
       el<HTMLButtonElement>('run').disabled = false;
       const chosen = Number(el<HTMLSelectElement>('sizeResolution').value) ||
         autoWidth(budget.videoBitrate, info.width);
+      if (info.size <= target) {
+        // Already under the limit: the honest estimate is "about this size", and the useful hint
+        // is the smaller preset, not a re-encode that can only hold or lose quality.
+        el('estimate').textContent = `≈ ${formatBytes(info.size)}, already under ${formatBytes(target)}`;
+        setVerdict(
+          `This file is already ${formatBytes(info.size)}, under ${formatBytes(target)}. Compressing keeps it about ` +
+            `the same size; pick a smaller limit to actually shrink it.`,
+          'warn',
+        );
+        return;
+      }
       el('estimate').textContent =
         `≈ ${formatBytes(target)} at ${Math.round(budget.videoBitrate / 1000)} kbps, ${chosen}p wide`;
       describeSource();
@@ -399,10 +410,15 @@ const status = STATUS[lang];
       probed.width,
     );
 
+    // The source's own video bitrate is the most worth spending: asking for more makes the file
+    // larger, not better. Measured on production: 4.1 MB in, "fit 10 MB", 8.0 MB out.
+    const sourceVideoBitrate = Math.max(0, sourceBitrate(probed.size, probed.duration) - audioCost());
+
     return encodeToTargetSize({
       targetBytes: target,
       duration: probed.duration,
       audioBitrate: audioCost(),
+      maxVideoBitrate: sourceVideoBitrate > 0 ? Math.round(sourceVideoBitrate * 0.97) : undefined,
       onStatus: (event) =>
         status(
           fill(event.pass === 'second' ? say.secondPass : say.encoding, {

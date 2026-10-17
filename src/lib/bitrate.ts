@@ -150,6 +150,13 @@ export async function encodeToTargetSize(options: {
   audioBitrate: number;
   run: (videoBitrate: number, onProgress: (fraction: number) => void) => Promise<Blob>;
   /**
+   * The most bits per second worth spending: the source's own video bitrate.
+   *
+   * A size target is a ceiling, never a floor. Without this, a 4.1 MB clip asked to fit 10 MB was
+   * re-encoded at the full 10 MB budget and came out at 8.0 MB, "97% larger" (production, Oct 2026).
+   */
+  maxVideoBitrate?: number;
+  /**
    * Progress, as facts rather than a sentence.
    *
    * This used to emit English text, which meant a Russian page reported 'Encoding at 6314 kbps…'
@@ -158,25 +165,27 @@ export async function encodeToTargetSize(options: {
    */
   onStatus?: (event: SizeProgress) => void;
 }): Promise<Blob> {
-  const { targetBytes, duration, audioBitrate, run, onStatus } = options;
+  const { targetBytes, duration, audioBitrate, run, onStatus, maxVideoBitrate } = options;
+  const cap = (bitrate: number) => (maxVideoBitrate ? Math.min(bitrate, maxVideoBitrate) : bitrate);
 
   // Aim under the wall: a file of exactly 10.00 MB is still refused by a 10 MB limit.
   const aim = targetBytes * 0.96;
   const budget = budgetFor({ targetBytes: aim, duration, audioBitrate });
+  const firstBitrate = cap(budget.videoBitrate);
 
-  onStatus?.({ pass: 'first', fraction: 0, kbps: Math.round(budget.videoBitrate / 1000) });
-  const first = await run(budget.videoBitrate, (p) =>
+  onStatus?.({ pass: 'first', fraction: 0, kbps: Math.round(firstBitrate / 1000) });
+  const first = await run(firstBitrate, (p) =>
     onStatus?.({ pass: 'first', fraction: p * 0.5, percent: Math.round(p * 100) }),
   );
 
   const missedBy = Math.abs(first.size - aim) / aim;
   if (first.size <= targetBytes && missedBy <= 0.04) return first;
 
-  const corrected = correctBitrate(budget.videoBitrate, first.size, aim);
+  const corrected = cap(correctBitrate(firstBitrate, first.size, aim));
 
   // No point re-encoding at a bitrate we are already at, or below the floor.
   const worthRetrying =
-    Math.abs(corrected - budget.videoBitrate) / budget.videoBitrate > 0.02 && corrected > MIN_VIDEO_BITRATE;
+    Math.abs(corrected - firstBitrate) / firstBitrate > 0.02 && corrected > MIN_VIDEO_BITRATE;
   if (!worthRetrying) return first;
 
   onStatus?.({ pass: 'second', fraction: 0.5, kbps: Math.round(corrected / 1000), previousBytes: first.size });

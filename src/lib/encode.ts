@@ -1,3 +1,4 @@
+import type { VideoCodec } from 'mediabunny';
 /**
  * Reading and re-encoding media in the browser.
  *
@@ -122,6 +123,52 @@ export async function probe(file: File): Promise<Probe> {
   };
 }
 
+/**
+ * Which video codecs to ask for, best first, per container.
+ *
+ * mediabunny takes the first codec the browser can encode, and Chrome offers VP9 for MP4. The
+ * result was an .mp4 holding VP9: played in Chrome, refused by QuickTime and by Photos on the very
+ * iPhone it was converted for (production, Oct 2026). H.264 is what "MP4" means to a person.
+ */
+export function codecPreference(container: Container): VideoCodec[] {
+  switch (container) {
+    case 'mp4':
+    case 'mov':
+      return ['avc', 'hevc', 'vp9', 'av1'];
+    case 'webm':
+      return ['vp9', 'vp8', 'av1'];
+    default:
+      return [];
+  }
+}
+
+/**
+ * Which codecs may be COPIED into a container without re-encoding.
+ *
+ * Narrower than what the container can technically hold: MP4 can carry VP9, and mediabunny will
+ * happily remux it, but QuickTime and Photos will not play it. "MP4" to a person means a file that
+ * opens everywhere, so only H.264 and HEVC pass through untouched; anything else is transcoded.
+ */
+export function copyableCodecs(container: Container): VideoCodec[] {
+  switch (container) {
+    case 'mp4':
+    case 'mov':
+      return ['avc', 'hevc'];
+    case 'webm':
+      return ['vp8', 'vp9', 'av1'];
+    default:
+      return [];
+  }
+}
+
+/** The codec this browser will actually use for `container`, or null when it can encode none. */
+export async function encodableCodec(container: Container, size?: { width: number; height: number }) {
+  const library = await loadMediabunny();
+  const wanted = codecPreference(container);
+  if (!wanted.length) return null;
+  return library.getFirstEncodableVideoCodec(wanted, size);
+}
+
 export async function encode(file: File, options: EncodeOptions): Promise<Blob> {
   return (await encodeDetailed(file, options)).blob;
 }
@@ -185,10 +232,18 @@ export async function encodeDetailed(file: File, options: EncodeOptions): Promis
     !dropVideo &&
     Boolean(options.width || options.height || options.fit || videoBitrate || options.forceTranscode);
 
+  // A source codec the container should not carry (VP9 into MP4) forces a transcode even when
+  // nothing else asked for one; otherwise the "conversion" is a remux that plays only in Chrome.
+  const sourceCodec = dropVideo ? null : ((await input.getPrimaryVideoTrack())?.codec ?? null);
+  const foreign = Boolean(sourceCodec && !copyableCodecs(options.container).includes(sourceCodec));
+  const reencode = transcode || foreign;
+  const codec = reencode && !dropVideo ? await encodableCodec(options.container) : null;
+
   const video = dropVideo
     ? { discard: true as const }
-    : transcode
+    : reencode
       ? {
+          ...(codec && { codec }),
           ...(options.width && { width: options.width }),
           ...(options.height && { height: options.height }),
           ...(options.fit && { fit: options.fit }),
@@ -245,7 +300,7 @@ export async function encodeDetailed(file: File, options: EncodeOptions): Promis
 
   return {
     blob: new Blob([buffer], { type: CONTAINER_MIME[options.container] }),
-    copiedVideo: !transcode && !dropVideo,
+    copiedVideo: !reencode && !dropVideo,
   };
 }
 

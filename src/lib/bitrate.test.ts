@@ -205,3 +205,45 @@ describe('reading a target from the controls', () => {
     }
   });
 });
+
+describe('a file that already fits', () => {
+  // Measured on production, 16 Oct 2026: a 4.1 MB 1080p clip asked to fit 10 MB came out at
+  // 8.0 MB, "97% larger". The budget for 10 MB was higher than the source's own bitrate, and
+  // the encoder dutifully spent it. A size target is a ceiling, never a floor.
+  test('the first pass is never asked for more bits than the source carries', async () => {
+    const asked: number[] = [];
+    await encodeToTargetSize({
+      targetBytes: 10 * MB,
+      duration: 6,
+      audioBitrate: 128_000,
+      maxVideoBitrate: 5_400_000,
+      run: async (bitrate) => { asked.push(bitrate); return new Blob([new Uint8Array(4 * MB)]); },
+    });
+    expect(asked.length).toBeGreaterThan(0);
+    for (const b of asked) expect(b).toBeLessThanOrEqual(5_400_000);
+  });
+
+  test('the correction after an undershoot respects the cap too', async () => {
+    const asked: number[] = [];
+    await encodeToTargetSize({
+      targetBytes: 10 * MB,
+      duration: 60,
+      audioBitrate: 0,
+      maxVideoBitrate: 1_000_000,
+      // Lands far under the aim, so the loop wants to raise the bitrate.
+      run: async (bitrate) => { asked.push(bitrate); return new Blob([new Uint8Array(2 * MB)]); },
+    });
+    for (const b of asked) expect(b).toBeLessThanOrEqual(1_000_000);
+  });
+
+  test('without a cap the budget is used as before', async () => {
+    const asked: number[] = [];
+    await encodeToTargetSize({
+      targetBytes: 10 * MB,
+      duration: 60,
+      audioBitrate: 0,
+      run: async (bitrate) => { asked.push(bitrate); return new Blob([new Uint8Array(Math.round(9.7 * MB))]); },
+    });
+    expect(asked[0]).toBe(budgetFor({ targetBytes: 10 * MB * 0.96, duration: 60, audioBitrate: 0 }).videoBitrate);
+  });
+});

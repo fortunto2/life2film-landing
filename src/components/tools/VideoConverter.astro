@@ -101,7 +101,7 @@ const status = STATUS[lang];
   import { fileChosen, toolFailed, track } from '../../lib/track';
   import { toolStrings, fill } from '../../lib/strings';
   import {
-    probe, encode, saveBlob, loadMediabunny, formatBytes, preciseClock,
+    probe, encode, saveBlob, encodableCodec, formatBytes, preciseClock,
     CONTAINER_EXTENSION, type Container,
   } from '../../lib/encode';
 
@@ -138,15 +138,9 @@ const status = STATUS[lang];
     }
 
     try {
-      const library = await loadMediabunny();
-      const format =
-        container === 'mp4'
-          ? new library.Mp4OutputFormat()
-          : container === 'webm'
-            ? new library.WebMOutputFormat()
-            : new library.MovOutputFormat();
-
-      const codec = await library.getFirstEncodableVideoCodec(format.getSupportedVideoCodecs());
+      // The same preference `encode` will use, so the note and the file agree: H.264 for MP4 and
+      // MOV, VP9 for WebM, and only then whatever else the browser has.
+      const codec = await encodableCodec(container);
 
       note.hidden = false;
       note.classList.toggle('bad', !codec);
