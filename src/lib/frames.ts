@@ -168,9 +168,10 @@ export function samplePlan(duration: number, maxSamples = 500): number[] {
 export function refinePlan(around: number, spread: number, step: number, duration: number): number[] {
   const first = Math.max(0, around - spread);
   const last = Math.min(duration, around + spread);
-  const points: number[] = [];
-  for (let t = first; t <= last; t += step) points.push(t);
-  return points;
+  // By index, not `t += step`: accumulated rounding stopped the walk one point short of `last`,
+  // which is exactly where a cut sits when the window is centred on the interval holding it.
+  const count = Math.floor((last - first) / step + 1e-6);
+  return Array.from({ length: count + 1 }, (_, i) => first + i * step);
 }
 
 /** Mean RGB of the centre column — what `detect_scenes_slick` compares between frames. */
@@ -194,35 +195,19 @@ export function centerPixel(frame: Frame): { r: number; g: number; b: number } {
   };
 }
 
-/**
- * Where exactly did the picture change?
- *
- * Walks a tight window around a candidate boundary and returns the instant of the largest
- * frame-to-frame jump in the centre pixel. No engine call: at this resolution the question is
- * simply which of twenty adjacent frames differs most from the one before it.
- *
- * Both the scene detector and the splitter refine their cuts, and they must agree — the same video
- * through either tool should report the same boundaries. It lived in both files until one copy
- * drifted a comment away from the other.
- */
-export async function refineBoundary(
-  source: VideoSource,
-  boundary: number,
-  coarseStep: number,
-  width: number,
-): Promise<number> {
-  const points = refinePlan(boundary, coarseStep, coarseStep / 10, source.duration);
-  if (points.length < 2) return boundary;
+type Rgb = { r: number; g: number; b: number };
 
-  let previous: { r: number; g: number; b: number } | null = null;
-  let best = boundary;
+const jump = (a: Rgb, b: Rgb) => Math.abs(a.r - b.r) + Math.abs(a.g - b.g) + Math.abs(a.b - b.b);
+
+/** The instant in `points` whose frame differs most from the one before it. */
+async function biggestJump(sample: (t: number) => Promise<Rgb>, points: number[]): Promise<number | null> {
+  let previous: Rgb | null = null;
+  let best: number | null = null;
   let biggest = -1;
-
   for (const at of points) {
-    const pixel = centerPixel(await source.frameAt(at, width));
+    const pixel = await sample(at);
     if (previous) {
-      const delta =
-        Math.abs(pixel.r - previous.r) + Math.abs(pixel.g - previous.g) + Math.abs(pixel.b - previous.b);
+      const delta = jump(pixel, previous);
       if (delta > biggest) {
         biggest = delta;
         best = at;
@@ -230,6 +215,65 @@ export async function refineBoundary(
     }
     previous = pixel;
   }
-
   return best;
+}
+
+/**
+ * How far from the engine's guess a cut can really be, in coarse steps.
+ *
+ * The engine smooths the frame-difference signal (Savitzky-Golay over 25 samples) before picking
+ * peaks, and the peak of a smoothed signal drifts toward whichever side moves more. Measured on a
+ * synthetic video with cuts at 3/6/9/12/15s: reported at 3.00, 5.63, 9.47, 11.47, 14.77 — up to
+ * five coarse steps off. The old ±1-step refine could not reach any of them.
+ */
+const WIDE_STEPS = 6;
+
+/**
+ * Where exactly did the picture change? Pure: frames come from `sample`, so it is testable.
+ *
+ * Two passes. A wide one at the coarse step, bounded by `limits` so it never wanders past the
+ * midpoint to a neighbouring cut, finds which coarse interval holds the jump. A fine one at a
+ * tenth of the step finds the frame inside that interval.
+ */
+export async function locateCut(
+  sample: (t: number) => Promise<Rgb>,
+  guess: number,
+  coarseStep: number,
+  limits: { lo: number; hi: number },
+): Promise<number> {
+  const lo = Math.max(limits.lo, guess - WIDE_STEPS * coarseStep);
+  const hi = Math.min(limits.hi, guess + WIDE_STEPS * coarseStep);
+
+  const wide = refinePlan((lo + hi) / 2, (hi - lo) / 2, coarseStep, limits.hi);
+  const interval = (await biggestJump(sample, wide)) ?? guess;
+
+  // The jump happened somewhere in (interval - step, interval]; one fine step of margin each side.
+  const fineStep = coarseStep / 10;
+  const fine = refinePlan(interval - coarseStep / 2, coarseStep / 2 + fineStep, fineStep, limits.hi);
+  return (await biggestJump(sample, fine.filter((t) => t >= limits.lo))) ?? interval;
+}
+
+/**
+ * Both the scene detector and the splitter refine their cuts, and they must agree — the same video
+ * through either tool should report the same boundaries. It lived in both files until one copy
+ * drifted a comment away from the other.
+ *
+ * `neighbours` are the engine's other boundaries; the search stops halfway to each.
+ */
+export async function refineBoundary(
+  source: VideoSource,
+  boundary: number,
+  coarseStep: number,
+  width: number,
+  neighbours: { previous: number; next: number } = { previous: 0, next: source.duration },
+): Promise<number> {
+  return locateCut(
+    async (t) => centerPixel(await source.frameAt(t, width)),
+    boundary,
+    coarseStep,
+    {
+      lo: Math.max(0, (neighbours.previous + boundary) / 2),
+      hi: Math.min(source.duration, (boundary + neighbours.next) / 2),
+    },
+  );
 }
