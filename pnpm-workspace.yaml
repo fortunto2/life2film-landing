@@ -13,3 +13,7 @@ minimumReleaseAgeExclude:
 onlyBuiltDependencies:
   - esbuild
   - sharp
+
+# `pnpm run` re-verifies node_modules first and refuses to run on any doubt (pnpm 11 default). The
+# deploy script was failing on that check, not on the build. Install explicitly; run just runs.
+verifyDepsBeforeRun: false
