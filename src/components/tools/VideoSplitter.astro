@@ -165,6 +165,7 @@ const fill = (t: string, n: number) => t.replace('{n}', String(n));
     import { encode, saveBlob } from '../../lib/encode';
     import { loadEngine } from '../../lib/engine';
     import { openVideo, samplePlan, centerPixel, refineBoundary, type VideoSource } from '../../lib/frames';
+    import { detectShots } from '../../lib/shots';
     import { equalClips, groupIntoClips, rankByScore, stars, type Clip, type Shot } from '../../lib/clips';
     import type { SplitterChrome } from '../../lib/splitter-i18n';
     import { clock } from '../../lib/timeline-export';
@@ -281,6 +282,7 @@ const fill = (t: string, n: number) => t.replace('{n}', String(n));
         const pixels: Array<{ r: number; g: number; b: number }> = [];
         const timestamps: number[] = [];
         const scores: Array<{ timestamp: number; score: number }> = [];
+        const vectors: number[][] = [];
 
         for (const [i, at] of plan.entries()) {
           const frame = await source.frameAt(at, ANALYSIS_WIDTH);
@@ -289,24 +291,18 @@ const fill = (t: string, n: number) => t.replace('{n}', String(n));
 
           const scored = JSON.parse(
             engine.score_frame(frame.width, frame.height, frame.rgb24, at, null),
-          ) as { score?: number; error?: string };
+          ) as { score?: number; vector?: number[]; error?: string };
           if (!scored.error) scores.push({ timestamp: at, score: scored.score ?? 0 });
+          // The same measurements feed the second detector; a frame the scorer refused gets a zero
+          // vector so the two series stay aligned with `timestamps`.
+          vectors.push(scored.vector ?? []);
 
           if (i % 8 === 0) status(`Reading the video — ${i + 1} of ${plan.length} frames`, ((i + 1) / plan.length) * 0.75);
         }
 
         status('Finding the shot changes…', 0.8);
 
-        const detected = JSON.parse(
-          engine.detect_scenes_slick(
-            JSON.stringify({ pixels, timestamps, duration: source.duration, algo: 'adjacent_diffs' }),
-          ),
-        ) as { scenes?: Array<[number, number]>; error?: string };
-        if (detected.error) throw new Error(detected.error);
-
-        const ranges = detected.scenes?.length
-          ? detected.scenes
-          : [[0, source.duration] as [number, number]];
+        const ranges = detectShots(engine, { pixels, vectors, timestamps, duration: source.duration });
 
         // Refine each boundary at ten times the coarse resolution — a cut reported half a second
         // late is a clip that opens on the end of the previous shot.

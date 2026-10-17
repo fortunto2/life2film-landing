@@ -144,6 +144,7 @@ const chrome = CHROME[lang];
     import type { Shot } from '../../lib/clips';
     import { loadEngine } from '../../lib/engine';
     import { openVideo, samplePlan, centerPixel, refineBoundary, type VideoSource } from '../../lib/frames';
+    import { detectShots } from '../../lib/shots';
     import { clock, timecode, render, download, EXTENSION, type Format, type Mark } from '../../lib/timeline-export';
 
     const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -213,6 +214,7 @@ const chrome = CHROME[lang];
         const pixels: Array<{ r: number; g: number; b: number }> = [];
         const timestamps: number[] = [];
         const scores: Array<{ timestamp: number; score: number }> = [];
+        const vectors: number[][] = [];
 
         for (const [i, at] of plan.entries()) {
           const frame = await source.frameAt(at, ANALYSIS_WIDTH);
@@ -221,8 +223,11 @@ const chrome = CHROME[lang];
 
           const scored = JSON.parse(
             engine.score_frame(frame.width, frame.height, frame.rgb24, at, null),
-          ) as { score?: number; error?: string };
+          ) as { score?: number; vector?: number[]; error?: string };
           if (!scored.error) scores.push({ timestamp: at, score: scored.score ?? 0 });
+          // The same measurements feed the second detector; a frame the scorer refused gets a zero
+          // vector so the two series stay aligned with `timestamps`.
+          vectors.push(scored.vector ?? []);
 
           // Reading every sample is the slow part, so the bar tracks it rather than the analysis.
           if (i % 4 === 0) {
@@ -232,20 +237,7 @@ const chrome = CHROME[lang];
 
         status('Finding the cuts…', 0.93);
 
-        const detected = JSON.parse(
-          engine.detect_scenes_slick(
-            JSON.stringify({
-              pixels,
-              timestamps,
-              duration: source.duration,
-              algo: 'adjacent_diffs',
-            }),
-          ),
-        ) as { scenes?: Array<[number, number]>; error?: string };
-
-        if (detected.error) throw new Error(detected.error);
-
-        const ranges = detected.scenes?.length ? detected.scenes : [[0, source.duration] as [number, number]];
+        const ranges = detectShots(engine, { pixels, vectors, timestamps, duration: source.duration });
 
         // Second pass: the coarse grid can only say which sample the picture changed by, so each
         // boundary is re-examined by `refineBoundary` — a wide pass at the coarse step, bounded by

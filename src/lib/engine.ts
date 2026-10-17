@@ -14,7 +14,7 @@ export interface Engine {
    */
   detect_beats: (samples: Float32Array, rate: number, config: string | null) => string;
 
-  /** RGB24 frame in, `{ score, features, is_garbage }` out. */
+  /** RGB24 frame in, `{ score, features, vector, is_garbage }` out; `vector` feeds `detect_scenes_features`. */
   score_frame: (
     width: number,
     height: number,
@@ -25,6 +25,9 @@ export interface Engine {
 
   /** `{ pixels, timestamps, duration, algo }` in, `{ scenes: [start, end][] }` out. */
   detect_scenes_slick: (inputJson: string) => string;
+
+  /** `{ features, timestamps, duration, method: 'feature_cosine', threshold_k, min_gap }` in, `{ scenes }` out. */
+  detect_scenes_features: (inputJson: string) => string;
 }
 
 interface Module extends Engine {
