@@ -1,0 +1,390 @@
+<Rive version="1" kind="fragment">
+  <Artboard defaultStateMachineId="0:3" viewModelId="0:100" viewModelInstanceId="0:101" styleId="0:5" width="400" height="400" name="Wheel" id="0:2">
+    <LayoutComponentStyle name="Artboard Style" id="0:5"/>
+    <StateMachine name="Main" id="0:3">
+      <StateMachineLayer name="Motion" id="0:4">
+        <AnyState x="320" y="-120"/>
+        <ExitState x="480" y="-120"/>
+        <EntryState x="0" y="0">
+          <StateTransition stateToId="0:7">
+          <TransitionViewModelCondition opValue="equal">
+            <TransitionPropertyViewModelComparator>
+              <BindablePropertyBoolean>
+                <DataBindContext sourcePathIds="0:100-0:102" propertyKey="634"/>
+              </BindablePropertyBoolean>
+            </TransitionPropertyViewModelComparator>
+            <TransitionValueBooleanComparator value="true"/>
+          </TransitionViewModelCondition>
+          </StateTransition>
+          <StateTransition stateToId="0:6"/>
+        </EntryState>
+        <AnimationState x="160" y="0" animationId="0:20" id="0:6">
+          <StateTransition stateToId="0:7" duration="400">
+          <TransitionViewModelCondition opValue="equal">
+            <TransitionPropertyViewModelComparator>
+              <BindablePropertyBoolean>
+                <DataBindContext sourcePathIds="0:100-0:102" propertyKey="634"/>
+              </BindablePropertyBoolean>
+            </TransitionPropertyViewModelComparator>
+            <TransitionValueBooleanComparator value="true"/>
+          </TransitionViewModelCondition>
+          </StateTransition>
+        </AnimationState>
+        <AnimationState x="320" y="0" animationId="0:21" id="0:7">
+          <StateTransition stateToId="0:6" duration="400">
+          <TransitionViewModelCondition opValue="equal">
+            <TransitionPropertyViewModelComparator>
+              <BindablePropertyBoolean>
+                <DataBindContext sourcePathIds="0:100-0:102" propertyKey="634"/>
+              </BindablePropertyBoolean>
+            </TransitionPropertyViewModelComparator>
+            <TransitionValueBooleanComparator value="false"/>
+          </TransitionViewModelCondition>
+          </StateTransition>
+        </AnimationState>
+      </StateMachineLayer>
+    </StateMachine>
+
+    <Shape x="201.5" y="200.0" rotation="1.570796" name="Play" id="0:50">
+      <Triangle width="16" height="14" originX="0.5" originY="0.5" name="Path"/>
+      <Fill name="Fill">
+        <LinearGradient startX="8.0" startY="-8.0" endX="-8.0" endY="8.0" name="Gradient">
+          <GradientStop colorValue="FF00F2E0" position="0.0"/>
+          <GradientStop colorValue="FF017AFF" position="0.1"/>
+          <GradientStop colorValue="FFFA3FA5" position="0.5"/>
+          <GradientStop colorValue="FFFFA61D" position="0.9"/>
+          <GradientStop colorValue="FFFEFF00" position="1.0"/>
+        </LinearGradient>
+      </Fill>
+    </Shape>
+    <Shape x="200.0" y="200.0" name="Ring 1" id="0:30">
+      <Ellipse width="40.0" height="40.0" originX="0.5" originY="0.5" name="Path"/>
+      <Stroke thickness="4" cap="round" join="round" name="Stroke">
+        <LinearGradient startX="20.0" startY="-20.0" endX="-20.0" endY="20.0" name="Gradient">
+          <GradientStop colorValue="FF00F2E0" position="0.0"/>
+          <GradientStop colorValue="FF017AFF" position="0.1"/>
+          <GradientStop colorValue="FFFA3FA5" position="0.5"/>
+          <GradientStop colorValue="FFFFA61D" position="0.9"/>
+          <GradientStop colorValue="FFFEFF00" position="1.0"/>
+        </LinearGradient>
+      </Stroke>
+    </Shape>
+    <Shape x="200.0" y="200.0" name="Ring 2" id="0:31">
+      <Ellipse width="58.4" height="58.4" originX="0.5" originY="0.5" name="Path"/>
+      <Stroke thickness="4" cap="round" join="round" name="Stroke">
+        <LinearGradient startX="29.2" startY="-29.2" endX="-29.2" endY="29.2" name="Gradient">
+          <GradientStop colorValue="FF00F2E0" position="0.0"/>
+          <GradientStop colorValue="FF017AFF" position="0.1"/>
+          <GradientStop colorValue="FFFA3FA5" position="0.5"/>
+          <GradientStop colorValue="FFFFA61D" position="0.9"/>
+          <GradientStop colorValue="FFFEFF00" position="1.0"/>
+        </LinearGradient>
+        <DashPath offset="0" name="Dashes">
+          <Dash length="50" name="On"/>
+          <Dash length="8" name="Off"/>
+        </DashPath>
+      </Stroke>
+    </Shape>
+    <Shape x="200.0" y="200.0" name="Ring 3" id="0:32">
+      <Ellipse width="76.0" height="76.0" originX="0.5" originY="0.5" name="Path"/>
+      <Stroke thickness="4" cap="round" join="round" name="Stroke">
+        <LinearGradient startX="38.0" startY="-38.0" endX="-38.0" endY="38.0" name="Gradient">
+          <GradientStop colorValue="FF00F2E0" position="0.0"/>
+          <GradientStop colorValue="FF017AFF" position="0.1"/>
+          <GradientStop colorValue="FFFA3FA5" position="0.5"/>
+          <GradientStop colorValue="FFFFA61D" position="0.9"/>
+          <GradientStop colorValue="FFFEFF00" position="1.0"/>
+        </LinearGradient>
+        <DashPath offset="0" name="Dashes">
+          <Dash length="40" name="On"/>
+          <Dash length="8" name="Off"/>
+        </DashPath>
+      </Stroke>
+    </Shape>
+    <Shape x="200.0" y="200.0" name="Ring 4" id="0:33">
+      <Ellipse width="92.8" height="92.8" originX="0.5" originY="0.5" name="Path"/>
+      <Stroke thickness="4" cap="round" join="round" name="Stroke">
+        <LinearGradient startX="37.1" startY="-37.1" endX="-27.8" endY="37.1" name="Gradient">
+          <GradientStop colorValue="FF00F2E0" position="0.0"/>
+          <GradientStop colorValue="FF017AFF" position="0.2"/>
+          <GradientStop colorValue="FFFA3FA5" position="0.5"/>
+          <GradientStop colorValue="FFFFA61D" position="0.9"/>
+          <GradientStop colorValue="FFFEFF00" position="1.0"/>
+        </LinearGradient>
+        <DashPath offset="0" name="Dashes">
+          <Dash length="40" name="On"/>
+          <Dash length="10" name="Off"/>
+        </DashPath>
+      </Stroke>
+    </Shape>
+    <Shape x="200.0" y="200.0" name="Ring 5" id="0:34">
+      <Ellipse width="110.8" height="110.8" originX="0.5" originY="0.5" name="Path"/>
+      <Stroke thickness="4" cap="round" join="round" name="Stroke">
+        <LinearGradient startX="44.3" startY="-44.3" endX="-33.2" endY="44.3" name="Gradient">
+          <GradientStop colorValue="FF00F2E0" position="0.0"/>
+          <GradientStop colorValue="FF017AFF" position="0.2"/>
+          <GradientStop colorValue="FFFA3FA5" position="0.5"/>
+          <GradientStop colorValue="FFFFA61D" position="0.9"/>
+          <GradientStop colorValue="FFFEFF00" position="1.0"/>
+        </LinearGradient>
+        <DashPath offset="10" name="Dashes">
+          <Dash length="40" name="On"/>
+          <Dash length="12" name="Off"/>
+        </DashPath>
+      </Stroke>
+    </Shape>
+    <Shape x="200.0" y="200.0" name="Ring 6" id="0:35">
+      <Ellipse width="130.4" height="130.4" originX="0.5" originY="0.5" name="Path"/>
+      <Stroke thickness="4" cap="round" join="round" name="Stroke">
+        <LinearGradient startX="52.2" startY="-52.2" endX="-39.1" endY="52.2" name="Gradient">
+          <GradientStop colorValue="FF00F2E0" position="0.0"/>
+          <GradientStop colorValue="FF017AFF" position="0.2"/>
+          <GradientStop colorValue="FFFA3FA5" position="0.5"/>
+          <GradientStop colorValue="FFFFA61D" position="0.9"/>
+          <GradientStop colorValue="FFFEFF00" position="1.0"/>
+        </LinearGradient>
+        <DashPath offset="20" name="Dashes">
+          <Dash length="60" name="On"/>
+          <Dash length="14" name="Off"/>
+        </DashPath>
+      </Stroke>
+    </Shape>
+    <Shape x="200.0" y="200.0" name="Ring 7" id="0:36">
+      <Ellipse width="150.6" height="150.6" originX="0.5" originY="0.5" name="Path"/>
+      <Stroke thickness="4" cap="round" join="round" name="Stroke">
+        <LinearGradient startX="60.2" startY="-60.2" endX="-45.2" endY="60.2" name="Gradient">
+          <GradientStop colorValue="FF00F2E0" position="0.0"/>
+          <GradientStop colorValue="FF017AFF" position="0.2"/>
+          <GradientStop colorValue="FFFA3FA5" position="0.5"/>
+          <GradientStop colorValue="FFFFA61D" position="0.9"/>
+          <GradientStop colorValue="FFFEFF00" position="1.0"/>
+        </LinearGradient>
+        <DashPath offset="0" name="Dashes">
+          <Dash length="70" name="On"/>
+          <Dash length="16" name="Off"/>
+        </DashPath>
+      </Stroke>
+    </Shape>
+    <Shape x="200.0" y="200.0" name="Ring 8" id="0:37">
+      <Ellipse width="172.4" height="172.4" originX="0.5" originY="0.5" name="Path"/>
+      <Stroke thickness="4" cap="round" join="round" name="Stroke">
+        <LinearGradient startX="69.0" startY="-69.0" endX="-51.7" endY="69.0" name="Gradient">
+          <GradientStop colorValue="FF00F2E0" position="0.0"/>
+          <GradientStop colorValue="FF017AFF" position="0.2"/>
+          <GradientStop colorValue="FFFA3FA5" position="0.5"/>
+          <GradientStop colorValue="FFFFA61D" position="0.9"/>
+          <GradientStop colorValue="FFFEFF00" position="1.0"/>
+        </LinearGradient>
+        <DashPath offset="40" name="Dashes">
+          <Dash length="80" name="On"/>
+          <Dash length="18" name="Off"/>
+        </DashPath>
+      </Stroke>
+    </Shape>
+    <Shape x="200.0" y="200.0" name="Ring 9" id="0:38">
+      <Ellipse width="196.2" height="196.2" originX="0.5" originY="0.5" name="Path"/>
+      <Stroke thickness="4" cap="round" join="round" name="Stroke">
+        <LinearGradient startX="78.5" startY="-78.5" endX="-58.9" endY="78.5" name="Gradient">
+          <GradientStop colorValue="FF00F2E0" position="0.0"/>
+          <GradientStop colorValue="FF017AFF" position="0.2"/>
+          <GradientStop colorValue="FFFA3FA5" position="0.5"/>
+          <GradientStop colorValue="FFFFA61D" position="0.9"/>
+          <GradientStop colorValue="FFFEFF00" position="1.0"/>
+        </LinearGradient>
+        <DashPath offset="50" name="Dashes">
+          <Dash length="100" name="On"/>
+          <Dash length="20" name="Off"/>
+        </DashPath>
+      </Stroke>
+    </Shape>
+    <Shape x="200.0" y="200.0" name="Ring 10" id="0:39">
+      <Ellipse width="221.6" height="221.6" originX="0.5" originY="0.5" name="Path"/>
+      <Stroke thickness="4" cap="round" join="round" name="Stroke">
+        <LinearGradient startX="88.6" startY="-88.6" endX="-66.5" endY="88.6" name="Gradient">
+          <GradientStop colorValue="FF00F2E0" position="0.0"/>
+          <GradientStop colorValue="FF017AFF" position="0.2"/>
+          <GradientStop colorValue="FFFA3FA5" position="0.5"/>
+          <GradientStop colorValue="FFFFA61D" position="0.9"/>
+          <GradientStop colorValue="FFFEFF00" position="1.0"/>
+        </LinearGradient>
+        <DashPath offset="60" name="Dashes">
+          <Dash length="150" name="On"/>
+          <Dash length="22" name="Off"/>
+        </DashPath>
+      </Stroke>
+    </Shape>
+    <Shape x="200.0" y="200.0" name="Ring 11" id="0:40">
+      <Ellipse width="246.0" height="246.0" originX="0.5" originY="0.5" name="Path"/>
+      <Stroke thickness="4" cap="round" join="round" name="Stroke">
+        <LinearGradient startX="98.4" startY="-98.4" endX="-73.8" endY="98.4" name="Gradient">
+          <GradientStop colorValue="FF00F2E0" position="0.0"/>
+          <GradientStop colorValue="FF017AFF" position="0.2"/>
+          <GradientStop colorValue="FFFA3FA5" position="0.5"/>
+          <GradientStop colorValue="FFFFA61D" position="0.9"/>
+          <GradientStop colorValue="FFFEFF00" position="1.0"/>
+        </LinearGradient>
+        <DashPath offset="70" name="Dashes">
+          <Dash length="150" name="On"/>
+          <Dash length="24" name="Off"/>
+        </DashPath>
+      </Stroke>
+    </Shape>
+    <Shape x="200.0" y="200.0" name="Ring 12" id="0:41">
+      <Ellipse width="274.0" height="274.0" originX="0.5" originY="0.5" name="Path"/>
+      <Stroke thickness="4" cap="round" join="round" name="Stroke">
+        <LinearGradient startX="-137.0" startY="0.0" endX="137.0" endY="0.0" name="Gradient">
+          <GradientStop colorValue="FF00F2E0" position="0.0566"/>
+          <GradientStop colorValue="FF0076FE" position="0.1288"/>
+          <GradientStop colorValue="FFF54AB2" position="0.1902"/>
+          <GradientStop colorValue="FFFEED07" position="0.273"/>
+          <GradientStop colorValue="FFF340A8" position="0.3503"/>
+          <GradientStop colorValue="FF0075FC" position="0.4327"/>
+          <GradientStop colorValue="FF00F2E0" position="0.5337"/>
+          <GradientStop colorValue="FF0077FF" position="0.6448"/>
+          <GradientStop colorValue="FFFF3EA3" position="0.7371"/>
+          <GradientStop colorValue="FFFEFF00" position="0.8072"/>
+          <GradientStop colorValue="FFEC42AA" position="0.8907"/>
+          <GradientStop colorValue="FF00F2E0" position="1.0"/>
+        </LinearGradient>
+        <DashPath offset="0" name="Dashes">
+          <Dash length="200" name="On"/>
+          <Dash length="26" name="Off"/>
+        </DashPath>
+      </Stroke>
+    </Shape>
+    <Shape x="200.0" y="200.0" name="Ring 13" id="0:42">
+      <Ellipse width="302.0" height="302.0" originX="0.5" originY="0.5" name="Path"/>
+      <Stroke thickness="4" cap="round" join="round" name="Stroke">
+        <LinearGradient startX="120.8" startY="-120.8" endX="-90.6" endY="120.8" name="Gradient">
+          <GradientStop colorValue="FF00F2E0" position="0.0"/>
+          <GradientStop colorValue="FF017AFF" position="0.2"/>
+          <GradientStop colorValue="FFFA3FA5" position="0.5"/>
+          <GradientStop colorValue="FFFFA61D" position="0.9"/>
+          <GradientStop colorValue="FFFEFF00" position="1.0"/>
+        </LinearGradient>
+        <DashPath offset="30" name="Dashes">
+          <Dash length="300" name="On"/>
+          <Dash length="28" name="Off"/>
+        </DashPath>
+      </Stroke>
+    </Shape>
+    <Shape x="200.0" y="200.0" name="Ring 14" id="0:43">
+      <Ellipse width="330.0" height="330.0" originX="0.5" originY="0.5" name="Path"/>
+      <Stroke thickness="4" cap="round" join="round" name="Stroke">
+        <LinearGradient startX="-165.0" startY="0.0" endX="165.0" endY="0.0" name="Gradient">
+          <GradientStop colorValue="FF00F2E0" position="0.0566"/>
+          <GradientStop colorValue="FF0076FE" position="0.1288"/>
+          <GradientStop colorValue="FFF54AB2" position="0.1902"/>
+          <GradientStop colorValue="FFFEED07" position="0.273"/>
+          <GradientStop colorValue="FFF340A8" position="0.3503"/>
+          <GradientStop colorValue="FF0075FC" position="0.4327"/>
+          <GradientStop colorValue="FF00F2E0" position="0.5337"/>
+          <GradientStop colorValue="FF0077FF" position="0.6448"/>
+          <GradientStop colorValue="FFFF3EA3" position="0.7371"/>
+          <GradientStop colorValue="FFFEFF00" position="0.8072"/>
+          <GradientStop colorValue="FFEC42AA" position="0.8907"/>
+          <GradientStop colorValue="FF00F2E0" position="1.0"/>
+        </LinearGradient>
+        <DashPath offset="0" name="Dashes">
+          <Dash length="150" name="On"/>
+          <Dash length="30" name="Off"/>
+        </DashPath>
+      </Stroke>
+    </Shape>
+
+    <LinearAnimation loopValue="loop" fps="60" duration="12000" name="Spin" id="0:20">
+      <KeyedObject objectId="0:30">
+        <KeyedProperty property="rotation">
+          <KeyFrameDouble value="0" frame="0" interpolationType="linear"/>
+          <KeyFrameDouble value="25.132741" frame="12000" interpolationType="linear"/>
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="0:31">
+        <KeyedProperty property="rotation">
+          <KeyFrameDouble value="0" frame="0" interpolationType="linear"/>
+          <KeyFrameDouble value="31.415927" frame="12000" interpolationType="linear"/>
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="0:32">
+        <KeyedProperty property="rotation">
+          <KeyFrameDouble value="0" frame="0" interpolationType="linear"/>
+          <KeyFrameDouble value="-37.699112" frame="12000" interpolationType="linear"/>
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="0:33">
+        <KeyedProperty property="rotation">
+          <KeyFrameDouble value="0" frame="0" interpolationType="linear"/>
+          <KeyFrameDouble value="43.982297" frame="12000" interpolationType="linear"/>
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="0:34">
+        <KeyedProperty property="rotation">
+          <KeyFrameDouble value="0" frame="0" interpolationType="linear"/>
+          <KeyFrameDouble value="50.265482" frame="12000" interpolationType="linear"/>
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="0:35">
+        <KeyedProperty property="rotation">
+          <KeyFrameDouble value="0" frame="0" interpolationType="linear"/>
+          <KeyFrameDouble value="-25.132741" frame="12000" interpolationType="linear"/>
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="0:36">
+        <KeyedProperty property="rotation">
+          <KeyFrameDouble value="0" frame="0" interpolationType="linear"/>
+          <KeyFrameDouble value="31.415927" frame="12000" interpolationType="linear"/>
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="0:37">
+        <KeyedProperty property="rotation">
+          <KeyFrameDouble value="0" frame="0" interpolationType="linear"/>
+          <KeyFrameDouble value="37.699112" frame="12000" interpolationType="linear"/>
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="0:38">
+        <KeyedProperty property="rotation">
+          <KeyFrameDouble value="0" frame="0" interpolationType="linear"/>
+          <KeyFrameDouble value="-43.982297" frame="12000" interpolationType="linear"/>
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="0:39">
+        <KeyedProperty property="rotation">
+          <KeyFrameDouble value="0" frame="0" interpolationType="linear"/>
+          <KeyFrameDouble value="50.265482" frame="12000" interpolationType="linear"/>
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="0:40">
+        <KeyedProperty property="rotation">
+          <KeyFrameDouble value="0" frame="0" interpolationType="linear"/>
+          <KeyFrameDouble value="25.132741" frame="12000" interpolationType="linear"/>
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="0:41">
+        <KeyedProperty property="rotation">
+          <KeyFrameDouble value="0" frame="0" interpolationType="linear"/>
+          <KeyFrameDouble value="-31.415927" frame="12000" interpolationType="linear"/>
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="0:42">
+        <KeyedProperty property="rotation">
+          <KeyFrameDouble value="0" frame="0" interpolationType="linear"/>
+          <KeyFrameDouble value="37.699112" frame="12000" interpolationType="linear"/>
+        </KeyedProperty>
+      </KeyedObject>
+      <KeyedObject objectId="0:43">
+        <KeyedProperty property="rotation">
+          <KeyFrameDouble value="0" frame="0" interpolationType="linear"/>
+          <KeyFrameDouble value="43.982297" frame="12000" interpolationType="linear"/>
+        </KeyedProperty>
+      </KeyedObject>
+    </LinearAnimation>
+    <LinearAnimation fps="60" duration="1" name="Still" id="0:21"/>
+  </Artboard>
+
+  <ViewModel defaultInstanceId="0:101" name="Wheel" id="0:100">
+    <ViewModelPropertyBoolean name="still" id="0:102"/>
+    <ViewModelInstance exports="true" name="Default" id="0:101">
+      <ViewModelInstanceBoolean propertyValue="false" viewModelPropertyId="0:102"/>
+    </ViewModelInstance>
+  </ViewModel>
+</Rive>
