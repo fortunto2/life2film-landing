@@ -54,36 +54,66 @@ const feats = [
             </svg>
             {t('ctaPrimary')}
           </a>
-          <a
-            class="btn-mac"
-            href="/studio/"
-            data-sda-event="studio_opened"
-            data-sda-placement="site-hero"
-          >
-            <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="currentColor">
-              <path d="M11.18 0c.08.9-.28 1.78-.83 2.42-.55.64-1.44 1.13-2.31 1.06-.1-.86.32-1.77.85-2.34C9.44.48 10.4.04 11.18 0zm2.7 5.44c-.05.03-1.63.94-1.61 2.8.02 2.23 1.95 2.97 1.98 2.98-.02.06-.31 1.06-1.02 2.09-.61.9-1.25 1.8-2.26 1.82-.99.02-1.31-.59-2.44-.59-1.13 0-1.48.57-2.42.6-.97.04-1.71-.97-2.33-1.87C2.5 11.44 1.53 8.1 2.83 5.84c.64-1.12 1.8-1.83 3.05-1.85.95-.02 1.85.64 2.43.64.58 0 1.67-.79 2.82-.68.48.02 1.83.19 2.7 1.45z"/>
-            </svg>
-            {t('macCta')}
-          </a>
         </div>
         <p class="muted small">{t('ctaNote')}</p>
-        <p class="muted small mac-note">{t('macNote')}</p>
+        {/*
+          The Mac button used to stand beside the App Store one, equal in weight — two
+          buttons split a decision the visitor did not come to make. It is a text link
+          now, same event, same placement, so the count continues.
+        */}
+        <p class="muted small mac-note">
+          <a href="/studio/" class="maclink" data-sda-event="studio_opened" data-sda-placement="site-hero">{t('macCta')} →</a>
+          <span> · {t('macNote')}</span>
+        </p>
+        <p class="proof">{t('heroProof')}</p>
       </div>
-      <CalendarWheel />
+
+      {/*
+        The film, not the logo. A real cut the engine made from one morning's clips, 20 s
+        of it looping muted in a phone frame. `preload="none"` and play-on-visible: the
+        3.6 MB download starts only when the frame is on screen, never under Reduce
+        Motion or Save-Data (the poster stands in). The first play is counted through the
+        shared snippet's click hook — the empty <i> below carries the event attributes
+        and the script clicks it once.
+      */}
+      <figure class="film">
+        <div class="phone">
+          <video
+            class="filmvideo"
+            poster="/img/hero-poster.jpg"
+            muted
+            playsinline
+            loop
+            preload="none"
+            width="720"
+            height="1280"
+            aria-label={t('heroFilmCaption')}
+          >
+            <source src="/video/hero.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <figcaption class="muted small">{t('heroFilmCaption')}</figcaption>
+        <i class="sda-mark" data-sda-event="hero_film_played" data-sda-placement="site-hero" aria-hidden="true"></i>
+      </figure>
     </div>
   </section>
 
   <section>
     <div class="wrap">
       <h2>{t('howTitle')}</h2>
-      <div class="grid cols-3 steps">
-        {steps.map((s, i) => (
-          <div class="card">
-            <span class="num gradient-text">{String(i + 1).padStart(2, '0')}</span>
-            <h3>{s.t}</h3>
-            <p>{s.d}</p>
-          </div>
-        ))}
+      {/* The wheel moved here from the hero: beside «pick a stretch of time» it explains
+          something; in the hero it was a logo where the film should be. */}
+      <div class="howgrid">
+        <div class="howwheel" aria-hidden="true"><CalendarWheel /></div>
+        <div class="steps">
+          {steps.map((s, i) => (
+            <div class="card">
+              <span class="num gradient-text">{String(i + 1).padStart(2, '0')}</span>
+              <h3>{s.t}</h3>
+              <p>{s.d}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   </section>
@@ -123,6 +153,34 @@ const feats = [
     </div>
   </section>
 
+  {/*
+    Not on an iPhone: Android, and the Studio for Mac while it is a beta. One address, one
+    reason, one email when it ships. POST /api/waitlist (functions/api/waitlist.js) keeps
+    sha256(address) → {reason, lang}; the form works without JavaScript (303 back here)
+    and with it (fetch, no reload). The count goes through the empty <i> on success only.
+  */}
+  <section class="wait" id="waitlist">
+    <div class="wrap waitwrap">
+      <h2>{t('waitTitle')}</h2>
+      <p class="muted">{t('waitLede')}</p>
+      <form class="waitform" method="post" action="/api/waitlist" data-done={t('waitDone')} data-fail={t('waitFail')}>
+        <input type="hidden" name="lang" value={lang} />
+        <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <div class="reasons" role="radiogroup" aria-label={t('waitTitle')}>
+          <label class="reason"><input type="radio" name="reason" value="android" checked /><span>{t('waitAndroid')}</span></label>
+          <label class="reason"><input type="radio" name="reason" value="studio" /><span>{t('waitStudio')}</span></label>
+        </div>
+        <div class="waitrow">
+          <label class="sr-only" for="wait-email">{t('waitEmail')}</label>
+          <input id="wait-email" type="email" name="email" required autocomplete="email" inputmode="email" placeholder={t('waitEmail')} />
+          <button type="submit" class="btn">{t('waitSend')}</button>
+        </div>
+        <p class="waitmsg muted small" role="status" aria-live="polite"></p>
+        <i class="sda-mark" data-sda-event="waitlist_sent" data-sda-placement="site-wait" aria-hidden="true"></i>
+      </form>
+    </div>
+  </section>
+
   <section class="priv">
     <div class="wrap privwrap">
       <h2>{t('privTitle')}</h2>
@@ -132,6 +190,62 @@ const feats = [
     </div>
   </section>
 </main>
+
+<script>
+  // The shared analytics snippet counts clicks on [data-sda-event] and offers no JS call,
+  // so a non-click event is reported by clicking an empty marker element once.
+  const count = (event: string) =>
+    document.querySelector<HTMLElement>(`.sda-mark[data-sda-event="${event}"]`)?.click();
+
+  const video = document.querySelector<HTMLVideoElement>('.filmvideo');
+  if (video) {
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
+    if (!reduced && !saveData) {
+      let played = false;
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) { video.pause(); continue; }
+            video.play().then(() => {
+              if (played) return;
+              played = true;
+              count('hero_film_played');
+            }).catch(() => {});
+          }
+        },
+        { threshold: 0.4 },
+      );
+      io.observe(video);
+    }
+    video.addEventListener('click', () => { if (video.paused) void video.play(); else video.pause(); });
+  }
+
+  const form = document.querySelector<HTMLFormElement>('.waitform');
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msg = form.querySelector<HTMLElement>('.waitmsg');
+      const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+      const data = Object.fromEntries(new FormData(form).entries());
+      if (button) button.disabled = true;
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', accept: 'application/json' },
+          body: JSON.stringify(data),
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        if (msg) msg.textContent = form.dataset.done ?? '';
+        form.querySelector<HTMLInputElement>('input[type="email"]')?.setAttribute('readonly', '');
+        count('waitlist_sent');
+      } catch {
+        if (msg) msg.textContent = form.dataset.fail ?? '';
+        if (button) button.disabled = false;
+      }
+    });
+  }
+</script>
 
 <style>
   .hero { padding-top: 64px; }
@@ -143,6 +257,9 @@ const feats = [
   .cta { margin: 28px 0 12px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
   .small { font-size: 14px; }
   .mac-note { margin-top: 4px; opacity: 0.75; }
+  .maclink { color: var(--fg); text-decoration: none; font-weight: 500; }
+  .maclink:hover { text-decoration: underline; }
+  .proof { margin-top: 18px; font-size: 13px; letter-spacing: 0.02em; color: var(--muted); }
 
   .btn-store {
     display: inline-flex; align-items: center; gap: 9px;
@@ -150,14 +267,52 @@ const feats = [
   }
   .btn-store:hover { transform: translateY(-1px); box-shadow: 0 12px 34px rgba(1, 122, 255, 0.35); }
 
-  .btn-mac {
-    display: inline-flex; align-items: center; gap: 9px;
-    padding: 12px 22px; border-radius: 12px;
-    border: 1px solid var(--line); background: var(--panel);
-    color: var(--fg); text-decoration: none; font-size: 15px; font-weight: 500;
-    transition: border-color 0.15s ease, background 0.15s ease;
+  /* The film in the hero: a phone-shaped frame, the video fills it. */
+  .film { margin: 0; justify-self: center; width: min(320px, 78vw); }
+  .phone {
+    position: relative;
+    aspect-ratio: 9 / 19.5;
+    border-radius: 42px;
+    padding: 10px;
+    background: #0b0b0e;
+    border: 1px solid #2a2a33;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
   }
-  .btn-mac:hover { border-color: #33333d; background: #131318; }
+  .phone video {
+    display: block; width: 100%; height: 100%; object-fit: cover;
+    border-radius: 34px; background: #000; cursor: pointer;
+  }
+  .film figcaption { margin-top: 14px; text-align: center; line-height: 1.45; }
+  .sda-mark { display: inline-block; width: 0; height: 0; overflow: hidden; }
+
+  .howgrid { display: grid; gap: 32px; margin-top: 28px; align-items: center; }
+  @media (min-width: 900px) { .howgrid { grid-template-columns: 0.9fr 1.1fr; } }
+  .howwheel :global(.wheel) { width: min(380px, 80vw); }
+  .steps { display: grid; gap: 16px; }
+
+  .waitwrap { max-width: 62ch; }
+  .waitwrap .muted { margin: 18px 0 20px; }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .reasons { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+  .reason {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 14px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--panel);
+    color: var(--fg); font-size: 14px; cursor: pointer;
+  }
+  .reason:has(input:checked) { border-color: var(--cyan); }
+  .reason input { accent-color: var(--cyan); margin: 0; }
+  .waitrow { display: flex; flex-wrap: wrap; gap: 10px; }
+  .waitrow input {
+    flex: 1 1 240px; min-width: 0;
+    padding: 12px 16px; border-radius: 12px;
+    border: 1px solid var(--line); background: var(--panel);
+    color: var(--fg); font-size: 15px;
+  }
+  .waitrow input:focus-visible { outline: 2px solid var(--cyan); outline-offset: 1px; }
+  .waitrow .btn { flex: 0 0 auto; }
+  .waitmsg { margin-top: 12px; min-height: 1.4em; }
 
   .steps, .feats { margin-top: 28px; }
   .num { display: block; font-size: 13px; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 10px; }

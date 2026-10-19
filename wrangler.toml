@@ -9,3 +9,10 @@ compatibility_date = "2025-10-01"
 [[kv_namespaces]]
 binding = "REFERRALS"
 id = "9d94d2ba23ea40a699581c3dccb1e4e7"
+
+# Waitlist (Android, Studio out of beta): `email:<sha256(address)>` → {email, reason,
+# lang, since}, plus `count:<reason>`. Written by POST /api/waitlist, counts read back by
+# GET /api/waitlist. No IP, no cookie. Created 19 Oct 2026 (`wrangler kv namespace create`).
+[[kv_namespaces]]
+binding = "WAITLIST"
+id = "dae23ccfb0b54c959e3e6f7d74804094"

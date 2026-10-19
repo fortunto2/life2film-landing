@@ -292,6 +292,16 @@ const jsonLd = {
   .lang:hover { color: var(--fg); }
   .lang.on { color: var(--fg); border-color: var(--line); background: var(--panel); }
 
+  /* On a phone the single 64 px row overflowed: Blog, Support and the whole language
+     switch sat past the right edge, so a Russian or Turkish phone could not reach its own
+     language (measured at 390 px, 18 Oct 2026). Two rows: logo + languages, then the links. */
+  @media (max-width: 720px) {
+    .navrow { flex-wrap: wrap; height: auto; padding: 12px 0; gap: 10px 16px; }
+    .langs { margin-left: auto; }
+    .navlinks { order: 3; width: 100%; margin-left: 0; flex-wrap: wrap; gap: 8px 16px; }
+    .navlinks a { font-size: 14px; }
+  }
+
   main { position: relative; z-index: 1; }
 
   h1, h2, h3 { letter-spacing: -0.03em; line-height: 1.1; margin: 0; }
