@@ -88,6 +88,11 @@ export const ui = {
     aboutH5: 'Who makes it',
     aboutP6:
       'Life2Film is built by SuperDuperAi, Corp., a Delaware company. Bugs, questions and feature requests all go to the same inbox, and a person reads them.',
+    aboutH6: 'Twelve years, one idea',
+    aboutP7:
+      'The first Life2Film came out in 2014: an iPhone app that cut your clips into a film by itself, back when nobody called that AI. More than a million people installed it. The technology of the time could not keep the promise, and the app closed in 2021. The idea has not moved since; the form has. What once needed a server now runs on the phone in your hand. This is the film we made about it then.',
+    aboutVideoPlay: 'Play the 2014 film',
+    aboutVideoNote: 'The video is on YouTube and loads only when you press play.',
   },
 
   es: {
@@ -166,6 +171,11 @@ export const ui = {
     aboutH5: 'Quién lo hace',
     aboutP6:
       'Life2Film lo desarrolla SuperDuperAi, Corp., una empresa de Delaware. Errores, preguntas y peticiones llegan al mismo buzón, y los lee una persona.',
+    aboutH6: 'Doce años, una sola idea',
+    aboutP7:
+      'El primer Life2Film salió en 2014: una app para iPhone que convertía tus clips en una película por sí sola, cuando nadie llamaba a eso IA. Más de un millón de personas la instalaron. La tecnología de entonces no pudo cumplir la promesa y la app cerró en 2021. La idea no ha cambiado desde entonces; la forma sí. Lo que antes necesitaba un servidor ahora funciona en el teléfono que tienes en la mano. Esta es la película que hicimos sobre ella en aquel momento.',
+    aboutVideoPlay: 'Ver la película de 2014',
+    aboutVideoNote: 'El vídeo está en YouTube y solo se carga cuando pulsas reproducir.',
   },
 
   pt: {
@@ -244,6 +254,11 @@ export const ui = {
     aboutH5: 'Quem faz',
     aboutP6:
       'O Life2Film é desenvolvido pela SuperDuperAi, Corp., empresa de Delaware. Erros, dúvidas e pedidos chegam na mesma caixa, e uma pessoa lê.',
+    aboutH6: 'Doze anos, uma única ideia',
+    aboutP7:
+      'O primeiro Life2Film saiu em 2014: um app para iPhone que transformava os seus clipes num filme sozinho, quando ninguém chamava isso de IA. Mais de um milhão de pessoas o instalaram. A tecnologia da época não conseguiu cumprir a promessa, e o app fechou em 2021. A ideia não mudou desde então; a forma, sim. O que antes precisava de um servidor agora roda no telefone na sua mão. Este é o filme que fizemos sobre ele naquela altura.',
+    aboutVideoPlay: 'Assistir ao filme de 2014',
+    aboutVideoNote: 'O vídeo está no YouTube e só é carregado quando você aperta play.',
   },
 
   id: {
@@ -322,6 +337,11 @@ export const ui = {
     aboutH5: 'Siapa yang membuat',
     aboutP6:
       'Life2Film dibuat oleh SuperDuperAi, Corp., perusahaan asal Delaware. Laporan bug, pertanyaan dan permintaan fitur masuk ke kotak surat yang sama, dan dibaca oleh manusia.',
+    aboutH6: 'Dua belas tahun, satu gagasan',
+    aboutP7:
+      'Life2Film pertama rilis pada 2014: aplikasi iPhone yang memotong klip Anda menjadi film dengan sendirinya, saat belum ada yang menyebutnya AI. Lebih dari satu juta orang memasangnya. Teknologi masa itu tidak sanggup menepati janjinya, dan aplikasi ditutup pada 2021. Gagasannya tidak berubah sejak itu; bentuknya yang berubah. Yang dulu butuh server kini berjalan di ponsel di tangan Anda. Inilah film yang kami buat tentangnya waktu itu.',
+    aboutVideoPlay: 'Putar film tahun 2014',
+    aboutVideoNote: 'Video ini ada di YouTube dan baru dimuat setelah Anda menekan putar.',
   },
 
   ar: {
@@ -400,6 +420,11 @@ export const ui = {
     aboutH5: 'من يصنعه',
     aboutP6:
       'يطوّر Life2Film شركة SuperDuperAi, Corp. المسجّلة في ديلاوير. تصل البلاغات والأسئلة والاقتراحات إلى البريد نفسه، ويقرأها إنسان.',
+    aboutH6: 'اثنا عشر عامًا، فكرة واحدة',
+    aboutP7:
+      'صدر أول Life2Film عام 2014: تطبيق لآيفون يقصّ مقاطعك إلى فيلم من تلقاء نفسه، قبل أن يسمّي أحد ذلك ذكاءً اصطناعيًا. ثبّته أكثر من مليون شخص. لم تستطع تقنية ذلك الوقت الوفاء بالوعد، فأُغلق التطبيق عام 2021. الفكرة لم تتغير منذ ذلك الحين، وتغيّر الشكل: ما كان يحتاج إلى خادم صار يعمل على الهاتف الذي في يدك. هذا هو الفيلم الذي صنعناه عنه آنذاك.',
+    aboutVideoPlay: 'شاهد فيلم 2014',
+    aboutVideoNote: 'الفيديو على YouTube ولا يُحمَّل إلا عند الضغط على التشغيل.',
   },
 
   ru: {
@@ -477,6 +502,11 @@ export const ui = {
     aboutH5: 'Кто делает',
     aboutP6:
       'Life2Film делает SuperDuperAi, Corp., компания из штата Делавэр. Ошибки, вопросы и пожелания идут в один и тот же ящик, и их читает человек.',
+    aboutH6: 'Двенадцать лет, одна идея',
+    aboutP7:
+      'Первый Life2Film вышел в 2014 году: приложение для iPhone, которое само резало ваши клипы в фильм, когда это ещё никто не называл ИИ. Его установили больше миллиона человек. Технологии того времени обещание не вытянули, и в 2021 году приложение закрылось. Идея с тех пор не сдвинулась, изменилась форма: то, для чего раньше нужен был сервер, теперь работает на телефоне у вас в руке. Это фильм, который мы тогда о нём сняли.',
+    aboutVideoPlay: 'Смотреть фильм 2014 года',
+    aboutVideoNote: 'Видео лежит на YouTube и загружается только после нажатия.',
   },
 
   tr: {
@@ -554,6 +584,11 @@ export const ui = {
     aboutH5: 'Kim yapıyor',
     aboutP6:
       'Life2Film, Delaware merkezli SuperDuperAi, Corp. tarafından geliştiriliyor. Hatalar, sorular ve istekler aynı posta kutusuna gidiyor ve hepsini bir insan okuyor.',
+    aboutH6: 'On iki yıl, tek bir fikir',
+    aboutP7:
+      'İlk Life2Film 2014’te çıktı: kliplerinizi kendi başına filme dönüştüren bir iPhone uygulamasıydı; o zamanlar kimse buna yapay zekâ demiyordu. Bir milyondan fazla kişi yükledi. O günün teknolojisi sözü tutamadı ve uygulama 2021’de kapandı. Fikir o günden beri yerinde duruyor; değişen biçim oldu. Eskiden sunucu gerektiren iş artık elinizdeki telefonda çalışıyor. Bu, o zaman onun hakkında çektiğimiz film.',
+    aboutVideoPlay: '2014 filmini izle',
+    aboutVideoNote: 'Video YouTube’da ve yalnızca oynata bastığınızda yüklenir.',
   },
 } as const satisfies Record<Lang, Record<string, string>>;
 
