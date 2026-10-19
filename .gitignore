@@ -3,3 +3,6 @@ dist/
 .astro/
 .wrangler/
 .DS_Store
+
+# Rive CLI build output; the .riv the site serves is copied to public/rive/ by rive/build.sh
+rive/*/build/
