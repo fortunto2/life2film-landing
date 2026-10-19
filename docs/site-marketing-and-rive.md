@@ -132,15 +132,33 @@ Motion, every tap a `Button`, triggers only from idle.
   `public/rive/`. Same contract names across site and app so the Swift side, if it
   comes, drives the file with the code Balalar already wrote.
 
-## What to do first (one week, no release needed)
+## What to do first (one week, no release needed) — shipped 19 Oct 2026, `a923c3d`…`1397a03`
 
-1. Hero film + poster, lazy; Mac button to a text link; `ct=site-hero` stays. (1 day)
-2. Before/after strip from one real day. (1 day, needs one screen recording)
-3. Proof line under the CTA: 2014 · 1M installs · built by SuperDuperAI. (1 h)
-4. Mobile nav wrap. (1 h)
-5. Email field for Android / Studio, Pages Function. (half a day)
-6. `wheel.riv` through the Balalar pipeline, replacing SMIL; CPU measured on a phone. (1–2 days)
-7. Two sda.js events: hero video played, before/after seen. (1 h)
+1. [x] Hero film + poster, lazy; Mac button to a text link; `ct=site-hero` stays. The film
+   is the first 20 s of `eval/2026-06-04-extra/montage_2026-06-04.mp4` (one morning at
+   the beach, no recognisable people), 720p, 3.6 MB, `preload="none"`, plays on
+   visibility, not under Reduce Motion / Save-Data. **A better film replaces one file:**
+   `public/video/hero.mp4` + `public/img/hero-poster.jpg`.
+2. [~] Before/after: folded into the hero caption rather than a second strip — the one
+   number that was verifiable («a 30-second film from one morning») is under the phone.
+   A 40-clip grid needs a screen recording from the app; still open.
+3. [x] Proof line under the CTA, seven locales.
+4. [x] Mobile nav wraps under 720 px (was: languages off the right edge at 390 px).
+5. [x] «Not on iPhone yet?»: POST `/api/waitlist`, KV `WAITLIST` (sha256(address) →
+   reason, lang), honeypot, works without JS; `GET /api/waitlist` answers the two counts.
+6. [x] `wheel.riv` (`rive/wheel/gen.py`, 14 rings, 4 KB, `still` for Reduce Motion:
+   0 bytes change over 600 frames with it on, 117 848 off). Drawn on a canvas under the
+   SVG month ring; runtime lazy, paused off-screen, wasm self-hosted (`rive.wasm` was
+   loading from unpkg.com by default). **Cost measured, not guessed: 57 KB JS + 325 KB
+   wasm, gzipped, once.** CPU on a phone not yet measured — the claim that stands is
+   «paused off-screen», not «cheaper while visible».
+7. [x] Events through the shared snippet's click hook: `hero_film_played`,
+   `waitlist_sent` (on success only).
+
+Found on the way, not changed: the page loads Google Fonts and **gtag (G-856SXW60BG)**
+beside our own counter, so «nothing leaves» is not true of the website the way it is of
+the app. Whether GA stays is Rustam's; the About page's privacy paragraph is about the
+app and does not mention the site.
 
 Re-shoot screenshots from 1.14 on the Duo and the people-consent cleanup go with the
 App Store screenshot task in `DirectorOS/docs/plan/iphone-duo_20261017/plan.md` (task 8),
