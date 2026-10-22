@@ -32,3 +32,48 @@ describe('what may be copied without re-encoding', async () => {
     expect(copyableCodecs('webm')).toContain('vp9');
   });
 });
+
+describe('what to try after an encode fails', async () => {
+  const { nextAttempt } = await import('./encode');
+  const hardware = { acceleration: 'prefer-hardware' as const, nudgeStart: false };
+
+  // The exact sentence production logged 30 times in four weeks (Oct 2026).
+  const refused = new Error(
+    'This specific encoder configuration (avc1.640028, quantizer 22 / 6111000 bps, 1920x1080, ' +
+      'hardware acceleration: prefer-hardware) is not supported by this browser',
+  );
+
+  test('a refused hardware configuration is retried in software', () => {
+    expect(nextAttempt(refused, hardware)).toEqual({ acceleration: 'no-preference', nudgeStart: false });
+  });
+
+  test('software refusing too is final, not a loop', () => {
+    expect(nextAttempt(refused, { acceleration: 'no-preference', nudgeStart: false })).toBeNull();
+  });
+
+  test('a sample rounded below zero starts the file a millisecond in, once', () => {
+    const negative = new Error('Timestamps must be non-negative (got -0.0000022675736961463855s).');
+    expect(nextAttempt(negative, hardware)).toEqual({ acceleration: 'prefer-hardware', nudgeStart: true });
+    expect(nextAttempt(negative, { ...hardware, nudgeStart: true })).toBeNull();
+  });
+
+  test('anything else is not retried', () => {
+    expect(nextAttempt(new Error('The browser could not decode that video.'), hardware)).toBeNull();
+  });
+});
+
+describe('the size the capability check asks about', async () => {
+  const { outputSize } = await import('./encode');
+  test('no box: the source size, made even', () => {
+    expect(outputSize({ width: 1920, height: 1081 }, {})).toEqual({ width: 1920, height: 1082 });
+  });
+  test('a width keeps the aspect', () => {
+    expect(outputSize({ width: 1920, height: 1080 }, { width: 1280 })).toEqual({ width: 1280, height: 720 });
+  });
+  test('a portrait source sized by height', () => {
+    expect(outputSize({ width: 1080, height: 1920 }, { height: 1280 })).toEqual({ width: 720, height: 1280 });
+  });
+  test('no source size, no claim', () => {
+    expect(outputSize({ width: 0, height: 0 }, { width: 1280 })).toBeUndefined();
+  });
+});

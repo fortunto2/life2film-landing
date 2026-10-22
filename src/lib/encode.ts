@@ -100,7 +100,12 @@ const isAudioOnly = (container: Container) => AUDIO_ONLY.has(container);
 let libraryPromise: Promise<typeof import('mediabunny')> | null = null;
 
 export function loadMediabunny() {
-  libraryPromise ??= import('mediabunny');
+  // A failed fetch is not cached: a dropped connection used to leave the promise rejected for the
+  // life of the page, so every later click failed without trying again.
+  libraryPromise ??= import('mediabunny').catch((error) => {
+    libraryPromise = null;
+    throw error;
+  });
   return libraryPromise;
 }
 
@@ -166,6 +171,48 @@ export function copyableCodecs(container: Container): VideoCodec[] {
   }
 }
 
+/**
+ * How one encode attempt is configured, and what the next one changes after a failure.
+ *
+ * Measured on production, Oct 2026: 30 of the ~60 tool failures in four weeks were one sentence,
+ * "This specific encoder configuration (avc1.640028 … 1920x1080, hardware acceleration:
+ * prefer-hardware) is not supported by this browser". The codec had been chosen by a check that
+ * asked about neither the frame size nor the hardware, and the encode then insisted on both. On a
+ * machine without a hardware encoder for that size the browser refuses, and the person got an
+ * error instead of a slower file. Seven more were MP3 extractions dying on a timestamp of
+ * −0.0000023 s — rounding in the resampler, one sample before zero.
+ */
+export interface Attempt {
+  acceleration: 'prefer-hardware' | 'no-preference';
+  /** Start a millisecond in, so a sample rounded to just below zero is dropped, not fatal. */
+  nudgeStart: boolean;
+}
+
+/** The attempt to make after `error`, or null when another try would fail the same way. */
+export function nextAttempt(error: unknown, current: Attempt): Attempt | null {
+  const message = error instanceof Error ? error.message : String(error);
+  if (current.acceleration === 'prefer-hardware' && /not supported by this browser/i.test(message)) {
+    return { ...current, acceleration: 'no-preference' };
+  }
+  if (!current.nudgeStart && /timestamps must be non-negative/i.test(message)) {
+    return { ...current, nudgeStart: true };
+  }
+  return null;
+}
+
+/** The size the encoder will actually be asked for, so the capability check asks the same thing. */
+export function outputSize(
+  source: { width: number; height: number },
+  box: { width?: number; height?: number },
+): { width: number; height: number } | undefined {
+  if (!source.width || !source.height) return undefined;
+  const even = (n: number) => Math.max(2, Math.round(n / 2) * 2);
+  if (box.width && box.height) return { width: even(box.width), height: even(box.height) };
+  if (box.width) return { width: even(box.width), height: even((source.height * box.width) / source.width) };
+  if (box.height) return { width: even((source.width * box.height) / source.height), height: even(box.height) };
+  return { width: even(source.width), height: even(source.height) };
+}
+
 /** The codec this browser will actually use for `container`, or null when it can encode none. */
 export async function encodableCodec(container: Container, size?: { width: number; height: number }) {
   const library = await loadMediabunny();
@@ -219,10 +266,10 @@ export async function encodeDetailed(file: File, options: EncodeOptions): Promis
     wav: () => new WavOutputFormat(),
     mp3: () => new Mp3OutputFormat(),
     ogg: () => new OggOutputFormat(),
-  }[options.container]();
+  }[options.container];
 
+  // Only for reading what the file holds; each attempt opens its own.
   const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
-  const output = new Output({ format, target: new BufferTarget() });
 
   const dropVideo = options.discardVideo || isAudioOnly(options.container);
 
@@ -247,14 +294,12 @@ export async function encodeDetailed(file: File, options: EncodeOptions): Promis
   // our codec and hardware hints. Knowing that up front lets us pass the hints and tell the truth.
   const trimmedStart = (options.trim?.start ?? 0) > 0.001;
   const reencode = transcode || foreign || (trimmedStart && !dropVideo);
-  const codec = reencode && !dropVideo ? await encodableCodec(options.container) : null;
-
   // "Longest edge", literally, and never upward. A 1080×1920 Reel asked for "720p" used to come out
   // 1280×2276: 2.8× the pixels, a forced transcode, a larger file.
   const srcW = sourceTrack?.displayWidth ?? 0;
   const srcH = sourceTrack?.displayHeight ?? 0;
   const portrait = srcH > srcW;
-  const box = options.fit
+  const box: { width?: number; height?: number } = options.fit
     ? { width: options.width, height: options.height }
     : options.width
       ? portrait
@@ -262,22 +307,36 @@ export async function encodeDetailed(file: File, options: EncodeOptions): Promis
         : { width: Math.min(options.width, srcW || options.width) }
       : {};
 
-  const video = dropVideo
-    ? { discard: true as const }
-    : reencode
-      ? {
-          ...(codec && { codec }),
-          ...(box.width && { width: box.width }),
-          ...(box.height && { height: box.height }),
-          ...(options.fit && { fit: options.fit }),
-          ...(videoBitrate && { bitrate: videoBitrate }),
-          ...(options.forceTranscode && { forceTranscode: true }),
-          // Measured on an M5 at 1080p: 180 fps against 34 fps for the software path — and the
-          // software encoder also overshot the requested bitrate more than threefold, so this is
-          // about output size as much as speed.
-          hardwareAcceleration: 'prefer-hardware' as const,
-        }
-      : {};
+  const size = outputSize({ width: srcW, height: srcH }, box);
+  const codec = reencode && !dropVideo ? await encodableCodec(options.container, size) : null;
+  // Hardware where this exact configuration is accepted — 180 fps against 34 on an M5 at 1080p,
+  // and the software encoder overshot the bitrate threefold — and whatever the browser has where
+  // it is not. Asking first is cheaper than failing; `nextAttempt` covers a browser that says yes
+  // and then refuses anyway.
+  const hardware =
+    codec !== null &&
+    (await library
+      .canEncodeVideo(codec, {
+        ...size,
+        ...(typeof videoBitrate === 'number' ? { bitrate: videoBitrate } : {}),
+        hardwareAcceleration: 'prefer-hardware',
+      })
+      .catch(() => false));
+
+  const videoFor = (attempt: Attempt) =>
+    dropVideo
+      ? { discard: true as const }
+      : reencode
+        ? {
+            ...(codec && { codec }),
+            ...(box.width && { width: box.width }),
+            ...(box.height && { height: box.height }),
+            ...(options.fit && { fit: options.fit }),
+            ...(videoBitrate && { bitrate: videoBitrate }),
+            ...(options.forceTranscode && { forceTranscode: true }),
+            hardwareAcceleration: attempt.acceleration,
+          }
+        : {};
 
   // WAV is uncompressed: sample rate × bit depth × channels, with no bitrate to choose. Every other
   // container here has one. Testing `isAudioOnly` instead used to lump MP3 and OGG in with WAV, and
@@ -294,33 +353,53 @@ export async function encodeDetailed(file: File, options: EncodeOptions): Promis
         ...(options.mono && { numberOfChannels: 1 }),
       };
 
-  const conversion = await Conversion.init({
-    input,
-    output,
-    ...(options.trim ? { trim: options.trim } : {}),
-    // An empty options object would still force a transcode; omitting it lets mediabunny copy
-    // the track through untouched when nothing about it needs to change.
-    ...(Object.keys(video).length ? { video } : {}),
-    ...(Object.keys(audio).length ? { audio } : {}),
-  });
+  const run = async (attempt: Attempt) => {
+    // A fresh input and output per attempt: a failed conversion leaves both half-consumed.
+    const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
+    const output = new Output({ format: format(), target: new BufferTarget() });
+    const video = videoFor(attempt);
+    const trim = attempt.nudgeStart
+      ? { start: (options.trim?.start ?? 0) + 0.001, ...(options.trim && { end: options.trim.end }) }
+      : options.trim;
 
-  if (!conversion.isValid) {
-    const reasons = conversion.discardedTracks
-      .map((track: { reason?: string }) => track.reason)
-      .filter(Boolean)
-      .join(', ');
-    throw new Error(
-      reasons
-        ? `This file cannot be converted that way (${reasons}).`
-        : 'This file cannot be converted to that format in your browser.',
-    );
+    const conversion = await Conversion.init({
+      input,
+      output,
+      ...(trim ? { trim } : {}),
+      // An empty options object would still force a transcode; omitting it lets mediabunny copy
+      // the track through untouched when nothing about it needs to change.
+      ...(Object.keys(video).length ? { video } : {}),
+      ...(Object.keys(audio).length ? { audio } : {}),
+    });
+
+    if (!conversion.isValid) {
+      const reasons = conversion.discardedTracks
+        .map((track: { reason?: string }) => track.reason)
+        .filter(Boolean)
+        .join(', ');
+      throw new Error(
+        reasons
+          ? `This file cannot be converted that way (${reasons}).`
+          : 'This file cannot be converted to that format in your browser.',
+      );
+    }
+
+    if (options.onProgress) conversion.onProgress = options.onProgress;
+    await conversion.execute();
+    return output.target.buffer;
+  };
+
+  let attempt: Attempt | null = { acceleration: hardware ? 'prefer-hardware' : 'no-preference', nudgeStart: false };
+  let buffer: ArrayBuffer | null = null;
+  while (attempt) {
+    try {
+      buffer = await run(attempt);
+      break;
+    } catch (error) {
+      attempt = nextAttempt(error, attempt);
+      if (!attempt) throw error;
+    }
   }
-
-  if (options.onProgress) conversion.onProgress = options.onProgress;
-
-  await conversion.execute();
-
-  const buffer = output.target.buffer;
   if (!buffer) throw new Error('The encoder produced no data.');
 
   return {

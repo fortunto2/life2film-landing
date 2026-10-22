@@ -193,6 +193,27 @@ const jsonLd = {
     }
     .tool select:hover { border-color: var(--cyan); }
 
+    /* Chrome draws the list itself when asked (customizable select). Without it macOS 26 opens a
+       system menu twice the size of the control, translucent over the page text — it read as a
+       glitch. Safari and Firefox keep their own menu, which is fine. */
+    @supports (appearance: base-select) {
+      .tool select, .tool select::picker(select) { appearance: base-select; }
+      .tool select { display: inline-flex; align-items: center; gap: 8px; }
+      .tool select::picker-icon { color: var(--muted); transition: rotate .15s; }
+      .tool select:open::picker-icon { rotate: 180deg; }
+      .tool select::picker(select) {
+        margin-top: 6px; padding: 4px; border-radius: 10px;
+        color: var(--fg); background: #0a0a0d; border: 1px solid var(--line);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, .5);
+      }
+      .tool select option {
+        padding: 8px 12px; border-radius: 7px; font-size: 14px; cursor: pointer;
+      }
+      .tool select option::checkmark { color: var(--cyan); }
+      .tool select option:hover, .tool select option:focus-visible { background: #17171c; }
+      .tool select option:checked { color: var(--cyan); }
+    }
+
     .ghost {
       padding: 9px 16px; border-radius: 10px; font: inherit; font-size: 14px; cursor: pointer;
       color: var(--fg); background: transparent; border: 1px solid var(--line);
