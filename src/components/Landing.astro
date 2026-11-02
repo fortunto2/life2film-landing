@@ -68,33 +68,7 @@ const feats = [
         <p class="proof">{t('heroProof')}</p>
       </div>
 
-      {/*
-        The film, not the logo. A real cut the engine made from one morning's clips, 20 s
-        of it looping muted in a phone frame. `preload="none"` and play-on-visible: the
-        3.6 MB download starts only when the frame is on screen, never under Reduce
-        Motion or Save-Data (the poster stands in). The first play is counted through the
-        shared snippet's click hook — the empty <i> below carries the event attributes
-        and the script clicks it once.
-      */}
-      <figure class="film">
-        <div class="phone">
-          <video
-            class="filmvideo"
-            poster="/img/hero-poster.jpg"
-            muted
-            playsinline
-            loop
-            preload="none"
-            width="720"
-            height="1280"
-            aria-label={t('heroFilmCaption')}
-          >
-            <source src="/video/hero.mp4" type="video/mp4" />
-          </video>
-        </div>
-        <figcaption class="muted small">{t('heroFilmCaption')}</figcaption>
-        <i class="sda-mark" data-sda-event="hero_film_played" data-sda-placement="site-hero" aria-hidden="true"></i>
-      </figure>
+      {/* AI-NOTE: hero film removed 2 Nov 2026 (Rustam: the beach cut looks bad). Restore from git once there is a better cut. */}
     </div>
   </section>
 
@@ -250,7 +224,6 @@ const feats = [
 <style>
   .hero { padding-top: 64px; }
   .herogrid { display: grid; gap: 48px; align-items: center; }
-  @media (min-width: 900px) { .herogrid { grid-template-columns: 1.05fr 1fr; } }
 
   h1 { margin: 20px 0 18px; }
   .lede { font-size: 19px; color: #cfcfd6; max-width: 54ch; }
