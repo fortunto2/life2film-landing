@@ -29,6 +29,9 @@ importers:
       superduper-site-kit:
         specifier: git+file:///Users/rustam/startups/shared/superduper-site-kit
         version: git+file:///Users/rustam/startups/shared/superduper-site-kit#a0d5223d254192f26b3fe9e321b837a2a845d209(astro@5.18.2(@types/node@24.13.3)(rollup@4.62.3)(typescript@6.0.3)(yaml@2.9.0))
+      superduper-tools:
+        specifier: git+file:///Users/rustam/startups/shared/superduper-tools
+        version: git+file:///Users/rustam/startups/shared/superduper-tools#0da90210d3bbf3f25cf2546e7093f4589133de02(astro@5.18.2(@types/node@24.13.3)(rollup@4.62.3)(typescript@6.0.3)(yaml@2.9.0))
     devDependencies:
       '@astrojs/check':
         specifier: ^0.9.10
@@ -1688,6 +1691,15 @@ packages:
   superduper-site-kit@git+file:///Users/rustam/startups/shared/superduper-site-kit#a0d5223d254192f26b3fe9e321b837a2a845d209:
     resolution: {commit: a0d5223d254192f26b3fe9e321b837a2a845d209, repo: file:///Users/rustam/startups/shared/superduper-site-kit, type: git}
     version: 0.1.0
+    peerDependencies:
+      astro: '>=5.0.0'
+    peerDependenciesMeta:
+      astro:
+        optional: true
+
+  superduper-tools@git+file:///Users/rustam/startups/shared/superduper-tools#0da90210d3bbf3f25cf2546e7093f4589133de02:
+    resolution: {commit: 0da90210d3bbf3f25cf2546e7093f4589133de02, repo: file:///Users/rustam/startups/shared/superduper-tools, type: git}
+    version: 0.1.1
     peerDependencies:
       astro: '>=5.0.0'
     peerDependenciesMeta:
@@ -4027,6 +4039,10 @@ snapshots:
       ansi-regex: 6.2.2
 
   superduper-site-kit@git+file:///Users/rustam/startups/shared/superduper-site-kit#a0d5223d254192f26b3fe9e321b837a2a845d209(astro@5.18.2(@types/node@24.13.3)(rollup@4.62.3)(typescript@6.0.3)(yaml@2.9.0)):
+    optionalDependencies:
+      astro: 5.18.2(@types/node@24.13.3)(rollup@4.62.3)(typescript@6.0.3)(yaml@2.9.0)
+
+  superduper-tools@git+file:///Users/rustam/startups/shared/superduper-tools#0da90210d3bbf3f25cf2546e7093f4589133de02(astro@5.18.2(@types/node@24.13.3)(rollup@4.62.3)(typescript@6.0.3)(yaml@2.9.0)):
     optionalDependencies:
       astro: 5.18.2(@types/node@24.13.3)(rollup@4.62.3)(typescript@6.0.3)(yaml@2.9.0)
 

@@ -1,4 +1,5 @@
 ---
+import Dropzone from 'superduper-tools/astro/Dropzone.astro';
 import { CHROME, STATUS } from '../../lib/tools-i18n';
 import type { Lang } from '../../i18n';
 
@@ -36,11 +37,7 @@ const fill = (t: string, n: number | string) => t.replace('{n}', String(n));
 <div class="tool" slot="tool">
   <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
   <span id="words" data-strings={JSON.stringify(words)} hidden></span>
-  <label class="drop" id="drop" for="file">
-    <input type="file" id="file" accept="video/*" hidden />
-    <strong>{chrome.chooseVideo}</strong>
-    <span class="muted">{chrome.dragHint} — {words.hint}</span>
-  </label>
+  <Dropzone id="drop" accept="video/*" class="drop" label={chrome.chooseVideo} hint={`${chrome.dragHint} — ${words.hint}`} lang={lang} />
 
   <div id="editor" hidden>
     <div class="facts" id="facts"></div>
@@ -107,15 +104,15 @@ const fill = (t: string, n: number | string) => t.replace('{n}', String(n));
   import { fileChosen, toolFailed, track } from '../../lib/track';
   import { toolStrings, fill } from '../../lib/strings';
   import { saveBlob, formatBytes, preciseClock } from '../../lib/encode';
-  import { openVideo, frameTimes, type VideoSource } from '../../lib/frames';
+  import { openVideo, type VideoSource } from '../../lib/frames';
+  import { frameTimes, frameName, baseName, extensionFor } from 'superduper-tools/video-to-frames';
+  import { fileFromEvent } from 'superduper-tools/shell';
   import { zipStored } from '../../lib/zip';
 
   const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
   const say = toolStrings();
   const w = JSON.parse(el('words').dataset.strings!) as Record<string, string>;
 
-  const drop = el<HTMLLabelElement>('drop');
-  const fileInput = el<HTMLInputElement>('file');
   const statusEl = el<HTMLDivElement>('status');
   const grid = el<HTMLDivElement>('frames');
 
@@ -177,9 +174,8 @@ const fill = (t: string, n: number | string) => t.replace('{n}', String(n));
     const width = Number(el<HTMLSelectElement>('width').value) || 0;
     const asked = Number(el<HTMLSelectElement>('interval').value) || 1;
     const { times, interval } = frameTimes(duration, asked);
-    const ext = type === 'image/png' ? 'png' : 'jpg';
-    const base = file.name.replace(/\.[^.]+$/, '') || 'video';
-    const digits = String(times.length).length;
+    const ext = extensionFor(type);
+    const base = baseName(file.name);
 
     let source: VideoSource | null = null;
     try {
@@ -187,7 +183,7 @@ const fill = (t: string, n: number | string) => t.replace('{n}', String(n));
       for (const [i, at] of times.entries()) {
         if (i % 4 === 0) status(fill(w.taking, { i: i + 1, n: times.length }), i / times.length);
         const blob = await source.imageAt(at, width, type);
-        const name = `${base}-${String(i + 1).padStart(digits, '0')}-${at.toFixed(2).replace('.', '_')}s.${ext}`;
+        const name = frameName(base, i, times.length, at, ext);
         images.push({ name, blob });
 
         if (i < PREVIEW) {
@@ -235,11 +231,10 @@ const fill = (t: string, n: number | string) => t.replace('{n}', String(n));
       status(w.zipping, 0.5);
       // One at a time: reading all 600 at once held every frame twice (Blob and buffer) before the
       // archive even started.
-      const entries = [];
+      const entries: { name: string; data: Uint8Array }[] = [];
       for (const { name, blob } of images) entries.push({ name, data: new Uint8Array(await blob.arrayBuffer()) });
       const zip = zipStored(entries);
-      const base = file.name.replace(/\.[^.]+$/, '') || 'video';
-      saveBlob(new Blob([zip], { type: 'application/zip' }), `${base}-frames.zip`);
+      saveBlob(new Blob([zip], { type: 'application/zip' }), `${baseName(file.name)}-frames.zip`);
       track('result_saved', { placement: 'result', format: entries[0].name.split('.').pop() ?? 'jpg' }, {
         frames: entries.length,
         size_mb: Math.round(zip.length / 104_857.6) / 10,
@@ -254,18 +249,10 @@ const fill = (t: string, n: number | string) => t.replace('{n}', String(n));
     }
   });
 
-  fileInput.addEventListener('change', () => {
-    const chosen = fileInput.files?.[0];
-    if (chosen) { fileChosen(chosen, 'picker'); void open(chosen); }
-  });
-  for (const type of ['dragenter', 'dragover']) {
-    drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.add('over'); });
-  }
-  for (const type of ['dragleave', 'drop']) {
-    drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.remove('over'); });
-  }
-  drop.addEventListener('drop', (e) => {
-    const chosen = (e as DragEvent).dataTransfer?.files?.[0];
-    if (chosen) { fileChosen(chosen, 'drop'); void open(chosen); }
+  // The shared Dropzone (superduper-tools) owns the input, drag and keyboard; it emits `tool:file`.
+  el('drop').addEventListener('tool:file', (e) => {
+    const { file: chosen, via } = fileFromEvent(e);
+    fileChosen(chosen, via);
+    void open(chosen);
   });
 </script>
