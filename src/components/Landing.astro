@@ -19,10 +19,15 @@ const feats = [
 ---
 
 <main>
+  {/*
+    Design pass 3 Nov 2026: one headline, one line, one button, one proof line. The pill
+    eyebrow, the account note and the Mac note went; Mac is a text link beside the button.
+    The right half shows the app itself (the calendar wheel screen), static: the beach film
+    stays out until there is a better cut.
+  */}
   <section class="hero">
     <div class="wrap herogrid">
-      <div>
-        <span class="badge">{t('heroBadge')}</span>
+      <div class="herotext">
         <h1 set:html={t('heroTitle')} />
         <p class="lede">{t('heroLede')}</p>
         <div class="cta">
@@ -54,21 +59,16 @@ const feats = [
             </svg>
             {t('ctaPrimary')}
           </a>
+          <a href="/studio/" class="maclink" data-sda-event="studio_opened" data-sda-placement="site-hero">{t('macCta')} <span class="arrow" aria-hidden="true">→</span></a>
         </div>
-        <p class="muted small">{t('ctaNote')}</p>
-        {/*
-          The Mac button used to stand beside the App Store one, equal in weight — two
-          buttons split a decision the visitor did not come to make. It is a text link
-          now, same event, same placement, so the count continues.
-        */}
-        <p class="muted small mac-note">
-          <a href="/studio/" class="maclink" data-sda-event="studio_opened" data-sda-placement="site-hero">{t('macCta')} →</a>
-          <span> · {t('macNote')}</span>
-        </p>
         <p class="proof">{t('heroProof')}</p>
       </div>
 
-      {/* AI-NOTE: hero film removed 2 Nov 2026 (Rustam: the beach cut looks bad). Restore from git once there is a better cut. */}
+      <figure class="heroshot">
+        <div class="phone">
+          <img src="/img/shot-01.jpg" alt={t('s1')} width="620" height="1280" loading="eager" fetchpriority="high" decoding="async" />
+        </div>
+      </figure>
     </div>
   </section>
 
@@ -95,9 +95,9 @@ const feats = [
   <section>
     <div class="wrap">
       <h2>{t('featTitle')}</h2>
-      <div class="grid cols-2 feats">
+      <div class="feats">
         {feats.map((f) => (
-          <div class="card">
+          <div class="feat">
             <h3>{f.t}</h3>
             <p>{f.d}</p>
           </div>
@@ -110,7 +110,7 @@ const feats = [
     <div class="wrap">
       <h2>{t('screensTitle')}</h2>
       <div class="shots">
-        {[1, 2, 3, 4].map((n) => (
+        {[2, 3, 4].map((n) => (
           <figure>
             <img
               src={`/img/shot-0${n}.jpg`}
@@ -127,6 +127,13 @@ const feats = [
     </div>
   </section>
 
+  <section class="priv">
+    <div class="wrap privwrap">
+      <h2>{t('privTitle')}</h2>
+      <p class="lede">{t('privLede')}</p>
+      <p class="muted small">{t('privNote')} <a class="privlink" href={localePath(lang, '/privacy')}>{t('privLink')} <span class="arrow" aria-hidden="true">→</span></a></p>
+    </div>
+  </section>
   {/*
     Not on an iPhone: Android, and the Studio for Mac while it is a beta. One address, one
     reason, one email when it ships. POST /api/waitlist (functions/api/waitlist.js) keeps
@@ -155,14 +162,6 @@ const feats = [
     </div>
   </section>
 
-  <section class="priv">
-    <div class="wrap privwrap">
-      <h2>{t('privTitle')}</h2>
-      <p class="lede">{t('privLede')}</p>
-      <p class="muted">{t('privNote')}</p>
-      <p><a class="privlink" href={localePath(lang, '/privacy')}>{t('privLink')} →</a></p>
-    </div>
-  </section>
 </main>
 
 <script>
@@ -170,30 +169,6 @@ const feats = [
   // so a non-click event is reported by clicking an empty marker element once.
   const count = (event: string) =>
     document.querySelector<HTMLElement>(`.sda-mark[data-sda-event="${event}"]`)?.click();
-
-  const video = document.querySelector<HTMLVideoElement>('.filmvideo');
-  if (video) {
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
-    if (!reduced && !saveData) {
-      let played = false;
-      const io = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (!entry.isIntersecting) { video.pause(); continue; }
-            video.play().then(() => {
-              if (played) return;
-              played = true;
-              count('hero_film_played');
-            }).catch(() => {});
-          }
-        },
-        { threshold: 0.4 },
-      );
-      io.observe(video);
-    }
-    video.addEventListener('click', () => { if (video.paused) void video.play(); else video.pause(); });
-  }
 
   const form = document.querySelector<HTMLFormElement>('.waitform');
   if (form) {
@@ -222,100 +197,107 @@ const feats = [
 </script>
 
 <style>
-  .hero { padding-top: 64px; }
+  /*
+   * Spacing on one scale (8 12 16 24 32 48 64 96), radii 12 for controls and 16/24 for
+   * frames, one curve (--ease) for every transition. Values outside it are a bug.
+   */
+  .hero { padding: 64px 0 96px; }
   .herogrid { display: grid; gap: 48px; align-items: center; }
-
-  h1 { margin: 20px 0 18px; }
-  .lede { font-size: 19px; color: #cfcfd6; max-width: 54ch; }
-  .cta { margin: 28px 0 12px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  @media (min-width: 900px) {
+    .herogrid { grid-template-columns: 1.15fr 0.85fr; gap: 64px; }
+  }
+  .herotext h1 { margin: 0 0 24px; max-width: 14ch; text-wrap: balance; }
+  .lede { font-size: 19px; line-height: 1.55; color: #cfcfd6; max-width: 42ch; text-wrap: pretty; }
+  .cta { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: center; }
   .small { font-size: 14px; }
-  .mac-note { margin-top: 4px; opacity: 0.75; }
-  .maclink { color: var(--fg); text-decoration: none; font-weight: 500; }
-  .maclink:hover { text-decoration: underline; }
-  .proof { margin-top: 18px; font-size: 13px; letter-spacing: 0.02em; color: var(--muted); }
+  .maclink {
+    color: var(--fg); text-decoration: none; font-weight: 500; font-size: 15px;
+    padding: 12px 0; opacity: 0.8;
+    transition: opacity 300ms var(--ease);
+  }
+  .maclink:hover { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
+  .arrow { display: inline-block; }
+  :global([dir='rtl']) .arrow { transform: scaleX(-1); }
+  .proof { margin-top: 16px; font-size: 14px; color: var(--muted); }
 
   .btn-store {
-    display: inline-flex; align-items: center; gap: 9px;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: transform 300ms var(--ease), box-shadow 300ms var(--ease);
   }
-  .btn-store:hover { transform: translateY(-1px); box-shadow: 0 12px 34px rgba(1, 122, 255, 0.35); }
+  .btn-store:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(1, 122, 255, 0.35); }
+  .btn-store:active { transform: translateY(1px); }
+  .btn-store:focus-visible, .maclink:focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; border-radius: 12px; }
 
-  /* The film in the hero: a phone-shaped frame, the video fills it. */
-  .film { margin: 0; justify-self: center; width: min(320px, 78vw); }
+  /* The app in a phone frame: outer 40, gap 8, so the screen is 32 (inner = outer − gap). */
+  .heroshot { margin: 0; justify-self: center; position: relative; width: min(300px, 72vw); }
+  .heroshot::before {
+    content: ''; position: absolute; inset: 12% -24%; z-index: -1; pointer-events: none;
+    background: radial-gradient(50% 50% at 50% 50%, rgba(1, 122, 255, 0.22), transparent 70%);
+    filter: blur(32px);
+  }
   .phone {
-    position: relative;
-    aspect-ratio: 9 / 19.5;
-    border-radius: 42px;
-    padding: 10px;
-    background: #0b0b0e;
-    border: 1px solid #2a2a33;
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    padding: 8px; border-radius: 40px;
+    background: #0b0b0e; border: 1px solid #2a2a33;
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
   }
-  .phone video {
-    display: block; width: 100%; height: 100%; object-fit: cover;
-    border-radius: 34px; background: #000; cursor: pointer;
-  }
-  .film figcaption { margin-top: 14px; text-align: center; line-height: 1.45; }
+  .phone img { display: block; width: 100%; height: auto; border-radius: 32px; background: #000; }
+  @media (max-width: 899px) { .heroshot { width: min(260px, 64vw); } }
+
   .sda-mark { display: inline-block; width: 0; height: 0; overflow: hidden; }
 
-  .howgrid { display: grid; gap: 32px; margin-top: 28px; align-items: center; }
+  .howgrid { display: grid; gap: 32px; margin-top: 32px; align-items: center; }
   @media (min-width: 900px) { .howgrid { grid-template-columns: 0.9fr 1.1fr; } }
   .howwheel :global(.wheel) { width: min(380px, 80vw); }
   .steps { display: grid; gap: 16px; }
+  .num { display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+
+  /* Features as a quiet list: four boxes in a row read as a template, a rule above each reads as an index. */
+  .feats { display: grid; gap: 32px 48px; margin-top: 32px; }
+  @media (min-width: 720px) { .feats { grid-template-columns: 1fr 1fr; } }
+  .feat { padding-top: 16px; border-top: 1px solid var(--line); }
+  .feat h3 { margin-bottom: 8px; }
+  .feat p { color: var(--muted); font-size: 16px; max-width: 40ch; }
+
+  .shots { display: grid; gap: 24px; margin-top: 32px; grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 640px) { .shots { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; } }
+  .shots figure { margin: 0; }
+  .shots img {
+    width: 100%; height: auto; display: block;
+    border-radius: 16px; border: 1px solid var(--line); background: var(--panel);
+  }
+  .shots figcaption { margin-top: 12px; font-size: 14px; line-height: 1.45; color: var(--muted); }
+  @media (max-width: 640px) { .shots figcaption { font-size: 12px; } }
+
+  .privwrap { max-width: 62ch; }
+  .privwrap .lede { margin: 16px 0; }
+  .privlink { color: var(--cyan); text-decoration: none; font-weight: 500; white-space: nowrap; }
+  .privlink:hover { text-decoration: underline; text-underline-offset: 4px; }
 
   .waitwrap { max-width: 62ch; }
-  .waitwrap .muted { margin: 18px 0 20px; }
-  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
-  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-  .reasons { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+  .waitwrap .muted { margin: 16px 0 24px; }
+  /* Honeypot: clipped in place. `left: -9999px` became 10 000 px of sideways scroll on /ar/. */
+  .hp, .sr-only {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip-path: inset(50%); white-space: nowrap; opacity: 0;
+  }
+  .sr-only { opacity: 1; }
+  .reasons { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
   .reason {
     display: inline-flex; align-items: center; gap: 8px;
-    padding: 8px 14px; border-radius: 999px;
+    padding: 8px 16px; border-radius: 999px;
     border: 1px solid var(--line); background: var(--panel);
     color: var(--fg); font-size: 14px; cursor: pointer;
   }
   .reason:has(input:checked) { border-color: var(--cyan); }
   .reason input { accent-color: var(--cyan); margin: 0; }
-  .waitrow { display: flex; flex-wrap: wrap; gap: 10px; }
+  .waitrow { display: flex; flex-wrap: wrap; gap: 12px; }
   .waitrow input {
     flex: 1 1 240px; min-width: 0;
     padding: 12px 16px; border-radius: 12px;
     border: 1px solid var(--line); background: var(--panel);
-    color: var(--fg); font-size: 15px;
+    color: var(--fg); font-size: 16px;
   }
   .waitrow input:focus-visible { outline: 2px solid var(--cyan); outline-offset: 1px; }
   .waitrow .btn { flex: 0 0 auto; }
   .waitmsg { margin-top: 12px; min-height: 1.4em; }
-
-  .steps, .feats { margin-top: 28px; }
-  .num { display: block; font-size: 13px; font-weight: 700; letter-spacing: 0.1em; margin-bottom: 10px; }
-
-  .shots {
-    display: grid;
-    gap: 24px;
-    margin-top: 32px;
-    grid-template-columns: repeat(2, 1fr);
-  }
-  @media (min-width: 860px) { .shots { grid-template-columns: repeat(4, 1fr); } }
-
-  .shots figure { margin: 0; }
-  .shots img {
-    width: 100%;
-    height: auto;
-    display: block;
-    border-radius: 18px;
-    border: 1px solid var(--line);
-    background: var(--panel);
-  }
-  .shots figcaption {
-    margin-top: 12px;
-    font-size: 14px;
-    line-height: 1.45;
-    color: var(--muted);
-  }
-
-  .privwrap { max-width: 62ch; }
-  .privwrap .lede { margin: 18px 0 14px; }
-  .privlink { display: inline-block; margin-top: 18px; color: var(--cyan); text-decoration: none; font-weight: 500; }
-  .privlink:hover { text-decoration: underline; }
 </style>

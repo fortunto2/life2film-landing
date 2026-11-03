@@ -1,7 +1,9 @@
 ---
+import '@fontsource-variable/space-grotesk';
+import fontLatin from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
 import Analytics from 'superduper-site-kit/astro/Analytics.astro';
 import LegalFooter from 'superduper-site-kit/astro/LegalFooter.astro';
-import { languages, localePath, rtl, useTranslations, type Lang } from '../i18n';
+import { languageNames, languages, localePath, rtl, useTranslations, type Lang } from '../i18n';
 interface Props {
   lang: Lang;
   /** Social preview. Absolute URL is built here; pass a root-relative path. */
@@ -149,9 +151,12 @@ const jsonLd = {
     </>
   )}
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎞️</text></svg>" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet" />
+  {/*
+    Self-hosted (Fontsource), not fonts.googleapis.com: the Google stylesheet was the slowest
+    render-blocking request on a phone (870 ms in Lighthouse, 3 Nov 2026) and sent every
+    visitor's IP to a third party. One variable file covers 400-700; the Latin subset is preloaded.
+  */}
+  <link rel="preload" href={fontLatin} as="font" type="font/woff2" crossorigin />
   <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
   {import.meta.env.PROD && (
     <>
@@ -182,13 +187,12 @@ const jsonLd = {
       <a class="logo" href={localePath(lang, '/')}>
         <span class="dot" aria-hidden="true"></span>Life2Film
       </a>
+      {/* Four links, not six: Engine and Support live in the footer, where people look for them. */}
       <div class="navlinks">
         <a href={localePath(lang, '/about')}>{t('navAbout')}</a>
         <a href={localePath(lang, '/studio')}>{t('navStudio')}</a>
         <a href={localePath(lang, '/tools/')}>Tools</a>
-        <a href={'/engine/'}>Engine</a>
         <a href={'/blog/'}>{t('navBlog')}</a>
-        <a href={localePath(lang, '/support')}>{t('navSupport')}</a>
       </div>
       {/*
         The switcher follows the locale list too. It used to render regardless, so every English-only
@@ -196,17 +200,44 @@ const jsonLd = {
         exist and have no redirect. The flag was declared once and honoured in only one of the two
         places that emit a locale URL.
       */}
+      {/*
+        Seven equal buttons took a third of the header and outweighed the nav. A <details>
+        menu (the superduperai.co pattern) opens without JS, is a native disclosure for
+        keyboards and screen readers, and shows each language in its own name. The hreflang
+        links in <head> stay the source for search engines; every alternate is still an <a>.
+      */}
       {alternates.length > 1 && (
-        <div class="langs">
-          {alternates.map((code) => (
-            <a class={`lang ${code === lang ? 'on' : ''}`} href={localePath(code, basePath)}>{languages[code]}</a>
-          ))}
-        </div>
+        <details class="langmenu" data-lang-menu>
+          <summary aria-label={`${languageNames[lang]} (${lang.toUpperCase()})`}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span>{lang.toUpperCase()}</span>
+            <svg class="chev" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </summary>
+          <ul role="list">
+            {alternates.map((code) => (
+              <li>{code === lang
+                ? <span aria-current="page" lang={code}>{languageNames[code]}</span>
+                : <a href={localePath(code, basePath)} hreflang={code} lang={code}>{languageNames[code]}</a>}
+              </li>
+            ))}
+          </ul>
+        </details>
       )}
     </div>
   </nav>
 
   <slot />
+
+  <script is:inline>
+    // Close the language menu on Escape and on a click outside it.
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      document.querySelectorAll('details[data-lang-menu][open]').forEach(function (d) { d.open = false; d.querySelector('summary').focus(); });
+    });
+    document.addEventListener('click', function (e) {
+      document.querySelectorAll('details[data-lang-menu][open]').forEach(function (d) { if (!d.contains(e.target)) d.open = false; });
+    });
+  </script>
 
   <footer>
     <div class="wrap footrow">
@@ -214,6 +245,7 @@ const jsonLd = {
       <div class="footlinks">
         <a href={localePath(lang, '/privacy')}>{t('navPrivacy')}</a>
         <a href={localePath(lang, '/support')}>{t('navSupport')}</a>
+        <a href="/engine/">Engine</a>
         <a href="/llms.txt">{t('footerLlms')}</a>
         <a href="mailto:info@life2film.com">info@life2film.com</a>
       </div>
@@ -238,6 +270,7 @@ const jsonLd = {
     --pink: #fa3fa5;
     --orange: #ffa61d;
     --yellow: #feff00;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
     --grad: linear-gradient(120deg, var(--cyan), var(--blue) 35%, var(--pink) 65%, var(--orange) 85%, var(--yellow));
   }
 
@@ -249,7 +282,7 @@ const jsonLd = {
     margin: 0;
     background: var(--bg);
     color: var(--fg);
-    font-family: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    font-family: 'Space Grotesk Variable', 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, sans-serif;
     font-size: 17px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
@@ -285,27 +318,44 @@ const jsonLd = {
     background: var(--grad);
     box-shadow: 0 0 14px rgba(0, 242, 224, 0.5);
   }
-  .navlinks { display: flex; gap: 20px; margin-left: auto; }
+  .navlinks { display: flex; gap: 24px; margin-inline-start: auto; }
   .navlinks a, .footlinks a {
     color: var(--muted); text-decoration: none; font-size: 15px;
-    transition: color 0.15s ease;
+    transition: color 300ms var(--ease);
   }
   .navlinks a:hover, .footlinks a:hover { color: var(--fg); }
-  .langs { display: flex; gap: 6px; }
-  .lang {
-    padding: 4px 9px; border-radius: 7px; font-size: 13px; font-weight: 500;
-    color: var(--muted); text-decoration: none; border: 1px solid transparent;
+  .langmenu { position: relative; font-size: 14px; font-weight: 500; }
+  .langmenu > summary {
+    list-style: none; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 12px; border-radius: 12px; border: 1px solid var(--line);
+    color: var(--muted); transition: color 300ms var(--ease);
   }
-  .lang:hover { color: var(--fg); }
-  .lang.on { color: var(--fg); border-color: var(--line); background: var(--panel); }
+  .langmenu > summary::-webkit-details-marker { display: none; }
+  .langmenu > summary:hover, .langmenu[open] > summary { color: var(--fg); }
+  .langmenu > summary:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+  .langmenu .chev { transition: transform 300ms var(--ease); }
+  .langmenu[open] .chev { transform: rotate(180deg); }
+  .langmenu ul {
+    position: absolute; inset-inline-end: 0; top: calc(100% + 8px); z-index: 20;
+    min-width: 200px; margin: 0; padding: 8px; list-style: none;
+    border: 1px solid var(--line); border-radius: 16px; background: var(--panel);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  }
+  .langmenu li a, .langmenu li span {
+    display: block; padding: 8px 12px; border-radius: 8px;
+    color: var(--muted); text-decoration: none;
+  }
+  .langmenu li a:hover { color: var(--fg); background: var(--line); }
+  .langmenu li [aria-current] { color: var(--fg); }
 
   /* On a phone the single 64 px row overflowed: Blog, Support and the whole language
      switch sat past the right edge, so a Russian or Turkish phone could not reach its own
      language (measured at 390 px, 18 Oct 2026). Two rows: logo + languages, then the links. */
   @media (max-width: 720px) {
     .navrow { flex-wrap: wrap; height: auto; padding: 12px 0; gap: 10px 16px; }
-    .langs { margin-left: auto; }
-    .navlinks { order: 3; width: 100%; margin-left: 0; flex-wrap: wrap; gap: 8px 16px; }
+    .langmenu { margin-inline-start: auto; }
+    .navlinks { order: 3; width: 100%; margin-inline-start: 0; flex-wrap: wrap; gap: 8px 16px; }
     .navlinks a { font-size: 14px; }
   }
 
