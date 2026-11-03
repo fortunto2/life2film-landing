@@ -1,0 +1,52 @@
+---
+/**
+ * /privacy and /support in every language of the site, from superduper-site-kit: the policy and
+ * support page are the registry's (audited against the app's code on the date they show), so
+ * life2film.com, superduperai.co and rustman.org can never state different facts. The website's
+ * own measurement (Google Analytics, our counter) follows the app policy as its own section.
+ */
+import Base from '../layouts/Base.astro';
+import PrivacyPolicy from 'superduper-site-kit/astro/PrivacyPolicy.astro';
+import Support from 'superduper-site-kit/astro/Support.astro';
+import { product, localize, contactEmail } from 'superduper-site-kit/registry';
+import { t } from 'superduper-site-kit/i18n';
+import { localePath, rtl, type Lang } from '../i18n';
+import { sitePrivacy } from '../site-privacy';
+
+interface Props { lang: Lang; kind: 'privacy' | 'support' }
+const { lang, kind } = Astro.props;
+const p = product('life2film');
+const app = localize(p, lang);
+const s = t(lang);
+const title = kind === 'privacy' ? s.policyTitle('Life2Film') : s.supportTitle('Life2Film');
+const description = (kind === 'privacy' ? app.privacy.summary : s.supportDescription('Life2Film', contactEmail(p))).slice(0, 300);
+const site = sitePrivacy[lang];
+---
+<Base lang={lang} title={title} description={description} basePath={`/${kind}`}>
+  <main>
+    <section>
+      <div class="wrap prose kit">
+        {kind === 'privacy' ? (
+          <>
+            <PrivacyPolicy product={p} lang={lang} supportHref={localePath(lang, '/support')} sitePrivacyHref="#website" />
+            <div id="website" lang={lang} dir={rtl.has(lang) ? 'rtl' : undefined}>
+              <h2>{site.h}</h2>
+              <p>{site.p}</p>
+            </div>
+          </>
+        ) : (
+          <Support product={p} lang={lang} privacyHref={localePath(lang, '/privacy')} homeHref={localePath(lang, '/')} cardClass="box" />
+        )}
+      </div>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .kit :global(h1) { font-size: clamp(32px, 5vw, 44px); margin-bottom: 16px; }
+  .kit :global(a) { color: var(--cyan); }
+  .kit :global(.box) { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; }
+  .kit :global(section) { padding: 0; }
+  .kit :global(table) { border-collapse: collapse; font-size: 14px; }
+  .kit :global(th), .kit :global(td) { border-bottom: 1px solid var(--line); padding: 8px 10px 8px 0; text-align: start; vertical-align: top; }
+</style>

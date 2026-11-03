@@ -1,13 +1,4 @@
 ---
-import Base from '../layouts/Base.astro';
-import Privacy from '../components/Privacy.astro';
-import { legal } from '../legal-i18n';
+import LegalKit from '../components/LegalKit.astro';
 ---
-<Base
-  lang="en"
-  title={`${legal.en.privTitle} — Life2Film`}
-  description={legal.en.privIntro}
-  basePath="/privacy"
->
-  <Privacy lang="en" />
-</Base>
+<LegalKit lang="en" kind="privacy" />

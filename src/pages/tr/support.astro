@@ -1,13 +1,4 @@
 ---
-import Base from '../../layouts/Base.astro';
-import Support from '../../components/Support.astro';
-import { legal } from '../../legal-i18n';
+import LegalKit from '../../components/LegalKit.astro';
 ---
-<Base
-  lang="tr"
-  title={`${legal.tr.supTitle} — Life2Film`}
-  description={legal.tr.supIntro}
-  basePath="/support"
->
-  <Support lang="tr" />
-</Base>
+<LegalKit lang="tr" kind="support" />

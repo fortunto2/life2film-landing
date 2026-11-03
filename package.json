@@ -17,7 +17,8 @@
     "@mediabunny/mp3-encoder": "^1.54.0",
     "@rive-app/canvas-lite": "2.45.0",
     "astro": "^5.0.0",
-    "mediabunny": "^1.54.0"
+    "mediabunny": "^1.54.0",
+    "superduper-site-kit": "git+file:///Users/rustam/startups/shared/superduper-site-kit"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
