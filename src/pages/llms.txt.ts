@@ -52,6 +52,17 @@ What makes it different from other video editors:
 
 The site is also available in Spanish, Portuguese, Indonesian, Arabic, Russian and Turkish (/es, /pt, /id, /ar, /ru, /tr); ${['en', ...Object.keys(TRANSLATIONS)].join(', ')} for the tools; the engine page is English only. Blog posts are English only. The guides exist in all seven languages.
 
+## For agents
+
+- MCP server: https://life2film.com/mcp (Streamable HTTP, no key, read-only). Tools: search_guides,
+  get_guide (any language), list_tools. It reads the guides, the blog and the tool descriptions; it
+  stores nothing and takes no user data. The browser tools run in the visitor's browser and cannot be
+  called through it.
+- Every guide, blog post and tool page has a markdown twin (append \`.md\`), and any of them, and the
+  home page, answers \`Accept: text/markdown\`.
+- Policy: https://life2film.com/agents.txt · MCP server card: /.well-known/mcp/server-card.json ·
+  agent card: /.well-known/agent-card.json · API catalog: /.well-known/api-catalog · ARD: /.well-known/ard.json
+
 ## Guides
 
 - [Edit video with an AI assistant: Claude Code, ChatGPT and Codex](https://life2film.com/guides/edit-video-with-ai-agents/)

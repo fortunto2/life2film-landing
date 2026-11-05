@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "include": [
+    "/",
+    "/guides/*",
+    "/blog/*",
+    "/tools/*",
+    "/es/guides/*",
+    "/pt/guides/*",
+    "/id/guides/*",
+    "/ar/guides/*",
+    "/ru/guides/*",
+    "/tr/guides/*",
+    "/mcp",
+    "/api/*",
+    "/r/*"
+  ],
+  "exclude": []
+}
