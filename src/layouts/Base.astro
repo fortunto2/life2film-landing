@@ -4,6 +4,8 @@ import fontLatin from '@fontsource-variable/space-grotesk/files/space-grotesk-la
 import Analytics from 'superduper-site-kit/astro/Analytics.astro';
 import LegalFooter from 'superduper-site-kit/astro/LegalFooter.astro';
 import { languageNames, languages, localePath, rtl, useTranslations, type Lang } from '../i18n';
+import { brandLd, orgLd } from 'superduper-site-kit/seo';
+import { ORG_ID } from 'superduper-site-kit/company';
 import { GUIDES_UI } from '../lib/guides-ui';
 interface Props {
   lang: Lang;
@@ -40,27 +42,18 @@ const SITE = 'https://life2film.com';
 const alternates = locales ?? (Object.keys(languages) as Lang[]);
 const t = useTranslations(lang);
 
-const ORG = {
-  '@type': 'Organization',
-  '@id': 'https://life2film.com/#org',
-  name: 'SuperDuperAi, Corp.',
-  url: 'https://superduperai.co',
-  email: 'info@life2film.com',
-  telephone: '+1-818-619-0966',
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: '1207 Delaware Ave, Unit 4241',
-    addressLocality: 'Wilmington',
-    addressRegion: 'DE',
-    postalCode: '19806',
-    addressCountry: 'US',
-  },
-};
+// Entities come from superduper-site-kit: the company is ORG_ID (superduperai.co/#org), this site is
+// its brand node (life2film.com/#org, parentOrganization -> ORG_ID). Nodes sit in @graph, so the
+// per-node @context is dropped.
+const node = <T extends { '@context'?: string }>({ '@context': _c, ...rest }: T) => rest;
+const SITE_ORG = node(brandLd({ url: SITE, name: 'Life2Film' }));
+const PUBLISHER = { '@id': ORG_ID };
 
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
-    ORG,
+    SITE_ORG,
+    node(orgLd()),
     {
       '@type': 'WebSite',
       '@id': 'https://life2film.com/#website',
@@ -68,7 +61,7 @@ const jsonLd = {
       name: 'Life2Film',
       description,
       inLanguage: ['en', 'ru', 'tr'],
-      publisher: { '@id': 'https://life2film.com/#org' },
+      publisher: PUBLISHER,
     },
     {
       '@type': 'MobileApplication',
@@ -79,7 +72,7 @@ const jsonLd = {
       applicationCategory: 'MultimediaApplication',
       operatingSystem: 'iOS 17+',
       url: 'https://life2film.com',
-      publisher: { '@id': 'https://life2film.com/#org' },
+      publisher: PUBLISHER,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       featureList: [
         'On-device AI video montage',
@@ -98,7 +91,7 @@ const jsonLd = {
       url: 'https://life2film.com/studio/',
       downloadUrl: 'https://github.com/fortunto2/life2film-landing/releases',
       softwareVersion: '0.2.0',
-      publisher: { '@id': 'https://life2film.com/#org' },
+      publisher: PUBLISHER,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       featureList: [
         '30 per-frame quality and composition features',

@@ -1,4 +1,6 @@
 import type { APIRoute } from 'astro';
+import { llmsLine } from 'superduper-site-kit/seo';
+import { topic } from 'superduper-site-kit/topics';
 import { GROUPS, TOOLS, byGroup } from '../lib/tools';
 import { TRANSLATIONS } from '../lib/tools/index';
 import { ENGINE_VERSION } from '../lib/skill';
@@ -60,6 +62,8 @@ The site is also available in Spanish, Portuguese, Indonesian, Arabic, Russian a
   Install on macOS, Windows and Linux, first session in a clips folder, prompts, fixes.
 - [Can ChatGPT edit video?](https://life2film.com/guides/edit-video-with-chatgpt-codex/)
   Browser chat cannot; the ChatGPT desktop app in Codex mode and the Codex CLI can. Setup and prompts.
+
+${llmsLine(topic('video-editing-with-ai-agents'))}
 
 Technical write-up from the same work: https://rustman.org/wiki/creative-video-with-claude/
 

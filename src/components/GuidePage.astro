@@ -3,6 +3,8 @@ import { render } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import { GUIDES_UI, guidePath, localesOf, type Guide } from '../lib/guides';
 import { localePath, type Lang } from '../i18n';
+import { articleLd, personLd } from 'superduper-site-kit/seo';
+import RelatedElsewhere from 'superduper-site-kit/astro/RelatedElsewhere.astro';
 
 interface Props { guide: Guide; lang: Lang; slug: string }
 const { guide, lang, slug } = Astro.props;
@@ -15,21 +17,20 @@ const fmt = (d: Date) =>
 const url = `https://life2film.com${guidePath(lang, slug)}`;
 const hub = `https://life2film.com${localePath(lang, '/guides/')}`;
 
-// Article and BreadcrumbList only. No HowTo and no Product: neither earns a rich result here.
+// Article, Person and BreadcrumbList only. No HowTo and no Product: neither earns a rich result here.
+// Author and publisher are the shared ids (rustman.org/#me, superduperai.co/#org).
+const { '@context': _a, ...article } = articleLd({
+  url,
+  title: guide.data.title,
+  description: guide.data.description,
+  date: guide.data.date.toISOString(),
+  modified: (guide.data.updated ?? guide.data.date).toISOString(),
+  lang,
+});
+const { '@context': _p, ...person } = personLd();
 const schema = [
-  {
-    '@type': 'Article',
-    '@id': `${url}#article`,
-    headline: guide.data.title,
-    description: guide.data.description,
-    datePublished: guide.data.date.toISOString(),
-    dateModified: (guide.data.updated ?? guide.data.date).toISOString(),
-    inLanguage: lang,
-    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
-    author: { '@type': 'Person', '@id': 'https://rustman.org/#me', name: 'Rustam Salavatov', url: 'https://rustman.org/' },
-    publisher: { '@id': 'https://superduperai.co/#org' },
-    isPartOf: { '@id': 'https://life2film.com/#website' },
-  },
+  { ...article, mainEntityOfPage: { '@type': 'WebPage', '@id': url }, isPartOf: { '@id': 'https://life2film.com/#website' } },
+  person,
   {
     '@type': 'BreadcrumbList',
     '@id': `${url}#breadcrumb`,
@@ -60,6 +61,7 @@ const schema = [
           · <a href={`${guidePath(lang, slug).replace(/\/$/, '')}.md`}>markdown</a>
         </p>
         <Content />
+        <RelatedElsewhere url={`https://life2film.com/guides/${slug}/`} site="https://life2film.com" lang={lang} />
       </article>
     </section>
   </main>
