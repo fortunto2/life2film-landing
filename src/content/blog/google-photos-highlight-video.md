@@ -69,3 +69,6 @@ uploaded; there is no account to make.
 If you have a long clip and only want it split at the shot changes, the free
 [video splitter](/tools/video-splitter/) on this site does that in the browser, with nothing
 uploaded either.
+
+Other automatic options are compared in [GoPro Quik alternatives for iPhone](/blog/gopro-quik-alternative-iphone/),
+and [how to make your own Memories video on iPhone](/blog/make-your-own-memories-video-iphone/) covers the Apple version.

@@ -71,3 +71,6 @@ while the phone charges, which is the Memories idea with the controls left in.
 
 If you only want the beat positions of a song, for an edit you are doing by hand, the free
 [BPM detector](/tools/bpm-detector/) on this site gives you every beat as a marker file.
+
+The Google equivalent is covered in [Google Photos highlight video: how to make one](/blog/google-photos-highlight-video/),
+and a wider comparison is in [GoPro Quik alternatives for iPhone](/blog/gopro-quik-alternative-iphone/).

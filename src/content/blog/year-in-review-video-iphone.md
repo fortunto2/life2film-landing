@@ -64,3 +64,6 @@ version.
 Every automatic year recap you have seen so far was made on someone's server from a library you
 uploaded. Life2Film's analysis runs on the iPhone, so the year's footage stays on the phone, there is
 no account, and it works on a plane. [How that compares](/blog/where-your-footage-goes/).
+
+For the holiday cut of the same footage, see [Christmas video montage from your phone](/blog/christmas-video-montage/),
+and for the options in each preset, [what each Life2Film preset does](/blog/life2film-presets/).

@@ -88,3 +88,7 @@ disagree with a placement, ask for a different length or a different mood and it
 
 Worth knowing either way: once you have marked beats by hand a few times, you stop being able to
 un-hear a montage that ignores them.
+
+To skip the manual part, the guide to [editing video with an AI agent](/guides/edit-video-with-ai-agents/)
+asks for a beat-matched cut in plain words, and [how the automatic apps place cuts](/blog/auto-beat-sync-apps/)
+compares CapCut, Filmora and the rest.

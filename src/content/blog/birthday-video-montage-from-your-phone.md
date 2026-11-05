@@ -63,3 +63,7 @@ device, but "the film about Anna" is a thing you steer with words, not a setting
   oldest first. Thirty seconds, no music, the ages as captions.
 - **Messages from people who were not there.** Collect ten-second clips, drop them into one album,
   and run **Just a film** on the album.
+
+For a child's birthday that is part of a bigger story, see the
+[baby's first year video montage](/blog/baby-first-year-video-montage/). To grab a still from a clip
+for an invitation or a card, the free [video to frames tool](/tools/video-to-frames/) does it in the browser.

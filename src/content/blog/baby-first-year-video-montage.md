@@ -65,3 +65,7 @@ worth a read before you hand a year of your child to any app, including ours.
 Slow build, a lift around two thirds in, under three minutes. Put the first steps, or the first
 laugh, on the lift. If you are posting it, use the platform's own music library at posting time;
 for the family, anything you love.
+
+For a card or a photo book, the free [video to frames tool](/tools/video-to-frames/) pulls still
+images out of any clip in the browser. The same approach to a longer recap is in
+[how to make a year in review video on iPhone](/blog/year-in-review-video-iphone/).

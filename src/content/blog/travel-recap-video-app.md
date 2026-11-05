@@ -56,3 +56,6 @@ Travel footage is a map of where you were and who with. Most automatic recap too
 they cut it. Life2Film's analysis runs on the iPhone, so it works offline, on the plane, with
 nothing leaving the phone and no account. [The comparison](/blog/where-your-footage-goes/) covers the
 others.
+
+The Travel preset is explained in [what each Life2Film preset does](/blog/life2film-presets/), and the
+same approach for a longer span is in [how to make a year in review video](/blog/year-in-review-video-iphone/).

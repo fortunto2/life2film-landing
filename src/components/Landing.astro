@@ -1,9 +1,12 @@
 ---
 import CalendarWheel from './CalendarWheel.astro';
 import { localePath, useTranslations, type Lang } from '../i18n';
+import { homeNote } from '../lib/related';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
+
+const note = homeNote(lang);
 
 const steps = [
   { t: t('h1t'), d: t('h1d') },
@@ -103,6 +106,7 @@ const feats = [
           </div>
         ))}
       </div>
+      {note && <p class="muted small toolsnote"><Fragment set:html={note} /></p>}
     </div>
   </section>
 
@@ -252,6 +256,8 @@ const feats = [
   .num { display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px; }
 
   /* Features as a quiet list: four boxes in a row read as a template, a rule above each reads as an index. */
+  .toolsnote { margin-top: 28px; }
+  .toolsnote :global(a) { color: var(--cyan); }
   .feats { display: grid; gap: 32px 48px; margin-top: 32px; }
   @media (min-width: 720px) { .feats { grid-template-columns: 1fr 1fr; } }
   .feat { padding-top: 16px; border-top: 1px solid var(--line); }

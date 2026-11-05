@@ -80,3 +80,6 @@ Whatever you chose, the result is a draft. "Shorter", "more of the kids", "a dif
 in seconds, and the editor lets you trim and reorder by hand. The analysis runs on the iPhone; no
 footage is uploaded and there is no account. Montage is free; the paid part is a chat director
 that edits by conversation. [App Store](https://apps.apple.com/app/id6761656888?pt=128499174&ct=blog-presets&mt=8).
+
+For the music side of a preset, [how to cut video to the beat](/blog/cut-video-to-the-beat/) explains
+where cuts belong, and the free [video splitter](/tools/video-splitter/) cuts a long clip at its shot changes.

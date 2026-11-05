@@ -4,6 +4,7 @@ import { GROUPS, TOOLS, byGroup } from '../lib/tools';
 import { TRANSLATIONS, toolPath } from '../lib/tools/index';
 import { HUB } from '../lib/tools-i18n';
 import { localePath, type Lang } from '../i18n';
+import { homeNote } from '../lib/related';
 
 interface Props {
   lang?: Lang;
@@ -11,6 +12,7 @@ interface Props {
 
 const { lang = 'en' } = Astro.props;
 const words = HUB[lang];
+const note = homeNote(lang, true);
 
 /**
  * A card's blurb comes from the translation when there is one.
@@ -76,6 +78,8 @@ const jsonLd = {
 
     <section>
       <div class="wrap prose">
+        {note && <p><Fragment set:html={note} /></p>}
+
         <h2>{words.whyTitle}</h2>
         <Fragment set:html={words.whyBody} />
 

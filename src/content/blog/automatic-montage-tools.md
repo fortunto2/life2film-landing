@@ -90,3 +90,6 @@ important thing in the frame is your grandmother, in the last summer she was wel
 Nobody has solved that, and possibly nobody will. The best available compromise is to make the
 re-cut cheap: if the first result misses the point, changing it should take seconds rather than a
 timeline session. That is the bar worth holding these tools to, including ours.
+
+For how the survivors compare in practice, see the [GoPro Quik alternatives for iPhone](/blog/gopro-quik-alternative-iphone/)
+and the notes on [making a Google Photos highlight video](/blog/google-photos-highlight-video/).

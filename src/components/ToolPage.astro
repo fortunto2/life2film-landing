@@ -5,6 +5,7 @@ import { TOOL, TOOLS } from '../lib/tools';
 import { TRANSLATIONS, localesFor, toolPath } from '../lib/tools/index';
 import { CHROME, asTranslation } from '../lib/tools-i18n';
 import { localePath, type Lang } from '../i18n';
+import { relatedForTool } from '../lib/related';
 
 interface Props {
   /** Which tool this is. Everything else comes from the registry. */
@@ -39,6 +40,8 @@ const others = TOOLS.filter((other) => other.slug !== slug).map((other) => ({
   // The blurb has a translation; the name does not, so it stays English on purpose.
   blurb: TRANSLATIONS[lang]?.[other.slug]?.blurb ?? other.blurb,
 }));
+
+const related = relatedForTool(slug, lang);
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -136,6 +139,17 @@ const jsonLd = {
               <li>
                 <a href={base.reading.href}>{base.reading.title}</a> — {base.reading.note}
               </li>
+            </ul>
+          </>
+        )}
+
+        {related && (
+          <>
+            <h2>{related.heading}</h2>
+            <ul class="related">
+              {related.links.map((link) => (
+                <li><a href={link.href}>{link.text}</a></li>
+              ))}
             </ul>
           </>
         )}

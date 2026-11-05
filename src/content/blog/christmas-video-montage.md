@@ -66,3 +66,6 @@ If it is going on Instagram or TikTok, render without music and add a track from
 posting time, or the audio may be muted. For the family chat, music in the file is fine. For a TV
 at the grandparents', pick the horizontal shape; Life2Film follows the footage's own majority unless
 you ask for vertical.
+
+If the holiday film is part of a year-end set, the [year in review video](/blog/year-in-review-video-iphone/)
+post covers that, and [what each Life2Film preset does](/blog/life2film-presets/) explains which one to pick here.

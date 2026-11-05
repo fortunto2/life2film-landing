@@ -72,3 +72,7 @@ to finish by hand.
 For the by-hand version of all this, the earlier post on
 [cutting video to the beat](/blog/cut-video-to-the-beat/) goes through where the cuts belong and
 why an edit that ignores the downbeat reads as amateur.
+
+If you would rather describe the cut in words and let an assistant do the timeline work, the
+[step-by-step guide to editing video with an AI agent](/guides/edit-video-with-ai-agents/) shows
+how to get a beat-matched cut from a folder of clips.

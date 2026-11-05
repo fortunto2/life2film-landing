@@ -65,3 +65,6 @@ Montage is free; the paid part is a chat director that edits by conversation.
 Quik itself remains the right answer for one group: people with a GoPro who want the camera's own
 stabilisation and highlight tags to carry into the edit. If that is you, the subscription is
 buying something the others do not have.
+
+For the history of why these tools keep appearing and disappearing, read
+[the automatic montage tools that came and went](/blog/automatic-montage-tools/).

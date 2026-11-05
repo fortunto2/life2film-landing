@@ -83,3 +83,6 @@ uploading is wrong, but because it should be a choice you made rather than a def
 Life2Film is built the local way: the analysis runs on the phone, originals never leave it, and the
 only thing that can go out, if you set up an AI provider with your own key, is a text description
 of clips. Details are in the [privacy policy](/privacy/), and the airplane-mode test works on us too.
+
+The free [video tools in the browser](/tools/) follow the same rule: the file is processed on your
+device and never sent anywhere.
