@@ -13,17 +13,17 @@
     "wasm": "cp node_modules/life2film-engine/va_wasm.js node_modules/life2film-engine/va_wasm_bg.wasm public/wasm/"
   },
   "dependencies": {
-    "@astrojs/sitemap": "^3.7.3",
+    "@astrojs/sitemap": "^3.7.4",
     "@fontsource-variable/space-grotesk": "^5.3.0",
     "@mediabunny/mp3-encoder": "^1.54.0",
     "@rive-app/canvas-lite": "2.45.0",
-    "astro": "^5.0.0",
+    "astro": "^6.4.8",
     "mediabunny": "^1.54.0",
     "superduper-site-kit": "git+file:///Users/rustam/startups/shared/superduper-site-kit",
     "superduper-tools": "git+file:///Users/rustam/startups/shared/superduper-tools"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.10",
+    "@astrojs/check": "^0.9.12",
     "life2film-engine": "^0.2.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10"
