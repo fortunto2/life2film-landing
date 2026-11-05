@@ -77,3 +77,65 @@ describe('the size the capability check asks about', async () => {
     expect(outputSize({ width: 0, height: 0 }, { width: 1280 })).toBeUndefined();
   });
 });
+
+describe('a codec that passes the probe and fails on the first frame', async () => {
+  const { nextAttempt, canCopyTrim, describeAttempt, isCodecRefusal } = await import('./encode');
+  // The exact reason production logged 109 times in 28 days (two people, /ru/tools/video-splitter/).
+  const refused = new DOMException('Unsupported configuration. Check isConfigSupported() prior to calling configure().', 'OperationError');
+  const hardware = { acceleration: 'prefer-hardware' as const, nudgeStart: false };
+  const software = { acceleration: 'no-preference' as const, nudgeStart: false };
+
+  test('the order is hardware, software, copy, then give up', () => {
+    const second = nextAttempt(refused, hardware, true);
+    expect(second).toEqual(software);
+    const third = nextAttempt(refused, second!, true);
+    expect(third).toEqual({ ...software, copy: true });
+    expect(nextAttempt(refused, third!, true)).toBeNull();
+  });
+
+  test('without a copy that fits (resize, bitrate) software is the last try', () => {
+    expect(nextAttempt(refused, software, false)).toBeNull();
+  });
+
+  test('a decoder dying mid-stream skips the encoder retry and goes to copy', () => {
+    const dying = new DOMException('Decoding error.', 'EncodingError');
+    expect(nextAttempt(dying, hardware, true)).toEqual({ ...hardware, copy: true });
+  });
+
+  test('"Failed to initialize video encode accelerator" is a hardware refusal like the older sentence', () => {
+    const accel = new Error('Encoding error. (Failed to initialize video encode accelerator.)');
+    expect(nextAttempt(accel, hardware, true)).toEqual(software);
+  });
+
+  test('a network error is not a codec problem', () => {
+    expect(nextAttempt(new TypeError('network error'), hardware, true)).toBeNull();
+    expect(isCodecRefusal(new TypeError('network error'))).toBe(false);
+    expect(isCodecRefusal(refused)).toBe(true);
+  });
+
+  const aac = (c: string) => c === 'aac';
+  const copyable = { videoCodec: 'avc', audioCodec: 'aac', audioSupported: aac };
+  test('a plain trim of H.264 + AAC into MP4 can be copied', () => {
+    expect(canCopyTrim({ container: 'mp4' }, copyable)).toBe(true);
+  });
+  test('anything that changes the picture cannot', () => {
+    expect(canCopyTrim({ container: 'mp4', width: 1080, height: 1920, fit: 'cover' }, copyable)).toBe(false);
+    expect(canCopyTrim({ container: 'mp4', videoBitrate: 1e6 }, copyable)).toBe(false);
+    expect(canCopyTrim({ container: 'mp4', mono: true }, copyable)).toBe(false);
+  });
+  test('VP9 into MP4, or audio the container refuses, cannot', () => {
+    expect(canCopyTrim({ container: 'mp4' }, { ...copyable, videoCodec: 'vp9' })).toBe(false);
+    expect(canCopyTrim({ container: 'mp4' }, { ...copyable, audioCodec: 'ac3' })).toBe(false);
+    expect(canCopyTrim({ container: 'mp4' }, { ...copyable, audioCodec: null })).toBe(true);
+  });
+  test('audio containers never copy video', () => {
+    expect(canCopyTrim({ container: 'mp3' }, copyable)).toBe(false);
+  });
+
+  test('the event line names the attempt and the codecs, nothing else', () => {
+    expect(describeAttempt({ ...software, copy: true }, { src: 'hvc1.1.6.L120 3840x2160 a=aac', out: 'avc 3840x2160' })).toBe(
+      'copy src=hvc1.1.6.L120 3840x2160 a=aac out=avc 3840x2160',
+    );
+    expect(describeAttempt(hardware, {})).toBe('enc/hw');
+  });
+});

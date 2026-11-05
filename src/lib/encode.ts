@@ -71,6 +71,8 @@ export interface EncodeResult {
    * reason to prefer one over the other.
    */
   copiedVideo: boolean;
+  /** Seconds the cut begins before the asked in-point: a copy can only start on a keyframe. */
+  startedEarly?: number;
 }
 
 const CONTAINER_MIME: Record<Container, string> = {
@@ -186,18 +188,80 @@ export interface Attempt {
   acceleration: 'prefer-hardware' | 'no-preference';
   /** Start a millisecond in, so a sample rounded to just below zero is dropped, not fatal. */
   nudgeStart: boolean;
+  /**
+   * Copy the packets instead of decoding them: no decoder, no encoder. The cut begins at the
+   * keyframe at or before the in-point, so the clip may start a moment early.
+   */
+  copy?: boolean;
 }
 
-/** The attempt to make after `error`, or null when another try would fail the same way. */
-export function nextAttempt(error: unknown, current: Attempt): Attempt | null {
+/** The browser accepted a hardware configuration and then refused to run it. */
+const HARDWARE_REFUSAL = /not supported by this browser|failed to initialize video encode accelerator/i;
+/**
+ * A codec that said yes to `isConfigSupported` and failed on the first real frame. Chrome words it
+ * "Unsupported configuration. Check isConfigSupported() prior to calling configure()" (an
+ * OperationError, raised by a decoder or encoder after the probe passed); mid-stream it is
+ * "Decoding error". Measured: 109 `tool_failed` events in 28 days, from two people.
+ */
+const CODEC_REFUSAL = /unsupported configuration|decoding error/i;
+
+/**
+ * The attempt to make after `error`, or null when another try would fail the same way.
+ * `canCopy`: the request needs no pixel changed, so a keyframe-snapped copy is a valid last resort.
+ */
+export function nextAttempt(error: unknown, current: Attempt, canCopy = false): Attempt | null {
   const message = error instanceof Error ? error.message : String(error);
-  if (current.acceleration === 'prefer-hardware' && /not supported by this browser/i.test(message)) {
+  if (current.acceleration === 'prefer-hardware' && HARDWARE_REFUSAL.test(message)) {
     return { ...current, acceleration: 'no-preference' };
   }
   if (!current.nudgeStart && /timestamps must be non-negative/i.test(message)) {
     return { ...current, nudgeStart: true };
   }
+  if (CODEC_REFUSAL.test(message)) {
+    // The encoder may be the one that refused: software is one cheap try (it fails in the first
+    // second). A decoder error mid-stream says nothing about the encoder, so it skips that.
+    if (current.acceleration === 'prefer-hardware' && /unsupported configuration/i.test(message)) {
+      return { ...current, acceleration: 'no-preference' };
+    }
+    if (canCopy && !current.copy) return { ...current, copy: true };
+  }
   return null;
+}
+
+/**
+ * Whether the request could be met by copying packets: nothing about the picture or sound is
+ * asked to change, the container takes the source codecs as they are, and there is a video track
+ * to cut. Pure, so the choice is testable without a browser.
+ */
+export function canCopyTrim(
+  options: Pick<
+    EncodeOptions,
+    'container' | 'width' | 'height' | 'fit' | 'videoBitrate' | 'audioBitrate' | 'mono' | 'quality' | 'discardVideo'
+  >,
+  source: { videoCodec: string | null; audioCodec: string | null; audioSupported: (codec: string) => boolean },
+): boolean {
+  if (isAudioOnly(options.container) || options.discardVideo) return false;
+  if (options.width || options.height || options.fit || options.videoBitrate || options.audioBitrate) return false;
+  if (options.mono || options.quality) return false;
+  if (!source.videoCodec || !(copyableCodecs(options.container) as string[]).includes(source.videoCodec)) return false;
+  return !source.audioCodec || source.audioSupported(source.audioCodec);
+}
+
+/** What the person is told when every attempt was refused: no codec jargon, one thing to try. */
+export const CODEC_REFUSED_MESSAGE =
+  'This browser cannot process that video (its codec or settings are not supported here). ' +
+  'Try desktop Chrome, or convert the video to a standard H.264 MP4 first.';
+
+export const isCodecRefusal = (error: unknown) =>
+  CODEC_REFUSAL.test(error instanceof Error ? error.message : String(error));
+
+/** One line for the `tool_failed` event: what was attempted, never a name or a byte of content. */
+export function describeAttempt(
+  attempt: Attempt,
+  facts: { src?: string; out?: string },
+): string {
+  const how = attempt.copy ? 'copy' : `enc/${attempt.acceleration === 'prefer-hardware' ? 'hw' : 'sw'}`;
+  return [how, facts.src && `src=${facts.src}`, facts.out && `out=${facts.out}`].filter(Boolean).join(' ');
 }
 
 /** The size the encoder will actually be asked for, so the capability check asks the same thing. */
@@ -219,6 +283,73 @@ export async function encodableCodec(container: Container, size?: { width: numbe
   const wanted = codecPreference(container);
   if (!wanted.length) return null;
   return library.getFirstEncodableVideoCodec(wanted, size);
+}
+
+/** Every attempt refused for a codec reason becomes one readable sentence; the raw text rides in `context`. */
+function describeFailure(error: unknown, tried: string[]): Error {
+  const raw = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+  const out = isCodecRefusal(error) ? new Error(CODEC_REFUSED_MESSAGE, { cause: error }) : error instanceof Error ? error : new Error(raw);
+  (out as Error & { context?: string }).context = `${tried.join(' > ')} | ${raw}`.slice(0, 190);
+  return out;
+}
+
+/**
+ * The cut without decoding: packets from the keyframe at or before the in-point to the out-point,
+ * moved to time zero. It runs when this browser's decoder or encoder refuses the file — a copy
+ * needs neither. The clip may begin a moment early (the length of the group of pictures).
+ */
+async function copyTrimmed(
+  file: File,
+  options: EncodeOptions,
+  format: () => InstanceType<typeof import('mediabunny').OutputFormat>,
+  library: typeof import('mediabunny'),
+): Promise<{ buffer: ArrayBuffer; startedEarly: number }> {
+  const { Input, Output, BufferTarget, BlobSource, ALL_FORMATS, EncodedPacketSink, EncodedVideoPacketSource, EncodedAudioPacketSource } = library;
+  const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
+  const output = new Output({ format: format(), target: new BufferTarget() });
+  const video = await input.getPrimaryVideoTrack();
+  const audio = options.discardAudio ? null : await input.getPrimaryAudioTrack();
+  if (!video) throw new Error('That file has no video track.');
+  const start = options.trim?.start ?? 0;
+  const end = options.trim?.end ?? Infinity;
+
+  const videoSink = new EncodedPacketSink(video);
+  const key = (await videoSink.getKeyPacket(start, { verifyKeyPackets: true })) ?? (await videoSink.getFirstPacket());
+  if (!key) throw new Error('That file has no video track.');
+  const origin = key.timestamp;
+
+  const videoSource = new EncodedVideoPacketSource(video.codec as VideoCodec);
+  output.addVideoTrack(videoSource);
+  const audioSource = audio ? new EncodedAudioPacketSource(audio.codec as never) : null;
+  if (audio && audioSource) output.addAudioTrack(audioSource);
+  await output.start();
+
+  const videoMeta = { decoderConfig: (await video.getDecoderConfig()) ?? undefined };
+  for await (const packet of videoSink.packets(key)) {
+    if (packet.timestamp >= end) break;
+    await videoSource.add(packet.clone({ timestamp: packet.timestamp - origin }), videoMeta);
+    options.onProgress?.(Math.min(0.9, (packet.timestamp - origin) / Math.max(0.001, end - origin)));
+  }
+  videoSource.close();
+
+  if (audio && audioSource) {
+    const audioSink = new EncodedPacketSink(audio);
+    const audioMeta = { decoderConfig: (await audio.getDecoderConfig()) ?? undefined };
+    const first = (await audioSink.getPacket(origin)) ?? (await audioSink.getFirstPacket());
+    if (first) {
+      for await (const packet of audioSink.packets(first)) {
+        if (packet.timestamp >= end) break;
+        if (packet.timestamp < origin) continue;
+        await audioSource.add(packet.clone({ timestamp: packet.timestamp - origin }), audioMeta);
+      }
+    }
+    audioSource.close();
+  }
+
+  await output.finalize();
+  if (!output.target.buffer) throw new Error('The encoder produced no data.');
+  options.onProgress?.(1);
+  return { buffer: output.target.buffer, startedEarly: Math.max(0, start - origin) };
 }
 
 export async function encode(file: File, options: EncodeOptions): Promise<Blob> {
@@ -389,22 +520,54 @@ export async function encodeDetailed(file: File, options: EncodeOptions): Promis
     return output.target.buffer;
   };
 
+  const audioTrack = dropVideo || options.discardAudio ? null : await input.getPrimaryAudioTrack().catch(() => null);
+  const canCopy =
+    Boolean(options.trim) &&
+    canCopyTrim(options, {
+      videoCodec: sourceCodec,
+      audioCodec: audioTrack?.codec ?? null,
+      audioSupported: (codec) => (format().getSupportedAudioCodecs() as string[]).includes(codec),
+    });
+
+  // What failed, for the next regression to be diagnosable. Codec strings and sizes only.
+  const facts = {
+    src: sourceCodec
+      ? `${(await sourceTrack?.getCodecParameterString().catch(() => null)) ?? sourceCodec} ${srcW}x${srcH}` +
+        (audioTrack ? ` a=${audioTrack.codec}` : '')
+      : undefined,
+    out: codec ? `${codec} ${size ? `${size.width}x${size.height}` : ''}`.trim() : undefined,
+  };
+
   let attempt: Attempt | null = { acceleration: hardware ? 'prefer-hardware' : 'no-preference', nudgeStart: false };
   let buffer: ArrayBuffer | null = null;
+  let startedEarly: number | undefined;
+  const tried: string[] = [];
   while (attempt) {
+    tried.push(describeAttempt(attempt, facts));
     try {
-      buffer = await run(attempt);
+      if (attempt.copy) {
+        const copied = await copyTrimmed(file, options, format, library);
+        buffer = copied.buffer;
+        startedEarly = copied.startedEarly;
+      } else {
+        buffer = await run(attempt);
+      }
       break;
     } catch (error) {
-      attempt = nextAttempt(error, attempt);
-      if (!attempt) throw error;
+      const next = nextAttempt(error, attempt, canCopy);
+      if (next) {
+        attempt = next;
+        continue;
+      }
+      throw describeFailure(error, tried);
     }
   }
   if (!buffer) throw new Error('The encoder produced no data.');
 
   return {
     blob: new Blob([buffer], { type: CONTAINER_MIME[options.container] }),
-    copiedVideo: !reencode && !dropVideo,
+    copiedVideo: (!reencode && !dropVideo) || startedEarly !== undefined,
+    ...(startedEarly !== undefined && { startedEarly }),
   };
 }
 

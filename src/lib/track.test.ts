@@ -84,3 +84,19 @@ describe('failureReason', () => {
     expect(failureReason(e)).toBe('NotSupportedError: Encoder failed');
   });
 });
+
+describe('browserOf', async () => {
+  const { browserOf } = await import('./track');
+  test.each([
+    ['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', 'Chrome 141 / Windows'],
+    ['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36 Edg/141.0.0.0', 'Edge 141 / Windows'],
+    ['Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 YaBrowser/25.8.0 Yowser/2.5 Safari/537.36', 'Yandex 25 / Windows'],
+    ['Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Safari/605.1.15', 'Safari 18 / macOS'],
+    ['Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.6 Mobile/15E148 Safari/604.1', 'Safari 18 / iOS'],
+    ['Mozilla/5.0 (X11; Linux x86_64; rv:142.0) Gecko/20100101 Firefox/142.0', 'Firefox 142 / Linux'],
+    ['Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Mobile Safari/537.36', 'Chrome 141 / Android'],
+    ['', 'other / other'],
+  ])('%s', (ua, expected) => {
+    expect(browserOf(ua)).toBe(expected);
+  });
+});

@@ -78,6 +78,42 @@ export function fileChosen(file: File, via: 'picker' | 'drop'): void {
   track('file_chosen', props, metrics);
 }
 
+/**
+ * Browser family, major version and OS from a user agent: "Chrome 141 / Windows". Coarse on
+ * purpose: enough to see that a refusal belongs to one browser, too little to tell people apart.
+ */
+export function browserOf(userAgent: string): string {
+  const ua = userAgent || '';
+  const pick = (re: RegExp) => ua.match(re)?.[1];
+  const browser =
+    (pick(/\b(?:Edg|EdgA|EdgiOS)\/(\d+)/) && `Edge ${pick(/\b(?:Edg|EdgA|EdgiOS)\/(\d+)/)}`) ||
+    (pick(/\bOPR\/(\d+)/) && `Opera ${pick(/\bOPR\/(\d+)/)}`) ||
+    (pick(/\b(?:YaBrowser)\/(\d+)/) && `Yandex ${pick(/\bYaBrowser\/(\d+)/)}`) ||
+    (pick(/\b(?:Firefox|FxiOS)\/(\d+)/) && `Firefox ${pick(/\b(?:Firefox|FxiOS)\/(\d+)/)}`) ||
+    (pick(/\b(?:Chrome|CriOS)\/(\d+)/) && `Chrome ${pick(/\b(?:Chrome|CriOS)\/(\d+)/)}`) ||
+    (pick(/Version\/(\d+)[^ ]* (?:Mobile\/\S+ )?Safari/) && `Safari ${pick(/Version\/(\d+)[^ ]* (?:Mobile\/\S+ )?Safari/)}`) ||
+    'other';
+  const os = /Windows/.test(ua)
+    ? 'Windows'
+    : /Android/.test(ua)
+      ? 'Android'
+      : /iPhone|iPad|iPod/.test(ua)
+        ? 'iOS'
+        : /Mac OS X|Macintosh/.test(ua)
+          ? 'macOS'
+          : /Linux|X11/.test(ua)
+            ? 'Linux'
+            : 'other';
+  return `${browser} / ${os}`;
+}
+
 export function toolFailed(stage: 'open' | 'analyse' | 'run' | 'save', error: unknown, file?: File | null): void {
-  track('tool_failed', { stage, reason: failureReason(error, file?.name) });
+  const props: Props = { stage, reason: failureReason(error, file?.name) };
+  if (typeof navigator !== 'undefined') props.ua = browserOf(navigator.userAgent);
+  // The encoder attaches what it tried and what the file held (codec strings, sizes); see `describeFailure`.
+  const context = error instanceof Error ? (error as Error & { context?: unknown }).context : undefined;
+  if (typeof context === 'string') {
+    props.cfg = (file?.name ? context.split(file.name).join('<file>') : context).slice(0, 200);
+  }
+  track('tool_failed', props);
 }
