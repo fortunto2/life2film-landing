@@ -169,6 +169,7 @@ const fill = (t: string, n: number) => t.replace('{n}', String(n));
     import { equalClips, groupIntoClips, rankByScore, stars, type Clip, type Shot } from '../../lib/clips';
     import type { SplitterChrome } from '../../lib/splitter-i18n';
     import { clock } from '../../lib/timeline-export';
+    import { modeChangeAction, runToken } from '../../lib/mode-switch';
 
     const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
   const say = toolStrings();
@@ -189,6 +190,12 @@ const fill = (t: string, n: number) => t.replace('{n}', String(n));
     let videoDuration = 0;
     let fileName = 'video';
     let busy = false;
+    let analysing = false;
+    let regrouping = false;
+    let regroupAgain = false;
+    let analysisEnded: Promise<void> = Promise.resolve();
+    const analysisRun = runToken();
+    class Cancelled extends Error {}
 
     function status(message: string, fraction?: number, isError = false) {
       statusEl.hidden = false;
@@ -251,6 +258,11 @@ const fill = (t: string, n: number) => t.replace('{n}', String(n));
     async function analyse(file: File) {
       if (busy) return;
       busy = true;
+      analysing = true;
+      const runId = analysisRun.begin();
+      let ended!: () => void;
+      analysisEnded = new Promise<void>((resolve) => { ended = resolve; });
+      const stillWanted = () => { if (!analysisRun.isCurrent(runId)) throw new Cancelled(); };
       sourceFile = file;
       fileName = file.name.replace(/\.[^.]+$/, '') || 'video';
       grid.replaceChildren();
@@ -285,6 +297,7 @@ const fill = (t: string, n: number) => t.replace('{n}', String(n));
         const vectors: number[][] = [];
 
         for (const [i, at] of plan.entries()) {
+          stillWanted();
           const frame = await source.frameAt(at, ANALYSIS_WIDTH);
           pixels.push(centerPixel(frame));
           timestamps.push(at);
@@ -309,6 +322,7 @@ const fill = (t: string, n: number) => t.replace('{n}', String(n));
         const moved = new Map<number, number>();
         const starts = ranges.slice(1).map(([start]) => start);
         for (const [i, start] of starts.entries()) {
+          stillWanted();
           status(`Placing cut ${i + 1} of ${starts.length}…`, 0.82 + (i / starts.length) * 0.16);
           moved.set(start, await refineBoundary(source, start, coarseStep, ANALYSIS_WIDTH, {
             previous: starts[i - 1] ?? 0,
@@ -335,11 +349,14 @@ const fill = (t: string, n: number) => t.replace('{n}', String(n));
           duration_s: Math.round(videoDuration),
         });
       } catch (error) {
+        if (error instanceof Cancelled) return;
         toolFailed('analyse', error, file);
         status(error instanceof Error ? error.message : 'Could not read that file.', 1, true);
       } finally {
         source?.release();
         busy = false;
+        analysing = false;
+        ended();
         if (switched) void showEqual(file, sp.tooLong);
       }
     }
@@ -480,6 +497,7 @@ const fill = (t: string, n: number) => t.replace('{n}', String(n));
     async function regroup() {
       if (!sourceFile) return;
       busy = true;
+      regrouping = true;
       let source: VideoSource | null = null;
       try {
         source = await openVideo(sourceFile);
@@ -490,6 +508,9 @@ const fill = (t: string, n: number) => t.replace('{n}', String(n));
       } finally {
         source?.release();
         busy = false;
+        regrouping = false;
+        // A second change made while this one ran (mode, then part length) is applied now.
+        if (regroupAgain) { regroupAgain = false; void regroup(); }
       }
     }
 
@@ -497,8 +518,18 @@ const fill = (t: string, n: number) => t.replace('{n}', String(n));
     for (const id of ['mode', 'parts', 'every']) {
       el<HTMLSelectElement>(id).addEventListener('change', async () => {
         syncModeUI();
-        if (!sourceFile || busy) return;
-        if (mode() === 'scenes' && !shots.length) return void analyse(sourceFile);
+        const action = modeChangeAction({
+          mode: mode(), hasFile: Boolean(sourceFile), busy, analysing, hasShots: shots.length > 0,
+        });
+        if (action === 'ignore' && regrouping) regroupAgain = true;
+        if (action === 'ignore' || !sourceFile) return;
+        if (action === 'analyse') return void analyse(sourceFile);
+        if (action === 'cancel-then-regroup') {
+          analysisRun.cancel();
+          await analysisEnded;
+          // Something else (a dropped file, a second change) may have taken over while it wound down.
+          if (busy || mode() === 'scenes') return;
+        }
         await regroup();
       });
     }
