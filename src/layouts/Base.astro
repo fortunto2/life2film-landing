@@ -4,6 +4,7 @@ import fontLatin from '@fontsource-variable/space-grotesk/files/space-grotesk-la
 import Analytics from 'superduper-site-kit/astro/Analytics.astro';
 import LegalFooter from 'superduper-site-kit/astro/LegalFooter.astro';
 import { languageNames, languages, localePath, rtl, useTranslations, type Lang } from '../i18n';
+import { GUIDES_UI } from '../lib/guides-ui';
 interface Props {
   lang: Lang;
   /** Social preview. Absolute URL is built here; pass a root-relative path. */
@@ -192,6 +193,7 @@ const jsonLd = {
         <a href={localePath(lang, '/about')}>{t('navAbout')}</a>
         <a href={localePath(lang, '/studio')}>{t('navStudio')}</a>
         <a href={localePath(lang, '/tools/')}>Tools</a>
+        <a href={localePath(lang, '/guides/')}>{GUIDES_UI[lang].nav}</a>
         <a href={'/blog/'}>{t('navBlog')}</a>
       </div>
       {/*

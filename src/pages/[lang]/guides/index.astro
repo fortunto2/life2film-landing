@@ -1,0 +1,14 @@
+---
+import GuidesHub from '../../../components/GuidesHub.astro';
+import { guidesFor } from '../../../lib/guides';
+import { languages, defaultLang, type Lang } from '../../../i18n';
+
+export async function getStaticPaths() {
+  const langs = (Object.keys(languages) as Lang[]).filter((l) => l !== defaultLang);
+  const out: any[] = [];
+  for (const lang of langs) if ((await guidesFor(lang)).length) out.push({ params: { lang }, props: { lang } });
+  return out;
+}
+const { lang } = Astro.props;
+---
+<GuidesHub lang={lang} />

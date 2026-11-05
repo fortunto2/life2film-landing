@@ -45,9 +45,23 @@ What makes it different from other video editors:
 - [Engine](https://life2film.com/engine/): the analysis engine as an npm package, with a skill for
   coding agents
 - [Support](https://life2film.com/support): contact and common questions
+- [Guides](https://life2film.com/guides/): how to edit video by talking to an AI assistant (Claude Code, ChatGPT desktop with Codex), for non-programmers. Also in /es, /pt, /id, /ar, /ru, /tr. Each guide has a markdown twin: append \`.md\` to its address
 - [Blog](https://life2film.com/blog): notes on the topics below
 
-The site is also available in Spanish, Portuguese, Indonesian, Arabic, Russian and Turkish (/es, /pt, /id, /ar, /ru, /tr); ${['en', ...Object.keys(TRANSLATIONS)].join(', ')} for the tools; the engine page is English only. Blog posts are English only.
+The site is also available in Spanish, Portuguese, Indonesian, Arabic, Russian and Turkish (/es, /pt, /id, /ar, /ru, /tr); ${['en', ...Object.keys(TRANSLATIONS)].join(', ')} for the tools; the engine page is English only. Blog posts are English only. The guides exist in all seven languages.
+
+## Guides
+
+- [Edit video with an AI assistant: Claude Code, ChatGPT and Codex](https://life2film.com/guides/edit-video-with-ai-agents/)
+  Pillar. Install ffmpeg, an assistant and two free skills (solo-transcribe, solo-video-edit from
+  github.com/fortunto2/solo-factory), then ask for a film: transcribe, find the beat, write the cut
+  as a script, render. Says which assistants can touch local files and which cannot.
+- [How to edit video with Claude Code](https://life2film.com/guides/edit-video-with-claude-code/)
+  Install on macOS, Windows and Linux, first session in a clips folder, prompts, fixes.
+- [Can ChatGPT edit video?](https://life2film.com/guides/edit-video-with-chatgpt-codex/)
+  Browser chat cannot; the ChatGPT desktop app in Codex mode and the Codex CLI can. Setup and prompts.
+
+Technical write-up from the same work: https://rustman.org/wiki/creative-video-with-claude/
 
 ## Articles
 

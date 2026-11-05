@@ -1,0 +1,96 @@
+---
+import { render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { GUIDES_UI, guidePath, localesOf, type Guide } from '../lib/guides';
+import { localePath, type Lang } from '../i18n';
+
+interface Props { guide: Guide; lang: Lang; slug: string }
+const { guide, lang, slug } = Astro.props;
+const { Content } = await render(guide);
+const ui = GUIDES_UI[lang];
+const locales = await localesOf(slug);
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString(lang === 'ar' ? 'ar' : lang, { day: 'numeric', month: 'long', year: 'numeric' });
+const url = `https://life2film.com${guidePath(lang, slug)}`;
+const hub = `https://life2film.com${localePath(lang, '/guides/')}`;
+
+// Article and BreadcrumbList only. No HowTo and no Product: neither earns a rich result here.
+const schema = [
+  {
+    '@type': 'Article',
+    '@id': `${url}#article`,
+    headline: guide.data.title,
+    description: guide.data.description,
+    datePublished: guide.data.date.toISOString(),
+    dateModified: (guide.data.updated ?? guide.data.date).toISOString(),
+    inLanguage: lang,
+    mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+    author: { '@type': 'Person', '@id': 'https://rustman.org/#me', name: 'Rustam Salavatov', url: 'https://rustman.org/' },
+    publisher: { '@id': 'https://superduperai.co/#org' },
+    isPartOf: { '@id': 'https://life2film.com/#website' },
+  },
+  {
+    '@type': 'BreadcrumbList',
+    '@id': `${url}#breadcrumb`,
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: ui.home, item: `https://life2film.com${localePath(lang, '/')}` },
+      { '@type': 'ListItem', position: 2, name: ui.nav, item: hub },
+      { '@type': 'ListItem', position: 3, name: guide.data.title, item: url },
+    ],
+  },
+];
+---
+<Base
+  lang={lang}
+  title={`${guide.data.title} — Life2Film`}
+  description={guide.data.description}
+  basePath={`/guides/${slug}`}
+  locales={locales}
+  schema={schema}
+>
+  <main>
+    <section>
+      <article class="wrap prose">
+        <a class="back" href={localePath(lang, '/guides/')}>← {ui.nav}</a>
+        <h1>{guide.data.title}</h1>
+        <p class="muted meta">
+          <time datetime={guide.data.date.toISOString()}>{fmt(guide.data.date)}</time>
+          {guide.data.updated && <> · {fmt(guide.data.updated)}</>}
+          · <a href={`${guidePath(lang, slug).replace(/\/$/, '')}.md`}>markdown</a>
+        </p>
+        <Content />
+      </article>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .back { display: inline-block; margin-bottom: 20px; color: var(--muted); text-decoration: none; font-size: 15px; }
+  .back:hover { color: var(--fg); }
+  h1 { font-size: clamp(30px, 4.5vw, 42px); margin-bottom: 10px; }
+  .meta { font-size: 14px; margin-bottom: 34px; }
+  .meta a { color: var(--muted); }
+
+  article :global(h2) { margin: 40px 0 14px; font-size: 25px; }
+  article :global(h3) { margin: 28px 0 8px; font-size: 18px; }
+  article :global(p), article :global(li) { color: #cfcfd6; margin-bottom: 14px; }
+  article :global(ul), article :global(ol) { padding-inline-start: 22px; }
+  article :global(a) { color: var(--cyan); }
+  article :global(strong) { color: var(--fg); }
+  article :global(blockquote) {
+    margin: 22px 0; padding: 14px 20px; border-inline-start: 3px solid var(--line);
+    background: var(--panel); border-radius: 10px; color: #b9b9c4;
+  }
+  article :global(table) { width: 100%; border-collapse: collapse; margin: 22px 0; font-size: 15px; display: block; overflow-x: auto; }
+  article :global(th), article :global(td) {
+    text-align: start; padding: 10px 12px; border-bottom: 1px solid var(--line); color: #cfcfd6;
+  }
+  article :global(th) { color: var(--fg); font-weight: 700; }
+  article :global(code) { background: var(--panel); padding: 2px 6px; border-radius: 5px; font-size: 14px; }
+  article :global(pre) {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 16px; overflow-x: auto; direction: ltr; text-align: left; margin: 18px 0;
+  }
+  article :global(pre code) { background: none; padding: 0; font-size: 14px; }
+</style>

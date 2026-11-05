@@ -1,0 +1,63 @@
+---
+import Base from '../layouts/Base.astro';
+import { GUIDES_UI, guidePath, guidesFor, GUIDE_SLUGS } from '../lib/guides';
+import { localePath, type Lang } from '../i18n';
+import { localesOf } from '../lib/guides';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const ui = GUIDES_UI[lang];
+const guides = await guidesFor(lang);
+const locales = await localesOf(GUIDE_SLUGS[0]);
+const hub = `https://life2film.com${localePath(lang, '/guides/')}`;
+const schema = [
+  {
+    '@type': 'CollectionPage',
+    '@id': `${hub}#page`,
+    name: ui.hubTitle,
+    description: ui.hubDesc,
+    inLanguage: lang,
+    isPartOf: { '@id': 'https://life2film.com/#website' },
+  },
+  {
+    '@type': 'BreadcrumbList',
+    '@id': `${hub}#breadcrumb`,
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: ui.home, item: `https://life2film.com${localePath(lang, '/')}` },
+      { '@type': 'ListItem', position: 2, name: ui.nav, item: hub },
+    ],
+  },
+];
+---
+<Base lang={lang} title={ui.hubTitle} description={ui.hubDesc} basePath="/guides" locales={locales} schema={schema}>
+  <main>
+    <section>
+      <div class="wrap">
+        <h1>{ui.nav}</h1>
+        <p class="lede">{ui.lede}</p>
+        <div class="posts">
+          {guides.map((g) => (
+            <a class="post" href={guidePath(lang, g.id.split('/')[1])}>
+              <h2>{g.data.title}</h2>
+              <p>{g.data.description}</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  </main>
+</Base>
+
+<style>
+  h1 { font-size: clamp(34px, 5vw, 48px); margin-bottom: 14px; }
+  .lede { font-size: 18px; color: #cfcfd6; max-width: 58ch; }
+  .posts { display: grid; gap: 18px; margin-top: 36px; }
+  .post {
+    display: block; padding: 24px; border-radius: 16px;
+    border: 1px solid var(--line); background: var(--panel);
+    text-decoration: none; transition: border-color 0.15s ease;
+  }
+  .post:hover { border-color: #33333d; }
+  .post h2 { margin: 0 0 8px; font-size: 21px; color: var(--fg); }
+  .post p { color: var(--muted); font-size: 15px; margin: 0; }
+</style>

@@ -1,0 +1,17 @@
+---
+import GuidePage from '../../../components/GuidePage.astro';
+import { guidesFor } from '../../../lib/guides';
+import { languages, defaultLang, type Lang } from '../../../i18n';
+
+export async function getStaticPaths() {
+  const langs = (Object.keys(languages) as Lang[]).filter((l) => l !== defaultLang);
+  const out: any[] = [];
+  for (const lang of langs)
+    for (const guide of await guidesFor(lang))
+      out.push({ params: { lang, slug: guide.id.split('/')[1] }, props: { guide, lang } });
+  return out;
+}
+const { guide, lang } = Astro.props;
+const slug = Astro.params.slug as string;
+---
+<GuidePage guide={guide} lang={lang} slug={slug as any} />
