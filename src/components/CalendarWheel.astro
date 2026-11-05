@@ -21,11 +21,10 @@ const MONTH_R = 1850;
 ---
 
 <div class="wheel" data-rive="/rive/wheel.riv">
-  <img class="rings poster" src="/img/wheel.png" width="400" height="400" alt="" decoding="async" />
+  <img class="rings poster" src="/img/wheel.png" width="400" height="400" alt="Life2Film calendar wheel" decoding="async" />
   <canvas class="rings live" width="400" height="400" hidden aria-hidden="true"></canvas>
 
-  <svg viewBox="-2000 -2000 4000 4000" preserveAspectRatio="xMidYMid meet" role="img"
-       aria-label="Life2Film calendar wheel">
+  <svg viewBox="-2000 -2000 4000 4000" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
     <g class="months" aria-hidden="true">
       {months.map((m, i) => {
         const a = ((i / 12) * 360 - 90) * (Math.PI / 180);
