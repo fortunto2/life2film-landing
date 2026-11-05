@@ -234,8 +234,6 @@ const jsonLd = {
     });
   </script>
 
-  {/* Cloudflare would rewrite these mailto links to /cdn-cgi/l/email-protection, a 404 for any crawler that does not run JS. */}
-  <Fragment set:html="<!--email_off-->" />
   <footer>
     <div class="wrap footrow">
       <span>{t('footerTag')}</span>
@@ -250,7 +248,6 @@ const jsonLd = {
       <LegalFooter lang={lang} class="muted legal" />
     </div>
   </footer>
-  <Fragment set:html="<!--/email_off-->" />
 </body>
 </html>
 
