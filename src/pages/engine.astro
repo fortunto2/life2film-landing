@@ -300,7 +300,7 @@ export const BeatFlash = ({ beats, bpm }) => {
     @media (min-width: 900px) { .pair { grid-template-columns: 1fr 1fr; } }
     .pairstep {
       border: 1px solid var(--line); border-radius: 14px; background: var(--panel);
-      padding: 18px; position: relative;
+      padding: 18px; position: relative; min-width: 0;
     }
     .pairstep .num {
       position: absolute; top: 16px; right: 18px;
@@ -319,7 +319,7 @@ export const BeatFlash = ({ beats, bpm }) => {
   </style>
 
   <script>
-    import { copyText } from '../lib/clipboard';
+    import { wireCopyButton } from 'superduper-tools/shell';
 
     const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -335,15 +335,7 @@ export const BeatFlash = ({ beats, bpm }) => {
       target.dataset.loaded = 'yes';
     });
 
-    const install = el<HTMLButtonElement>('copyInstall');
-    install.addEventListener('click', () =>
-      copyText(el('installCmd').textContent ?? '', install, 'Copy', el('installCmd')),
-    );
-
-    const skill = el<HTMLButtonElement>('copySkill');
-    skill.addEventListener('click', async () => {
-      skill.textContent = 'Fetching…';
-      copyText(await loadSkill(), skill, 'Copy skill', el('skillText'));
-    });
+    wireCopyButton(el<HTMLButtonElement>('copyInstall'), () => el('installCmd').textContent ?? '', { label: 'Copy', event: 'code_copied', kind: 'command', placement: 'engine-install', select: el('installCmd') });
+    wireCopyButton(el<HTMLButtonElement>('copySkill'), loadSkill, { label: 'Copy skill', event: 'code_copied', kind: 'prompt', placement: 'engine-skill', select: el('skillText') });
   </script>
 </Base>

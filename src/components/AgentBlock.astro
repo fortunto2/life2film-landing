@@ -96,7 +96,7 @@ const chrome = CHROME[lang];
 </style>
 
 <script>
-  import { copyText } from '../lib/clipboard';
+  import { wireCopyButton } from 'superduper-tools/shell';
 
   for (const block of document.querySelectorAll<HTMLElement>('.agentblock')) {
     const tabs = block.querySelectorAll<HTMLButtonElement>('.tab');
@@ -110,10 +110,8 @@ const chrome = CHROME[lang];
     }
 
     for (const button of block.querySelectorAll<HTMLButtonElement>('.copy')) {
-      button.addEventListener('click', () => {
-        const code = block.querySelector(`.panel[data-panel="${button.dataset.copy}"] code`);
-        copyText(code?.textContent ?? '', button, 'Copy', code);
-      });
+      const code = () => block.querySelector(`.panel[data-panel="${button.dataset.copy}"] code`);
+      wireCopyButton(button, () => code()?.textContent ?? '', { label: 'Copy', event: 'code_copied', kind: button.dataset.copy === 'prompt' ? 'prompt' : 'command', placement: 'agentblock', select: code() });
     }
   }
 </script>
