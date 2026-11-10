@@ -234,6 +234,18 @@ const jsonLd = {
     });
   </script>
 
+  <script>
+    // One-tap Copy on every code block (guides, blog, engine, install lines); blocks that carry
+    // their own button are skipped via `.agentblock` / data-no-copy.
+    import { attachCodeCopy } from 'superduper-tools/shell';
+    import { track } from '../lib/track';
+    attachCodeCopy({
+      selector: 'pre:not(.agentblock pre)',
+      css: '.sd-codecopy{margin:0}.sd-codecopy>pre{margin:0}',
+      onCopied: () => track('code_copied', { path: location.pathname, placement: 'block' }),
+    });
+  </script>
+
   <footer>
     <div class="wrap footrow">
       <span>{t('footerTag')}</span>

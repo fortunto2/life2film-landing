@@ -117,7 +117,7 @@ const jsonLd = {
         -->
         <details class="skillbox" id="skillbox">
           <summary>Read it here</summary>
-          <pre><code id="skillText">Loading…</code></pre>
+          <pre data-no-copy><code id="skillText">Loading…</code></pre>
         </details>
 
         <p class="muted small">
@@ -269,7 +269,7 @@ export const BeatFlash = ({ beats, bpm }) => {
     }
     .ghost:hover { border-color: var(--cyan); color: var(--cyan); }
     .ghost.primary { border-color: rgba(0,242,224,.4); color: var(--cyan); }
-    .ghost.small { padding: 6px 12px; font-size: 13px; }
+    .ghost.small { padding: 6px 12px; font-size: 13px; min-height: 44px; }
 
     .skillbox { margin-top: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
     .skillbox summary {

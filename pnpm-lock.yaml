@@ -31,7 +31,7 @@ importers:
         version: git+file:///Users/rustam/startups/shared/superduper-site-kit#d988f561af0c5946a39eba390f59df6a226823fb(astro@6.4.8(@types/node@24.13.3)(rollup@4.62.3)(yaml@2.9.0))
       superduper-tools:
         specifier: git+file:///Users/rustam/startups/shared/superduper-tools
-        version: git+file:///Users/rustam/startups/shared/superduper-tools#0da90210d3bbf3f25cf2546e7093f4589133de02(astro@6.4.8(@types/node@24.13.3)(rollup@4.62.3)(yaml@2.9.0))
+        version: git+file:///Users/rustam/startups/shared/superduper-tools#836dbf30c008f3f920ef47a569f35d78e12fec7a(astro@6.4.8(@types/node@24.13.3)(rollup@4.62.3)(yaml@2.9.0))
     devDependencies:
       '@astrojs/check':
         specifier: ^0.9.12
@@ -1517,8 +1517,8 @@ packages:
       astro:
         optional: true
 
-  superduper-tools@git+file:///Users/rustam/startups/shared/superduper-tools#0da90210d3bbf3f25cf2546e7093f4589133de02:
-    resolution: {commit: 0da90210d3bbf3f25cf2546e7093f4589133de02, repo: file:///Users/rustam/startups/shared/superduper-tools, type: git}
+  superduper-tools@git+file:///Users/rustam/startups/shared/superduper-tools#836dbf30c008f3f920ef47a569f35d78e12fec7a:
+    resolution: {commit: 836dbf30c008f3f920ef47a569f35d78e12fec7a, repo: file:///Users/rustam/startups/shared/superduper-tools, type: git}
     version: 0.1.1
     peerDependencies:
       astro: '>=5.0.0'
@@ -3714,7 +3714,7 @@ snapshots:
     optionalDependencies:
       astro: 6.4.8(@types/node@24.13.3)(rollup@4.62.3)(yaml@2.9.0)
 
-  superduper-tools@git+file:///Users/rustam/startups/shared/superduper-tools#0da90210d3bbf3f25cf2546e7093f4589133de02(astro@6.4.8(@types/node@24.13.3)(rollup@4.62.3)(yaml@2.9.0)):
+  superduper-tools@git+file:///Users/rustam/startups/shared/superduper-tools#836dbf30c008f3f920ef47a569f35d78e12fec7a(astro@6.4.8(@types/node@24.13.3)(rollup@4.62.3)(yaml@2.9.0)):
     optionalDependencies:
       astro: 6.4.8(@types/node@24.13.3)(rollup@4.62.3)(yaml@2.9.0)
 
