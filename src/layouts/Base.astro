@@ -238,7 +238,7 @@ const jsonLd = {
     // One-tap Copy on every code block (guides, blog, engine, install lines) and the copy event.
     // Blocks that carry their own button are skipped via `.agentblock` / data-no-copy.
     import { initCopyButtons } from 'superduper-tools/shell';
-    initCopyButtons({ selector: 'pre:not(.agentblock pre)', event: 'code_copied', css: '.sd-codecopy{margin:0}.sd-codecopy>pre{margin:0}' });
+    initCopyButtons({ selector: 'pre:not(.agentblock pre)', css: '.sd-codecopy{margin:0}.sd-codecopy>pre{margin:0}' });
   </script>
 
   <footer>

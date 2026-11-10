@@ -111,7 +111,7 @@ const chrome = CHROME[lang];
 
     for (const button of block.querySelectorAll<HTMLButtonElement>('.copy')) {
       const code = () => block.querySelector(`.panel[data-panel="${button.dataset.copy}"] code`);
-      wireCopyButton(button, () => code()?.textContent ?? '', { label: 'Copy', event: 'code_copied', kind: button.dataset.copy === 'prompt' ? 'prompt' : 'command', placement: 'agentblock', select: code() });
+      wireCopyButton(button, () => code()?.textContent ?? '', { label: 'Copy', kind: button.dataset.copy === 'prompt' ? 'prompt' : 'command', placement: 'agentblock', select: code() });
     }
   }
 </script>

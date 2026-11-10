@@ -335,7 +335,7 @@ export const BeatFlash = ({ beats, bpm }) => {
       target.dataset.loaded = 'yes';
     });
 
-    wireCopyButton(el<HTMLButtonElement>('copyInstall'), () => el('installCmd').textContent ?? '', { label: 'Copy', event: 'code_copied', kind: 'command', placement: 'engine-install', select: el('installCmd') });
-    wireCopyButton(el<HTMLButtonElement>('copySkill'), loadSkill, { label: 'Copy skill', event: 'code_copied', kind: 'prompt', placement: 'engine-skill', select: el('skillText') });
+    wireCopyButton(el<HTMLButtonElement>('copyInstall'), () => el('installCmd').textContent ?? '', { label: 'Copy', kind: 'command', placement: 'engine-install', select: el('installCmd') });
+    wireCopyButton(el<HTMLButtonElement>('copySkill'), loadSkill, { label: 'Copy skill', kind: 'prompt', placement: 'engine-skill', select: el('skillText') });
   </script>
 </Base>
