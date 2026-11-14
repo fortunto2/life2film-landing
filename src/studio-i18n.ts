@@ -1,163 +1,67 @@
 import type { Lang } from './i18n';
 
 /** Copy for /studio, kept apart from the main bundle — it is long and page-specific. */
-export const studio = {
+export const studio: Record<string, Record<string, string>> = {
   en: {
-    metaTitle: 'Life2Film Studio — desktop video analyser (beta)',
+    metaTitle: 'Life2Film Studio — a timeline editor people and agents share (beta)',
     metaDesc:
-      'Analyse large video archives on your Mac: 30 per-frame features, automatic scene segmentation, montage assembly, and direct import from Apple Photos. Runs entirely on your machine.',
-    badge: 'Public beta',
+      'A native Mac editor that opens an OpenTimelineIO film and plays it straight from the original files: no proxies, no import. Cut, mix through live CLAP plugins, export, and let an agent propose edits you accept.',
+    badge: 'Public beta · 0.4',
     title: 'Studio',
     lede:
-      'The desktop half of Life2Film. Point it at an archive of raw footage and it scores every frame, finds where the scenes actually change, and assembles a montage from the segments worth keeping. Built for the case the phone struggles with: hundreds of clips at once.',
+      'A native timeline editor for the Mac. It opens a film kept as an OpenTimelineIO file and plays it from the original footage, with no proxies and no import step. You and an agent edit the same file: the agent proposes, you watch the proposal and accept it or not.',
     ctaDownload: 'Download for Mac',
     ctaReleases: 'All releases',
-    ctaNote: 'Apple Silicon · macOS 13+ · free while in beta',
-    shotCaption: 'Per-frame feature scores on the right, segment timeline and audio energy below the preview.',
+    ctaNote: 'Apple Silicon · macOS 15 or later · free while in beta',
+    shotCaption: 'A 51-minute travel film, 1164 pieces over the original files, opened in 0.34 s.',
+    shotSound: 'The Sound workspace: a strip per lane and one for the selected piece, each with its own chain of plugins, and the master.',
+    shotWords: 'Every subtitle line in film order. Edit a line where it stands, or click it to go to its moment.',
 
     installTitle: 'Install',
     installBrew: 'With Homebrew:',
     installDmg:
-      'Or download the DMG and drag the app into Applications. It is signed with a Developer ID and notarised by Apple, so it opens without Gatekeeper warnings, and ffmpeg is linked statically, so there is nothing to install first.',
+      'Or download the DMG and drag the app into Applications. It is signed with a Developer ID and notarised by Apple, so it opens without Gatekeeper warnings. There is nothing to install first.',
 
     doesTitle: 'What it does',
-    d1t: 'Scores every frame',
-    d1d: 'Thirty measurements per frame, from sharpness and stability to face quality and aesthetic score. Each becomes a signal you can see and sort by.',
-    d2t: 'Finds the segments',
-    d2d: 'An ensemble of detectors decides where a scene genuinely changes, instead of cutting whenever the camera moves. Shots are classified by scale, close-up through wide.',
-    d3t: 'Assembles the montage',
-    d3d: 'Segments are ranked, trimmed and laid out to a target duration. Audio energy and beat positions shape where the cuts land.',
+    d1t: 'Plays the originals',
+    d1d: 'A film is a small .otio file that points at your footage. Studio plays it as it is, MKV included, so an hour-long cut opens in under a second and nothing is copied or transcoded on a full disk.',
+    d2t: 'Edits the file, not a project',
+    d2d: 'Blade, ripple, slip, speed, dissolves, B-roll, voice-over, chapters and scenes. Every edit is written to the .otio at once and can be undone. The same file opens in other editors through an interchange copy.',
+    d3t: 'Lets an agent in',
+    d3d: 'An MCP door with twelve tools: read the film, look at frames, read loudness, propose edits. A proposal is drawn on the timeline and can be played before you accept it. The agent never writes the film itself.',
 
-    photosTitle: 'Straight from Apple Photos',
-    photosBody:
-      'No exporting to a folder first. Studio reads your macOS Photos library directly, in two ways: a picker with the Photos sidebar when you want to choose visually, and a PhotoKit export when you want to pull a whole batch. The library stays untouched: files are copied out for analysis, never modified in place.',
+    featTitle: 'In the window',
+    f1t: 'Sound like a DAW',
+    f1d: 'CLAP plugins run in the playback path, on a lane, on the master or on one piece of sound. What you hear is what the export renders, and one click brings the mix to -16 LUFS by measurement.',
+    f2t: 'Words and subtitles',
+    f2d: 'Subtitle, caption and title lanes follow the picture through every edit. Lines are edited in place, burned into the picture or written as .srt, per lane.',
+    f3t: 'Inside a source',
+    f3d: 'Open any shot to see its whole file, which stretches the film already uses and which are left, then insert a stretch or lay it over as B-roll.',
+    f4t: 'Export places',
+    f4d: 'YouTube, vertical, a small copy for a messenger, a master, a review copy with the clock burned in. Tick several and they are written one after another, with subtitles, chapters and a map of the film beside them.',
+    f5t: 'Notes that stay put',
+    f5d: 'Pin a note to a moment or paste a list of timecodes from a viewing. Each note stays on its frame through edits, and the agent reads them as its brief.',
+    f6t: 'The iPhone app, soon',
+    f6d: 'A private link to Life2Film on your iPhone is next: take a day of clips straight from the phone over your own network, with the analysis the phone already made, and no cloud in between.',
 
-    measuresTitle: 'What it measures',
-    measuresSub: 'Every number below is computed locally, per frame, and exposed in the interface.',
-    g1t: 'Is the shot usable',
-    g1n: 'Shaky handoffs, out-of-focus starts and blown-out frames are scored down before anything else is considered.',
-    g2t: 'Who and what is in it',
-    g2n: 'Faces are detected with a YOLO model; quality combines detector confidence, landmark visibility and how much of the frame the face occupies, so a sharp face filling the shot outranks a distant one.',
-    g3t: 'Is it composed well',
-    g3n: 'Framing, subject placement and depth separation, so a deliberate shot wins over an accidental one.',
-    g4t: 'How it looks',
-    g4n: 'Colour and texture signatures also tell the segmenter when the scene has actually changed rather than the camera merely moving.',
-
-    archivesTitle: 'Built for big archives',
-    archivesBody:
-      'A phone is fine for a day or a trip. Studio is for the folder that has been accumulating for years: it runs the analysis in a native engine, keeps the scores so a re-cut does not re-analyse anything, and lets you work through hundreds of files in one pass rather than one clip at a time.',
+    agentTitle: 'Bring your own agent',
+    agentBody:
+      'Studio holds no model and no key. The door is a command-line program inside the app that speaks MCP over stdio, so there is no port and nothing listening. Register it with the agent you already use:',
+    agentAfter:
+      'Then ask it to review a cut or direct a film. It reads the timeline, looks at frames and proposes; only you accept. The Notes panel can also call the agent installed on your Mac with one click.',
+    agentLink: 'The agent guide: tools, the skill, the working loop',
 
     betaTitle: 'Still a beta',
     betaBody:
-      'The analysis engine is the mature part; the interface around it is not. Expect rough edges, missing polish and the occasional dead end. It does not touch your originals: nothing is overwritten, nothing is uploaded. Even so, do not make it the only copy of anything.',
+      'This is version 0.4, a new native app that replaces the earlier Studio. It edits the .otio file and never your footage: originals are only read. Expect rough edges. The earlier app, which scored frames and assembled a montage from a folder, stays in the release list as 0.3; that analysis now lives in the Life2Film iPhone app and the command line.',
     betaContact: 'Found something broken?',
   },
-
-  ru: {
-    metaTitle: 'Life2Film Studio — десктопный анализатор видео (бета)',
-    metaDesc:
-      'Разбор больших видеоархивов на Mac: 30 признаков на кадр, автоматическая нарезка на сцены, сборка монтажа и импорт прямо из Apple Photos. Всё работает на вашей машине.',
-    badge: 'Открытая бета',
-    title: 'Studio',
-    lede:
-      'Десктопная половина Life2Film. Укажите ей архив исходников — она оценит каждый кадр, найдёт, где действительно меняются сцены, и соберёт монтаж из сегментов, которые стоит оставить. Сделано для случая, с которым телефону тяжело: сотни клипов сразу.',
-    ctaDownload: 'Скачать для Mac',
-    ctaReleases: 'Все релизы',
-    ctaNote: 'Apple Silicon · macOS 13+ · бесплатно, пока бета',
-    shotCaption: 'Справа — оценки признаков по кадру, под превью — таймлайн сегментов и энергия звука.',
-
-    installTitle: 'Установка',
-    installBrew: 'Через Homebrew:',
-    installDmg:
-      'Или скачайте DMG и перетащите приложение в Applications. Оно подписано Developer ID и заверено у Apple, поэтому открывается без предупреждений Gatekeeper, а ffmpeg вшит статически — ставить заранее ничего не нужно.',
-
-    doesTitle: 'Что она делает',
-    d1t: 'Оценивает каждый кадр',
-    d1d: 'Тридцать измерений на кадр: от резкости и стабильности до качества лица и эстетической оценки. Каждое становится сигналом, который видно и по которому можно сортировать.',
-    d2t: 'Находит сегменты',
-    d2d: 'Ансамбль детекторов решает, где сцена действительно сменилась, а не режет каждый раз, когда двинулась камера. Планы классифицируются по крупности — от крупного до общего.',
-    d3t: 'Собирает монтаж',
-    d3d: 'Сегменты ранжируются, подрезаются и раскладываются под нужную длительность. Энергия звука и позиции битов задают, куда попадут склейки.',
-
-    photosTitle: 'Прямо из Apple Photos',
-    photosBody:
-      'Не нужно сначала выгружать всё в папку. Studio читает медиатеку Photos на macOS напрямую, двумя способами: пикер с боковой панелью Photos, когда хочется выбрать глазами, и экспорт через PhotoKit, когда нужно забрать пачку целиком. Медиатека остаётся нетронутой: файлы копируются для анализа, а не правятся на месте.',
-
-    measuresTitle: 'Что она измеряет',
-    measuresSub: 'Каждое число ниже считается локально, покадрово, и видно в интерфейсе.',
-    g1t: 'Годится ли кадр',
-    g1n: 'Тряские переходы, расфокус в начале и выбитые света отбраковываются раньше, чем оценивается всё остальное.',
-    g2t: 'Кто и что в кадре',
-    g2n: 'Лица находит модель YOLO; качество складывается из уверенности детектора, видимости точек лица и доли кадра, которую лицо занимает — резкое лицо крупным планом обходит далёкое.',
-    g3t: 'Хорошо ли построен кадр',
-    g3n: 'Композиция, положение объекта и разделение по глубине: осознанный кадр выигрывает у случайного.',
-    g4t: 'Как он выглядит',
-    g4n: 'Цветовые и текстурные сигнатуры заодно подсказывают сегментатору, что сцена действительно сменилась, а не просто поехала камера.',
-
-    archivesTitle: 'Сделано под большие архивы',
-    archivesBody:
-      'Для одного дня или поездки хватит телефона. Studio — для папки, которая копится годами: анализ идёт в нативном движке, оценки сохраняются, поэтому пересборка монтажа не запускает разбор заново, и сотни файлов проходят за один заход, а не по клипу за раз.',
-
-    betaTitle: 'Это всё ещё бета',
-    betaBody:
-      'Зрелая часть здесь — движок анализа, интерфейс вокруг него пока нет. Будут шероховатости, недоделки и тупики. Оригиналы не трогаются: ничего не перезаписывается и никуда не загружается — но единственной копией чего-либо это делать не стоит.',
-    betaContact: 'Нашли поломку?',
-  },
-
-  tr: {
-    metaTitle: 'Life2Film Studio — masaüstü video analiz aracı (beta)',
-    metaDesc:
-      "Mac'inizde büyük video arşivlerini analiz edin: kare başına 30 özellik, otomatik sahne bölümleme, kurgu birleştirme ve Apple Photos'tan doğrudan içe aktarma. Tamamı cihazınızda çalışır.",
-    badge: 'Herkese açık beta',
-    title: 'Studio',
-    lede:
-      'Life2Film’in masaüstü yarısı. Ham görüntü arşivinizi gösterin; her kareyi puanlar, sahnelerin gerçekten nerede değiştiğini bulur ve saklamaya değer bölümlerden bir kurgu çıkarır. Telefonun zorlandığı durum için yapıldı: aynı anda yüzlerce klip.',
-    ctaDownload: 'Mac için indir',
-    ctaReleases: 'Tüm sürümler',
-    ctaNote: 'Apple Silicon · macOS 13+ · beta boyunca ücretsiz',
-    shotCaption: 'Sağda kare başına özellik puanları, önizlemenin altında bölüm zaman çizelgesi ve ses enerjisi.',
-
-    installTitle: 'Kurulum',
-    installBrew: 'Homebrew ile:',
-    installDmg:
-      "Ya da DMG dosyasını indirip uygulamayı Applications klasörüne sürükleyin. Developer ID ile imzalı ve Apple tarafından onaylı olduğu için Gatekeeper uyarısı çıkmaz; ffmpeg statik olarak gömülüdür, önceden kurmanız gereken bir şey yok.",
-
-    doesTitle: 'Ne yapar',
-    d1t: 'Her kareyi puanlar',
-    d1d: 'Kare başına otuz ölçüm: keskinlik ve sabitlikten yüz kalitesine ve estetik puana kadar. Her biri görebileceğiniz ve sıralayabileceğiniz bir sinyale dönüşür.',
-    d2t: 'Bölümleri bulur',
-    d2d: 'Bir dedektör topluluğu, kamera her kımıldadığında kesmek yerine sahnenin gerçekten değiştiği yeri belirler. Çekimler yakın plandan genel plana ölçeğe göre sınıflandırılır.',
-    d3t: 'Kurguyu birleştirir',
-    d3d: 'Bölümler sıralanır, kırpılır ve hedef süreye göre dizilir. Ses enerjisi ve vuruş konumları kesmelerin nereye düşeceğini belirler.',
-
-    photosTitle: "Doğrudan Apple Photos'tan",
-    photosBody:
-      "Önce bir klasöre aktarmanıza gerek yok. Studio macOS Photos kitaplığınızı doğrudan okur, iki yolla: gözle seçmek istediğinizde Photos kenar çubuğuyla bir seçici, toplu almak istediğinizde PhotoKit dışa aktarımı. Kitaplığa dokunulmaz — dosyalar analiz için kopyalanır, yerinde değiştirilmez.",
-
-    measuresTitle: 'Neleri ölçer',
-    measuresSub: 'Aşağıdaki her sayı cihazınızda, kare başına hesaplanır ve arayüzde görünür.',
-    g1t: 'Çekim kullanılabilir mi',
-    g1n: 'Sallantılı geçişler, odaksız başlangıçlar ve patlamış kareler, başka hiçbir şeye bakılmadan önce elenir.',
-    g2t: 'Karede kim ve ne var',
-    g2n: 'Yüzler bir YOLO modeliyle bulunur; kalite, dedektör güveni, yüz noktalarının görünürlüğü ve yüzün kareyi ne kadar kapladığından oluşur — kareyi dolduran net bir yüz, uzaktakini geçer.',
-    g3t: 'Kadraj iyi mi',
-    g3n: 'Kompozisyon, öznenin yerleşimi ve derinlik ayrımı: bilinçli çekim, tesadüfi olanı geçer.',
-    g4t: 'Nasıl görünüyor',
-    g4n: 'Renk ve doku imzaları ayrıca bölümleyiciye sahnenin gerçekten değiştiğini mi yoksa kameranın mı hareket ettiğini söyler.',
-
-    archivesTitle: 'Büyük arşivler için',
-    archivesBody:
-      'Bir gün ya da bir tatil için telefon yeter. Studio, yıllardır birikmiş klasör için: analiz yerel bir motorda çalışır, puanlar saklanır, böylece yeniden kurgu analizi baştan başlatmaz ve yüzlerce dosya tek seferde işlenir, klip klip değil.',
-
-    betaTitle: 'Hâlâ beta',
-    betaBody:
-      'Olgun olan kısım analiz motoru; etrafındaki arayüz değil. Pürüzler, eksik cilalar ve ara sıra çıkmaz sokaklar olacak. Orijinallerinize dokunulmaz — hiçbir şeyin üzerine yazılmaz, hiçbir şey yüklenmez — ama yine de tek kopyanız burası olmasın.',
-    betaContact: 'Bozuk bir şey mi buldunuz?',
-  },
-} as const;
+  ru: {},
+  tr: {},
+};
 
 export function useStudio(lang: Lang) {
-  return function s(key: keyof (typeof studio)['en']): string {
-    return (studio[lang] as Record<string, string>)[key] ?? studio.en[key];
+  return function s(key: string): string {
+    return studio[lang]?.[key] ?? studio.en[key] ?? key;
   };
 }

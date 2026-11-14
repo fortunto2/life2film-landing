@@ -1,0 +1,119 @@
+---
+import Base from '../../layouts/Base.astro';
+const MCP = 'claude mcp add studio -- "/Applications/Life2Film Studio.app/Contents/MacOS/studio-cli" mcp';
+const SKILL = `mkdir -p ~/.claude/skills/life2film-studio
+cp "/Applications/Life2Film Studio.app/Contents/Resources/skill/life2film-studio/SKILL.md" \\
+   ~/.claude/skills/life2film-studio/`;
+const JSON_CFG = `{
+  "mcpServers": {
+    "studio": {
+      "command": "/Applications/Life2Film Studio.app/Contents/MacOS/studio-cli",
+      "args": ["mcp"]
+    }
+  }
+}`;
+const tools = [
+  ['timeline_read', 'The film: its outline, a stretch, the words said, what is at a moment, the files behind it, loudness, notes'],
+  ['timeline_frame', 'One frame at a moment, as the window shows it'],
+  ['timeline_sheet', 'A sheet of frames over a stretch, or the inside of one source file'],
+  ['timeline_propose', 'Edits checked against the film and kept beside it until you decide'],
+  ['timeline_accept', 'Apply a proposal, after your yes'],
+  ['timeline_reject', 'Take a proposal back, whole or its last idea'],
+  ['timeline_undo', 'Put the film back as it was before the last accepted proposal'],
+  ['timeline_note', 'Pin a note to a moment or reply to one'],
+  ['timeline_new', 'Begin a film, or cut a reel out of another one'],
+  ['timeline_mix', 'Render the sound with its plugin chains and measure it'],
+  ['mix_plugins', 'The effects that exist, their knobs and ready-made chains'],
+  ['timeline_film', 'Export: the whole film or a stretch, by preset'],
+];
+---
+<Base lang="en" title="Connect an agent to Life2Film Studio" description="Life2Film Studio carries an MCP server with twelve tools. Register it with Claude Code or any MCP host, add the skill, and let an agent review a cut and propose edits you accept." basePath="/studio/agent" locales={['en']}>
+  <main>
+    <section class="hero">
+      <div class="wrap prose">
+        <p class="muted"><a href="/studio/">Studio</a> / Agent guide</p>
+        <h1>Connect an agent</h1>
+        <p class="lede">
+          Studio holds no model and no key. Inside the app is a small program that speaks MCP over stdio:
+          no port, nothing listening, started by the agent host you already use. The agent reads the film,
+          looks at frames and proposes edits. Only you accept them.
+        </p>
+
+        <h2>1. Register the door</h2>
+        <p>With Claude Code:</p>
+        <pre><code>{MCP}</code></pre>
+        <p>With any other MCP host, the same program with the one argument <code>mcp</code>:</p>
+        <pre><code>{JSON_CFG}</code></pre>
+
+        <h2>2. Add the skill</h2>
+        <p>
+          The skill tells the agent how to work here: the order to read a film in, how pieces are named,
+          what to check before asking you. It ships inside the app:
+        </p>
+        <pre><code>{SKILL}</code></pre>
+        <p>
+          Or read it here: <a href="/studio/skill/SKILL.md">SKILL.md</a>. The server also hands every agent
+          its instructions on connect, plus three guides as MCP resources
+          (<code>studio://guide/director</code>, <code>review</code>, <code>edits</code>), so a host without
+          skills still gets the method.
+        </p>
+
+        <h2>3. Ask</h2>
+        <p>Open the film in Studio so you can watch what happens, then ask in plain words. A few that work:</p>
+        <ul>
+          <li>“Review the cut at ~/Movies/trip/trip.otio. Propose nothing yet.”</li>
+          <li>“At 14:36 the caption is wrong, it should say Seattle.”</li>
+          <li>“Chapter 3 drags. Propose a version two minutes shorter.”</li>
+          <li>“Bring the mix to -16 LUFS and tell me what you changed.”</li>
+          <li>“Make a 60-second vertical from the Golden Gate chapter.”</li>
+        </ul>
+        <p>
+          Two prompts come with the server and appear in the host’s prompt list:
+          <code>direct_film</code> and <code>review_cut</code>.
+        </p>
+
+        <h2>What you see in the window</h2>
+        <p>
+          While an agent is connected, the window says so and marks the stretch it last looked at. A
+          proposal is drawn on the timeline in amber: what goes is hatched, what comes in stands over the
+          frame it would cover. Play shows the film as proposed before anything is written. Accept takes
+          it, Drop Last removes the newest idea, and one undo puts the film back.
+        </p>
+        <p>
+          Notes are the other half. Pin a note to a moment, or paste a list of timecodes from a viewing;
+          each stays on its frame through edits, and the agent reads them as its brief the next time it
+          opens the film.
+        </p>
+
+        <h2>The twelve tools</h2>
+        <div class="tools">
+          {tools.map(([n, d]) => (<div class="row"><code>{n}</code><span>{d}</span></div>))}
+        </div>
+
+        <h2>What the agent cannot do</h2>
+        <ul>
+          <li>Write the film without your accept.</li>
+          <li>Look into files the film does not use.</li>
+          <li>Hear. It reads loudness, pauses and measured levels, and says where a judgment needs ears.</li>
+          <li>Touch your footage. Originals are only read.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .hero { padding-top: 56px; }
+  h1 { font-size: clamp(34px, 5vw, 48px); margin: 10px 0 18px; }
+  .lede { font-size: 18px; color: #cfcfd6; max-width: 66ch; }
+  pre {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px 18px; overflow-x: auto; margin: 12px 0 18px;
+  }
+  pre code { background: none; padding: 0; font-size: 13.5px; color: var(--cyan); }
+  .tools { display: grid; gap: 8px; margin: 14px 0 8px; }
+  .row { display: grid; grid-template-columns: minmax(150px, 190px) 1fr; gap: 14px; align-items: baseline;
+         padding: 10px 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+  .row span { color: #cfcfd6; font-size: 15px; }
+  @media (max-width: 560px) { .row { grid-template-columns: 1fr; gap: 4px; } }
+</style>
