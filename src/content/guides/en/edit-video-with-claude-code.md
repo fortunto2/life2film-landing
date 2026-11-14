@@ -77,7 +77,7 @@ Claude Code will:
 3. write the cut as a small script file;
 4. render an mp4 with ffmpeg and check that length and sound match.
 
-Claude Code can also connect to the Life2Film Studio app on a Mac. That gives it the shot and quality analysis from the app. The command is in the [technical write-up](https://rustman.org/wiki/creative-video-with-claude/).
+Claude Code can also work inside the Life2Film Studio app on a Mac: it reads the timeline, looks at frames and proposes edits that you accept in the window. Setup takes one command, see [Connect an agent](/studio/agent/).
 
 ## When something goes wrong
 

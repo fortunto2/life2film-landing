@@ -23,6 +23,7 @@ const MCP = 'claude mcp add studio -- "/Applications/Life2Film Studio.app/Conten
     <div class="wrap">
       <img class="appicon" src="/img/studio-icon.png" alt="" width="96" height="96" />
       <span class="badge beta">{s('badge')}</span>
+      <p class="kicker">{s('kicker')}</p>
       <h1>{s('title')}</h1>
       <p class="lede">{s('lede')}</p>
 
@@ -32,6 +33,7 @@ const MCP = 'claude mcp add studio -- "/Applications/Life2Film Studio.app/Conten
             binary_downloaded — прямой файл, app_store_opened — ссылка в магазин. */}
         <a class="btn" href={DMG}
            data-sda-event="binary_downloaded" data-sda-placement="studio-hero">{s('ctaDownload')}</a>
+        <a class="btn-ghost strong" href="/studio/agent/" data-sda-event="agent_guide_opened" data-sda-placement="studio-hero">{s('ctaAgent')}</a>
         <a class="btn-ghost" href={RELEASES}>{s('ctaReleases')}</a>
       </div>
       <p class="muted small">{s('ctaNote')}</p>
@@ -82,6 +84,7 @@ const MCP = 'claude mcp add studio -- "/Applications/Life2Film Studio.app/Conten
           </div>
         ))}
       </div>
+      <p class="muted plugins">{s('pluginsNote')} <a href="https://rustman.org/projects/project-superduper-dsp/">{s('pluginsLink')} →</a></p>
       <figure class="shot">
         <img src="/img/studio-words.jpg" alt={s('shotWords')} width="2000" height="1054" loading="lazy" decoding="async" />
         <figcaption>{s('shotWords')}</figcaption>
@@ -109,7 +112,7 @@ const MCP = 'claude mcp add studio -- "/Applications/Life2Film Studio.app/Conten
 <style>
   .hero { padding-top: 56px; }
   .appicon { display: block; width: 96px; height: 96px; margin: 0 0 18px -8px; }
-  h1 { font-size: clamp(40px, 6vw, 60px); margin: 16px 0 18px; }
+  h1 { font-size: clamp(36px, 5.4vw, 56px); margin: 6px 0 18px; }
   .lede { font-size: 19px; color: #cfcfd6; max-width: 62ch; }
   .lede-sub { max-width: 60ch; margin-top: 10px; }
   .badge.beta { border-color: #33333d; color: var(--cyan); }
@@ -122,6 +125,9 @@ const MCP = 'claude mcp add studio -- "/Applications/Life2Film Studio.app/Conten
     text-decoration: none; font-size: 15px; font-weight: 500;
   }
   .btn-ghost:hover { border-color: #33333d; }
+  .btn-ghost.strong { border-color: var(--cyan); }
+  .kicker { margin: 14px 0 0; font-size: 15px; font-weight: 600; letter-spacing: 0.04em; color: var(--muted); }
+  .plugins { margin-top: 18px; font-size: 15px; }
 
   .shot { margin: 44px 0 0; }
   .shot.tight { margin-top: 24px; }

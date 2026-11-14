@@ -71,4 +71,4 @@ Codex расшифрует речь, найдёт бит, запишет мон�
 
 - Общий порядок и правила против плохого монтажа: [Монтаж видео нейросетью и ИИ-агентом](/ru/guides/edit-video-with-ai-agents/).
 - Как монтировали настоящие фильмы: [разбор на rustman.org](https://rustman.org/wiki/creative-video-agent-cut/).
-- Нужно готовое приложение с окном: [Life2Film Studio](/ru/studio/) на Mac.
+- Нужно окно, где видна каждая склейка, предложенная ассистентом: [Life2Film Studio](/ru/studio/) на Mac.

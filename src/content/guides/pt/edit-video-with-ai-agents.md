@@ -109,7 +109,7 @@ Coisas úteis para dizer depois do primeiro corte:
 
 ## Prefere uma janela a um chat?
 
-O [Life2Film Studio](/studio/) é um app grátis para Mac (beta) que faz a análise e a montagem de vídeo em uma janela, e também pode ser controlado pelo Claude Code. Para ferramentas no navegador, veja as [ferramentas grátis](/pt/tools/): detector de batida, detector de cenas, cortador e mais, tudo rodando no seu navegador sem envio de arquivos. Para desenvolvedores, o motor de análise está na [página Engine](/engine/).
+O [Life2Film Studio](/studio/) é um app grátis para Mac (beta): um editor de linha do tempo que você divide com o assistente. Ele abre o filme a partir dos arquivos originais, o assistente propõe cortes na linha do tempo e você assiste a cada proposta antes de aceitar. Para ferramentas no navegador, veja as [ferramentas grátis](/pt/tools/): detector de batida, detector de cenas, cortador e mais, tudo rodando no seu navegador sem envio de arquivos. Para desenvolvedores, o motor de análise está na [página Engine](/engine/).
 
 ## Os detalhes técnicos
 

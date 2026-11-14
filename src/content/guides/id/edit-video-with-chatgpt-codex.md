@@ -71,4 +71,4 @@ Kalau kamu sudah berlangganan Claude, [Claude Code](/id/guides/edit-video-with-c
 
 - Alur umum dan aturan yang mencegah potongan jelek: [Edit video dengan asisten AI](/id/guides/edit-video-with-ai-agents/).
 - Cara film-film nyata dipotong: [tulisan di rustman.org](https://rustman.org/wiki/creative-video-agent-cut/).
-- Mau aplikasi siap pakai dengan jendela: [Life2Film Studio](/studio/) di Mac.
+- Mau jendela tempat Anda melihat tiap potongan yang diusulkan asisten: [Life2Film Studio](/studio/) di Mac.

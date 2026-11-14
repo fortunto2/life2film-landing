@@ -109,7 +109,7 @@ Useful things to say after the first cut:
 
 ## Prefer a window to a chat?
 
-[Life2Film Studio](/studio/) is a free Mac app (beta) that does the analysis and the montage in a window, and can be driven by Claude Code too. For browser tools, see [Free tools](/tools/): beat detector, scene detector, trimmer and more, all running in your browser without upload. For developers, the analysis engine is on the [Engine page](/engine/).
+[Life2Film Studio](/studio/) is a free Mac app (beta): a timeline editor you share with your assistant. It opens a film from the original files, the assistant proposes cuts on the timeline, and you play each proposal before accepting it. For browser tools, see [Free tools](/tools/): beat detector, scene detector, trimmer and more, all running in your browser without upload. For developers, the analysis engine is on the [Engine page](/engine/).
 
 ## The technical details
 

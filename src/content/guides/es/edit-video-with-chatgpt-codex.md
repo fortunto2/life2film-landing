@@ -71,4 +71,4 @@ Si ya pagas por Claude, [Claude Code](/es/guides/edit-video-with-claude-code/) h
 
 - El flujo general y las reglas que evitan malos cortes: [Montaje de video con IA](/es/guides/edit-video-with-ai-agents/).
 - Cómo se cortaron las películas reales: [nota en rustman.org](https://rustman.org/wiki/creative-video-agent-cut/).
-- ¿Quieres una app lista con ventana? [Life2Film Studio](/studio/) en un Mac.
+- ¿Quieres una ventana donde ver cada corte que propone el asistente? [Life2Film Studio](/studio/) en un Mac.

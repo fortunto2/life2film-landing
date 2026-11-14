@@ -71,4 +71,4 @@ npx skills add fortunto2/solo-factory --skill solo-transcribe --skill solo-video
 
 - التسلسل العام والقواعد التي تمنع القص السيئ: [مونتاج فيديو بالذكاء الاصطناعي](/ar/guides/edit-video-with-ai-agents/).
 - كيف قُصّت الأفلام الحقيقية: [شرح rustman.org](https://rustman.org/wiki/creative-video-agent-cut/).
-- تريد تطبيقًا جاهزًا بنافذة: [Life2Film Studio](/studio/) على Mac.
+- تريد نافذة ترى فيها كل قطع يقترحه المساعد: [Life2Film Studio](/studio/) على Mac.

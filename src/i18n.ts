@@ -68,7 +68,7 @@ export const ui = {
     s4: 'Trim and reorder by hand when you want to',
     navBlog: 'Blog',
     navStudio: 'Studio',
-    macCta: 'Also on Mac',
+    macCta: 'On Mac: the agent-first editor',
     footerLlms: 'For AI assistants',
     footerTag: 'Made by SuperDuperAI',
     footerRights: 'All rights reserved.',

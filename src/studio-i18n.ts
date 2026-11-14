@@ -3,14 +3,16 @@ import type { Lang } from './i18n';
 /** Copy for /studio, kept apart from the main bundle — it is long and page-specific. */
 export const studio: Record<string, Record<string, string>> = {
   en: {
-    metaTitle: 'Life2Film Studio — a timeline editor people and agents share (beta)',
+    metaTitle: 'Life2Film Studio — the agent-first video editor for Mac (beta)',
     metaDesc:
-      'A native Mac editor that opens an OpenTimelineIO film and plays it straight from the original files: no proxies, no import. Cut, mix through live CLAP plugins, export, and let an agent propose edits you accept.',
+      'A native Mac video editor that is a companion to Claude and other AI agents: the agent reads the film, looks at frames and proposes cuts you accept. Plays from the original files, mixes through live CLAP plugins, exports for YouTube and Reels.',
     badge: 'Public beta · 0.4',
-    title: 'Studio',
+    title: 'The agent-first video editor',
+    kicker: 'Life2Film Studio',
     lede:
-      'A native timeline editor for the Mac. It opens a film kept as an OpenTimelineIO file and plays it from the original footage, with no proxies and no import step. You and an agent edit the same file: the agent proposes, you watch the proposal and accept it or not.',
+      'A native Mac editor that is a companion to Claude and other AI agents. Your agent reads the film, looks at frames, measures the sound and proposes cuts. Every proposal is drawn on the timeline and you play it before you accept it. The film plays from your original footage: no proxies, no import, no upload.',
     ctaDownload: 'Download for Mac',
+    ctaAgent: 'Add to your agent',
     ctaReleases: 'All releases',
     ctaNote: 'Apple Silicon · macOS 15 or later · free while in beta',
     shotCaption: 'A 51-minute travel film, 1164 pieces over the original files, opened in 0.34 s.',
@@ -33,6 +35,8 @@ export const studio: Record<string, Record<string, string>> = {
     featTitle: 'In the window',
     f1t: 'Sound like a DAW',
     f1d: 'CLAP plugins run in the playback path, on a lane, on the master or on one piece of sound. What you hear is what the export renders, and one click brings the mix to -16 LUFS by measurement.',
+    pluginsNote: 'The effects are SuperDuper DSP: 36 free, open-source audio plugins in Rust (CLAP, VST3, AU) that also work in any DAW.',
+    pluginsLink: 'Get the plugins',
     f2t: 'Words and subtitles',
     f2d: 'Subtitle, caption and title lanes follow the picture through every edit. Lines are edited in place, burned into the picture or written as .srt, per lane.',
     f3t: 'Inside a source',

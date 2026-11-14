@@ -77,7 +77,7 @@ Claude Code şunları yapar:
 3. kesimi küçük bir senaryo dosyası olarak yazar;
 4. ffmpeg ile mp4 oluşturur ve sürenin ve sesin uyduğunu kontrol eder.
 
-Claude Code, bir Mac'teki Life2Film Studio uygulamasına da bağlanabilir. Bu ona uygulamadaki çekim ve kalite analizini verir. Komut [teknik yazıda](https://rustman.org/wiki/creative-video-with-claude/).
+Claude Code, bir Mac'teki Life2Film Studio uygulamasının içinde de çalışabilir: zaman çizelgesini okur, karelere bakar ve pencerede sizin kabul ettiğiniz değişiklikler önerir. Bağlantı tek komut, bkz. [Connect an agent](/studio/agent/).
 
 ## Bir şey ters giderse
 

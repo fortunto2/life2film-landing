@@ -77,7 +77,7 @@ Claude Code akan:
 3. menulis potongan sebagai file skrip kecil;
 4. merender mp4 dengan ffmpeg dan memeriksa bahwa durasi dan suaranya sesuai.
 
-Claude Code juga bisa terhubung ke aplikasi Life2Film Studio di Mac. Dengan itu, ia mendapat analisis shot dan kualitas dari aplikasi. Perintahnya ada di [tulisan teknis](https://rustman.org/wiki/creative-video-with-claude/).
+Claude Code juga bisa bekerja di dalam aplikasi Life2Film Studio di Mac: ia membaca timeline, melihat frame, dan mengusulkan perubahan yang Anda terima di jendela. Menghubungkannya cukup satu perintah, lihat [Connect an agent](/studio/agent/).
 
 ## Kalau ada yang salah
 

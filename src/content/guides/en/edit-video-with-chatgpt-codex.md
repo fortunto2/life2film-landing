@@ -71,4 +71,4 @@ If you already pay for Claude, [Claude Code](/guides/edit-video-with-claude-code
 
 - The general flow and the rules that prevent bad cuts: [Edit video with an AI assistant](/guides/edit-video-with-ai-agents/).
 - How the real films were cut: [rustman.org write-up](https://rustman.org/wiki/creative-video-agent-cut/).
-- Want a ready app with a window: [Life2Film Studio](/studio/) on a Mac.
+- Want a window where you see every cut the assistant proposes: [Life2Film Studio](/studio/) on a Mac.

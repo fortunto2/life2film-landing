@@ -109,7 +109,7 @@ Hal berguna yang bisa kamu katakan setelah potongan pertama:
 
 ## Lebih suka jendela daripada chat?
 
-[Life2Film Studio](/studio/) adalah aplikasi Mac gratis (beta) yang melakukan analisis dan montase di dalam jendela, dan bisa juga dikendalikan lewat Claude Code. Untuk alat di browser, lihat [alat gratis](/id/tools/): beat detector, scene detector, trimmer dan lainnya, semua berjalan di browsermu tanpa upload. Untuk developer, mesin analisisnya ada di [halaman Engine](/engine/).
+[Life2Film Studio](/studio/) adalah aplikasi Mac gratis (beta): editor timeline yang Anda pakai bersama asisten. Film dibuka langsung dari file aslinya, asisten mengusulkan potongan di timeline, dan Anda menonton tiap usulan sebelum menerimanya. Untuk alat di browser, lihat [alat gratis](/id/tools/): beat detector, scene detector, trimmer dan lainnya, semua berjalan di browsermu tanpa upload. Untuk developer, mesin analisisnya ada di [halaman Engine](/engine/).
 
 ## Detail teknis
 

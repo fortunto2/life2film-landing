@@ -71,4 +71,4 @@ Zaten Claude için ödüyorsanız, [Claude Code](/tr/guides/edit-video-with-clau
 
 - Genel akış ve kötü kesimi önleyen kurallar: [Yapay zeka ile video düzenleme](/tr/guides/edit-video-with-ai-agents/).
 - Gerçek filmler nasıl kesildi: [rustman.org yazısı](https://rustman.org/wiki/creative-video-agent-cut/).
-- Pencereli hazır uygulama mı istiyorsunuz: Mac'te [Life2Film Studio](/tr/studio/).
+- Asistanın önerdiği her kesmeyi gördüğünüz bir pencere mi istiyorsunuz: Mac'te [Life2Film Studio](/tr/studio/).

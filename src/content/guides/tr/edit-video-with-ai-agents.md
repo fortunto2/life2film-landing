@@ -109,7 +109,7 @@ Sonra olanlar:
 
 ## Sohbet yerine pencere mi istiyorsunuz?
 
-[Life2Film Studio](/tr/studio/) analizi ve montajı bir pencerede yapan ücretsiz bir Mac uygulamasıdır (beta), Claude Code ile de yönetilebilir. Tarayıcı araçları için [Ücretsiz araçlar](/tr/tools/) sayfasına bakın: ritim bulucu, sahne bulucu, kırpıcı ve daha fazlası, hepsi yükleme yapmadan tarayıcınızda çalışır. Geliştiriciler için analiz motoru [Engine sayfasında](/engine/).
+[Life2Film Studio](/tr/studio/) ücretsiz bir Mac uygulamasıdır (beta): asistanınızla paylaştığınız bir zaman çizelgesi editörü. Filmi özgün dosyalardan açar, asistan zaman çizelgesinde kesmeler önerir, siz de her öneriyi kabul etmeden önce izlersiniz. Tarayıcı araçları için [Ücretsiz araçlar](/tr/tools/) sayfasına bakın: ritim bulucu, sahne bulucu, kırpıcı ve daha fazlası, hepsi yükleme yapmadan tarayıcınızda çalışır. Geliştiriciler için analiz motoru [Engine sayfasında](/engine/).
 
 ## Teknik ayrıntılar
 

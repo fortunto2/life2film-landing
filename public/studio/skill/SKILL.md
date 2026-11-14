@@ -1,6 +1,6 @@
 ---
 name: life2film-studio
-description: Edit a film in Life2Film Studio through its MCP door — read an .otio timeline, look at frames, read loudness, propose cuts, B-roll, subtitles and mix changes that the person accepts in the window. Use when the user asks to review a cut, direct a film, fix a moment they name by timecode ("at 14:36 the caption is wrong"), trim or reorder chapters, add cutaways, set levels or plugin chains, make a reel or a vertical from a chapter, or export a film. Do NOT use for analysing raw footage or assembling a first cut from a folder (that is the Life2Film app or the video-analyzer CLI).
+description: Edit a film in Life2Film Studio through its MCP door — read an .otio timeline, look at frames, read loudness, propose cuts, B-roll, subtitles and mix changes that the person accepts in the window. Use when the user asks to review a cut, direct a film, fix a moment they name by timecode ("at 14:36 the caption is wrong"), trim or reorder chapters, add cutaways, set levels or plugin chains, make a reel or a vertical from a chapter, start a film from a folder of footage, or export a film. Do NOT use for scoring raw footage or an automatic montage (that is the Life2Film app or the video-analyzer CLI).
 ---
 
 # Life2Film Studio
@@ -34,7 +34,7 @@ reads off the screen, as text (`"10:21"`, `"1:02:05"`).
 | `timeline_reject` | Take a proposal back (`last` for the newest idea alone) |
 | `timeline_undo` | Put back the film as it was before the last accepted proposal |
 | `timeline_note` | Pin a note to a moment, or reply to one (`re`) |
-| `timeline_new` | Begin a film; with `of`, `from`, `to` a reel cut out of another film |
+| `timeline_new` | Begin a film; with `folder` the film begins with that folder's video files, whole, in the order shot (then read it and propose the cut); with `of`, `from`, `to` a reel cut out of another film |
 | `timeline_mix` | Render the film's sound with its chains and measure it (LUFS, peak); `proposal: true` measures the film as proposed. `to_target` in the answer is the edit that brings it to -16 LUFS |
 | `mix_plugins` | The effects that exist, each one's knobs, and `chains` ready made |
 | `timeline_film` | Write the film: whole or `from`/`to`; `preset` (youtube, vertical, messenger, master, review) |
@@ -76,6 +76,7 @@ start either job with its guide attached.
 - **A short is a film of its own.** Begin a reel with `timeline_new` and `of`; never cut the long
   film down to make it.
 - **Footage outside the film is out of reach.** The door looks only into files the film already uses.
+  A folder the person names becomes a film with `timeline_new` and `folder`; after that its clips are the film's.
 - **Nothing is rendered unless asked.** `timeline_film` writes a file; call it when the person asks
   for an export or a review copy, and tell them where it went.
 

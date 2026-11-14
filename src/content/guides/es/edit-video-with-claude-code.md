@@ -77,7 +77,7 @@ Claude Code va a:
 3. escribir el corte como un pequeño archivo de guion;
 4. renderizar un mp4 con ffmpeg y comprobar que la duración y el sonido coincidan.
 
-Claude Code también puede conectarse a la app Life2Film Studio en un Mac. Eso le da el análisis de planos y de calidad de la app. El comando está en la [nota técnica](https://rustman.org/wiki/creative-video-with-claude/).
+Claude Code también puede trabajar dentro de la app Life2Film Studio en un Mac: lee la línea de tiempo, mira fotogramas y propone cambios que tú aceptas en la ventana. Se conecta con un comando, mira [Connect an agent](/studio/agent/).
 
 ## Cuando algo sale mal
 
