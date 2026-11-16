@@ -60,10 +60,17 @@ export const studio: Record<string, Record<string, string>> = {
       'Then ask it to review a cut or direct a film. It reads the timeline, looks at frames and proposes; only you accept. The Notes panel can also call the agent installed on your Mac with one click.',
     agentLink: 'The agent guide: tools, the skill, the working loop',
 
+    phoneTitle: 'With the iPhone app',
+    phoneBody:
+      'Life2Film on the iPhone finds the moments worth keeping in a day of clips and cuts a first film to the beat, on the phone. Studio takes the same day further on the Mac: the clips come over from the phone or from Photos, laid in the order shot, ready for you and an agent to cut.',
+    phoneCta: 'Life2Film for iPhone',
+
     betaTitle: 'Still a beta',
     betaBody:
       'This is a new native app that replaces the earlier Studio. It edits the .otio file and never your footage: originals are only read. Expect rough edges. The earlier app, which scored frames and assembled a montage from a folder, stays in the release list as 0.3; that analysis now lives in the Life2Film iPhone app and the command line.',
     betaContact: 'Found something broken?',
+    countsBody:
+      'Studio counts, with no names, files or words, how many people open it and which parts they use (a film opened, an agent let in, a film written), so we know what to fix first. Life2Film Studio > Share Anonymous Usage Counts turns it off.',
   },
   ru: {},
   tr: {},

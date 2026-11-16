@@ -9,6 +9,8 @@ const release = await studioRelease();
 
 const DMG = 'https://github.com/fortunto2/life2film-landing/releases/latest/download/Life2FilmStudio.dmg';
 const RELEASES = 'https://github.com/fortunto2/life2film-landing/releases';
+// The iPhone app; `ct` names this page in App Analytics' downloads by campaign.
+const PHONE = 'https://apps.apple.com/app/id6761656888?pt=128499174&ct=site-studio&mt=8';
 
 const steps = [
   { t: s('d1t'), d: s('d1d') },
@@ -121,8 +123,16 @@ const MCP = 'claude mcp add studio -- "/Applications/Life2Film Studio.app/Conten
       </figure>
       <p><a href="/studio/agent/">{s('agentLink')} →</a></p>
 
+      <h2>{s('phoneTitle')}</h2>
+      <p>{s('phoneBody')}</p>
+      <p>
+        <a class="btn-ghost strong" href={PHONE} target="_blank" rel="noopener"
+           data-sda-event="app_store_opened" data-sda-placement="studio-iphone">{s('phoneCta')}</a>
+      </p>
+
       <h2>{s('betaTitle')}</h2>
       <p>{s('betaBody')}</p>
+      <p>{s('countsBody')}</p>
       <p>
         {s('betaContact')} <a href="mailto:info@life2film.com">info@life2film.com</a>
       </p>
