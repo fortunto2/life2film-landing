@@ -55,7 +55,7 @@ export const studio: Record<string, Record<string, string>> = {
 
     agentTitle: 'Bring your own agent',
     agentBody:
-      'Studio holds no model and no key. The door is a command-line program inside the app that speaks MCP over stdio, so there is no port and nothing listening. Register it with the agent you already use:',
+      'Studio holds no model and no key. The door is a command-line program inside the app that speaks MCP over stdio, so there is no port and nothing listening. With Studio in Applications and Claude Code installed (the agent guide has both lines), one command tells Claude Code where the door is; it downloads nothing:',
     agentAfter:
       'Then ask it to review a cut or direct a film. It reads the timeline, looks at frames and proposes; only you accept. The Notes panel can also call the agent installed on your Mac with one click.',
     agentLink: 'The agent guide: tools, the skill, the working loop',

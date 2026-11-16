@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
-const MCP = 'claude mcp add studio -- "/Applications/Life2Film Studio.app/Contents/MacOS/studio-cli" mcp';
+const MCP = 'claude mcp add --scope user studio -- "/Applications/Life2Film Studio.app/Contents/MacOS/studio-cli" mcp';
+const INSTALL = 'curl -fsSL https://claude.ai/install.sh | bash';
 const SKILL = `mkdir -p ~/.claude/skills/life2film-studio
 cp "/Applications/Life2Film Studio.app/Contents/Resources/skill/life2film-studio/SKILL.md" \\
    ~/.claude/skills/life2film-studio/`;
@@ -39,9 +40,23 @@ const tools = [
           looks at frames and proposes edits. Only you accept them.
         </p>
 
+        <h2>0. Before you start</h2>
+        <p>
+          Two programs on the Mac: Studio 0.4 or later, dragged into Applications from the
+          <a href="/studio/">download</a> (older builds have no door inside), and the agent. For Claude Code,
+          from Anthropic's own installer:
+        </p>
+        <pre><code>{INSTALL}</code></pre>
+        <p>Then run <code>claude</code> once and sign in. Any other MCP host works too; see step 1.</p>
+
         <h2>1. Register the door</h2>
-        <p>With Claude Code:</p>
+        <p>
+          With Claude Code. This downloads nothing: it tells Claude Code where the program inside Studio is,
+          and Claude Code starts it when a conversation needs it. <code>--scope user</code> makes it
+          reachable from every folder; without it the door exists only in the folder you ran the command in.
+        </p>
         <pre><code>{MCP}</code></pre>
+        <p>Check with <code>claude mcp list</code>: <code>studio</code> should say it is connected.</p>
         <p>With any other MCP host, the same program with the one argument <code>mcp</code>:</p>
         <pre><code>{JSON_CFG}</code></pre>
 

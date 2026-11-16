@@ -12,10 +12,11 @@ tools. You read and propose; **only the person accepts**. You never write the fi
 > **Needs:** Life2Film Studio 0.4 or later on macOS 15+ (Apple Silicon), and the door registered once:
 >
 > ```bash
-> claude mcp add studio -- "/Applications/Life2Film Studio.app/Contents/MacOS/studio-cli" mcp
+> claude mcp add --scope user studio -- "/Applications/Life2Film Studio.app/Contents/MacOS/studio-cli" mcp
 > ```
 >
-> Check with `claude mcp list`. Any MCP host works the same way: the command is the program above with
+> `--scope user` makes it reachable from every folder; without it Claude Code keeps it for the folder
+> the command was run in. Check with `claude mcp list`. Any MCP host works the same way: the command is the program above with
 > the one argument `mcp`, over stdio. There is no port and no key. If the tools are missing, say so and
 > give the person this command; do not edit the `.otio` by hand instead.
 
@@ -26,7 +27,7 @@ reads off the screen, as text (`"10:21"`, `"1:02:05"`).
 
 | Tool | What it is for |
 |---|---|
-| `timeline_read` | The film. A long film answers with its outline (chapters, lanes); then read a stretch with `from`/`to`. Views: `words` (the lines said, `find` searches), `where` (what is at a moment), `sources` (the files behind a stretch and what of each is unused), `sound` (loudness ten times a second, pauses, the level at each cut), `levels` (each sound lane against where it is kept), `session` (notes and past proposals) |
+| `timeline_read` | The film. A long film answers with its outline (chapters, lanes); then read a stretch with `from`/`to`. Views: `words` (the lines said, `find` searches), `where` (what is at a moment), `sources` (the files behind a stretch and what of each is unused), `sound` (loudness ten times a second, pauses, the level at each cut), `levels` (each sound lane against where it is kept), `session` (notes and past proposals), `shots` (each shot's scale and score by the montage's own rules, how like the shot before it is, the planner's price of each cut under a `profile`, and the shots that break a rule: start an editor's review here), `alike` (with `from`: the moments elsewhere that look most like that one; without: the shots that repeat) |
 | `timeline_frame` | One frame of the film at a moment, as the window shows it, subtitles in |
 | `timeline_sheet` | A sheet of frames over a stretch; `openings` gives the first frame of every shot. With `source`, the inside of one of the film's own files |
 | `timeline_propose` | Edits checked against the film's `revision` and kept beside the file. `on_top: true` lays a second idea over a waiting one |
@@ -61,9 +62,12 @@ start either job with its guide attached.
 
 ## Rules that are easy to get wrong
 
-- **Pieces are named `[track, index]`** as `timeline_read` printed them for the current `revision`.
-  After any accepted edit the indexes move: read again before the next proposal. A proposal against an
-  old revision is refused.
+- **Name a piece by its `id`** (`"s1a2b3c4d"`, printed by `timeline_read`, `where`, `shots`, `alike`)
+  in place of `track, index`: `["trim", "s1a2b3c4d", 0, -1]`, `["move", id, id_of_the_place]`. An id
+  stays with its piece through every edit, so later edits of the same proposal still find it after a
+  split or a move; an index moves (`[track, index]` still works, counted as the edits before left it).
+  A piece's `in` is the scene or chapter it begins in, by that marker's `id`. A proposal against an old
+  revision is refused.
 - **A moment the person names is a film time.** `timeline_read` view `where` turns it into the chapter,
   the shot and the file behind it.
 - **Linked edits carry the rest.** Removing or trimming a shot of the main line moves its sound, the

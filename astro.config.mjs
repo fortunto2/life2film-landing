@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import ogCards from './src/integrations/og-cards.mjs';
 
 // Static site → dist/ for Cloudflare Pages. Localized routes: / (en), /ru, /tr.
 export default defineConfig({
@@ -17,6 +18,7 @@ export default defineConfig({
   },
   site: 'https://life2film.com',
   integrations: [
+    ogCards(),
     sitemap({
       i18n: {
         defaultLocale: 'en',
