@@ -6,17 +6,22 @@ export const studio: Record<string, Record<string, string>> = {
     metaTitle: 'Life2Film Studio — the agent-first video editor for Mac (beta)',
     metaDesc:
       'A native Mac video editor that is a companion to Claude and other AI agents: the agent reads the film, looks at frames and proposes cuts you accept. Plays from the original files, mixes through live CLAP plugins, exports for YouTube and Reels.',
-    badge: 'Public beta · 0.4',
+    badge: 'Public beta',
+    badgeVersion: 'Public beta · {version}',
     title: 'The agent-first video editor',
     kicker: 'Life2Film Studio',
     lede:
-      'A native Mac editor that is a companion to Claude and other AI agents. Your agent reads the film, looks at frames, measures the sound and proposes cuts. Every proposal is drawn on the timeline and you play it before you accept it. The film plays from your original footage: no proxies, no import, no upload.',
+      'A native Mac editor that is a companion to Claude and other AI agents. Your agent reads the film, looks at frames, measures the sound and proposes cuts. Every proposal is drawn on the timeline and you play it before you accept it. Open a folder of footage and its clips are on a timeline, ready to cut by hand or with the agent. The film plays from your original footage: no proxies, no import, no upload.',
     ctaDownload: 'Download for Mac',
     ctaAgent: 'Add to your agent',
     ctaReleases: 'All releases',
     ctaNote: 'Apple Silicon · macOS 15 or later · free while in beta',
+    versionLine: 'Version {version}, {date}',
+    newTitle: 'New in {version}',
+    newAll: 'All releases and their notes',
     shotCaption: 'A 51-minute travel film, 1164 pieces over the original files, opened in 0.34 s.',
     shotSound: 'The Sound workspace: a strip per lane and one for the selected piece, each with its own chain of plugins, and the master.',
+    shotAgent: 'A proposal from Claude on the timeline: what goes is hatched, the note says why, and Play shows the film as proposed before you accept.',
     shotWords: 'Every subtitle line in film order. Edit a line where it stands, or click it to go to its moment.',
 
     installTitle: 'Install',
@@ -26,7 +31,7 @@ export const studio: Record<string, Record<string, string>> = {
 
     doesTitle: 'What it does',
     d1t: 'Plays the originals',
-    d1d: 'A film is a small .otio file that points at your footage. Studio plays it as it is, MKV included, so an hour-long cut opens in under a second and nothing is copied or transcoded on a full disk.',
+    d1d: 'Open a folder of footage and its clips are laid on a timeline in the order they were shot. A film is a small .otio file that points at your footage. Studio plays it as it is, MKV included, so an hour-long cut opens in under a second and nothing is copied or transcoded on a full disk.',
     d2t: 'Edits the file, not a project',
     d2d: 'Blade, ripple, slip, speed, dissolves, B-roll, voice-over, chapters and scenes. Every edit is written to the .otio at once and can be undone. The same file opens in other editors through an interchange copy.',
     d3t: 'Lets an agent in',
@@ -57,7 +62,7 @@ export const studio: Record<string, Record<string, string>> = {
 
     betaTitle: 'Still a beta',
     betaBody:
-      'This is version 0.4, a new native app that replaces the earlier Studio. It edits the .otio file and never your footage: originals are only read. Expect rough edges. The earlier app, which scored frames and assembled a montage from a folder, stays in the release list as 0.3; that analysis now lives in the Life2Film iPhone app and the command line.',
+      'This is a new native app that replaces the earlier Studio. It edits the .otio file and never your footage: originals are only read. Expect rough edges. The earlier app, which scored frames and assembled a montage from a folder, stays in the release list as 0.3; that analysis now lives in the Life2Film iPhone app and the command line.',
     betaContact: 'Found something broken?',
   },
   ru: {},

@@ -7,6 +7,7 @@ import { languageNames, languages, localePath, rtl, useTranslations, type Lang }
 import { brandLd, orgLd } from 'superduper-site-kit/seo';
 import { ORG_ID } from 'superduper-site-kit/company';
 import { GUIDES_UI } from '../lib/guides-ui';
+import { studioRelease } from '../lib/studio-release';
 interface Props {
   lang: Lang;
   /** Social preview. Absolute URL is built here; pass a root-relative path. */
@@ -49,6 +50,7 @@ const node = <T extends { '@context'?: string }>({ '@context': _c, ...rest }: T)
 const SITE_ORG = node(brandLd({ url: SITE, name: 'Life2Film' }));
 const PUBLISHER = { '@id': ORG_ID };
 
+const release = await studioRelease();
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -90,14 +92,14 @@ const jsonLd = {
       processorRequirements: 'Apple Silicon',
       url: 'https://life2film.com/studio/',
       downloadUrl: 'https://github.com/fortunto2/life2film-landing/releases',
-      softwareVersion: '0.4.0',
+      ...(release && { softwareVersion: release.version, releaseNotes: release.url, dateModified: release.date }),
       publisher: PUBLISHER,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       featureList: [
-        '30 per-frame quality and composition features',
-        'Ensemble scene segmentation',
-        'Automatic montage assembly',
-        'Direct import from the Apple Photos library',
+        'Plays an OpenTimelineIO film from the original files, MKV included, with no proxies',
+        'An MCP door for AI agents: edits are proposed, drawn on the timeline and played before you accept',
+        'A live mix with CLAP plugin chains and loudness measured against a target',
+        'Siri, Spotlight and Shortcuts actions',
       ],
     },
     ...schema,

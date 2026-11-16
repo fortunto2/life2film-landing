@@ -7,7 +7,7 @@
     "dev": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview",
-    "deploy": "astro build && wrangler pages deploy dist --project-name=life2film-site --branch=production",
+    "deploy": "GITHUB_TOKEN=${GITHUB_TOKEN:-$(gh auth token 2>/dev/null)} STUDIO_RELEASE_REQUIRED=1 astro build && wrangler pages deploy dist --project-name=life2film-site --branch=production",
     "test": "vitest run",
     "check": "astro check && vitest run",
     "wasm": "cp node_modules/life2film-engine/va_wasm.js node_modules/life2film-engine/va_wasm_bg.wasm public/wasm/"

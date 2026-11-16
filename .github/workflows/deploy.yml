@@ -3,6 +3,9 @@ name: Deploy to Cloudflare Pages
 on:
   push:
     branches: [main]
+  # A Studio release published here puts its version and notes on the site (src/lib/studio-release.ts).
+  release:
+    types: [published]
   workflow_dispatch:
 
 jobs:
@@ -26,6 +29,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm vitest run
       - run: pnpm build
+        env:
+          STUDIO_RELEASE_REQUIRED: 1
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: cloudflare/wrangler-action@v3
         with:

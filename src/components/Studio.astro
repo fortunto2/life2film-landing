@@ -1,9 +1,11 @@
 ---
 import { useStudio } from '../studio-i18n';
 import type { Lang } from '../i18n';
+import { releaseDay, studioRelease } from '../lib/studio-release';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const s = useStudio(lang);
+const release = await studioRelease();
 
 const DMG = 'https://github.com/fortunto2/life2film-landing/releases/latest/download/Life2FilmStudio.dmg';
 const RELEASES = 'https://github.com/fortunto2/life2film-landing/releases';
@@ -22,7 +24,7 @@ const MCP = 'claude mcp add studio -- "/Applications/Life2Film Studio.app/Conten
   <section class="hero">
     <div class="wrap">
       <img class="appicon" src="/img/studio-icon.png" alt="" width="96" height="96" />
-      <span class="badge beta">{s('badge')}</span>
+      <span class="badge beta">{release ? s('badgeVersion').replace('{version}', release.version) : s('badge')}</span>
       <p class="kicker">{s('kicker')}</p>
       <h1>{s('title')}</h1>
       <p class="lede">{s('lede')}</p>
@@ -36,7 +38,10 @@ const MCP = 'claude mcp add studio -- "/Applications/Life2Film Studio.app/Conten
         <a class="btn-ghost strong" href="/studio/agent/" data-sda-event="agent_guide_opened" data-sda-placement="studio-hero">{s('ctaAgent')}</a>
         <a class="btn-ghost" href={RELEASES}>{s('ctaReleases')}</a>
       </div>
-      <p class="muted small">{s('ctaNote')}</p>
+      <p class="muted small">
+        {s('ctaNote')}
+        {release && <> · <a class="quiet" href={release.url}>{s('versionLine').replace('{version}', release.version).replace('{date}', releaseDay(release.date, lang))}</a></>}
+      </p>
 
       <figure class="shot">
         <img src="/img/studio.jpg" alt={s('shotCaption')} width="2000" height="1054" loading="lazy" decoding="async" />
@@ -53,6 +58,18 @@ const MCP = 'claude mcp add studio -- "/Applications/Life2Film Studio.app/Conten
       <p>{s('installDmg')}</p>
     </div>
   </section>
+
+  {release && release.notes.length > 0 && (
+    <section>
+      <div class="wrap prose">
+        <h2>{s('newTitle').replace('{version}', release.version)}</h2>
+        <ul class="news">
+          {release.notes.map((n) => <li><strong>{n.title}</strong>: {n.text}</li>)}
+        </ul>
+        <p><a href={release.url}>{s('newAll')} →</a></p>
+      </div>
+    </section>
+  )}
 
   <section>
     <div class="wrap">
@@ -98,6 +115,10 @@ const MCP = 'claude mcp add studio -- "/Applications/Life2Film Studio.app/Conten
       <p>{s('agentBody')}</p>
       <pre><code>{MCP}</code></pre>
       <p>{s('agentAfter')}</p>
+      <figure class="shot">
+        <img src="/img/studio-agent.jpg" alt={s('shotAgent')} width="2000" height="1054" loading="lazy" decoding="async" />
+        <figcaption>{s('shotAgent')}</figcaption>
+      </figure>
       <p><a href="/studio/agent/">{s('agentLink')} →</a></p>
 
       <h2>{s('betaTitle')}</h2>
@@ -119,6 +140,9 @@ const MCP = 'claude mcp add studio -- "/Applications/Life2Film Studio.app/Conten
 
   .cta { margin: 28px 0 10px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
   .small { font-size: 14px; }
+  .news li { margin: 0 0 10px; }
+  .quiet { color: inherit; text-decoration: underline; text-decoration-color: #4a4a55; text-underline-offset: 3px; }
+  .quiet:hover { color: #e6e6ec; }
   .btn-ghost {
     display: inline-flex; align-items: center; padding: 12px 22px; border-radius: 12px;
     border: 1px solid var(--line); background: var(--panel); color: var(--fg);

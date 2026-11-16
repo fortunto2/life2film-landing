@@ -13,7 +13,7 @@ const JSON_CFG = `{
   }
 }`;
 const tools = [
-  ['timeline_read', 'The film: its outline, a stretch, the words said, what is at a moment, the files behind it, loudness, notes'],
+  ['timeline_read', 'The film: its outline, a stretch, the words said, what is at a moment, the files behind it, loudness, notes, each shot’s size and score, the frames that look alike'],
   ['timeline_frame', 'One frame at a moment, as the window shows it'],
   ['timeline_sheet', 'A sheet of frames over a stretch, or the inside of one source file'],
   ['timeline_propose', 'Edits checked against the film and kept beside it until you decide'],
@@ -21,7 +21,7 @@ const tools = [
   ['timeline_reject', 'Take a proposal back, whole or its last idea'],
   ['timeline_undo', 'Put the film back as it was before the last accepted proposal'],
   ['timeline_note', 'Pin a note to a moment or reply to one'],
-  ['timeline_new', 'Begin a film, or cut a reel out of another one'],
+  ['timeline_new', 'Begin a film, empty or from a folder of footage, or cut a reel out of another one'],
   ['timeline_mix', 'Render the sound with its plugin chains and measure it'],
   ['mix_plugins', 'The effects that exist, their knobs and ready-made chains'],
   ['timeline_film', 'Export: the whole film or a stretch, by preset'],
@@ -61,6 +61,7 @@ const tools = [
         <h2>3. Ask</h2>
         <p>Open the film in Studio so you can watch what happens, then ask in plain words. A few that work:</p>
         <ul>
+          <li>“Make a film from the folder ~/Movies/trip/day1 and propose a three-minute cut.”</li>
           <li>“Review the cut at ~/Movies/trip/trip.otio. Propose nothing yet.”</li>
           <li>“At 14:36 the caption is wrong, it should say Seattle.”</li>
           <li>“Chapter 3 drags. Propose a version two minutes shorter.”</li>
@@ -78,6 +79,10 @@ const tools = [
           proposal is drawn on the timeline in amber: what goes is hatched, what comes in stands over the
           frame it would cover. Play shows the film as proposed before anything is written. Accept takes
           it, Drop Last removes the newest idea, and one undo puts the film back.
+        </p>
+        <p>
+          Every piece and chapter carries a name that no edit changes, so an agent that proposes five
+          edits in a row still finds the shot it meant after the first one has split or moved it.
         </p>
         <p>
           Notes are the other half. Pin a note to a moment, or paste a list of timecodes from a viewing;

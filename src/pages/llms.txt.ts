@@ -4,6 +4,7 @@ import { topic } from 'superduper-site-kit/topics';
 import { GROUPS, TOOLS, byGroup } from '../lib/tools';
 import { TRANSLATIONS } from '../lib/tools/index';
 import { ENGINE_VERSION } from '../lib/skill';
+import { studioRelease } from '../lib/studio-release';
 
 /**
  * The site, for agents.
@@ -24,9 +25,10 @@ Two products, one engine:
 - **Life2Film** — iPhone app. Analysis runs on the phone using Apple's Vision framework, a compact
   neural model for grouping faces, and a native engine that assembles the timeline. No account, no
   upload, works in airplane mode.
-- **Life2Film Studio** — macOS desktop app, public beta. Built for large archives: 30 measurements
-  per frame, ensemble scene segmentation, montage assembly, and direct import from the Apple Photos
-  library. Free while in beta.
+- **Life2Film Studio** — macOS timeline editor, public beta{{version}}. It opens a film kept as an
+  OpenTimelineIO file and plays it from the original footage, and an AI agent works on the same file
+  through an MCP door: it reads the film, looks at frames and proposes edits that the person plays
+  before accepting. Free while in beta.
 
 What makes it different from other video editors:
 
@@ -42,7 +44,8 @@ What makes it different from other video editors:
 
 - [Home](https://life2film.com/): what the app does, in three steps
 - [About](https://life2film.com/about): why it exists, the film-made-of-films idea
-- [Studio](https://life2film.com/studio): the desktop analyser — features it measures, install
+- [Studio](https://life2film.com/studio): the Mac timeline editor — what it does, what is new, install
+- [Studio agent guide](https://life2film.com/studio/agent/): connecting an agent, the twelve tools, the working loop
 - [Privacy](https://life2film.com/privacy): what stays on device, what can leave, and when
 - [Engine](https://life2film.com/engine/): the analysis engine as an npm package, with a skill for
   coding agents
@@ -109,8 +112,10 @@ const toolLines = (group: (typeof GROUPS)[number]) =>
     .map((tool) => `- [${tool.name}](https://life2film.com/tools/${tool.slug}/): ${tool.blurb}`)
     .join('\n');
 
-export const GET: APIRoute = () => {
-  const body = `${HEAD}
+export const GET: APIRoute = async () => {
+  const release = await studioRelease();
+  const version = release ? ` (${release.version}, ${release.date})` : '';
+  const body = `${HEAD.replace('{{version}}', version)}
 
 ## Free tools (browser, no upload)
 
