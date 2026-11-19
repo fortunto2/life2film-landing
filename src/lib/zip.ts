@@ -27,8 +27,8 @@ export interface ZipEntry {
   data: Uint8Array;
 }
 
-/** Entries in, archive bytes out. Names are ASCII here (frame-0001.jpg), flagged UTF-8 anyway. */
-export function zipStored(entries: ZipEntry[]): Uint8Array<ArrayBuffer> {
+/** Entries in, archive parts out, in order. Names are ASCII here (frame-0001.jpg), flagged UTF-8 anyway. */
+function zipParts(entries: ZipEntry[]): Uint8Array[] {
   const encoder = new TextEncoder();
   const locals: Uint8Array[] = [];
   const centrals: Uint8Array[] = [];
@@ -78,11 +78,26 @@ export function zipStored(entries: ZipEntry[]): Uint8Array<ArrayBuffer> {
   ev.setUint32(12, centralSize, true);
   ev.setUint32(16, offset, true);
 
-  const out = new Uint8Array(offset + centralSize + end.length);
+  return [...locals, ...centrals, end];
+}
+
+export function zipStored(entries: ZipEntry[]): Uint8Array<ArrayBuffer> {
+  const parts = zipParts(entries);
+  const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0));
   let at = 0;
-  for (const part of [...locals, ...centrals, end]) {
+  for (const part of parts) {
     out.set(part, at);
     at += part.length;
   }
   return out;
+}
+
+/**
+ * The same archive as a Blob of its parts. Copying every frame into one Uint8Array failed past
+ * ~2 GB in Chrome («ArrayBuffer/ArrayBufferView size exceeds the supported range», 19 Nov 2026);
+ * a Blob built from parts has no such ceiling. Byte-for-byte equal to `zipStored`.
+ */
+export function zipStoredBlob(entries: ZipEntry[]): Blob {
+  const parts = zipParts(entries);
+  return new Blob(parts as BlobPart[], { type: 'application/zip' });
 }

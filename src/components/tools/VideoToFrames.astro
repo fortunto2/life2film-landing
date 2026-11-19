@@ -107,7 +107,7 @@ const fill = (t: string, n: number | string) => t.replace('{n}', String(n));
   import { openVideo, type VideoSource } from '../../lib/frames';
   import { frameTimes, frameName, baseName, extensionFor } from 'superduper-tools/video-to-frames';
   import { fileFromEvent } from 'superduper-tools/shell';
-  import { zipStored } from '../../lib/zip';
+  import { zipStoredBlob } from '../../lib/zip';
 
   const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
   const say = toolStrings();
@@ -233,11 +233,11 @@ const fill = (t: string, n: number | string) => t.replace('{n}', String(n));
       // archive even started.
       const entries: { name: string; data: Uint8Array }[] = [];
       for (const { name, blob } of images) entries.push({ name, data: new Uint8Array(await blob.arrayBuffer()) });
-      const zip = zipStored(entries);
-      saveBlob(new Blob([zip], { type: 'application/zip' }), `${baseName(file.name)}-frames.zip`);
+      const zip = zipStoredBlob(entries);
+      saveBlob(zip, `${baseName(file.name)}-frames.zip`);
       track('result_saved', { placement: 'result', format: entries[0].name.split('.').pop() ?? 'jpg' }, {
         frames: entries.length,
-        size_mb: Math.round(zip.length / 104_857.6) / 10,
+        size_mb: Math.round(zip.size / 104_857.6) / 10,
       });
       status(fill(w.saved, { n: entries.length }), 1);
       setTimeout(() => { statusEl.hidden = true; }, 4000);

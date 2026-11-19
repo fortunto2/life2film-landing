@@ -1,4 +1,5 @@
 import type { VideoCodec } from 'mediabunny';
+import { PieceSink } from './sink';
 /**
  * Reading and re-encoding media in the browser.
  *
@@ -98,6 +99,8 @@ const AUDIO_ONLY = new Set<Container>(['wav', 'mp3', 'ogg']);
 
 const isAudioOnly = (container: Container) => AUDIO_ONLY.has(container);
 
+export const STALE_PAGE_MESSAGE = 'The site was updated while this page was open. Reload the page and run it again.';
+
 /** Loaded once and shared: two tools on one page must not fetch 670 KB twice. */
 let libraryPromise: Promise<typeof import('mediabunny')> | null = null;
 
@@ -106,6 +109,11 @@ export function loadMediabunny() {
   // life of the page, so every later click failed without trying again.
   libraryPromise ??= import('mediabunny').catch((error) => {
     libraryPromise = null;
+    // A deploy renames every chunk, so a page opened before it asks for a file that is gone.
+    // Seen 4 times to 19 Nov 2026 as «Failed to fetch dynamically imported module»; retrying cannot help.
+    if (error instanceof TypeError && /dynamically imported module/i.test(error.message)) {
+      throw new Error(STALE_PAGE_MESSAGE, { cause: error });
+    }
     throw error;
   });
   return libraryPromise;
@@ -286,9 +294,33 @@ export async function encodableCodec(container: Container, size?: { width: numbe
 }
 
 /** Every attempt refused for a codec reason becomes one readable sentence; the raw text rides in `context`. */
+/**
+ * The file stopped being readable mid-way: moved or renamed, still syncing from a cloud folder, or on
+ * a disk that went away. Chrome says «TypeError: network error» for a File it can no longer read,
+ * Safari «NotReadableError», both «NotFoundError». 23 failures in 14 days to 19 Nov 2026, all at the
+ * last step, each reported as a bare exception name.
+ */
+export const FILE_LOST_MESSAGE =
+  'The browser lost access to the file while reading it (moved, still syncing from a cloud folder, or on a disk that went away). Copy it to a local folder and choose it again.';
+
+export function isFileLost(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  return (
+    error.name === 'NotReadableError' ||
+    error.name === 'NotFoundError' ||
+    (error.name === 'TypeError' && /^network error$/i.test(error.message))
+  );
+}
+
 function describeFailure(error: unknown, tried: string[]): Error {
   const raw = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
-  const out = isCodecRefusal(error) ? new Error(CODEC_REFUSED_MESSAGE, { cause: error }) : error instanceof Error ? error : new Error(raw);
+  const out = isCodecRefusal(error)
+    ? new Error(CODEC_REFUSED_MESSAGE, { cause: error })
+    : isFileLost(error)
+      ? new Error(FILE_LOST_MESSAGE, { cause: error })
+      : error instanceof Error
+        ? error
+        : new Error(raw);
   (out as Error & { context?: string }).context = `${tried.join(' > ')} | ${raw}`.slice(0, 190);
   return out;
 }
@@ -303,10 +335,11 @@ async function copyTrimmed(
   options: EncodeOptions,
   format: () => InstanceType<typeof import('mediabunny').OutputFormat>,
   library: typeof import('mediabunny'),
-): Promise<{ buffer: ArrayBuffer; startedEarly: number }> {
-  const { Input, Output, BufferTarget, BlobSource, ALL_FORMATS, EncodedPacketSink, EncodedVideoPacketSource, EncodedAudioPacketSource } = library;
+): Promise<{ buffer: PieceSink; startedEarly: number }> {
+  const { Input, Output, StreamTarget, BlobSource, ALL_FORMATS, EncodedPacketSink, EncodedVideoPacketSource, EncodedAudioPacketSource } = library;
   const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
-  const output = new Output({ format: format(), target: new BufferTarget() });
+  const sink = new PieceSink();
+  const output = new Output({ format: format(), target: new StreamTarget(sink.stream(), { chunked: true }) });
   const video = await input.getPrimaryVideoTrack();
   const audio = options.discardAudio ? null : await input.getPrimaryAudioTrack();
   if (!video) throw new Error('That file has no video track.');
@@ -347,9 +380,9 @@ async function copyTrimmed(
   }
 
   await output.finalize();
-  if (!output.target.buffer) throw new Error('The encoder produced no data.');
+  if (!sink.size) throw new Error('The encoder produced no data.');
   options.onProgress?.(1);
-  return { buffer: output.target.buffer, startedEarly: Math.max(0, start - origin) };
+  return { buffer: sink, startedEarly: Math.max(0, start - origin) };
 }
 
 export async function encode(file: File, options: EncodeOptions): Promise<Blob> {
@@ -362,7 +395,7 @@ export async function encodeDetailed(file: File, options: EncodeOptions): Promis
     Input,
     Output,
     Conversion,
-    BufferTarget,
+    StreamTarget,
     BlobSource,
     ALL_FORMATS,
     Mp4OutputFormat,
@@ -487,7 +520,8 @@ export async function encodeDetailed(file: File, options: EncodeOptions): Promis
   const run = async (attempt: Attempt) => {
     // A fresh input and output per attempt: a failed conversion leaves both half-consumed.
     const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
-    const output = new Output({ format: format(), target: new BufferTarget() });
+    const sink = new PieceSink();
+    const output = new Output({ format: format(), target: new StreamTarget(sink.stream(), { chunked: true }) });
     const video = videoFor(attempt);
     const trim = attempt.nudgeStart
       ? { start: (options.trim?.start ?? 0) + 0.001, ...(options.trim && { end: options.trim.end }) }
@@ -517,7 +551,7 @@ export async function encodeDetailed(file: File, options: EncodeOptions): Promis
 
     if (options.onProgress) conversion.onProgress = options.onProgress;
     await conversion.execute();
-    return output.target.buffer;
+    return sink.size ? sink : null;
   };
 
   const audioTrack = dropVideo || options.discardAudio ? null : await input.getPrimaryAudioTrack().catch(() => null);
@@ -539,7 +573,7 @@ export async function encodeDetailed(file: File, options: EncodeOptions): Promis
   };
 
   let attempt: Attempt | null = { acceleration: hardware ? 'prefer-hardware' : 'no-preference', nudgeStart: false };
-  let buffer: ArrayBuffer | null = null;
+  let buffer: PieceSink | null = null;
   let startedEarly: number | undefined;
   const tried: string[] = [];
   while (attempt) {
@@ -565,7 +599,7 @@ export async function encodeDetailed(file: File, options: EncodeOptions): Promis
   if (!buffer) throw new Error('The encoder produced no data.');
 
   return {
-    blob: new Blob([buffer], { type: CONTAINER_MIME[options.container] }),
+    blob: buffer.blob(CONTAINER_MIME[options.container]),
     copiedVideo: (!reencode && !dropVideo) || startedEarly !== undefined,
     ...(startedEarly !== undefined && { startedEarly }),
   };

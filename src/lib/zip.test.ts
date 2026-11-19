@@ -3,7 +3,7 @@ import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, test } from 'vitest';
-import { crc32, zipStored } from './zip';
+import { crc32, zipStored, zipStoredBlob } from './zip';
 
 describe('zip', () => {
   test('crc32 matches the known answer', () => {
@@ -25,5 +25,16 @@ z = zipfile.ZipFile(sys.argv[1])
 print(z.testzip(), z.namelist(), list(z.read('frame-0001.jpg')), z.read('frame-0002.jpg').decode())
 `, path]).toString().trim();
     expect(report).toBe("None ['frame-0001.jpg', 'frame-0002.jpg'] [1, 2, 3, 250, 0, 7] hello frames");
+  });
+});
+
+describe('zipStoredBlob', () => {
+  test('is byte-for-byte the archive zipStored builds', async () => {
+    const entries = [
+      { name: 'frame-0001.jpg', data: new Uint8Array([1, 2, 3]) },
+      { name: 'frame-0002.jpg', data: new Uint8Array([4, 5]) },
+    ];
+    const blob = new Uint8Array(await zipStoredBlob(entries).arrayBuffer());
+    expect([...blob]).toEqual([...zipStored(entries)]);
   });
 });
