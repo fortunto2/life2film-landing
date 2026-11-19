@@ -14,7 +14,6 @@ export interface Frame {
 }
 
 export interface VideoSource {
-  element: HTMLVideoElement;
   duration: number;
   width: number;
   height: number;
@@ -65,7 +64,21 @@ function seek(video: HTMLVideoElement, seconds: number): Promise<void> {
   });
 }
 
-export function openVideo(file: File): Promise<VideoSource> {
+/**
+ * `<video>` first: it is everywhere and fast to seek. When it refuses the file, WebCodecs
+ * (`frames-webcodecs.ts`), which reaches decoders and containers `<video>` does not.
+ */
+export async function openVideo(file: File): Promise<VideoSource> {
+  try {
+    return await openVideoElement(file);
+  } catch (error) {
+    if (!(error instanceof Error) || !error.message.startsWith('The browser could not decode')) throw error;
+    const { openVideoWebCodecs } = await import('./frames-webcodecs');
+    return openVideoWebCodecs(file);
+  }
+}
+
+function openVideoElement(file: File): Promise<VideoSource> {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
     const video = document.createElement('video');
@@ -106,7 +119,6 @@ export function openVideo(file: File): Promise<VideoSource> {
       };
 
       resolve({
-        element: video,
         duration,
         width,
         height,
