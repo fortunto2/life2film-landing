@@ -15,6 +15,7 @@ interface Props {
 }
 
 const { slug, lang = 'en' } = Astro.props;
+const STUDIO_DMG = 'https://github.com/fortunto2/life2film-landing/releases/latest/download/Life2FilmStudio.dmg';
 const base = TOOL[slug];
 
 // The words for this locale, or the English original when there is no translation yet.
@@ -80,18 +81,24 @@ const jsonLd = {
 
         <slot name="tool" />
 
-        {/* Revealed by `tool:saved` (see lib/track.ts): the offer at the moment the result exists. */}
-        <p class="app-after" id="appAfter" hidden>
-          <span>{chrome.appAfter}</span>
-          <a
-            class="ghost primary"
-            href={`https://apps.apple.com/app/id6761656888?pt=128499174&ct=tool-${slug}-result&mt=8`}
-            target="_blank"
-            rel="noopener"
-            data-sda-event="app_store_opened"
-            data-sda-placement={`tool-${slug}-result`}
-          >{chrome.appCta}</a>
-        </p>
+        {/* Revealed by `tool:saved` (see lib/track.ts): the offer at the moment the result exists.
+            Two cards, one shown: Studio on a Mac, the iPhone app everywhere else (`data-offer`, picked
+            by the inline script below). Counted under the same placement as before plus the event
+            that names which door: app_store_opened or binary_downloaded. */}
+        <div class="app-after" id="appAfter" hidden>
+          <div class="offer" data-offer="phone">
+            <img src="/img/app-icon.png" alt="" width="48" height="48" />
+            <span>{chrome.appAfter}</span>
+            <a class="ghost primary" href={`https://apps.apple.com/app/id6761656888?pt=128499174&ct=tool-${slug}-result&mt=8`}
+               target="_blank" rel="noopener" data-sda-event="app_store_opened" data-sda-placement={`tool-${slug}-result`}>{chrome.appCta}</a>
+          </div>
+          <div class="offer" data-offer="mac" hidden>
+            <img src="/img/studio-icon.png" alt="" width="48" height="48" />
+            <span>{chrome.studioAfter}<small class="muted">{chrome.studioNote}</small></span>
+            <a class="ghost primary" href={STUDIO_DMG}
+               data-sda-event="binary_downloaded" data-sda-placement={`tool-${slug}-result`}>{chrome.studioCta}</a>
+          </div>
+        </div>
         <script is:inline>
           addEventListener('tool:saved', () => { const n = document.getElementById('appAfter'); if (n) n.hidden = false; });
         </script>
@@ -106,17 +113,29 @@ const jsonLd = {
           `data-sda-placement` tells our counter the click happened. Per tool, because "which tool
           feeds the app" is the question this exists to answer.
         */}
-        <p class="app-pitch">
-          <span>{chrome.appPitch}</span>
-          <a
-            class="ghost primary"
-            href={`https://apps.apple.com/app/id6761656888?pt=128499174&ct=tool-${slug}&mt=8`}
-            target="_blank"
-            rel="noopener"
-            data-sda-event="app_store_opened"
-            data-sda-placement={`tool-${slug}`}
-          >{chrome.appCta}</a>
-        </p>
+        <div class="app-pitch">
+          <div class="offer" data-offer="phone">
+            <img src="/img/app-icon.png" alt="" width="48" height="48" loading="lazy" />
+            <span>{chrome.appPitch}</span>
+            <a class="ghost primary" href={`https://apps.apple.com/app/id6761656888?pt=128499174&ct=tool-${slug}&mt=8`}
+               target="_blank" rel="noopener" data-sda-event="app_store_opened" data-sda-placement={`tool-${slug}`}>{chrome.appCta}</a>
+          </div>
+          <div class="offer" data-offer="mac" hidden>
+            <img src="/img/studio-icon.png" alt="" width="48" height="48" loading="lazy" />
+            <span>{chrome.studioPitch}<small class="muted">{chrome.studioNote}</small></span>
+            <a class="ghost primary" href={STUDIO_DMG}
+               data-sda-event="binary_downloaded" data-sda-placement={`tool-${slug}`}>{chrome.studioCta}</a>
+          </div>
+        </div>
+        {/* A desktop Mac gets Studio; an iPad says "Macintosh" too, but reports touch points (a Mac reports 0). Everything else keeps
+            the iPhone offer, as before. Runs before paint of the cards below the tool, no flash on top. */}
+        <script is:inline>
+          (() => {
+            const mac = /Macintosh/.test(navigator.userAgent) && !navigator.maxTouchPoints;
+            if (!mac) return;
+            for (const n of document.querySelectorAll('[data-offer]')) n.hidden = n.dataset.offer !== 'mac';
+          })();
+        </script>
       </div>
     </section>
 
@@ -253,20 +272,18 @@ const jsonLd = {
     .verdict.bad { border-color: rgba(250,63,165,.4); color: var(--pink); }
 
     .privacy-note { margin-top: 16px; font-size: 14px; max-width: 62ch; }
-    .app-pitch {
-      display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: center; margin-top: 18px;
-      padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; font-size: 15px; color: #cfcfd6;
+    .app-pitch, .app-after {
+      margin-top: 18px; padding: 14px 16px; border-radius: 16px; font-size: 15px;
+      border: 1px solid var(--line); color: #cfcfd6;
+      background: linear-gradient(135deg, rgba(0,242,224,.06), rgba(250,63,165,.05));
     }
-    .app-pitch span { flex: 1 1 32ch; }
-    .app-after {
-      display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: center; margin-top: 14px;
-      padding: 14px 16px; border: 1px solid rgba(0,242,224,.45); border-radius: 14px;
-      background: rgba(0,242,224,.05); font-size: 15px; color: var(--fg);
-    }
-    .app-after[hidden] { display: none; }
-    .app-after span { flex: 1 1 32ch; }
-    .app-after a { text-decoration: none; white-space: nowrap; }
-    .app-pitch a { text-decoration: none; white-space: nowrap; }
+    .app-after { margin-top: 14px; border-color: rgba(0,242,224,.45); color: var(--fg); }
+    .app-after[hidden], .offer[hidden] { display: none; }
+    .offer { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; }
+    .offer img { width: 48px; height: 48px; border-radius: 11px; flex: none; }
+    .offer span { flex: 1 1 28ch; }
+    .offer small { display: block; margin-top: 4px; font-size: 13px; }
+    .offer a { text-decoration: none; white-space: nowrap; }
     .prose .q { margin: 28px 0 8px; font-size: 17px; }
 
     .related { padding-left: 0; list-style: none; }
