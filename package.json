@@ -15,10 +15,10 @@
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
     "@fontsource-variable/space-grotesk": "^5.3.0",
-    "@mediabunny/mp3-encoder": "^1.54.0",
+    "@mediabunny/mp3-encoder": "^1.66.2",
     "@rive-app/canvas-lite": "2.45.0",
     "astro": "^6.4.8",
-    "mediabunny": "^1.54.0",
+    "mediabunny": "^1.66.2",
     "superduper-site-kit": "git+file:///Users/rustam/startups/shared/superduper-site-kit",
     "superduper-tools": "git+file:///Users/rustam/startups/shared/superduper-tools"
   },
