@@ -1,6 +1,6 @@
 ---
-title: "How to cut video to the beat, by hand and automatically"
-description: "Why edits land badly when they ignore the music, how to place cuts on downbeats manually, and what beat-sync tools actually detect."
+title: "Cut video to the beat automatically, free in the browser (or by hand)"
+description: "Which tools cut video to the beat for you, with links: a free browser auto-montage that needs no upload, CapCut, Filmora, GoPro Quik. Plus how to place cuts on downbeats by hand."
 date: 2026-07-31
 ---
 

@@ -52,7 +52,21 @@ const article = {
           {post.data.updated && <> · updated {fmt(post.data.updated)}</>}
         </p>
         <Content />
+        <aside class="app-end">
+          <img src="/img/app-icon.png" alt="" width="48" height="48" />
+          <span><strong>Life2Film for iPhone</strong> picks the best moments of a day and cuts them to the music, on the phone. No account, nothing uploaded.</span>
+          <a class="ghost primary" href={`https://apps.apple.com/app/id6761656888?pt=128499174&ct=blog-${post.id}-end&mt=8`} target="_blank" rel="noopener"
+             data-sda-event="app_store_opened" data-sda-placement={`blog-${post.id}-end`}>Get the app</a>
+        </aside>
       </article>
+      <script is:inline define:vars={{ slug: post.id }}>
+        // Links written in the markdown carry no tracking attributes; until 20 Nov 2026 every App Store
+        // click from an article was invisible, and the blog read as converting nobody.
+        document.querySelectorAll('article.prose a[href*="apps.apple.com"]:not([data-sda-event])').forEach((a) => {
+          a.dataset.sdaEvent = 'app_store_opened';
+          a.dataset.sdaPlacement = `blog-${slug}-inline`;
+        });
+      </script>
     </section>
   </main>
 </Base>
@@ -60,6 +74,9 @@ const article = {
 <style>
   .back { display: inline-block; margin-bottom: 20px; color: var(--muted); text-decoration: none; font-size: 15px; }
   .back:hover { color: var(--fg); }
+  .app-end { display: flex; gap: 14px; align-items: center; margin-top: 40px; padding: 16px; border: 1px solid #2a2a33; border-radius: 14px; }
+  .app-end span { flex: 1; color: #cfcfd6; font-size: 15px; }
+  @media (max-width: 560px) { .app-end { flex-wrap: wrap; } }
   h1 { font-size: clamp(30px, 4.5vw, 42px); margin-bottom: 10px; }
   .meta { font-size: 14px; margin-bottom: 34px; }
 

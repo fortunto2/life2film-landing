@@ -1,5 +1,5 @@
 ---
-title: "Google Photos highlight video: how to make one, and why it keeps processing"
+title: "Google Photos highlight video stuck processing? Make one, change the music, fix it"
 description: "The steps to create a highlight video in Google Photos on the web and in the app, how to change the music and the clips, why it says still processing or will not save, and what to use when you want control."
 date: 2026-10-17
 ---
