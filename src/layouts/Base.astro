@@ -64,6 +64,10 @@ const SITE_ORG = {
 const PUBLISHER = { '@id': ORG_ID };
 
 const release = await studioRelease();
+// The Studio page exists only in some locales (src/pages/<lang>/studio.astro); elsewhere the nav links
+// the English one. Until 20 Nov 2026 es/pt/id/ar linked /<lang>/studio/, a 404, from every page.
+const studioLangs = Object.keys(import.meta.glob('../pages/*/studio.astro')).map((k) => k.split('/')[2]);
+const studioHref = studioLangs.includes(lang) ? localePath(lang, '/studio') : '/studio/';
 const jsonLd = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -203,7 +207,7 @@ const jsonLd = {
       {/* Four links, not six: Engine and Support live in the footer, where people look for them. */}
       <div class="navlinks">
         <a href={localePath(lang, '/about')}>{t('navAbout')}</a>
-        <a href={localePath(lang, '/studio')}>{t('navStudio')}</a>
+        <a href={studioHref}>{t('navStudio')}</a>
         <a href={localePath(lang, '/tools/')}>Tools</a>
         <a href={localePath(lang, '/guides/')}>{GUIDES_UI[lang].nav}</a>
         <a href={'/blog/'}>{t('navBlog')}</a>
