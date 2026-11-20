@@ -378,4 +378,75 @@ Requirements:
 Reference implementation: https://life2film.com/tools/add-music-to-video/`,
     agentJob: 'Laying music under a video, locally',
   },
+  {
+    // 20 Nov 2026: «merge videos» / «объединить видео» — joining clips is the step before a film.
+    slug: 'merge-videos',
+    group: 'everyday',
+    name: 'Merge Videos',
+    appName: 'Merge Videos',
+    blurb: 'Join two or more videos into one file, in the order you set.',
+
+    searchPhrase: 'Merge Videos Online',
+    title: 'Merge Videos Online Free | join MP4, MOV clips, no upload, no watermark',
+    description: 'Merge videos online for free: join two or more MP4, MOV or WebM clips into one file in the order you choose. Different sizes are fitted into one frame. Runs in your browser, nothing is uploaded, no watermark.',
+    heading: 'Merge',
+    accent: 'videos',
+    lede: 'Put clips one after another and get a single video. Nothing leaves your device.',
+    featureList: [
+      'Joins any number of MP4, MOV and WebM clips',
+      'Reorder before joining',
+      'Clips of different shapes are letterboxed into the first one\'s frame',
+      'Clips without sound get silence, so picture and sound stay in step',
+      'Runs fully client-side: no upload, no watermark',
+    ],
+    faq: [
+      {
+        q: 'Can I merge videos of different sizes or from different phones?',
+        a: 'Yes. Every frame is decoded and placed into the first clip\'s frame (with black bars when the shape differs), then the whole film is encoded once. That is slower than gluing files together, and it is what makes clips from different cameras play as one.',
+      },
+      {
+        q: 'Is there a size limit?',
+        a: 'Only your device\'s memory: the merged file is held in memory before it is saved, so a few hundred megabytes is comfortable on a laptop, several gigabytes is not.',
+      },
+      {
+        q: 'Can it pick the best parts and cut them to music?',
+        a: 'Not this page: it joins whole clips as they are. Picking the best moments from many clips and cutting them to a song is what the Life2Film iPhone app does.',
+      },
+      {
+        q: 'Is anything uploaded?',
+        a: 'No. Decoding and encoding run in your browser through WebCodecs.',
+      },
+    ],
+
+    summary: 'Join several videos into one in the browser, re-encoding into the first clip\'s frame so clips from different cameras play as one.',
+    facts: [
+      'Packet-level concatenation only works when every clip shares codec, profile and size; phones rarely agree, so a decode + encode pass is the general answer.',
+      'A clip with no audio must contribute silence of its own length, or every later clip\'s sound drifts ahead of its picture.',
+    ],
+    code: `import { CanvasSink, CanvasSource, Output, Mp4OutputFormat, BufferTarget } from 'mediabunny';
+
+const canvas = new OffscreenCanvas(width, height);
+const ctx = canvas.getContext('2d');
+const video = new CanvasSource(canvas, { codec: 'avc', bitrate: 5e6 });
+// output.addVideoTrack(video); await output.start();
+let offset = 0;
+for (const clip of clips) {
+  for await (const f of new CanvasSink(clip.track, { width, height, fit: 'contain' }).canvases()) {
+    ctx.drawImage(f.canvas, 0, 0);
+    await video.add(offset + f.timestamp, f.duration);
+  }
+  offset += clip.duration;
+}`,
+    prompt: `Add "merge several videos into one" to my project, running entirely in the browser.
+
+Requirements:
+- Use "mediabunny" (WebCodecs). Decode every clip with CanvasSink fitted ('contain') into the first
+  clip's display size, draw onto one canvas and encode with CanvasSource, offsetting timestamps.
+- Sound: one stereo track at the first clip's sample rate; resample others through
+  OfflineAudioContext; a clip without sound adds silence of its own length.
+- Let the user reorder the clips before joining.
+
+Reference implementation: https://life2film.com/tools/merge-videos/`,
+    agentJob: 'Joining videos into one, locally',
+  },
 ];
