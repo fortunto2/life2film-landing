@@ -30,6 +30,8 @@ interface Copy {
   silence: string;
   normalize: string;
   denoise: string;
+  split: string;
+  collage: string;
   hub: string;
   homeNote: (hub: string, frames: string, guides: string) => string;
   hubNote: (frames: string, guides: string) => string;
@@ -53,6 +55,8 @@ const COPY: Partial<Record<Lang, Copy>> = {
     silence: 'Cut every pause out of a talking video automatically',
     normalize: 'Bring the recording to a standard loudness (normalize)',
     denoise: 'Remove background noise from the recording',
+    split: 'Two videos side by side, stacked or picture-in-picture',
+    collage: 'Three or four videos in one frame (collage)',
     hub: 'All free video tools',
     homeNote: (hub, frames, guides) =>
       `Free in the browser: <a href="${hub}">video tools</a> such as <a href="${frames}">splitting a video into frames</a>, and <a href="${guides}">guides to editing video with an AI agent</a>.`,
@@ -76,6 +80,8 @@ const COPY: Partial<Record<Lang, Copy>> = {
     silence: 'Автоматически вырезать все паузы из видео с речью',
     normalize: 'Довести запись до стандартной громкости (нормализация)',
     denoise: 'Убрать фоновый шум из записи',
+    split: 'Два видео рядом, друг над другом или картинка в картинке',
+    collage: 'Три-четыре видео в одном кадре (коллаж)',
     hub: 'Все бесплатные видеоинструменты',
     homeNote: (hub, frames, guides) =>
       `Бесплатно в браузере: <a href="${hub}">видеоинструменты</a>, например <a href="${frames}">разбить видео на кадры</a>, и <a href="${guides}">руководства по монтажу видео с ИИ-агентом</a>.`,
@@ -135,6 +141,12 @@ export function relatedForTool(slug: string, lang: Lang): { heading: string; lin
     ],
     'remove-background-noise': [{ href: toolPath(lang, 'normalize-audio'), text: c.normalize }],
     'normalize-audio': [{ href: toolPath(lang, 'remove-background-noise'), text: c.denoise }],
+    'split-screen-video': [{ href: toolPath(lang, 'video-collage'), text: c.collage }],
+    'video-collage': [{ href: toolPath(lang, 'split-screen-video'), text: c.split }],
+    'merge-videos': [
+      { href: toolPath(lang, 'split-screen-video'), text: c.split },
+      { href: toolPath(lang, 'video-collage'), text: c.collage },
+    ],
     'video-splitter': [frames, guide],
     'video-to-frames': [splitter, guide],
     'scene-detector': [frames],
