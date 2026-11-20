@@ -33,6 +33,12 @@ export function track(name: string, props?: Props, metrics?: Metrics): void {
   // analytics call and outside its try: a throwing counter must not hide the offer.
   // `tool:shown` too: a tool whose result is the answer itself (a BPM, a list of scenes) is often never
   // saved, and its page showed no offer at all (bpm-detector, 165 visitors in 14 days, 0 offers, 20 Nov 2026).
+  // `tool:started`: work began (a run button, or a file for tools that start on their own). The page
+  // shows the offer while a long job runs, counted as `tool-<slug>-wait` (ToolPage).
+  if (name === 'tool_run' || name === 'file_chosen' || name === 'tool_failed') {
+    const kind = name === 'tool_failed' ? 'tool:failed' : 'tool:started';
+    try { window.dispatchEvent(new CustomEvent(kind, { detail: name })); } catch { /* no DOM */ }
+  }
   if (name === 'result_saved' || name === 'result_shown') {
     const kind = name === 'result_saved' ? 'tool:saved' : 'tool:shown';
     try { window.dispatchEvent(new CustomEvent(kind)); } catch { /* no DOM, nothing to show */ }

@@ -20,6 +20,9 @@ const savedSplit = (text: string): [string, string] => {
   const i = text.indexOf('. ');
   return i < 0 ? ['', text] : [text.slice(0, i + 1), text.slice(i + 2)];
 };
+const waitMode = ['video-splitter', 'scene-detector', 'bpm-detector'].includes(slug)
+  ? 'file'
+  : slug === 'video-trimmer' ? 'none' : 'run';
 const STUDIO_DMG = 'https://github.com/fortunto2/life2film-landing/releases/latest/download/Life2FilmStudio.dmg';
 const base = TOOL[slug];
 
@@ -91,7 +94,7 @@ const jsonLd = {
             Two cards, one shown: Studio on a Mac, the iPhone app everywhere else (`data-offer`, picked
             by the inline script below). Counted under the same placement as before plus the event
             that names which door: app_store_opened or binary_downloaded. */}
-        <div class="app-after" id="appAfter" hidden>
+        <div class="app-after" id="appAfter" data-wait={waitMode} hidden>
           <div class="offer" data-offer="phone">
             <img src="/img/app-icon.png" alt="" width="48" height="48" />
             <span><span class="when-saved">{savedSplit(chrome.appAfter)[0]} </span>{savedSplit(chrome.appAfter)[1]}</span>
@@ -106,6 +109,35 @@ const jsonLd = {
           </div>
         </div>
         <script is:inline>
+          (() => {
+            // While a long job runs (6 s with no result), the same card, counted as `-wait`.
+            // Tools that start on a file: splitter, scenes, bpm. The others start on their button
+            // (`tool_run`); the trimmer has neither, so it never waits. No delay is added to any job.
+            const card = document.getElementById('appAfter');
+            if (!card) return;
+            const startsOnFile = card.dataset.wait === 'file';
+            let timer = 0;
+            const setPlacement = (to) => card.querySelectorAll('a[data-sda-placement]').forEach((a) => {
+              a.dataset.sdaPlacement = a.dataset.sdaPlacement.replace(/-(result|wait)$/, '-' + to);
+              a.href = a.href.replace(/(ct=tool-[a-z0-9-]+?)-(result|wait)/, '$1-' + to);
+            });
+            const settle = () => { clearTimeout(timer); timer = 0; };
+            addEventListener('tool:started', (e) => {
+              const started = e.detail === 'tool_run' || (startsOnFile && e.detail === 'file_chosen');
+              if (!started || !card.hidden || card.dataset.wait === 'none') return;
+              settle();
+              timer = setTimeout(() => { if (card.hidden) { setPlacement('wait'); card.hidden = false; card.dataset.waiting = '1'; } }, 6000);
+            });
+            // Run buttons are counted by the snippet from `data-sda-event="tool_run"`, not through track().
+            document.addEventListener('click', (e) => {
+              if (e.target instanceof Element && e.target.closest('[data-sda-event="tool_run"]')) {
+                dispatchEvent(new CustomEvent('tool:started', { detail: 'tool_run' }));
+              }
+            }, true);
+            addEventListener('tool:failed', () => { settle(); if (card.dataset.waiting) { card.hidden = true; delete card.dataset.waiting; setPlacement('result'); } });
+            addEventListener('tool:shown', () => { settle(); if (card.dataset.waiting) { delete card.dataset.waiting; setPlacement('result'); } }, { capture: true });
+            addEventListener('tool:saved', () => { settle(); if (card.dataset.waiting) { delete card.dataset.waiting; setPlacement('result'); } }, { capture: true });
+          })();
           addEventListener('tool:shown', () => { const n = document.getElementById('appAfter'); if (n) n.hidden = false; });
           addEventListener('tool:saved', () => { const n = document.getElementById('appAfter'); if (n) { n.hidden = false; n.dataset.saved = '1'; } });
         </script>
