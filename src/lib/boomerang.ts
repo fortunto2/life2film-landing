@@ -1,10 +1,8 @@
 /**
  * A boomerang: the clip forward, then backward, repeated, silent, optionally sped up. In the browser.
  */
-import { PieceSink } from './sink';
-import { loadMediabunny, encodableCodec } from './encode';
-
-const FPS = 30;
+import { loadMediabunny } from './encode';
+import { FPS, canvasMp4, openVideo } from './canvas-out';
 /** Longest stretch of the source used: a boomerang is a moment. */
 export const MAX_SOURCE = 6;
 
@@ -22,23 +20,11 @@ export function boomerangTimes(len: number, loops: number, speed: number): numbe
 }
 
 export async function boomerang(file: File, loops: number, speed: number, onProgress?: (f: number) => void): Promise<{ blob: Blob; duration: number }> {
-  const { Input, BlobSource, ALL_FORMATS, Output, StreamTarget, Mp4OutputFormat, CanvasSink, CanvasSource, QUALITY_HIGH } = await loadMediabunny();
-  const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
-  const video = await input.getPrimaryVideoTrack();
-  if (!video) throw new Error('That file has no picture.');
-  if (!(await video.canDecode())) throw new Error('This browser cannot decode that video. Chrome or Edge usually can.');
-  const len = Math.min(MAX_SOURCE, await input.computeDuration());
-  const width = video.displayWidth - (video.displayWidth % 2), height = video.displayHeight - (video.displayHeight % 2);
-  const vcodec = await encodableCodec('mp4', { width, height });
-  if (!vcodec) throw new Error('This browser cannot encode MP4 video. Chrome or Edge usually can.');
-  const canvas = new OffscreenCanvas(width, height);
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('Canvas is unavailable in this browser.');
-  const sink = new PieceSink();
-  const output = new Output({ format: new Mp4OutputFormat(), target: new StreamTarget(sink.stream(), { chunked: true }) });
-  const vsource = new CanvasSource(canvas, { codec: vcodec, bitrate: QUALITY_HIGH, keyFrameInterval: 2 });
-  output.addVideoTrack(vsource, { frameRate: FPS });
-  await output.start();
+  const { CanvasSink } = await loadMediabunny();
+  const { video, duration, width, height } = await openVideo(file);
+  const len = Math.min(MAX_SOURCE, duration);
+  const out = await canvasMp4(width, height, false);
+  const { ctx, vsource } = out;
 
   // Decoded afresh on every loop: caching a cycle's frames would hold ~8 MB per 1080p frame.
   const cycle = boomerangTimes(len, 1, speed);
@@ -53,8 +39,7 @@ export async function boomerang(file: File, loops: number, speed: number, onProg
     }
   }
   vsource.close();
-  await output.finalize();
+  const blob = await out.finish();
   onProgress?.(1);
-  if (!sink.size) throw new Error('Nothing was written.');
-  return { blob: sink.blob('video/mp4'), duration: total / FPS };
+  return { blob, duration: total / FPS };
 }

@@ -3,11 +3,10 @@
  * quieter than a threshold for longer than `minSilence` are dropped, a little padding kept on both
  * sides of speech so words are not clipped. Picture and sound are rebuilt from the kept ranges.
  */
-import { PieceSink } from './sink';
-import { loadMediabunny, encodableCodec } from './encode';
+import { loadMediabunny } from './encode';
+import { FPS, canvasMp4, openVideo } from './canvas-out';
 import { RATE, pushStereo, trackStereo } from './audio-io';
 
-const FPS = 30;
 export const WINDOW = 0.02;
 
 /** RMS of each WINDOW-second slice of a mono signal. */
@@ -80,33 +79,15 @@ export async function removeSilence(file: File, thresholdDb: number, minSilence:
  * sound together, 5 ms ramps at every join. `pcm` skips decoding the sound again when the caller has it.
  */
 export async function renderRanges(file: File, ranges: [number, number][], onProgress?: (f: number) => void, pcm?: [Float32Array, Float32Array]): Promise<{ blob: Blob; before: number; after: number }> {
-  const { Input, BlobSource, ALL_FORMATS, Output, StreamTarget, Mp4OutputFormat, CanvasSink, CanvasSource, AudioBufferSource, getFirstEncodableAudioCodec, QUALITY_HIGH } = await loadMediabunny();
+  const { CanvasSink } = await loadMediabunny();
   const rate = RATE;
-  const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
-  const video = await input.getPrimaryVideoTrack();
-  if (!video) throw new Error('That file has no picture.');
-  if (!(await video.canDecode())) throw new Error('This browser cannot decode that video. Chrome or Edge usually can.');
-  const before = await input.computeDuration();
+  const { video, audio, duration: before, width, height } = await openVideo(file);
   ranges = ranges.map(([a, b]) => [Math.max(0, a), Math.min(before, b)] as [number, number]).filter(([a, b]) => b - a > 1 / FPS);
   if (!ranges.length) throw new Error('Nothing would be left.');
-  const audio = await input.getPrimaryAudioTrack();
-  const [L, R] = pcm ?? (audio ? await decodeStereo(file) : [new Float32Array(0), new Float32Array(0)]);
+  const [L, R] = pcm ?? (audio && (await trackStereo(audio, before))) ?? [new Float32Array(0), new Float32Array(0)];
   const after = ranges.reduce((s, [a, b]) => s + (b - a), 0);
-  const width = video.displayWidth - (video.displayWidth % 2), height = video.displayHeight - (video.displayHeight % 2);
-  const format = new Mp4OutputFormat();
-  const vcodec = await encodableCodec('mp4', { width, height });
-  if (!vcodec) throw new Error('This browser cannot encode MP4 video. Chrome or Edge usually can.');
-  const acodec = L.length === 0 ? null : await getFirstEncodableAudioCodec(format.getSupportedAudioCodecs(), { numberOfChannels: 2, sampleRate: rate, bitrate: 192_000 });
-  const canvas = new OffscreenCanvas(width, height);
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('Canvas is unavailable in this browser.');
-  const sink = new PieceSink();
-  const output = new Output({ format, target: new StreamTarget(sink.stream(), { chunked: true }) });
-  const vsource = new CanvasSource(canvas, { codec: vcodec, bitrate: QUALITY_HIGH, keyFrameInterval: 2 });
-  output.addVideoTrack(vsource, { frameRate: FPS });
-  const asource = acodec ? new AudioBufferSource({ codec: acodec, bitrate: 192_000 }) : null;
-  if (asource) output.addAudioTrack(asource);
-  await output.start();
+  const out = await canvasMp4(width, height, L.length > 0);
+  const { ctx, vsource, asource } = out;
 
   // Output frame k shows the source moment that maps to k/FPS on the cut timeline.
   const count = Math.max(1, Math.floor(after * FPS));
@@ -143,8 +124,7 @@ export async function renderRanges(file: File, ranges: [number, number][], onPro
     }
     await pushStereo(asource, oL, oR);
   }
-  await output.finalize();
+  const blob = await out.finish();
   onProgress?.(1);
-  if (!sink.size) throw new Error('Nothing was written.');
-  return { blob: sink.blob('video/mp4'), before, after };
+  return { blob, before, after };
 }

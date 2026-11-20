@@ -629,3 +629,14 @@ export const STATUS: Record<Lang, ToolStatus> = {
     tryLower: 'Daha düşük bir çözünürlük deneyin ya da özgün dosyayı saklayın.',
   },
 };
+
+/** The hub's last group: tools whose home is another of our sites, read from the shared registry. */
+export const ELSEWHERE: Record<Lang, { name: string; note: string }> = {
+  en: { name: 'On our other sites', note: 'Same team, same rule: it runs in the browser and nothing is uploaded. For AI video: prompts, reference frames, captions.' },
+  ru: { name: 'На наших других сайтах', note: 'Та же команда и то же правило: всё работает в браузере, ничего не загружается. Для AI-видео: промпты, опорные кадры, подписи.' },
+  es: { name: 'En nuestros otros sitios', note: 'El mismo equipo y la misma regla: todo funciona en el navegador y no se sube nada. Para video con IA: prompts, fotogramas de referencia, subtítulos.' },
+  pt: { name: 'Nos nossos outros sites', note: 'A mesma equipe e a mesma regra: tudo roda no navegador e nada é enviado. Para vídeo com IA: prompts, quadros de referência, legendas.' },
+  id: { name: 'Di situs kami yang lain', note: 'Tim yang sama, aturan yang sama: semuanya berjalan di browser dan tidak ada yang diunggah. Untuk video AI: prompt, frame referensi, teks.' },
+  tr: { name: 'Diğer sitelerimizde', note: 'Aynı ekip, aynı kural: her şey tarayıcıda çalışır, hiçbir şey yüklenmez. Yapay zekâ videosu için: istemler, referans kareler, altyazılar.' },
+  ar: { name: 'على مواقعنا الأخرى', note: 'الفريق نفسه والقاعدة نفسها: كل شيء يعمل في المتصفح ولا يُرفع أي شيء. لفيديو الذكاء الاصطناعي: الأوامر والإطارات المرجعية والترجمات.' },
+};

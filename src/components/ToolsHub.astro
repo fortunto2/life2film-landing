@@ -2,7 +2,8 @@
 import Base from '../layouts/Base.astro';
 import { GROUPS, TOOLS, byGroup } from '../lib/tools';
 import { TRANSLATIONS, toolName, toolPath } from '../lib/tools/index';
-import { HUB } from '../lib/tools-i18n';
+import { ELSEWHERE, HUB } from '../lib/tools-i18n';
+import { SITES, externalFor, localizedPath } from 'superduper-tools/registry';
 import { localePath, type Lang } from '../i18n';
 import { homeNote } from '../lib/related';
 
@@ -19,6 +20,13 @@ const note = homeNote(lang, true);
  * H1 (heading + accent), which is how that page names the job in that language. Until 20 Nov 2026
  * every non-English hub showed English names («Trim Video») over translated blurbs.
  */
+/** Tools whose home is another of our sites (shared registry): linked in this language when it has one. */
+const elsewhere = externalFor('life2film').map((t) => ({
+  ...t,
+  href: `${SITES[t.canonical_site].url}${t.languages.includes(lang) ? localizedPath(t, lang) : t.path}`,
+  site: SITES[t.canonical_site].name,
+}));
+
 const blurbFor = (slug: string, fallback: string) => TRANSLATIONS[lang]?.[slug]?.blurb ?? fallback;
 
 /** Locales that have at least one tool translated — the hub exists wherever the tools do. */
@@ -71,6 +79,22 @@ const jsonLd = {
             </div>
           </div>
         ))}
+
+        {elsewhere.length > 0 && (
+          <div class="group">
+            <h2 class="grouphead">{ELSEWHERE[lang].name}</h2>
+            <p class="groupnote muted">{ELSEWHERE[lang].note}</p>
+            <div class="grid cols-2 tools">
+              {elsewhere.map((t) => (
+                <a class="card tool" href={t.href}>
+                  <h3>{t.name}</h3>
+                  <p>{t.blurb}</p>
+                  <span class="go">{t.site} →</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </section>
 

@@ -58,26 +58,17 @@ const words = WORDS[lang] ?? WORDS.en!;
 </style>
 
 <script>
+  import { mountTool, messageOf } from 'superduper-tools/shell';
   import { fileChosen, toolFailed, track } from '../../lib/track';
   import { saveBlob, formatBytes, preciseClock } from '../../lib/encode';
   import { songSpeed } from '../../lib/song-speed';
 
   const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
   const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
-  const statusEl = el<HTMLDivElement>('status');
-  const drop = el<HTMLLabelElement>('drop');
   const speed = el<HTMLInputElement>('speed');
   const reverb = el<HTMLInputElement>('reverb');
-  let file: File | null = null;
-  let busy = false;
   let preset = 'custom';
 
-  function status(message: string, fraction?: number, isError = false) {
-    statusEl.hidden = false;
-    statusEl.classList.toggle('err', isError);
-    el('statusText').textContent = message;
-    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
-  }
   const show = () => {
     el('spv').textContent = `${Number(speed.value).toFixed(2)}×`;
     el('rvv').textContent = `${Math.round(Number(reverb.value) * 100)}%`;
@@ -87,15 +78,14 @@ const words = WORDS[lang] ?? WORDS.en!;
   el('presetUp').addEventListener('click', () => { speed.value = '1.25'; reverb.value = '0'; el<HTMLInputElement>('keep').checked = false; preset = 'sped-up'; show(); });
   el('presetSlow').addEventListener('click', () => { speed.value = '0.8'; reverb.value = '0.35'; el<HTMLInputElement>('keep').checked = false; preset = 'slowed-reverb'; show(); });
 
-  el('run').addEventListener('click', async () => {
-    if (!file || busy) return;
-    busy = true;
-    el<HTMLButtonElement>('run').disabled = true;
-    const sp = Number(speed.value);
-    const format = el<HTMLSelectElement>('format').value as 'mp3' | 'wav';
-    const keep = el<HTMLInputElement>('keep').checked;
-    status(w.working, 0.02);
-    try {
+  mountTool({
+    onFiles: ([f], via, status) => { fileChosen(f, via); status(f.name); },
+    onError: (error, [f]) => { toolFailed('run', error, f); return w.failed.replace('{msg}', messageOf(error)); },
+    run: async ({ file, status }) => {
+      const sp = Number(speed.value);
+      const format = el<HTMLSelectElement>('format').value as 'mp3' | 'wav';
+      const keep = el<HTMLInputElement>('keep').checked;
+      status(w.working, 0.02);
       const { blob, duration } = await songSpeed(file, { speed: sp, mode: keep ? 'keep-pitch' : 'turntable', reverb: Number(reverb.value), format, onProgress: (f) => status(w.working, f) });
       const play = el<HTMLAudioElement>('play');
       play.src = URL.createObjectURL(blob);
@@ -104,18 +94,7 @@ const words = WORDS[lang] ?? WORDS.en!;
       saveBlob(blob, `${file.name.replace(/\.[^.]+$/, '')} (${tag}).${format}`);
       track('result_saved', { placement: 'result', format, preset, mode: keep ? 'keep-pitch' : 'turntable' }, { speed: sp, seconds: Math.round(duration) });
       status(w.saved.replace('{size}', formatBytes(blob.size)).replace('{len}', preciseClock(duration)), 1);
-    } catch (error) {
-      toolFailed('run', error, file);
-      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
-    } finally {
-      busy = false;
-      el<HTMLButtonElement>('run').disabled = false;
-    }
+    },
   });
 
-  const take = (f: File | undefined, how: 'picker' | 'drop') => { if (!f) return; file = f; fileChosen(f, how); status(f.name); };
-  el<HTMLInputElement>('file').addEventListener('change', (e) => take((e.target as HTMLInputElement).files?.[0], 'picker'));
-  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
-  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
-  drop.addEventListener('drop', (e) => take((e as DragEvent).dataTransfer?.files?.[0], 'drop'));
 </script>

@@ -24,7 +24,7 @@
     "gifenc": "1.0.3",
     "mediabunny": "^1.66.2",
     "superduper-site-kit": "git+file:///Users/rustam/startups/shared/superduper-site-kit",
-    "superduper-tools": "git+file:///Users/rustam/startups/shared/superduper-tools"
+    "superduper-tools": "git+file:///Users/rustam/startups/shared/superduper-tools#d859cc3dc0f7dc5dad40c9878e2b2ecb2d6d6dce"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",

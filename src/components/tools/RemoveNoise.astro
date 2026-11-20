@@ -54,32 +54,22 @@ const words = WORDS[lang] ?? WORDS.en!;
 </style>
 
 <script>
+  import { mountTool, messageOf } from 'superduper-tools/shell';
   import { fileChosen, toolFailed, track } from '../../lib/track';
   import { saveBlob, formatBytes, preciseClock } from '../../lib/encode';
   import { denoise } from '../../lib/denoise';
 
   const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
   const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
-  const statusEl = el<HTMLDivElement>('status');
-  const drop = el<HTMLLabelElement>('drop');
   const strength = el<HTMLInputElement>('strength');
-  let file: File | null = null;
-  let busy = false;
 
-  function status(message: string, fraction?: number, isError = false) {
-    statusEl.hidden = false;
-    statusEl.classList.toggle('err', isError);
-    el('statusText').textContent = message;
-    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
-  }
   strength.addEventListener('input', () => { el('sv').textContent = `${Math.round(Number(strength.value) * 100)}%`; });
 
-  el('run').addEventListener('click', async () => {
-    if (!file || busy) return;
-    busy = true;
-    el<HTMLButtonElement>('run').disabled = true;
-    status(w.working, 0.02);
-    try {
+  mountTool({
+    onFiles: ([f], via, status) => { fileChosen(f, via); status(f.name); },
+    onError: (error, [f]) => { toolFailed('run', error, f); return w.failed.replace('{msg}', messageOf(error)); },
+    run: async ({ file, status }) => {
+      status(w.working, 0.02);
       const r = await denoise(file, { strength: Number(strength.value), format: el<HTMLSelectElement>('format').value as 'mp3' | 'wav', onProgress: (f) => status(w.working, f) });
       if (!r.extension.startsWith('mp4') && !r.extension.startsWith('webm')) {
         el<HTMLAudioElement>('before').src = URL.createObjectURL(file);
@@ -90,18 +80,7 @@ const words = WORDS[lang] ?? WORDS.en!;
       track('result_saved', { placement: 'result', format: r.extension }, { seconds: Math.round(r.duration), voice: Math.round(r.voice * 100) / 100 });
       const msg = r.voice < 0.15 ? w.novoice : w.saved;
       status(msg.replace('{size}', formatBytes(r.blob.size)).replace('{len}', preciseClock(r.duration)), 1);
-    } catch (error) {
-      toolFailed('run', error, file);
-      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
-    } finally {
-      busy = false;
-      el<HTMLButtonElement>('run').disabled = false;
-    }
+    },
   });
 
-  const take = (f: File | undefined, how: 'picker' | 'drop') => { if (!f) return; file = f; fileChosen(f, how); status(f.name); };
-  el<HTMLInputElement>('file').addEventListener('change', (e) => take((e.target as HTMLInputElement).files?.[0], 'picker'));
-  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
-  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
-  drop.addEventListener('drop', (e) => take((e as DragEvent).dataTransfer?.files?.[0], 'drop'));
 </script>

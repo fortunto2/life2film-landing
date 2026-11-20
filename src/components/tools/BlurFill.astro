@@ -40,46 +40,24 @@ const words = WORDS[lang] ?? WORDS.en!;
 </div>
 
 <script>
+  import { mountTool, messageOf } from 'superduper-tools/shell';
   import { fileChosen, toolFailed, track } from '../../lib/track';
   import { saveBlob, formatBytes } from '../../lib/encode';
   import { blurFill, type Shape } from '../../lib/blur-fill';
 
   const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
   const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
-  const statusEl = el<HTMLDivElement>('status');
-  const drop = el<HTMLLabelElement>('drop');
-  let file: File | null = null;
-  let busy = false;
 
-  function status(message: string, fraction?: number, isError = false) {
-    statusEl.hidden = false;
-    statusEl.classList.toggle('err', isError);
-    el('statusText').textContent = message;
-    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
-  }
-
-  el('run').addEventListener('click', async () => {
-    if (!file || busy) return;
-    busy = true;
-    el<HTMLButtonElement>('run').disabled = true;
-    const shape = el<HTMLSelectElement>('shape').value as Shape;
-    try {
+  mountTool({
+    onFiles: ([f], via, status) => { fileChosen(f, via); status(f.name); },
+    onError: (error, [f]) => { toolFailed('run', error, f); return w.failed.replace('{msg}', messageOf(error)); },
+    run: async ({ file, status }) => {
+      const shape = el<HTMLSelectElement>('shape').value as Shape;
       const blob = await blurFill(file, shape, (f) => status(w.working.replace('{n}', String(Math.round(f * 100))), f));
       saveBlob(blob, `${file.name.replace(/\.[^.]+$/, '')}-${shape.replace(':', 'x')}.mp4`);
       track('result_saved', { placement: 'result', shape }, { size_mb: Math.round(blob.size / 104_857.6) / 10 });
       status(w.saved.replace('{size}', formatBytes(blob.size)), 1);
-    } catch (error) {
-      toolFailed('run', error, file);
-      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
-    } finally {
-      busy = false;
-      el<HTMLButtonElement>('run').disabled = false;
-    }
+    },
   });
 
-  const take = (f: File | undefined, how: 'picker' | 'drop') => { if (!f) return; file = f; fileChosen(f, how); status(f.name); };
-  el<HTMLInputElement>('file').addEventListener('change', (e) => take((e.target as HTMLInputElement).files?.[0], 'picker'));
-  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
-  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
-  drop.addEventListener('drop', (e) => take((e as DragEvent).dataTransfer?.files?.[0], 'drop'));
 </script>

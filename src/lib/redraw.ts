@@ -2,11 +2,11 @@
  * Redraw every frame of a video on a canvas and keep its sound, optionally faded with the picture.
  * Fade, progress bar and border are each a few options on this one loop. In the browser.
  */
-import { PieceSink } from './sink';
-import { loadMediabunny, encodableCodec } from './encode';
-import { RATE, pushStereo, trackStereo } from './audio-io';
+import { loadMediabunny } from './encode';
+import { pushStereo, trackStereo } from './audio-io';
+import { FPS, canvasMp4, openVideo } from './canvas-out';
 
-export const FPS = 30;
+export { FPS };
 
 /** Opacity of the picture at time t: 0→1 over `fin`, 1→0 over the last `fout` seconds. */
 export function fadeGain(t: number, duration: number, fin: number, fout: number): number {
@@ -19,30 +19,10 @@ export type Decorate = (ctx: OffscreenCanvasRenderingContext2D, t: number, durat
 
 export async function redrawVideo(file: File, o: { fin?: number; fout?: number; decorate?: Decorate; inset?: number; background?: string }, onProgress?: (f: number) => void): Promise<{ blob: Blob; duration: number }> {
   const fin = o.fin ?? 0, fout = o.fout ?? 0;
-  const { Input, BlobSource, ALL_FORMATS, Output, StreamTarget, Mp4OutputFormat, CanvasSink, CanvasSource, AudioBufferSource, getFirstEncodableAudioCodec, QUALITY_HIGH } = await loadMediabunny();
-  const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
-  const video = await input.getPrimaryVideoTrack();
-  if (!video) throw new Error('That file has no picture.');
-  if (!(await video.canDecode())) throw new Error('This browser cannot decode that video. Chrome or Edge usually can.');
-  const audio = await input.getPrimaryAudioTrack();
-  const duration = await input.computeDuration();
-  const width = video.displayWidth - (video.displayWidth % 2), height = video.displayHeight - (video.displayHeight % 2);
-  const format = new Mp4OutputFormat();
-  const vcodec = await encodableCodec('mp4', { width, height });
-  if (!vcodec) throw new Error('This browser cannot encode MP4 video. Chrome or Edge usually can.');
-  const hasAudio = !!audio && (await audio.canDecode().catch(() => false));
-  const acodec = hasAudio ? await getFirstEncodableAudioCodec(format.getSupportedAudioCodecs(), { numberOfChannels: 2, sampleRate: RATE, bitrate: 192_000 }) : null;
-
-  const canvas = new OffscreenCanvas(width, height);
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('Canvas is unavailable in this browser.');
-  const sink = new PieceSink();
-  const output = new Output({ format, target: new StreamTarget(sink.stream(), { chunked: true }) });
-  const vsource = new CanvasSource(canvas, { codec: vcodec, bitrate: QUALITY_HIGH, keyFrameInterval: 2 });
-  output.addVideoTrack(vsource, { frameRate: FPS });
-  const asource = acodec ? new AudioBufferSource({ codec: acodec, bitrate: 192_000 }) : null;
-  if (asource) output.addAudioTrack(asource);
-  await output.start();
+  const { CanvasSink } = await loadMediabunny();
+  const { video, audio, duration, width, height } = await openVideo(file);
+  const out = await canvasMp4(width, height, !!audio);
+  const { ctx, vsource, asource } = out;
 
   const count = Math.max(1, Math.floor(duration * FPS));
   const times = Array.from({ length: count }, (_, i) => i / FPS);
@@ -76,8 +56,7 @@ export async function redrawVideo(file: File, o: { fin?: number; fout?: number; 
     if (pcm) await pushStereo(asource, pcm[0], pcm[1]);
     else asource.close();
   }
-  await output.finalize();
+  const blob = await out.finish();
   onProgress?.(1);
-  if (!sink.size) throw new Error('Nothing was written.');
-  return { blob: sink.blob('video/mp4'), duration };
+  return { blob, duration };
 }

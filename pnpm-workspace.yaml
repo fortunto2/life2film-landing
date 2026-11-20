@@ -1,9 +1,11 @@
+packages:
+  - '.'
 allowBuilds:
   esbuild: true
   sharp: true
   # Our own shared package, a git dependency that builds itself on install. pnpm 11 matches a git
   # dependency only by its full spec with the commit, so this line changes when the package moves.
-  superduper-tools@git+file:///Users/rustam/startups/shared/superduper-tools#fd9dda4bd05308c1bf53b271f462e6f6b30f9f1f: true
+  superduper-tools@git+file:///Users/rustam/startups/shared/superduper-tools#d859cc3dc0f7dc5dad40c9878e2b2ecb2d6d6dce: true
   superduper-site-kit@git+file:///Users/rustam/startups/shared/superduper-site-kit#2304fb61a3c4dfe29d7ea198cc5fd97bc89c5936: true
 # pnpm 11 refuses packages published less than a day ago (minimumReleaseAge, a supply-chain guard).
 # life2film-engine is our own build from the sibling repository, published minutes before it is

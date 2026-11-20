@@ -3,14 +3,13 @@
  * (cropped to cover, never stretched), playing together for as long as the shorter one lasts. Sound
  * from the first, the second, or both mixed. In the browser.
  */
-import { PieceSink } from './sink';
-import { loadMediabunny, encodableCodec } from './encode';
+import { loadMediabunny } from './encode';
+import { FPS, canvasMp4, openVideo } from './canvas-out';
 import { RATE, pushStereo, trackStereo } from './audio-io';
 import { cover, type Rect } from './blur-fill';
 
 export type Layout = 'side' | 'stack' | 'pip';
 export type SoundFrom = 'a' | 'b' | 'both';
-const FPS = 30;
 
 /** Output size and the two cells for a layout, with a `gap` px divider. */
 export function cells(layout: Layout, gap = 8): { width: number; height: number; a: Rect; b: Rect } {
@@ -67,33 +66,12 @@ export function collage(files: File[], onProgress?: (f: number) => void) {
 
 /** Draw each clip into its cell (cropped to cover) for as long as the shortest; mix the chosen sounds. */
 async function compose(files: File[], frame: { width: number; height: number; cells: Rect[] }, soundFrom: number[], onProgress?: (f: number) => void): Promise<{ blob: Blob; duration: number }> {
-  const { Input, BlobSource, ALL_FORMATS, Output, StreamTarget, Mp4OutputFormat, CanvasSink, CanvasSource, AudioBufferSource, getFirstEncodableAudioCodec, QUALITY_HIGH } = await loadMediabunny();
-  const open = async (f: File) => {
-    const input = new Input({ source: new BlobSource(f), formats: ALL_FORMATS });
-    const video = await input.getPrimaryVideoTrack();
-    if (!video) throw new Error(`${f.name}: no picture.`);
-    if (!(await video.canDecode())) throw new Error(`${f.name}: this browser cannot decode it. Chrome or Edge usually can.`);
-    return { input, video, audio: await input.getPrimaryAudioTrack(), duration: await input.computeDuration() };
-  };
-  const clips: Awaited<ReturnType<typeof open>>[] = [];
-  clips.push(...(await Promise.all(files.map(open))));
+  const { CanvasSink } = await loadMediabunny();
+  const clips = await Promise.all(files.map((f) => openVideo(f, true)));
   const duration = Math.min(...clips.map((c) => c.duration));
   const { width, height } = frame;
-  const format = new Mp4OutputFormat();
-  const vcodec = await encodableCodec('mp4', { width, height });
-  if (!vcodec) throw new Error('This browser cannot encode MP4 video. Chrome or Edge usually can.');
-  const acodec = await getFirstEncodableAudioCodec(format.getSupportedAudioCodecs(), { numberOfChannels: 2, sampleRate: RATE, bitrate: 192_000 });
-
-  const canvas = new OffscreenCanvas(width, height);
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('Canvas is unavailable in this browser.');
-  const sink = new PieceSink();
-  const output = new Output({ format, target: new StreamTarget(sink.stream(), { chunked: true }) });
-  const vsource = new CanvasSource(canvas, { codec: vcodec, bitrate: QUALITY_HIGH, keyFrameInterval: 2 });
-  output.addVideoTrack(vsource, { frameRate: FPS });
-  const asource = acodec ? new AudioBufferSource({ codec: acodec, bitrate: 192_000 }) : null;
-  if (asource) output.addAudioTrack(asource);
-  await output.start();
+  const out = await canvasMp4(width, height, true);
+  const { ctx, vsource, asource } = out;
 
   const count = Math.max(1, Math.floor(duration * FPS));
   const times = Array.from({ length: count }, (_, i) => i / FPS);
@@ -122,8 +100,7 @@ async function compose(files: File[], frame: { width: number; height: number; ce
     const [L, R] = mixStereo(sa ?? null, sb ?? null, Math.round(duration * RATE));
     await pushStereo(asource, L, R);
   }
-  await output.finalize();
+  const blob = await out.finish();
   onProgress?.(1);
-  if (!sink.size) throw new Error('Nothing was written.');
-  return { blob: sink.blob('video/mp4'), duration };
+  return { blob, duration };
 }
