@@ -404,6 +404,31 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'audio-converter': {
+    searchPhrase: 'Ses dönüştürücü online',
+    title: 'Ses Dönüştürücü Online Ücretsiz — M4A, WAV, FLAC’tan MP3’e, yükleme yok',
+    description:
+      'Sesi online ve ücretsiz dönüştürün: M4A, WAV, FLAC, OGG, AAC ya da bir videonun sesini seçtiğiniz bit hızında MP3, WAV veya OGG’ye. Tarayıcıda, yükleme ve boyut sınırı yok.',
+    heading: 'Ses',
+    accent: 'dönüştürücü',
+    lede: 'Bir ses dosyasının biçimini hiçbir yere göndermeden değiştirin.',
+    blurb: 'M4A, WAV, FLAC, OGG ve diğerlerini MP3, WAV veya OGG’ye, istediğiniz bit hızında.',
+    featureList: [
+      'Giriş: M4A, WAV, FLAC, OGG, AAC, MP3 ve videolar',
+      'Çıkış: bit hızı seçimiyle MP3, WAV veya OGG',
+      'Her şey tarayıcıda: yükleme ve sınır yok',
+    ],
+    faq: [
+      {
+        q: 'M4A nasıl MP3’e dönüştürülür?',
+        a: 'M4A dosyasını bırakın, MP3 ve bit hızını seçin (192 kbps iyi bir varsayılan) ve dönüştürün. iPhone sesli notları da M4A’dır.',
+      },
+      {
+        q: 'Daha yüksek bit hızı sesi iyileştirir mi?',
+        a: 'Hayır. Dosya sıkıştırılırken kaybettiğini geri kazanamaz; yalnızca büyür.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',

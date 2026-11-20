@@ -404,6 +404,31 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'audio-converter': {
+    searchPhrase: 'Konverter audio online',
+    title: 'Konverter Audio Online Gratis — M4A, WAV, FLAC ke MP3 tanpa unggah',
+    description:
+      'Konversi audio secara online dan gratis: M4A, WAV, FLAC, OGG, AAC atau suara video ke MP3, WAV atau OGG dengan bitrate pilihan. Di browser, tanpa unggah dan tanpa batas ukuran.',
+    heading: 'Konverter',
+    accent: 'audio',
+    lede: 'Ubah format file audio tanpa mengirimnya ke mana pun.',
+    blurb: 'M4A, WAV, FLAC, OGG dan lainnya ke MP3, WAV atau OGG, dengan bitrate pilihan.',
+    featureList: [
+      'Masukan: M4A, WAV, FLAC, OGG, AAC, MP3 dan video',
+      'Keluaran: MP3, WAV atau OGG dengan pilihan bitrate',
+      'Semua di browser: tanpa unggah dan batas',
+    ],
+    faq: [
+      {
+        q: 'Bagaimana mengonversi M4A ke MP3?',
+        a: 'Jatuhkan M4A, pilih MP3 dan bitrate (192 kbps pilihan yang baik), lalu konversi. Memo suara iPhone juga M4A.',
+      },
+      {
+        q: 'Apakah bitrate lebih tinggi membuat suara lebih baik?',
+        a: 'Tidak. File tidak mendapatkan kembali detail yang hilang saat dikompresi; hanya jadi lebih besar.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',

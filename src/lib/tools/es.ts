@@ -407,6 +407,31 @@ export const es: ToolTranslations = {
       },
     ],
   },
+  'audio-converter': {
+    searchPhrase: 'Convertidor de audio online',
+    title: 'Convertidor de audio online gratis — M4A, WAV, FLAC a MP3 sin subir',
+    description:
+      'Convierte audio online gratis: M4A, WAV, FLAC, OGG, AAC o el sonido de un video a MP3, WAV u OGG con el bitrate que elijas. En tu navegador, sin subir nada y sin límite de tamaño.',
+    heading: 'Convertidor',
+    accent: 'de audio',
+    lede: 'Cambia el formato de un audio sin enviarlo a ninguna parte.',
+    blurb: 'M4A, WAV, FLAC, OGG y más a MP3, WAV u OGG, con el bitrate que elijas.',
+    featureList: [
+      'Entrada: M4A, WAV, FLAC, OGG, AAC, MP3 y videos',
+      'Salida: MP3, WAV u OGG con bitrate a elegir',
+      'Todo en el navegador: sin subidas ni límite',
+    ],
+    faq: [
+      {
+        q: '¿Cómo convierto M4A a MP3?',
+        a: 'Suelta el M4A, elige MP3 y un bitrate (192 kbps va bien) y convierte. Las notas de voz del iPhone también son M4A.',
+      },
+      {
+        q: '¿Un bitrate mayor mejora el sonido?',
+        a: 'No. Un archivo no recupera lo que perdió al comprimirse; solo ocupa más.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Convertidor de vídeo online',
     title: 'Convertidor de Vídeo Online Gratis — MP4, WebM, MOV sin subir nada',

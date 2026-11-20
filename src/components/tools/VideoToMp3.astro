@@ -4,9 +4,12 @@ import type { Lang } from '../../i18n';
 
 interface Props {
   lang?: Lang;
+  /** The audio-converter page reuses this tool with its own words and without the video prose. */
+  runLabel?: string;
+  prose?: boolean;
 }
 
-const { lang = 'en' } = Astro.props;
+const { lang = 'en', runLabel = 'Extract audio', prose = true } = Astro.props;
 const chrome = CHROME[lang];
 const status = STATUS[lang];
 
@@ -58,7 +61,7 @@ const status = STATUS[lang];
 
         <span class="spacer"></span>
         <span class="muted" id="estimate"></span>
-        <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">Extract audio</button>
+        <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{runLabel}</button>
       </div>
     </div>
 
@@ -68,7 +71,7 @@ const status = STATUS[lang];
     </div>
   </div>
 
-  {lang === 'en' && (
+  {prose && lang === 'en' && (
   <Fragment slot="prose">
     <h2>What extracting audio actually is</h2>
     <p>

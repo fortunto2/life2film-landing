@@ -623,4 +623,46 @@ Requirements:
 Reference implementation: https://life2film.com/tools/audio-cutter/`,
     agentJob: 'Cutting a song, locally',
   },
+  {
+    // 20 Nov 2026: «audio converter», «m4a to mp3», «конвертер аудио» — the video-to-mp3 engine,
+    // which already takes audio files, under the name people search for.
+    slug: 'audio-converter',
+    group: 'everyday',
+    name: 'Audio Converter',
+    appName: 'Audio Converter',
+    blurb: 'M4A, WAV, FLAC, OGG and more to MP3, WAV or OGG, with the bitrate you choose.',
+
+    searchPhrase: 'Audio Converter Online',
+    title: 'Audio Converter Online Free | M4A, WAV, FLAC to MP3, no upload',
+    description: 'Convert audio online for free: M4A, WAV, FLAC, OGG, AAC or the sound of a video to MP3, WAV or OGG, at the bitrate you choose. Runs in your browser, nothing is uploaded, no size limit.',
+    heading: 'Audio',
+    accent: 'converter',
+    lede: 'Change an audio file\'s format without sending it anywhere.',
+    featureList: [
+      'M4A, WAV, FLAC, OGG, AAC, MP3 and video files in',
+      'MP3, WAV or OGG out, with a bitrate choice',
+      'Runs fully client-side: no upload, no size limit',
+    ],
+    faq: [
+      {
+        q: 'How do I convert M4A to MP3?',
+        a: 'Drop the M4A file, choose MP3 and a bitrate (192 kbps is a good default), and convert. iPhone voice memos and Apple Music downloads without DRM are M4A and convert the same way.',
+      },
+      {
+        q: 'Does converting to a higher bitrate improve the sound?',
+        a: 'No. A file cannot gain detail it lost when it was first compressed; a 128 kbps source converted at 320 kbps is only bigger. The tool says when the chosen bitrate is above the source.',
+      },
+      {
+        q: 'Is my file uploaded?',
+        a: 'No. Decoding and encoding run in your browser.',
+      },
+    ],
+
+    summary: 'Convert audio files between formats in the browser (M4A, WAV, FLAC, OGG to MP3, WAV, OGG).',
+    facts: [
+      'Converting to a higher bitrate than the source adds size, not quality.',
+      'MP3 encoding in the browser needs an encoder (LAME via @mediabunny/mp3-encoder); WebCodecs has none.',
+    ],
+    agentJob: 'Converting audio formats, locally',
+  },
 ];
