@@ -60,6 +60,8 @@ export interface EncodeOptions {
    * the frames (a re-encode), for the players and uploaders that ignore that metadata.
    */
   rotate?: 0 | 90 | 180 | 270;
+  /** Region of the (rotated) picture to keep, in source pixels. Always re-encodes. */
+  crop?: { left: number; top: number; width: number; height: number };
   flip?: boolean;
   bakeTransform?: boolean;
   /** Drop the picture — used by "extract the audio". */
@@ -454,7 +456,7 @@ export async function encodeDetailed(file: File, options: EncodeOptions): Promis
   // does not imply a transcode gets added.
   const transcode =
     !dropVideo &&
-    Boolean(options.width || options.height || options.fit || videoBitrate || options.forceTranscode || options.bakeTransform);
+    Boolean(options.width || options.height || options.fit || videoBitrate || options.forceTranscode || options.bakeTransform || options.crop);
 
   const sourceTrack = dropVideo ? null : await input.getPrimaryVideoTrack();
   // A source codec the container should not carry (VP9 into MP4) forces a transcode even when
@@ -498,7 +500,9 @@ export async function encodeDetailed(file: File, options: EncodeOptions): Promis
   const turn = {
     ...(options.rotate && { rotate: options.rotate }),
     ...(options.flip && { flip: true }),
-    ...(options.bakeTransform && { allowTransformationMetadata: false }),
+    // A crop is in display pixels (after rotation): draw the turn into the frames so they agree.
+    ...((options.bakeTransform || options.crop) && { allowTransformationMetadata: false }),
+    ...(options.crop && { crop: options.crop }),
   };
   const videoFor = (attempt: Attempt) =>
     dropVideo

@@ -1,0 +1,161 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { run: 'Crop', shape: 'Shape', vertical: '9:16 — Reels, TikTok, Shorts', square: '1:1 — square', portrait: '4:5 — Instagram feed', wide: '16:9 — YouTube', position: 'Position', saved: 'Saved — {size}, {w}×{h}.', failed: 'Could not crop — {msg}', same: 'The video is already this shape.' },
+  ru: { run: 'Обрезать', shape: 'Формат', vertical: '9:16 — Reels, TikTok, Shorts', square: '1:1 — квадрат', portrait: '4:5 — лента Instagram', wide: '16:9 — YouTube', position: 'Положение', saved: 'Сохранено — {size}, {w}×{h}.', failed: 'Не удалось обрезать — {msg}', same: 'Видео уже в этом формате.' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="video/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP4, MOV, WebM</span>
+  </label>
+  <div id="editor" hidden>
+    <div class="stage" id="stage">
+      <video id="preview" muted playsinline loop autoplay></video>
+      <div class="box" id="box"></div>
+    </div>
+    <div class="controls">
+      <label class="control">
+        <span class="muted">{words.shape}</span>
+        <select id="shape">
+          <option value="9:16" selected>{words.vertical}</option>
+          <option value="1:1">{words.square}</option>
+          <option value="4:5">{words.portrait}</option>
+          <option value="16:9">{words.wide}</option>
+        </select>
+      </label>
+      <label class="control grow">
+        <span class="muted">{words.position}</span>
+        <input type="range" id="pos" min="0" max="100" value="50" />
+      </label>
+      <span class="spacer"></span>
+      <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+    </div>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<style>
+  .stage { position: relative; max-width: 100%; margin: 0 auto 16px; width: fit-content; }
+  .stage video { display: block; max-width: 100%; max-height: 420px; border-radius: 8px; }
+  .box { position: absolute; top: 0; outline: 2px solid #fff; box-shadow: 0 0 0 9999px rgba(0,0,0,.55); pointer-events: none; }
+  .stage { overflow: hidden; border-radius: 8px; }
+  .grow { flex: 1; min-width: 140px; }
+</style>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { toolStrings, fill } from '../../lib/strings';
+  import { probe, encodeDetailed, saveBlob, formatBytes, CONTAINER_EXTENSION, type Container, type Probe } from '../../lib/encode';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const say = toolStrings();
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  const fileInput = el<HTMLInputElement>('file');
+  let file: File | null = null;
+  let info: Probe | null = null;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  /** The largest rectangle of the chosen shape inside the picture, slid along the free axis. Even sizes: encoders want them. */
+  function rect(W: number, H: number) {
+    const [a, b] = el<HTMLSelectElement>('shape').value.split(':').map(Number);
+    const p = Number(el<HTMLInputElement>('pos').value) / 100;
+    let width = W, height = Math.round((W * b) / a);
+    if (height > H) { height = H; width = Math.round((H * a) / b); }
+    width -= width % 2; height -= height % 2;
+    return { left: Math.round((W - width) * p), top: Math.round((H - height) * p), width, height };
+  }
+
+  function drawBox() {
+    if (!info) return;
+    const r = rect(info.width, info.height);
+    const box = el('box');
+    box.style.left = `${(r.left / info.width) * 100}%`;
+    box.style.top = `${(r.top / info.height) * 100}%`;
+    box.style.width = `${(r.width / info.width) * 100}%`;
+    box.style.height = `${(r.height / info.height) * 100}%`;
+  }
+
+  function containerOf(f: File): Container {
+    const ext = f.name.split('.').pop()?.toLowerCase();
+    if (ext === 'mov' || f.type === 'video/quicktime') return 'mov';
+    if (ext === 'webm' || f.type === 'video/webm') return 'webm';
+    return 'mp4';
+  }
+
+  async function open(chosen: File) {
+    file = chosen;
+    try {
+      status(say.reading);
+      info = await probe(chosen);
+      if (!info.width) throw new Error('That file has no video track.');
+      el<HTMLVideoElement>('preview').src = URL.createObjectURL(chosen);
+      el('editor').hidden = false;
+      statusEl.hidden = true;
+      drawBox();
+    } catch (error) {
+      toolFailed('open', error, chosen);
+      status(error instanceof Error ? error.message : 'Could not read that file.', 1, true);
+    }
+  }
+
+  el('shape').addEventListener('change', drawBox);
+  el('pos').addEventListener('input', drawBox);
+
+  el<HTMLButtonElement>('run').addEventListener('click', async () => {
+    if (!file || !info || busy) return;
+    const crop = rect(info.width, info.height);
+    if (crop.width >= info.width - 1 && crop.height >= info.height - 1) { status(w.same, 1); return; }
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    const container = containerOf(file);
+    const name = file.name.replace(/\.[^.]+$/, '') || 'video';
+    const shape = el<HTMLSelectElement>('shape').value;
+    try {
+      status(fill(say.working, { n: 0 }), 0);
+      const result = await encodeDetailed(file, {
+        container, crop,
+        onProgress: (p) => status(fill(say.working, { n: Math.round(p * 100) }), p),
+      });
+      saveBlob(result.blob, `${name}-${shape.replace(':', 'x')}.${CONTAINER_EXTENSION[container]}`);
+      track('result_saved', { placement: 'result', format: container, shape: shape.replace(':', 'x') }, { size_mb: Math.round(result.blob.size / 104_857.6) / 10 });
+      status(w.saved.replace('{size}', formatBytes(result.blob.size)).replace('{w}', String(crop.width)).replace('{h}', String(crop.height)), 1);
+    } catch (error) {
+      toolFailed('run', error, file);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  fileInput.addEventListener('change', () => { const f = fileInput.files?.[0]; if (f) { fileChosen(f, 'picker'); void open(f); } });
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => { const f = (e as DragEvent).dataTransfer?.files?.[0]; if (f) { fileChosen(f, 'drop'); void open(f); } });
+</script>
