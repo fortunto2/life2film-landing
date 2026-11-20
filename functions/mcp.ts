@@ -4,6 +4,7 @@
  * output (/agent-index.json and the .md twins), list_tools describes the browser tools. The browser
  * tools run in the visitor's browser and cannot be called from here. Protocol: superduper-site-kit/agent-mcp.
  */
+import { countMcp } from './_count';
 import { createMcpHandler, loadJson, loadMarkdown, scoreDoc, type McpTool } from 'superduper-site-kit/agent-mcp';
 
 type Env = { ASSETS: { fetch(r: Request): Promise<Response> } };
@@ -137,7 +138,7 @@ const tools: McpTool<Env>[] = [
   },
 ];
 
-export const onRequest = createMcpHandler<Env>({
+const handler = createMcpHandler<Env>({
   server: { name: 'life2film.com', title: 'Life2Film: guides and browser video tools', version: '1.0.0' },
   instructions:
     'Guides on editing video with an AI assistant, a blog, and the free video tools of life2film.com. Read-only: ' +
@@ -146,3 +147,8 @@ export const onRequest = createMcpHandler<Env>({
   tools,
   docsUrl: 'https://life2film.com/llms.txt',
 });
+
+export const onRequest = async (ctx: Parameters<typeof handler>[0] & { waitUntil(p: Promise<unknown>): void }) => {
+  if (ctx.request.method === 'POST') countMcp(await ctx.request.clone().text().catch(() => ''), (p) => ctx.waitUntil(p));
+  return handler(ctx);
+};

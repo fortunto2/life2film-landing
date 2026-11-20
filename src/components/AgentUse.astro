@@ -23,11 +23,11 @@ const ask = `Use Life2Film's ${slug} on my file: call get_tool("${slug}") on the
 ---
 <div class="agent-use">
   <p class="pitch"><strong>{t.pitch}:</strong> {t.mcp}</p>
-  <div class="row"><code>{setup.claudeCode}</code><button type="button" class="au-copy" data-text={setup.claudeCode}>Copy</button></div>
+  <div class="row"><code>{setup.claudeCode}</code><button type="button" class="au-copy" data-text={setup.claudeCode} data-sda-event="agent_setup_copied" data-sda-placement={`tool-${slug}-mcp`}>Copy</button></div>
   <details>
     <summary>{t.more}</summary>
     <p>{t.prompt}</p>
-    <div class="row"><code>{ask}</code><button type="button" class="au-copy" data-text={ask}>Copy</button></div>
+    <div class="row"><code>{ask}</code><button type="button" class="au-copy" data-text={ask} data-sda-event="agent_setup_copied" data-sda-placement={`tool-${slug}-prompt`}>Copy</button></div>
     <p class="small">Claude.ai / ChatGPT connector: <code>{setup.connector}</code> · Cursor: <code>{setup.cursor}</code></p>
     <p class="small"><code>get_tool("{slug}")</code> · <a href={`/tools/${slug}/skill.md`}>{t.skill}: /tools/{slug}/skill.md</a> · <a href="/.well-known/agent-skills/index.json">all skills</a></p>
   </details>
