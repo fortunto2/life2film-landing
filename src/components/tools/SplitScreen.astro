@@ -1,0 +1,95 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { pick: 'Choose two videos', layout: 'Layout', side: 'Side by side (16:9)', stack: 'One above the other (9:16)', sound: 'Sound', a: 'first video', b: 'second video', both: 'both', run: 'Put them together', need: 'Choose two videos.', working: 'Combining… {n}%', saved: 'Saved — {size}, {len}.', failed: 'Could not combine — {msg}' },
+  ru: { pick: 'Выберите два видео', layout: 'Расположение', side: 'Рядом (16:9)', stack: 'Друг над другом (9:16)', sound: 'Звук', a: 'первого видео', b: 'второго видео', both: 'обоих', run: 'Соединить', need: 'Выберите два видео.', working: 'Соединяем… {n}%', saved: 'Сохранено — {size}, {len}.', failed: 'Не удалось соединить — {msg}' },
+  es: { pick: 'Elige dos videos', layout: 'Disposición', side: 'Lado a lado (16:9)', stack: 'Uno sobre otro (9:16)', sound: 'Sonido', a: 'primer video', b: 'segundo video', both: 'ambos', run: 'Unirlos', need: 'Elige dos videos.', working: 'Uniendo… {n}%', saved: 'Guardado — {size}, {len}.', failed: 'No se pudo unir — {msg}' },
+  pt: { pick: 'Escolha dois vídeos', layout: 'Disposição', side: 'Lado a lado (16:9)', stack: 'Um sobre o outro (9:16)', sound: 'Som', a: 'primeiro vídeo', b: 'segundo vídeo', both: 'ambos', run: 'Juntar', need: 'Escolha dois vídeos.', working: 'Juntando… {n}%', saved: 'Salvo — {size}, {len}.', failed: 'Não foi possível juntar — {msg}' },
+  id: { pick: 'Pilih dua video', layout: 'Tata letak', side: 'Berdampingan (16:9)', stack: 'Atas bawah (9:16)', sound: 'Suara', a: 'video pertama', b: 'video kedua', both: 'keduanya', run: 'Gabungkan', need: 'Pilih dua video.', working: 'Menggabungkan… {n}%', saved: 'Tersimpan — {size}, {len}.', failed: 'Gagal menggabungkan — {msg}' },
+  tr: { pick: 'İki video seçin', layout: 'Düzen', side: 'Yan yana (16:9)', stack: 'Üst üste (9:16)', sound: 'Ses', a: 'ilk video', b: 'ikinci video', both: 'ikisi', run: 'Birleştir', need: 'İki video seçin.', working: 'Birleştiriliyor… %{n}', saved: 'Kaydedildi — {size}, {len}.', failed: 'Birleştirilemedi — {msg}' },
+  ar: { pick: 'اختر فيديوهين', layout: 'التخطيط', side: 'جنبًا إلى جنب (16:9)', stack: 'أحدهما فوق الآخر (9:16)', sound: 'الصوت', a: 'الفيديو الأول', b: 'الفيديو الثاني', both: 'كلاهما', run: 'اجمعهما', need: 'اختر فيديوهين.', working: 'جارٍ الجمع… {n}%', saved: 'تم الحفظ — {size}، {len}.', failed: 'تعذّر الجمع — {msg}' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="video/*" multiple hidden />
+    <strong>{words.pick}</strong>
+    <span class="muted">{chrome.dragHint} — MP4, MOV, WebM</span>
+  </label>
+  <div class="controls">
+    <label class="control"><span class="muted">{words.layout}</span>
+      <select id="layout"><option value="side" selected>{words.side}</option><option value="stack">{words.stack}</option></select></label>
+    <label class="control"><span class="muted">{words.sound}</span>
+      <select id="sound"><option value="a" selected>{words.a}</option><option value="b">{words.b}</option><option value="both">{words.both}</option></select></label>
+    <span class="spacer"></span>
+    <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { saveBlob, formatBytes, preciseClock } from '../../lib/encode';
+  import { splitScreen, type Layout, type SoundFrom } from '../../lib/split-screen';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  let files: File[] = [];
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  function take(list: FileList | null | undefined, how: 'picker' | 'drop') {
+    const vids = Array.from(list ?? []).filter((f) => f.type.startsWith('video/') || /\.(mp4|mov|m4v|webm|mkv)$/i.test(f.name));
+    files = [...files, ...vids].slice(-2);
+    vids.forEach((f) => fileChosen(f, how));
+    status(files.map((f, i) => `${i + 1}. ${f.name}`).join('   '));
+  }
+
+  el('run').addEventListener('click', async () => {
+    if (busy) return;
+    if (files.length < 2) { status(w.need, 1, true); return; }
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    const layout = el<HTMLSelectElement>('layout').value as Layout;
+    const sound = el<HTMLSelectElement>('sound').value as SoundFrom;
+    try {
+      const { blob, duration } = await splitScreen(files[0], files[1], layout, sound, (f) => status(w.working.replace('{n}', String(Math.round(f * 100))), f));
+      saveBlob(blob, `split-screen-${layout}.mp4`);
+      track('result_saved', { placement: 'result', layout, sound }, { seconds: Math.round(duration), size_mb: Math.round(blob.size / 104_857.6) / 10 });
+      status(w.saved.replace('{size}', formatBytes(blob.size)).replace('{len}', preciseClock(duration)), 1);
+    } catch (error) {
+      toolFailed('run', error, files[0]);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  el<HTMLInputElement>('file').addEventListener('change', (e) => take((e.target as HTMLInputElement).files, 'picker'));
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => take((e as DragEvent).dataTransfer?.files, 'drop'));
+</script>

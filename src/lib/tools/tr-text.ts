@@ -280,4 +280,30 @@ export const trText: ToolTranslations = {
       },
     ],
   },
+  'split-screen-video': {
+    searchPhrase: 'İki video tek ekranda online',
+    title: 'Bölünmüş Ekran Video Online Ücretsiz — iki video yan yana, yükleme yok',
+    description:
+      'İki videoyu online ve ücretsiz tek karede birleştirin: yan yana (16:9) veya üst üste (Reels ve TikTok için 9:16), eşzamanlı, birinin ya da ikisinin sesiyle. Tarayıcıda, yükleme yok.',
+    heading: 'Bölünmüş ekran',
+    accent: 'video',
+    lede: 'İki klip, tek kare, eşzamanlı.',
+    blurb: 'İki videoyu yan yana veya üst üste, aynı anda oynatın.',
+    featureList: [
+      'Yan yana (1920x1080) veya üst üste (1080x1920)',
+      'Her klip yarısını esnemeden doldurur',
+      'İlkinin, ikincinin veya ikisinin sesi',
+      'Yükleme ve filigran yok',
+    ],
+    faq: [
+      {
+        q: 'Süreleri farklıysa?',
+        a: 'Sonuç kısa olanın süresi kadardır.',
+      },
+      {
+        q: 'Videolar yükleniyor mu?',
+        a: 'Hayır. Tarayıcınız işler.',
+      },
+    ],
+  },
 };

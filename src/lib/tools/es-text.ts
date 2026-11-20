@@ -280,4 +280,30 @@ export const esText: ToolTranslations = {
       },
     ],
   },
+  'split-screen-video': {
+    searchPhrase: 'Dos videos en una pantalla online',
+    title: 'Pantalla dividida online gratis — dos videos lado a lado, sin subir',
+    description:
+      'Pon dos videos en un mismo cuadro online y gratis: lado a lado (16:9) o uno sobre otro (9:16 para Reels y TikTok), sincronizados, con el sonido de uno o ambos. En tu navegador, sin subir nada.',
+    heading: 'Pantalla',
+    accent: 'dividida',
+    lede: 'Dos clips, un cuadro, sincronizados.',
+    blurb: 'Dos videos lado a lado o uno sobre otro, a la vez.',
+    featureList: [
+      'Lado a lado (1920x1080) o apilados (1080x1920)',
+      'Cada clip llena su mitad sin deformarse',
+      'Sonido del primero, el segundo o ambos',
+      'Sin subidas ni marca de agua',
+    ],
+    faq: [
+      {
+        q: '¿Y si tienen distinta duración?',
+        a: 'El resultado dura lo que el más corto.',
+      },
+      {
+        q: '¿Se suben los videos?',
+        a: 'No. Tu navegador los procesa.',
+      },
+    ],
+  },
 };

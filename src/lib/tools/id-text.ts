@@ -280,4 +280,30 @@ export const idText: ToolTranslations = {
       },
     ],
   },
+  'split-screen-video': {
+    searchPhrase: 'Dua video dalam satu layar online',
+    title: 'Split Screen Video Online Gratis — dua video berdampingan, tanpa unggah',
+    description:
+      'Taruh dua video dalam satu frame secara online dan gratis: berdampingan (16:9) atau atas bawah (9:16 untuk Reels dan TikTok), bersamaan, dengan suara salah satu atau keduanya. Di browser, tanpa unggah.',
+    heading: 'Split screen',
+    accent: 'video',
+    lede: 'Dua klip, satu frame, sinkron.',
+    blurb: 'Dua video berdampingan atau atas bawah, diputar bersamaan.',
+    featureList: [
+      'Berdampingan (1920x1080) atau atas bawah (1080x1920)',
+      'Setiap klip mengisi setengahnya tanpa melar',
+      'Suara pertama, kedua atau keduanya',
+      'Tanpa unggah dan watermark',
+    ],
+    faq: [
+      {
+        q: 'Bagaimana jika durasinya berbeda?',
+        a: 'Hasilnya sepanjang klip yang lebih pendek.',
+      },
+      {
+        q: 'Apakah video diunggah?',
+        a: 'Tidak. Browser Anda yang memprosesnya.',
+      },
+    ],
+  },
 };

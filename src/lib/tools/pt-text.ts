@@ -280,4 +280,30 @@ export const ptText: ToolTranslations = {
       },
     ],
   },
+  'split-screen-video': {
+    searchPhrase: 'Dois vídeos na mesma tela online',
+    title: 'Tela dividida online grátis — dois vídeos lado a lado, sem upload',
+    description:
+      'Coloque dois vídeos no mesmo quadro online e grátis: lado a lado (16:9) ou um sobre o outro (9:16 para Reels e TikTok), sincronizados, com o som de um ou dos dois. No navegador, sem upload.',
+    heading: 'Tela',
+    accent: 'dividida',
+    lede: 'Dois clipes, um quadro, sincronizados.',
+    blurb: 'Dois vídeos lado a lado ou um sobre o outro, ao mesmo tempo.',
+    featureList: [
+      'Lado a lado (1920x1080) ou empilhados (1080x1920)',
+      'Cada clipe preenche sua metade sem distorcer',
+      'Som do primeiro, do segundo ou dos dois',
+      'Sem upload nem marca d’água',
+    ],
+    faq: [
+      {
+        q: 'E se tiverem durações diferentes?',
+        a: 'O resultado dura o mesmo que o mais curto.',
+      },
+      {
+        q: 'Os vídeos são enviados?',
+        a: 'Não. O navegador os processa.',
+      },
+    ],
+  },
 };

@@ -430,4 +430,40 @@ export const TEXT_TOOLS: Tool[] = [
     facts: ['The same CSS filter string drives the preview element and the canvas that encodes, so the preview is the result.'],
     agentJob: 'Applying a colour filter to a video, locally',
   },
+  {
+    // 20 Nov 2026: «два видео в одном кадре», «side by side video maker», «split screen video».
+    slug: 'split-screen-video',
+    group: 'everyday',
+    name: 'Split Screen Video',
+    appName: 'Split Screen',
+    blurb: 'Put two videos side by side or one above the other, playing together.',
+
+    searchPhrase: 'Split Screen Video Maker Online',
+    title: 'Split Screen Video Maker Online Free | two videos side by side, no upload',
+    description: 'Put two videos in one frame online for free: side by side (16:9) or one above the other (9:16 for Reels and TikTok), playing together, with the sound of either or both. Runs in your browser; nothing is uploaded, no watermark.',
+    heading: 'Split screen',
+    accent: 'video',
+    lede: 'Two clips, one frame, in sync. The videos stay on your device.',
+    featureList: [
+      'Side by side (1920x1080) or stacked (1080x1920)',
+      'Each clip fills its half, cropped to cover, never stretched',
+      'Sound from the first, the second, or both',
+      'Plays for as long as the shorter clip',
+      'Nothing uploaded, no watermark',
+    ],
+    faq: [
+      {
+        q: 'What if the videos have different lengths?',
+        a: 'The result is as long as the shorter one. Trim the longer clip first (Video Trimmer) to choose which part plays.',
+      },
+      {
+        q: 'Are the videos uploaded?',
+        a: 'No. Your browser decodes both, draws them into one frame and encodes the result.',
+      },
+    ],
+
+    summary: 'Two videos side by side or stacked in one MP4, sound from either or both, in the browser.',
+    facts: ['A reaction or before/after video is the common use; stacked 9:16 fits a phone feed.'],
+    agentJob: 'Putting two videos in one frame, locally',
+  },
 ];
