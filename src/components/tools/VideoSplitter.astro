@@ -11,6 +11,10 @@ const { lang = 'en' } = Astro.props;
 const chrome = CHROME[lang];
 const status = STATUS[lang];
 const sp = SPLITTER[lang];
+// What the page opens in. Russian searchers ask for «на 2 части», «на 3 части» (Search Console,
+// 28 days to 20 Nov 2026: every RU splitter query with impressions names a number of parts), so the
+// Russian page starts on equal parts; elsewhere it starts on shot changes, the part only we do.
+const initialMode = lang === 'ru' ? 'parts' : 'scenes';
 const fill = (t: string, n: number) => t.replace('{n}', String(n));
 
 /**
@@ -34,8 +38,8 @@ const fill = (t: string, n: number) => t.replace('{n}', String(n));
             <label class="control">
               <span class="muted">{sp.splitBy}</span>
               <select id="mode">
-                <option value="scenes" selected>{sp.byScenes}</option>
-                <option value="parts">{sp.byParts}</option>
+                <option value="scenes" selected={initialMode === 'scenes'}>{sp.byScenes}</option>
+                <option value="parts" selected={initialMode === 'parts'}>{sp.byParts}</option>
                 <option value="every">{sp.byEvery}</option>
               </select>
             </label>
