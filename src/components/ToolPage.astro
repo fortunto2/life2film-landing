@@ -29,6 +29,7 @@ const base = TOOL[slug];
 // The words for this locale, or the English original when there is no translation yet.
 const tool = lang === 'en' ? asTranslation(base) : TRANSLATIONS[lang]?.[slug] ?? asTranslation(base);
 const chrome = CHROME[lang];
+const phoneAfter = slug === 'bpm-detector' ? chrome.appAfterBeat : chrome.appAfter;
 const path = localePath(lang, `/tools/${slug}/`);
 
 /** Only the locales that actually have this page — never claim a translation that does not exist. */
@@ -97,7 +98,7 @@ const jsonLd = {
         <div class="app-after" id="appAfter" data-wait={waitMode} hidden>
           <div class="offer" data-offer="phone">
             <img src="/img/app-icon.png" alt="" width="48" height="48" />
-            <span><span class="when-saved">{savedSplit(chrome.appAfter)[0]} </span>{savedSplit(chrome.appAfter)[1]}</span>
+            <span><span class="when-saved">{savedSplit(phoneAfter)[0]} </span>{savedSplit(phoneAfter)[1]}</span>
             <a class="ghost primary" href={`https://apps.apple.com/app/id6761656888?pt=128499174&ct=tool-${slug}-result&mt=8`}
                target="_blank" rel="noopener" data-sda-event="app_store_opened" data-sda-placement={`tool-${slug}-result`}>{chrome.appCta}</a>
           </div>

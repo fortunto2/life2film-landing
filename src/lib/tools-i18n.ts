@@ -53,6 +53,9 @@ export interface ToolChrome {
   studioAfter: string;
   /** What Studio needs, under its button. */
   studioNote: string;
+  /** The phone offer on the BPM page: its visitors come with a track, not a camera roll
+   * (the RU page is the site's most-searched, 5,937 impressions in 28 days to 19 Nov 2026). */
+  appAfterBeat: string;
 }
 
 export const CHROME: Record<Lang, ToolChrome> = {
@@ -80,6 +83,7 @@ export const CHROME: Record<Lang, ToolChrome> = {
     studioCta: "Download Life2Film Studio",
     studioAfter: "Saved. Life2Film Studio for Mac does the whole edit by itself: best moments, cut to music, on your desktop.",
     studioNote: "Apple Silicon · macOS 15+ · free in beta",
+    appAfterBeat: 'Saved. Life2Film cuts your iPhone videos to the beat of a track like this one by itself: pick the song, it picks the moments.',
   },
   es: {
     allTools: '← Todas las herramientas',
@@ -105,6 +109,7 @@ export const CHROME: Record<Lang, ToolChrome> = {
     studioCta: "Descargar Life2Film Studio",
     studioAfter: "Guardado. Life2Film Studio para Mac hace toda la edición solo: los mejores momentos, montados con música, en tu ordenador.",
     studioNote: "Apple Silicon · macOS 15+ · gratis en beta",
+    appAfterBeat: 'Guardado. Life2Film monta solo los vídeos de tu iPhone al ritmo de una canción como esta: tú eliges la canción, él elige los momentos.',
   },
   pt: {
     allTools: '← Todas as ferramentas',
@@ -130,6 +135,7 @@ export const CHROME: Record<Lang, ToolChrome> = {
     studioCta: "Baixar Life2Film Studio",
     studioAfter: "Salvo. O Life2Film Studio para Mac faz toda a edição sozinho: os melhores momentos, montados com música, no seu computador.",
     studioNote: "Apple Silicon · macOS 15+ · grátis no beta",
+    appAfterBeat: 'Salvo. O Life2Film monta sozinho os vídeos do seu iPhone no ritmo de uma música como esta: você escolhe a música, ele escolhe os momentos.',
   },
   id: {
     allTools: '← Semua alat',
@@ -155,6 +161,7 @@ export const CHROME: Record<Lang, ToolChrome> = {
     studioCta: "Unduh Life2Film Studio",
     studioAfter: "Tersimpan. Life2Film Studio untuk Mac mengerjakan seluruh editan sendiri: momen terbaik, dipotong sesuai musik, di komputer Anda.",
     studioNote: "Apple Silicon · macOS 15+ · gratis selama beta",
+    appAfterBeat: 'Tersimpan. Life2Film memotong video iPhone Anda sendiri mengikuti ketukan lagu seperti ini: Anda pilih lagunya, ia pilih momennya.',
   },
   ar: {
     allTools: '← كل الأدوات',
@@ -180,6 +187,7 @@ export const CHROME: Record<Lang, ToolChrome> = {
     studioCta: "تنزيل Life2Film Studio",
     studioAfter: "تم الحفظ. يتولى Life2Film Studio لأجهزة Mac المونتاج كاملًا بنفسه: أفضل اللحظات، مقطّعة على الموسيقى، على حاسوبك.",
     studioNote: "Apple Silicon · macOS 15 أو أحدث · مجاني خلال النسخة التجريبية",
+    appAfterBeat: 'تم الحفظ. يقطّع Life2Film مقاطع الآيفون بنفسه على إيقاع أغنية مثل هذه: أنت تختار الأغنية، وهو يختار اللحظات.',
   },
   ru: {
     allTools: '← Все инструменты',
@@ -205,6 +213,7 @@ export const CHROME: Record<Lang, ToolChrome> = {
     studioCta: "Скачать Life2Film Studio",
     studioAfter: "Сохранено. Life2Film Studio для Mac делает весь монтаж сам: лучшие моменты, нарезанные под музыку, прямо на компьютере.",
     studioNote: "Apple Silicon · macOS 15+ · бесплатно на время беты",
+    appAfterBeat: 'Сохранено. Life2Film сам режет видео с iPhone в бит такого трека: вы выбираете песню, он выбирает моменты.',
   },
   tr: {
     allTools: '← Tüm araçlar',
@@ -230,6 +239,7 @@ export const CHROME: Record<Lang, ToolChrome> = {
     studioCta: "Life2Film Studio'yu indir",
     studioAfter: "Kaydedildi. Mac için Life2Film Studio tüm kurguyu kendisi yapar: en iyi anlar, müziğe göre kesilmiş, bilgisayarınızda.",
     studioNote: "Apple Silicon · macOS 15+ · beta süresince ücretsiz",
+    appAfterBeat: 'Kaydedildi. Life2Film iPhone videolarınızı böyle bir şarkının ritmine göre kendisi keser: şarkıyı siz seçersiniz, anları o seçer.',
   },
 };
 
