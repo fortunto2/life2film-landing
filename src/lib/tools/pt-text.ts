@@ -4,7 +4,7 @@ import type { ToolTranslations } from '../tools-i18n';
 export const ptText: ToolTranslations = {
   'auto-subtitles': {
     searchPhrase: 'Gerador de legendas automáticas online',
-    title: 'Legendas automáticas online grátis — vídeo para SRT com Whisper, sem upload',
+    title: 'Legendas automáticas online grátis — vídeo para SRT com Whisper',
     description:
       'Crie legendas de um vídeo automaticamente, online e grátis: o Whisper roda no navegador e escreve SRT ou VTT com tempos, em 99 idiomas. O vídeo não é enviado; o modelo é baixado uma vez.',
     heading: 'Legendas',
@@ -256,7 +256,7 @@ export const ptText: ToolTranslations = {
   },
   'video-filters': {
     searchPhrase: 'Filtros de vídeo online',
-    title: 'Filtros de vídeo online grátis — clarear vídeo escuro, preto e branco, sem upload',
+    title: 'Filtros de vídeo online grátis — clarear vídeo escuro, preto e branco',
     description:
       'Aplique filtros num vídeo online e grátis: clareie um vídeo escuro, deixe preto e branco, vívido, quente, frio ou vintage, ou ajuste brilho, contraste, saturação e calor com prévia ao vivo. No navegador, sem upload.',
     heading: 'Filtros de',
@@ -308,7 +308,7 @@ export const ptText: ToolTranslations = {
   },
   'tiktok-captions': {
     searchPhrase: 'Legendas estilo TikTok',
-    title: 'Legendas estilo TikTok online grátis — legendas grandes palavra por palavra, sem upload',
+    title: 'Legendas estilo TikTok online grátis — legendas grandes palavra por palavra',
     description:
       'Adicione legendas estilo TikTok e Reels a um vídeo automaticamente, online e grátis: o Whisper ouve a fala no navegador e grava legendas grandes em negrito, de 1 a 4 palavras, no centro. Sem upload, sem marca d’água.',
     heading: 'Legendas',
@@ -385,7 +385,7 @@ export const ptText: ToolTranslations = {
   },
   'remove-silence-from-video': {
     searchPhrase: 'Remover silêncios de um vídeo online',
-    title: 'Remover silêncio de vídeo online grátis — jump cuts automáticos, sem upload',
+    title: 'Remover silêncio de vídeo online grátis — jump cuts automáticos',
     description:
       'Corte as pausas de um vídeo falado automaticamente, online e grátis: escolha o que é silêncio e que pausa cortar e receba um MP4 mais dinâmico. No navegador, sem upload.',
     heading: 'Remover silêncios',
@@ -437,7 +437,7 @@ export const ptText: ToolTranslations = {
   },
   'video-progress-bar': {
     searchPhrase: 'Barra de progresso no vídeo online',
-    title: 'Adicionar barra de progresso ao vídeo online grátis — para Shorts, Reels e TikTok, sem upload',
+    title: 'Adicionar barra de progresso ao vídeo online grátis — para Shorts, Reels e TikTok',
     description:
       'Adicione uma barra de progresso a um vídeo online e grátis: uma barra fina em cima ou embaixo que enche enquanto toca, em cinco cores. No navegador, sem upload.',
     heading: 'Barra de progresso',
@@ -485,7 +485,7 @@ export const ptText: ToolTranslations = {
   },
   'video-collage': {
     searchPhrase: 'Colagem de vídeos online',
-    title: 'Colagem de vídeos online grátis — 2 a 4 vídeos em um quadro, sem upload',
+    title: 'Colagem de vídeos online grátis — 2 a 4 vídeos em um quadro',
     description:
       'Crie uma colagem de vídeos online e grátis: de dois a quatro clipes em um quadro 16:9, em grade, ao mesmo tempo, com o som do primeiro. No navegador, sem upload.',
     heading: 'Colagem',
@@ -507,7 +507,7 @@ export const ptText: ToolTranslations = {
   },
   'normalize-audio': {
     searchPhrase: 'Normalizar áudio online',
-    title: 'Normalizar áudio online grátis — mais alto sem distorcer, MP3 ou WAV, sem upload',
+    title: 'Normalizar áudio online grátis — mais alto sem distorcer, MP3 ou WAV',
     description:
       'Normalize um arquivo de áudio online e grátis: volume padrão (-16 dB) ou o mais alto possível sem distorcer, em MP3 ou WAV. No navegador, sem upload.',
     heading: 'Normalizar',
@@ -529,7 +529,7 @@ export const ptText: ToolTranslations = {
   },
   'add-border-to-video': {
     searchPhrase: 'Borda para vídeo online',
-    title: 'Adicionar borda ao vídeo online grátis — moldura branca ou colorida, sem upload',
+    title: 'Adicionar borda ao vídeo online grátis — moldura branca ou colorida',
     description:
       'Adicione uma borda a um vídeo online e grátis: branca, preta ou colorida, fina, média ou grossa, com a imagem inteira dentro. No navegador, sem upload.',
     heading: 'Adicionar borda',

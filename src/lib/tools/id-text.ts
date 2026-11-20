@@ -4,7 +4,7 @@ import type { ToolTranslations } from '../tools-i18n';
 export const idText: ToolTranslations = {
   'auto-subtitles': {
     searchPhrase: 'Pembuat subtitle otomatis online',
-    title: 'Subtitle Otomatis Online Gratis — video ke SRT dengan Whisper, tanpa unggah',
+    title: 'Subtitle Otomatis Online Gratis — video ke SRT dengan Whisper',
     description:
       'Buat subtitle video secara otomatis, online dan gratis: Whisper berjalan di browser dan menulis SRT atau VTT berwaktu, dalam 99 bahasa. Video tidak diunggah; model diunduh sekali.',
     heading: 'Subtitle',
@@ -256,7 +256,7 @@ export const idText: ToolTranslations = {
   },
   'video-filters': {
     searchPhrase: 'Filter video online',
-    title: 'Filter Video Online Gratis — terangkan video gelap, hitam putih, tanpa unggah',
+    title: 'Filter Video Online Gratis — terangkan video gelap, hitam putih',
     description:
       'Terapkan filter ke video secara online dan gratis: terangkan video gelap, jadikan hitam putih, cerah, hangat, dingin atau vintage, atau atur kecerahan, kontras, saturasi dan kehangatan dengan pratinjau langsung. Di browser, tanpa unggah.',
     heading: 'Filter',
@@ -282,7 +282,7 @@ export const idText: ToolTranslations = {
   },
   'split-screen-video': {
     searchPhrase: 'Dua video dalam satu layar online',
-    title: 'Split Screen Video Online Gratis — dua video berdampingan, tanpa unggah',
+    title: 'Split Screen Video Online Gratis — dua video berdampingan',
     description:
       'Taruh dua video dalam satu frame secara online dan gratis: berdampingan (16:9) atau atas bawah (9:16 untuk Reels dan TikTok), bersamaan, dengan suara salah satu atau keduanya. Di browser, tanpa unggah.',
     heading: 'Split screen',
@@ -308,7 +308,7 @@ export const idText: ToolTranslations = {
   },
   'tiktok-captions': {
     searchPhrase: 'Caption gaya TikTok',
-    title: 'Caption Gaya TikTok Online Gratis — caption besar per kata, tanpa unggah',
+    title: 'Caption Gaya TikTok Online Gratis — caption besar per kata',
     description:
       'Tambahkan caption gaya TikTok dan Reels ke video secara otomatis, online dan gratis: Whisper mendengar ucapan di browser dan menanamkan caption tebal besar, 1–4 kata, di tengah frame. Tanpa unggah, tanpa watermark.',
     heading: 'Caption',
@@ -385,7 +385,7 @@ export const idText: ToolTranslations = {
   },
   'remove-silence-from-video': {
     searchPhrase: 'Hapus jeda dari video online',
-    title: 'Hapus Hening dari Video Online Gratis — jump cut otomatis, tanpa unggah',
+    title: 'Hapus Hening dari Video Online Gratis — jump cut otomatis',
     description:
       'Potong jeda dari video bicara secara otomatis, online dan gratis: pilih ambang hening dan panjang jeda, dapatkan MP4 yang lebih padat. Di browser, tanpa unggah.',
     heading: 'Hapus jeda',
@@ -437,7 +437,7 @@ export const idText: ToolTranslations = {
   },
   'video-progress-bar': {
     searchPhrase: 'Progress bar di video online',
-    title: 'Tambah Progress Bar ke Video Online Gratis — untuk Shorts, Reels, TikTok, tanpa unggah',
+    title: 'Tambah Progress Bar ke Video Online Gratis — untuk Shorts, Reels, TikTok',
     description:
       'Tambahkan progress bar ke video secara online dan gratis: bilah tipis di atas atau bawah yang terisi saat video diputar, lima warna. Di browser, tanpa unggah.',
     heading: 'Progress bar',
@@ -485,7 +485,7 @@ export const idText: ToolTranslations = {
   },
   'video-collage': {
     searchPhrase: 'Kolase video online',
-    title: 'Kolase Video Online Gratis — 2 sampai 4 video dalam satu frame, tanpa unggah',
+    title: 'Kolase Video Online Gratis — 2 sampai 4 video dalam satu frame',
     description:
       'Buat kolase video secara online dan gratis: dua sampai empat klip dalam satu frame 16:9, berbentuk grid, diputar bersamaan, dengan suara klip pertama. Di browser, tanpa unggah.',
     heading: 'Kolase',
@@ -507,7 +507,7 @@ export const idText: ToolTranslations = {
   },
   'normalize-audio': {
     searchPhrase: 'Normalisasi audio online',
-    title: 'Normalisasi Audio Online Gratis — lebih keras tanpa clipping, MP3 atau WAV, tanpa unggah',
+    title: 'Normalisasi Audio Online Gratis — lebih keras tanpa clipping, MP3 atau WAV',
     description:
       'Normalisasi file audio secara online dan gratis: ke kenyaringan standar (-16 dB) atau sekeras mungkin tanpa clipping, MP3 atau WAV. Di browser, tanpa unggah.',
     heading: 'Normalisasi',
@@ -529,7 +529,7 @@ export const idText: ToolTranslations = {
   },
   'add-border-to-video': {
     searchPhrase: 'Bingkai video online',
-    title: 'Tambah Bingkai ke Video Online Gratis — putih atau berwarna, tanpa unggah',
+    title: 'Tambah Bingkai ke Video Online Gratis — putih atau berwarna',
     description:
       'Tambahkan bingkai ke video secara online dan gratis: putih, hitam atau berwarna, tipis, sedang atau tebal, gambar utuh di dalamnya. Di browser, tanpa unggah.',
     heading: 'Tambah bingkai',

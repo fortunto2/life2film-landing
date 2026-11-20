@@ -4,7 +4,7 @@ import type { ToolTranslations } from '../tools-i18n';
 export const esText: ToolTranslations = {
   'auto-subtitles': {
     searchPhrase: 'Generador de subtítulos automáticos online',
-    title: 'Subtítulos automáticos online gratis — video a SRT con Whisper, sin subir',
+    title: 'Subtítulos automáticos online gratis — video a SRT con Whisper',
     description:
       'Crea subtítulos de un video automáticamente, online y gratis: Whisper funciona en tu navegador y escribe SRT o VTT con tiempos, en 99 idiomas. El video no se sube; el modelo se descarga una vez.',
     heading: 'Subtítulos',
@@ -256,7 +256,7 @@ export const esText: ToolTranslations = {
   },
   'video-filters': {
     searchPhrase: 'Filtros de video online',
-    title: 'Filtros de video online gratis — aclarar un video oscuro, blanco y negro, sin subir',
+    title: 'Filtros de video online gratis — aclarar un video oscuro, blanco y negro',
     description:
       'Aplica filtros a un video online y gratis: aclara un video oscuro, pásalo a blanco y negro, vivo, cálido, frío o vintage, o ajusta brillo, contraste, saturación y calidez con vista previa en vivo. En tu navegador, sin subir nada.',
     heading: 'Filtros de',
@@ -308,7 +308,7 @@ export const esText: ToolTranslations = {
   },
   'tiktok-captions': {
     searchPhrase: 'Subtítulos estilo TikTok',
-    title: 'Subtítulos estilo TikTok online gratis — subtítulos grandes palabra a palabra, sin subir',
+    title: 'Subtítulos estilo TikTok online gratis — subtítulos grandes palabra a palabra',
     description:
       'Añade subtítulos estilo TikTok y Reels a un video automáticamente, online y gratis: Whisper escucha la voz en tu navegador e incrusta subtítulos grandes en negrita, de 1 a 4 palabras, en el centro. Sin subir, sin marca de agua.',
     heading: 'Subtítulos',
@@ -334,7 +334,7 @@ export const esText: ToolTranslations = {
   },
   'fade-video': {
     searchPhrase: 'Fundido de entrada y salida online',
-    title: 'Fundido de video online gratis — aparecer y desvanecer a negro, sin subir',
+    title: 'Fundido de video online gratis — aparecer y desvanecer a negro',
     description:
       'Añade un fundido desde negro y a negro a un video online y gratis, con el sonido. De 0,5 a 3 s en cada extremo. En tu navegador, sin subir.',
     heading: 'Fundido de entrada y salida',
@@ -385,7 +385,7 @@ export const esText: ToolTranslations = {
   },
   'remove-silence-from-video': {
     searchPhrase: 'Quitar silencios de un video online',
-    title: 'Quitar silencios de video online gratis — jump cuts automáticos, sin subir',
+    title: 'Quitar silencios de video online gratis — jump cuts automáticos',
     description:
       'Corta las pausas de un video hablado automáticamente, online y gratis: elige qué es silencio y qué pausa cortar, y obtén un MP4 más ágil. En tu navegador, sin subir.',
     heading: 'Quitar silencios',
@@ -437,7 +437,7 @@ export const esText: ToolTranslations = {
   },
   'video-progress-bar': {
     searchPhrase: 'Barra de progreso en un video online',
-    title: 'Añadir barra de progreso a un video online gratis — para Shorts, Reels y TikTok, sin subir',
+    title: 'Añadir barra de progreso a un video online gratis — para Shorts, Reels y TikTok',
     description:
       'Añade una barra de progreso a un video online y gratis: una barra fina arriba o abajo que se llena mientras se reproduce, en cinco colores. En tu navegador, sin subir.',
     heading: 'Barra de progreso',
@@ -459,7 +459,7 @@ export const esText: ToolTranslations = {
   },
   'cut-part-of-video': {
     searchPhrase: 'Quitar una parte de un video online',
-    title: 'Quitar una parte de un video online gratis — cortar el medio, sin subir',
+    title: 'Quitar una parte de un video online gratis — cortar el medio',
     description:
       'Corta una sección del medio de un video online y gratis: marca inicio y fin mientras lo ves, y lo de antes y después se une. En tu navegador, sin subir.',
     heading: 'Quitar una parte',
@@ -507,7 +507,7 @@ export const esText: ToolTranslations = {
   },
   'normalize-audio': {
     searchPhrase: 'Normalizar audio online',
-    title: 'Normalizar audio online gratis — más alto sin saturar, MP3 o WAV, sin subir',
+    title: 'Normalizar audio online gratis — más alto sin saturar, MP3 o WAV',
     description:
       'Normaliza un archivo de audio online y gratis: a volumen estándar (-16 dB) o lo más alto posible sin saturar, en MP3 o WAV. En tu navegador, sin subir.',
     heading: 'Normalizar',
@@ -529,7 +529,7 @@ export const esText: ToolTranslations = {
   },
   'add-border-to-video': {
     searchPhrase: 'Borde para video online',
-    title: 'Añadir borde a un video online gratis — marco blanco o de color, sin subir',
+    title: 'Añadir borde a un video online gratis — marco blanco o de color',
     description:
       'Añade un borde a un video online y gratis: blanco, negro o de color, fino, medio o grueso, con toda la imagen dentro. En tu navegador, sin subir.',
     heading: 'Añadir borde',

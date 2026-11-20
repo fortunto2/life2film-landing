@@ -4,7 +4,7 @@ import type { ToolTranslations } from '../tools-i18n';
 export const trText: ToolTranslations = {
   'auto-subtitles': {
     searchPhrase: 'Otomatik altyazı oluşturucu online',
-    title: 'Otomatik Altyazı Online Ücretsiz — Whisper ile videodan SRT, yükleme yok',
+    title: 'Otomatik Altyazı Online Ücretsiz — Whisper ile videodan SRT',
     description:
       'Bir videonun altyazısını otomatik, online ve ücretsiz oluşturun: Whisper tarayıcınızda çalışır ve zamanlamalı SRT veya VTT yazar, 99 dilde. Video yüklenmez; model bir kez iner.',
     heading: 'Otomatik',
@@ -152,7 +152,7 @@ export const trText: ToolTranslations = {
   },
   'sped-up-slowed-reverb': {
     searchPhrase: 'Sped up ve slowed + reverb şarkı online',
-    title: 'Sped Up ve Slowed + Reverb Online Ücretsiz — şarkıyı hızlandır veya yavaşlat, yükleme yok',
+    title: 'Sped Up ve Slowed + Reverb Online Ücretsiz — şarkıyı hızlandır veya yavaşlat',
     description:
       'Bir şarkının sped up veya slowed + reverb versiyonunu online ve ücretsiz yapın: tek tık ön ayarlar, 0,5×–2× hız, yankı ve ses perdesini koruma seçeneği. MP3 veya WAV. Tarayıcıda, yükleme yok.',
     heading: 'Sped up ve',
@@ -256,7 +256,7 @@ export const trText: ToolTranslations = {
   },
   'video-filters': {
     searchPhrase: 'Video filtreleri online',
-    title: 'Video Filtreleri Online Ücretsiz — karanlık videoyu aydınlat, siyah beyaz, yükleme yok',
+    title: 'Video Filtreleri Online Ücretsiz — karanlık videoyu aydınlat, siyah beyaz',
     description:
       'Bir videoya online ve ücretsiz filtre uygulayın: karanlık videoyu aydınlatın, siyah beyaz, canlı, sıcak, soğuk veya vintage yapın ya da canlı önizlemeyle parlaklık, kontrast, doygunluk ve sıcaklığı ayarlayın. Tarayıcıda, yükleme yok.',
     heading: 'Video',
@@ -308,7 +308,7 @@ export const trText: ToolTranslations = {
   },
   'tiktok-captions': {
     searchPhrase: 'TikTok tarzı altyazı',
-    title: 'TikTok Tarzı Altyazı Online Ücretsiz — kelime kelime büyük altyazı, yükleme yok',
+    title: 'TikTok Tarzı Altyazı Online Ücretsiz — kelime kelime büyük altyazı',
     description:
       'Bir videoya TikTok ve Reels tarzı altyazıyı otomatik, online ve ücretsiz ekleyin: Whisper konuşmayı tarayıcıda dinler, karenin ortasına 1–4 kelimelik büyük kalın altyazılar gömer. Yükleme ve filigran yok.',
     heading: 'TikTok tarzı',
@@ -334,7 +334,7 @@ export const trText: ToolTranslations = {
   },
   'fade-video': {
     searchPhrase: 'Videoya belirme ve kararma online',
-    title: 'Video Kararma Online Ücretsiz — siyahtan belirme ve siyaha kararma, yükleme yok',
+    title: 'Video Kararma Online Ücretsiz — siyahtan belirme ve siyaha kararma',
     description:
       'Bir videoya siyahtan belirme ve siyaha kararma geçişini online ve ücretsiz ekleyin, ses de birlikte azalır. Her uç için 0,5–3 saniye. Tarayıcıda, yükleme yok.',
     heading: 'Belirme ve kararma',
@@ -385,7 +385,7 @@ export const trText: ToolTranslations = {
   },
   'remove-silence-from-video': {
     searchPhrase: 'Videodaki sessizlikleri online kes',
-    title: 'Videodan Sessizliği Kaldır Online Ücretsiz — otomatik jump cut, yükleme yok',
+    title: 'Videodan Sessizliği Kaldır Online Ücretsiz — otomatik jump cut',
     description:
       'Konuşmalı bir videodaki duraklamaları otomatik, online ve ücretsiz kesin: neyin sessizlik sayılacağını ve duraklama uzunluğunu seçin, daha akıcı bir MP4 alın. Tarayıcıda, yükleme yok.',
     heading: 'Sessizliği kaldır',
@@ -437,7 +437,7 @@ export const trText: ToolTranslations = {
   },
   'video-progress-bar': {
     searchPhrase: 'Videoya ilerleme çubuğu online',
-    title: 'Videoya İlerleme Çubuğu Ekle Online Ücretsiz — Shorts, Reels, TikTok için, yükleme yok',
+    title: 'Videoya İlerleme Çubuğu Ekle Online Ücretsiz — Shorts, Reels, TikTok için',
     description:
       'Bir videoya online ve ücretsiz ilerleme çubuğu ekleyin: üstte veya altta, video oynadıkça dolan ince bir çubuk, beş renk. Tarayıcıda, yükleme yok.',
     heading: 'İlerleme çubuğu',
@@ -507,7 +507,7 @@ export const trText: ToolTranslations = {
   },
   'normalize-audio': {
     searchPhrase: 'Sesi online normalleştir',
-    title: 'Ses Normalleştirme Online Ücretsiz — bozulmadan daha yüksek, MP3 veya WAV, yükleme yok',
+    title: 'Ses Normalleştirme Online Ücretsiz — bozulmadan daha yüksek, MP3 veya WAV',
     description:
       'Bir ses dosyasını online ve ücretsiz normalleştirin: standart yükseklik (-16 dB) veya bozulmadan en yüksek seviye, MP3 ya da WAV. Tarayıcıda, yükleme yok.',
     heading: 'Sesi',
