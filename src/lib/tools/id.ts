@@ -183,6 +183,32 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'video-info': {
+    searchPhrase: 'Cek bitrate video online',
+    title: 'Cek Bitrate Video dan Audio Online Gratis — codec, FPS, resolusi',
+    description:
+      'Lihat bitrate, codec, frame rate, resolusi, HDR, dan sample rate audio dari file video atau audio, online dan gratis. Dibaca di browser: file tidak diunggah.',
+    heading: 'Info',
+    accent: 'video',
+    lede: 'Jatuhkan file dan lihat isinya: bitrate, codec, FPS, resolusi, audio. Tidak ada yang diunggah.',
+    blurb: 'Bitrate, codec, FPS, resolusi, dan detail audio dari file apa pun.',
+    featureList: [
+      'Bitrate total, video, dan audio',
+      'Codec, resolusi, FPS, rotasi, dan HDR',
+      'Kanal dan sample rate audio',
+      'Semua di browser: tanpa unggah',
+    ],
+    faq: [
+      {
+        q: 'Bagaimana bitrate diukur?',
+        a: 'Dari file itu sendiri: ukuran paket tiap trek dibagi durasinya, hingga 600 paket. Bitrate total adalah ukuran file dibagi durasi, termasuk kontainer.',
+      },
+      {
+        q: 'Apakah file saya diunggah?',
+        a: 'Tidak. Browser hanya membaca bagian yang diperlukan; tidak ada yang keluar dari perangkat.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',

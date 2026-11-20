@@ -183,6 +183,32 @@ export const pt: ToolTranslations = {
       },
     ],
   },
+  'video-info': {
+    searchPhrase: 'Ver bitrate de vídeo online',
+    title: 'Ver o bitrate de vídeo e áudio online grátis — codec, FPS, resolução',
+    description:
+      'Descubra o bitrate, o codec, os quadros por segundo, a resolução, o HDR e a taxa de amostragem de um vídeo ou áudio, online e grátis. Lido no navegador: o arquivo não é enviado.',
+    heading: 'Informações',
+    accent: 'do vídeo',
+    lede: 'Solte um arquivo e veja o que há dentro: bitrate, codec, FPS, resolução, áudio. Nada é enviado.',
+    blurb: 'Bitrate, codec, FPS, resolução e dados de áudio de qualquer arquivo.',
+    featureList: [
+      'Bitrate total, de vídeo e de áudio',
+      'Codec, resolução, FPS, rotação e HDR',
+      'Canais e taxa de amostragem do áudio',
+      'Tudo no navegador: sem upload',
+    ],
+    faq: [
+      {
+        q: 'Como o bitrate é medido?',
+        a: 'Pelo próprio arquivo: o tamanho dos pacotes de cada faixa dividido pela duração, com até 600 pacotes. O bitrate total é o tamanho do arquivo pela duração e inclui o contêiner.',
+      },
+      {
+        q: 'Meu arquivo é enviado?',
+        a: 'Não. O navegador lê só as partes de que precisa; nada sai do seu aparelho.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Conversor de vídeo online',
     title: 'Conversor de Vídeo Online Grátis — MP4, WebM, MOV sem enviar nada',

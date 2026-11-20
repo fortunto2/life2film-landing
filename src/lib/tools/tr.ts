@@ -183,6 +183,32 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'video-info': {
+    searchPhrase: 'Video bit hızı öğrenme online',
+    title: 'Video ve Ses Bit Hızını Online Öğren Ücretsiz — codec, FPS, çözünürlük',
+    description:
+      'Bir video veya ses dosyasının bit hızını, codec’ini, kare hızını, çözünürlüğünü, HDR’sini ve örnekleme hızını online ve ücretsiz öğrenin. Tarayıcıda okunur: dosya yüklenmez.',
+    heading: 'Video',
+    accent: 'bilgisi',
+    lede: 'Bir dosya bırakın ve içinde ne olduğunu görün: bit hızı, codec, FPS, çözünürlük, ses. Hiçbir şey yüklenmez.',
+    blurb: 'Her dosyanın bit hızı, codec’i, FPS’i, çözünürlüğü ve ses bilgisi.',
+    featureList: [
+      'Toplam, video ve ses bit hızı',
+      'Codec, çözünürlük, FPS, dönüş ve HDR',
+      'Ses kanalları ve örnekleme hızı',
+      'Her şey tarayıcıda: yükleme yok',
+    ],
+    faq: [
+      {
+        q: 'Bit hızı nasıl ölçülüyor?',
+        a: 'Dosyanın kendisinden: her parçanın paket boyutları süresine bölünür, en fazla 600 paket okunur. Toplam bit hızı dosya boyutunun süreye bölümüdür ve kapsayıcıyı da içerir.',
+      },
+      {
+        q: 'Dosyam yükleniyor mu?',
+        a: 'Hayır. Tarayıcı yalnızca gereken kısımları okur; cihazınızdan hiçbir şey çıkmaz.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',
