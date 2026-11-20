@@ -19,6 +19,9 @@ interface Copy {
   splitter: string;
   guide: string;
   guideMusic: string;
+  key: string;
+  changeKey: string;
+  speed: string;
   hub: string;
   homeNote: (hub: string, frames: string, guides: string) => string;
   hubNote: (frames: string, guides: string) => string;
@@ -31,6 +34,9 @@ const COPY: Partial<Record<Lang, Copy>> = {
     splitter: 'Split a video into parts or at its shot changes',
     guide: 'Edit video by talking to an AI agent: a step-by-step guide',
     guideMusic: 'Cut a video to music with an AI agent: a step-by-step guide',
+    key: 'Find the key of a song (and its Camelot code)',
+    changeKey: 'Change the key of a song without changing its tempo',
+    speed: 'Make a sped up or slowed + reverb version',
     hub: 'All free video tools',
     homeNote: (hub, frames, guides) =>
       `Free in the browser: <a href="${hub}">video tools</a> such as <a href="${frames}">splitting a video into frames</a>, and <a href="${guides}">guides to editing video with an AI agent</a>.`,
@@ -43,6 +49,9 @@ const COPY: Partial<Record<Lang, Copy>> = {
     splitter: 'Разделить видео на части или по сменам плана',
     guide: 'Монтаж видео с ИИ-агентом: пошаговое руководство',
     guideMusic: 'Монтаж видео под музыку с ИИ-агентом: пошаговое руководство',
+    key: 'Определить тональность песни (и код Camelot)',
+    changeKey: 'Изменить тональность песни без изменения темпа',
+    speed: 'Ускорить песню (sped up) или замедлить с ревербом',
     hub: 'Все бесплатные видеоинструменты',
     homeNote: (hub, frames, guides) =>
       `Бесплатно в браузере: <a href="${hub}">видеоинструменты</a>, например <a href="${frames}">разбить видео на кадры</a>, и <a href="${guides}">руководства по монтажу видео с ИИ-агентом</a>.`,
@@ -61,7 +70,14 @@ export function relatedForTool(slug: string, lang: Lang): { heading: string; lin
   const splitter = { href: toolPath(lang, 'video-splitter'), text: c.splitter };
   const guide = { href: guidePath(lang, GUIDE), text: c.guide };
   const byTool: Record<string, RelatedLink[]> = {
-    'bpm-detector': [{ ...guide, text: c.guideMusic }],
+    // 20 Nov 2026: the page with the most impressions (БПМ queries) points at the music tools it
+    // naturally leads to; read their impressions on 4 Dec.
+    'bpm-detector': [
+      { href: toolPath(lang, 'key-finder'), text: c.key },
+      { href: toolPath(lang, 'change-key'), text: c.changeKey },
+      { href: toolPath(lang, 'sped-up-slowed-reverb'), text: c.speed },
+      { ...guide, text: c.guideMusic },
+    ],
     'video-splitter': [frames, guide],
     'video-to-frames': [splitter, guide],
     'scene-detector': [frames],
