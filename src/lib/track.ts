@@ -31,8 +31,11 @@ export function track(name: string, props?: Props, metrics?: Metrics): void {
   if (typeof window === 'undefined') return;
   // The page reacts to a finished result (ToolPage shows the app offer then). Dispatched BEFORE the
   // analytics call and outside its try: a throwing counter must not hide the offer.
-  if (name === 'result_saved') {
-    try { window.dispatchEvent(new CustomEvent('tool:saved')); } catch { /* no DOM, nothing to show */ }
+  // `tool:shown` too: a tool whose result is the answer itself (a BPM, a list of scenes) is often never
+  // saved, and its page showed no offer at all (bpm-detector, 165 visitors in 14 days, 0 offers, 20 Nov 2026).
+  if (name === 'result_saved' || name === 'result_shown') {
+    const kind = name === 'result_saved' ? 'tool:saved' : 'tool:shown';
+    try { window.dispatchEvent(new CustomEvent(kind)); } catch { /* no DOM, nothing to show */ }
   }
   const w = window as unknown as { sda?: Sda };
   try {
