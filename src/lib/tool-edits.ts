@@ -571,4 +571,56 @@ Requirements:
 Reference implementation: https://life2film.com/tools/screen-recorder/`,
     agentJob: 'Recording the screen, locally',
   },
+  {
+    // 20 Nov 2026: «mp3 cutter» / «обрезать песню онлайн» — the audio twin of the trimmer.
+    slug: 'audio-cutter',
+    group: 'everyday',
+    name: 'Audio Cutter',
+    appName: 'MP3 Cutter',
+    blurb: 'Cut a piece out of a song for a ringtone, a reel or an edit, with a soft fade.',
+
+    searchPhrase: 'MP3 Cutter Online',
+    title: 'MP3 Cutter Online Free | cut a song, make a ringtone, no upload',
+    description: 'Cut MP3, M4A, WAV, OGG or FLAC online and free: listen, set the start and end, add a soft fade, save as MP3 or WAV. Works for ringtones and reels. In your browser: nothing is uploaded.',
+    heading: 'Cut',
+    accent: 'audio',
+    lede: 'Listen, mark the start and end, save the piece. The song never leaves your device.',
+    featureList: [
+      'MP3, M4A, WAV, OGG, FLAC, or the sound of a video',
+      'Set start and end from the player',
+      'Optional half-second fade at both ends, so the cut does not click',
+      'Save as MP3 (192 kbps) or WAV',
+      'Runs fully client-side: no upload',
+    ],
+    faq: [
+      {
+        q: 'How do I make a ringtone from a song?',
+        a: 'Cut 20–30 seconds with a fade and save as MP3. On Android, put the file in the Ringtones folder or pick it in Settings; on an iPhone, ringtones go through GarageBand or Finder as M4R, and the MP3 from here is the starting point.',
+      },
+      {
+        q: 'Does cutting lower the quality?',
+        a: 'Saving as WAV keeps every sample as decoded. MP3 at 192 kbps is re-encoded once, which is not audible on a phone; cutting an MP3 repeatedly would add up.',
+      },
+      {
+        q: 'Is my song uploaded?',
+        a: 'No. Your browser decodes and encodes the audio itself.',
+      },
+    ],
+
+    summary: 'Cut a section of an audio file in the browser with optional fades and save it as MP3 or WAV.',
+    facts: [
+      'A hard cut mid-waveform clicks; a 0.5 s linear fade at each end removes it.',
+      'Decode only [start, end) with AudioBufferSink(start, end) and trim the edge buffers by sample.',
+    ],
+    code: `for await (const { buffer } of new AudioBufferSink(track).buffers(start, end)) await source.add(buffer);`,
+    prompt: `Add "cut a song" to my project, running entirely in the browser.
+
+Requirements:
+- Use "mediabunny": AudioBufferSink(start, end), trim edge buffers by sample, optional linear fade
+  at both ends, encode with AudioBufferSource to MP3 (@mediabunny/mp3-encoder) or WAV.
+- Let the user set start/end from an <audio> player's current time.
+
+Reference implementation: https://life2film.com/tools/audio-cutter/`,
+    agentJob: 'Cutting a song, locally',
+  },
 ];

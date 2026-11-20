@@ -1,0 +1,122 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { start: 'Start, s', end: 'End, s', here: 'Set to the playhead', fade: 'Fade in and out', format: 'Save as', run: 'Cut', saved: 'Saved — {size}, {len}.', failed: 'Could not cut — {msg}', order: 'The end must come after the start.' },
+  ru: { start: 'Начало, с', end: 'Конец, с', here: 'Поставить по курсору', fade: 'Плавное начало и конец', format: 'Сохранить как', run: 'Обрезать', saved: 'Сохранено — {size}, {len}.', failed: 'Не удалось обрезать — {msg}', order: 'Конец должен быть позже начала.' },
+  es: { start: 'Inicio, s', end: 'Final, s', here: 'Poner en la posición actual', fade: 'Fundido al inicio y al final', format: 'Guardar como', run: 'Cortar', saved: 'Guardado — {size}, {len}.', failed: 'No se pudo cortar — {msg}', order: 'El final debe ir después del inicio.' },
+  pt: { start: 'Início, s', end: 'Fim, s', here: 'Usar a posição atual', fade: 'Fade no início e no fim', format: 'Salvar como', run: 'Cortar', saved: 'Salvo — {size}, {len}.', failed: 'Não foi possível cortar — {msg}', order: 'O fim precisa vir depois do início.' },
+  id: { start: 'Awal, dtk', end: 'Akhir, dtk', here: 'Pakai posisi pemutar', fade: 'Fade di awal dan akhir', format: 'Simpan sebagai', run: 'Potong', saved: 'Tersimpan — {size}, {len}.', failed: 'Gagal memotong — {msg}', order: 'Akhir harus setelah awal.' },
+  tr: { start: 'Başlangıç, sn', end: 'Son, sn', here: 'Oynatıcı konumunu kullan', fade: 'Başta ve sonda yumuşak geçiş', format: 'Farklı kaydet', run: 'Kes', saved: 'Kaydedildi — {size}, {len}.', failed: 'Kesilemedi — {msg}', order: 'Son, başlangıçtan sonra olmalı.' },
+  ar: { start: 'البداية، ث', end: 'النهاية، ث', here: 'استخدم موضع المشغل', fade: 'تلاشٍ في البداية والنهاية', format: 'احفظ بصيغة', run: 'قص', saved: 'تم الحفظ — {size}، {len}.', failed: 'تعذّر القص — {msg}', order: 'يجب أن تأتي النهاية بعد البداية.' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="audio/*,video/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP3, M4A, WAV, OGG, FLAC</span>
+  </label>
+  <div id="editor" hidden>
+    <audio id="player" controls></audio>
+    <div class="controls">
+      <label class="control"><span class="muted">{words.start}</span><input type="number" id="a" min="0" step="0.1" value="0" /></label>
+      <button type="button" class="ghost" id="setA">{words.here}</button>
+      <label class="control"><span class="muted">{words.end}</span><input type="number" id="b" min="0" step="0.1" value="30" /></label>
+      <button type="button" class="ghost" id="setB">{words.here}</button>
+    </div>
+    <div class="controls">
+      <label class="control check"><input type="checkbox" id="fade" checked /> <span>{words.fade}</span></label>
+      <label class="control"><span class="muted">{words.format}</span>
+        <select id="format"><option value="mp3" selected>MP3</option><option value="wav">WAV</option></select></label>
+      <span class="spacer"></span>
+      <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+    </div>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<style>
+  #player { width: 100%; margin-bottom: 12px; }
+  .control input[type=number] { width: 90px; }
+  .check { display: flex; gap: 8px; align-items: center; }
+</style>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { toolStrings, fill } from '../../lib/strings';
+  import { cutAudio } from '../../lib/audio-cut';
+  import { saveBlob, formatBytes, preciseClock } from '../../lib/encode';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const say = toolStrings();
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  const fileInput = el<HTMLInputElement>('file');
+  const player = el<HTMLAudioElement>('player');
+  let file: File | null = null;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  function open(chosen: File) {
+    file = chosen;
+    player.src = URL.createObjectURL(chosen);
+    player.onloadedmetadata = () => {
+      if (Number.isFinite(player.duration)) el<HTMLInputElement>('b').value = String(Math.min(30, Math.round(player.duration * 10) / 10));
+    };
+    el('editor').hidden = false;
+    statusEl.hidden = true;
+  }
+
+  el('setA').addEventListener('click', () => { el<HTMLInputElement>('a').value = player.currentTime.toFixed(1); });
+  el('setB').addEventListener('click', () => { el<HTMLInputElement>('b').value = player.currentTime.toFixed(1); });
+
+  el<HTMLButtonElement>('run').addEventListener('click', async () => {
+    if (!file || busy) return;
+    const start = Number(el<HTMLInputElement>('a').value) || 0;
+    const end = Number(el<HTMLInputElement>('b').value) || 0;
+    if (end <= start) { status(w.order, 1, true); return; }
+    const format = el<HTMLSelectElement>('format').value as 'mp3' | 'wav';
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    try {
+      status(fill(say.working, { n: 0 }), 0);
+      const result = await cutAudio(file, { start, end, fade: el<HTMLInputElement>('fade').checked ? 0.5 : 0, format,
+        onProgress: (p) => status(fill(say.working, { n: Math.round(p * 100) }), p) });
+      saveBlob(result.blob, `${file.name.replace(/\.[^.]+$/, '') || 'audio'}-cut.${format}`);
+      track('result_saved', { placement: 'result', format }, { size_mb: Math.round(result.blob.size / 104_857.6) / 10 });
+      status(w.saved.replace('{size}', formatBytes(result.blob.size)).replace('{len}', preciseClock(result.duration)), 1);
+    } catch (error) {
+      toolFailed('run', error, file);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  fileInput.addEventListener('change', () => { const f = fileInput.files?.[0]; if (f) { fileChosen(f, 'picker'); open(f); } });
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => { const f = (e as DragEvent).dataTransfer?.files?.[0]; if (f) { fileChosen(f, 'drop'); open(f); } });
+</script>

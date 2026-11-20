@@ -381,6 +381,32 @@ export const es: ToolTranslations = {
       },
     ],
   },
+  'audio-cutter': {
+    searchPhrase: 'Cortar MP3 online',
+    title: 'Cortar MP3 online gratis — recortar una canción, hacer un tono, sin subir',
+    description:
+      'Corta MP3, M4A, WAV, OGG o FLAC online y gratis: escucha, marca el inicio y el final, añade un fundido suave y guarda en MP3 o WAV. Sirve para tonos y reels. En tu navegador: no se sube nada.',
+    heading: 'Cortar',
+    accent: 'audio',
+    lede: 'Escucha, marca el inicio y el final y guarda el trozo. La canción no sale de tu dispositivo.',
+    blurb: 'Corta un trozo de una canción para un tono, un reel o un montaje, con fundido suave.',
+    featureList: [
+      'MP3, M4A, WAV, OGG, FLAC o el sonido de un video',
+      'Inicio y final desde el reproductor',
+      'Fundido de medio segundo en ambos extremos, sin clics',
+      'Guarda en MP3 (192 kbps) o WAV',
+    ],
+    faq: [
+      {
+        q: '¿Cómo hago un tono con una canción?',
+        a: 'Corta 20–30 segundos con fundido y guarda en MP3. En Android ponlo en la carpeta Ringtones o elígelo en Ajustes.',
+      },
+      {
+        q: '¿Se sube mi canción?',
+        a: 'No. Tu navegador decodifica y codifica el audio.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Convertidor de vídeo online',
     title: 'Convertidor de Vídeo Online Gratis — MP4, WebM, MOV sin subir nada',

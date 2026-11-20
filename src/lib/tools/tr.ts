@@ -378,6 +378,32 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'audio-cutter': {
+    searchPhrase: 'MP3 kesme online',
+    title: 'MP3 Kes Online Ücretsiz — şarkı kes, zil sesi yap, yükleme yok',
+    description:
+      'MP3, M4A, WAV, OGG veya FLAC dosyasını online ve ücretsiz kesin: dinleyin, başlangıcı ve sonu işaretleyin, yumuşak geçiş ekleyin, MP3 veya WAV olarak kaydedin. Zil sesi ve reels için uygun. Tarayıcıda: hiçbir şey yüklenmez.',
+    heading: 'Ses',
+    accent: 'kes',
+    lede: 'Dinleyin, başı ve sonu işaretleyin, parçayı kaydedin. Şarkı cihazınızdan çıkmaz.',
+    blurb: 'Zil sesi, reels ya da kurgu için şarkıdan parça kesin, yumuşak geçişle.',
+    featureList: [
+      'MP3, M4A, WAV, OGG, FLAC ya da bir videonun sesi',
+      'Başlangıç ve son oynatıcıdan',
+      'İki uçta yarım saniyelik geçiş, tıkırtı yok',
+      'MP3 (192 kbps) veya WAV olarak kaydet',
+    ],
+    faq: [
+      {
+        q: 'Şarkıdan zil sesi nasıl yapılır?',
+        a: '20–30 saniyeyi geçişle kesip MP3 olarak kaydedin. Android’de Ringtones klasörüne koyun ya da Ayarlar’dan seçin.',
+      },
+      {
+        q: 'Şarkım yükleniyor mu?',
+        a: 'Hayır. Tarayıcınız sesi kendisi çözer ve kodlar.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',

@@ -382,6 +382,32 @@ export const pt: ToolTranslations = {
       },
     ],
   },
+  'audio-cutter': {
+    searchPhrase: 'Cortar MP3 online',
+    title: 'Cortar MP3 online grátis — cortar música, fazer toque, sem upload',
+    description:
+      'Corte MP3, M4A, WAV, OGG ou FLAC online e grátis: ouça, marque início e fim, adicione um fade suave e salve em MP3 ou WAV. Serve para toques e reels. No navegador: nada é enviado.',
+    heading: 'Cortar',
+    accent: 'áudio',
+    lede: 'Ouça, marque início e fim e salve o trecho. A música não sai do seu aparelho.',
+    blurb: 'Corte um trecho de música para toque, reel ou edição, com fade suave.',
+    featureList: [
+      'MP3, M4A, WAV, OGG, FLAC ou o som de um vídeo',
+      'Início e fim direto do player',
+      'Fade de meio segundo nas pontas, sem estalos',
+      'Salve em MP3 (192 kbps) ou WAV',
+    ],
+    faq: [
+      {
+        q: 'Como fazer um toque com uma música?',
+        a: 'Corte 20–30 segundos com fade e salve em MP3. No Android, coloque na pasta Ringtones ou escolha nas Configurações.',
+      },
+      {
+        q: 'Minha música é enviada?',
+        a: 'Não. O navegador decodifica e codifica o áudio.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Conversor de vídeo online',
     title: 'Conversor de Vídeo Online Grátis — MP4, WebM, MOV sem enviar nada',

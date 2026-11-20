@@ -378,6 +378,32 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'audio-cutter': {
+    searchPhrase: 'Potong MP3 online',
+    title: 'Potong MP3 Online Gratis — potong lagu, buat nada dering, tanpa unggah',
+    description:
+      'Potong MP3, M4A, WAV, OGG atau FLAC secara online dan gratis: dengarkan, tandai awal dan akhir, tambahkan fade lembut, simpan sebagai MP3 atau WAV. Cocok untuk nada dering dan reel. Di browser: tidak ada yang diunggah.',
+    heading: 'Potong',
+    accent: 'audio',
+    lede: 'Dengarkan, tandai awal dan akhir, simpan potongannya. Lagu tidak keluar dari perangkat.',
+    blurb: 'Potong bagian lagu untuk nada dering, reel atau editan, dengan fade lembut.',
+    featureList: [
+      'MP3, M4A, WAV, OGG, FLAC atau suara video',
+      'Awal dan akhir dari pemutar',
+      'Fade setengah detik di kedua ujung, tanpa bunyi klik',
+      'Simpan sebagai MP3 (192 kbps) atau WAV',
+    ],
+    faq: [
+      {
+        q: 'Bagaimana membuat nada dering dari lagu?',
+        a: 'Potong 20–30 detik dengan fade dan simpan sebagai MP3. Di Android, taruh di folder Ringtones atau pilih di Pengaturan.',
+      },
+      {
+        q: 'Apakah lagu saya diunggah?',
+        a: 'Tidak. Browser mendekode dan meng-encode audio sendiri.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',
