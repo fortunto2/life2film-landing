@@ -8,15 +8,16 @@ const status = STATUS[lang];
 void CHROME;
 
 const WORDS: Partial<Record<Lang, Record<string, string>>> = {
-  en: { start: 'Start recording', stop: 'Stop and save', format: 'Save as', rec: 'Recording… {t}', saving: 'Saving…', saved: 'Saved {t} — {size}.', denied: 'The browser did not get the microphone. Allow it in the address bar and try again.', unsupported: 'This browser cannot record sound. Chrome, Edge, Firefox and Safari can.', failed: 'Could not save the recording — {msg}', again: 'Record another' },
-  ru: { start: 'Начать запись', stop: 'Остановить и сохранить', format: 'Сохранить как', rec: 'Идёт запись… {t}', saving: 'Сохраняем…', saved: 'Сохранено {t} — {size}.', denied: 'Браузер не получил микрофон. Разрешите его в адресной строке и попробуйте ещё раз.', unsupported: 'Этот браузер не умеет записывать звук. Chrome, Edge, Firefox и Safari умеют.', failed: 'Не удалось сохранить запись — {msg}', again: 'Записать ещё' },
-  es: { start: 'Empezar a grabar', stop: 'Detener y guardar', format: 'Guardar como', rec: 'Grabando… {t}', saving: 'Guardando…', saved: 'Guardado {t} — {size}.', denied: 'El navegador no obtuvo el micrófono. Permítelo en la barra de direcciones e inténtalo de nuevo.', unsupported: 'Este navegador no puede grabar sonido. Chrome, Edge, Firefox y Safari sí.', failed: 'No se pudo guardar — {msg}', again: 'Grabar otra' },
-  pt: { start: 'Começar a gravar', stop: 'Parar e salvar', format: 'Salvar como', rec: 'Gravando… {t}', saving: 'Salvando…', saved: 'Salvo {t} — {size}.', denied: 'O navegador não obteve o microfone. Permita na barra de endereço e tente de novo.', unsupported: 'Este navegador não grava som. Chrome, Edge, Firefox e Safari gravam.', failed: 'Não foi possível salvar — {msg}', again: 'Gravar outra' },
-  id: { start: 'Mulai merekam', stop: 'Berhenti dan simpan', format: 'Simpan sebagai', rec: 'Merekam… {t}', saving: 'Menyimpan…', saved: 'Tersimpan {t} — {size}.', denied: 'Browser tidak mendapat mikrofon. Izinkan di bilah alamat lalu coba lagi.', unsupported: 'Browser ini tidak bisa merekam suara. Chrome, Edge, Firefox dan Safari bisa.', failed: 'Gagal menyimpan — {msg}', again: 'Rekam lagi' },
-  tr: { start: 'Kaydı başlat', stop: 'Durdur ve kaydet', format: 'Biçim', rec: 'Kaydediliyor… {t}', saving: 'Kaydediliyor…', saved: 'Kaydedildi {t} — {size}.', denied: 'Tarayıcı mikrofona erişemedi. Adres çubuğundan izin verip tekrar deneyin.', unsupported: 'Bu tarayıcı ses kaydedemiyor. Chrome, Edge, Firefox ve Safari kaydedebilir.', failed: 'Kayıt saklanamadı — {msg}', again: 'Yeniden kaydet' },
-  ar: { start: 'ابدأ التسجيل', stop: 'أوقف واحفظ', format: 'احفظ بصيغة', rec: 'جارٍ التسجيل… {t}', saving: 'جارٍ الحفظ…', saved: 'تم الحفظ {t} — {size}.', denied: 'لم يحصل المتصفح على الميكروفون. اسمح به من شريط العنوان وحاول مجددًا.', unsupported: 'هذا المتصفح لا يسجل الصوت. Chrome وEdge وFirefox وSafari تسجّل.', failed: 'تعذّر حفظ التسجيل — {msg}', again: 'سجّل مرة أخرى' },
+  en: { next: 'Turn it into text →', start: 'Start recording', stop: 'Stop and save', format: 'Save as', rec: 'Recording… {t}', saving: 'Saving…', saved: 'Saved {t} — {size}.', denied: 'The browser did not get the microphone. Allow it in the address bar and try again.', unsupported: 'This browser cannot record sound. Chrome, Edge, Firefox and Safari can.', failed: 'Could not save the recording — {msg}', again: 'Record another' },
+  ru: { next: 'Расшифровать в текст →', start: 'Начать запись', stop: 'Остановить и сохранить', format: 'Сохранить как', rec: 'Идёт запись… {t}', saving: 'Сохраняем…', saved: 'Сохранено {t} — {size}.', denied: 'Браузер не получил микрофон. Разрешите его в адресной строке и попробуйте ещё раз.', unsupported: 'Этот браузер не умеет записывать звук. Chrome, Edge, Firefox и Safari умеют.', failed: 'Не удалось сохранить запись — {msg}', again: 'Записать ещё' },
+  es: { next: 'Convertirla en texto →', start: 'Empezar a grabar', stop: 'Detener y guardar', format: 'Guardar como', rec: 'Grabando… {t}', saving: 'Guardando…', saved: 'Guardado {t} — {size}.', denied: 'El navegador no obtuvo el micrófono. Permítelo en la barra de direcciones e inténtalo de nuevo.', unsupported: 'Este navegador no puede grabar sonido. Chrome, Edge, Firefox y Safari sí.', failed: 'No se pudo guardar — {msg}', again: 'Grabar otra' },
+  pt: { next: 'Transformar em texto →', start: 'Começar a gravar', stop: 'Parar e salvar', format: 'Salvar como', rec: 'Gravando… {t}', saving: 'Salvando…', saved: 'Salvo {t} — {size}.', denied: 'O navegador não obteve o microfone. Permita na barra de endereço e tente de novo.', unsupported: 'Este navegador não grava som. Chrome, Edge, Firefox e Safari gravam.', failed: 'Não foi possível salvar — {msg}', again: 'Gravar outra' },
+  id: { next: 'Ubah jadi teks →', start: 'Mulai merekam', stop: 'Berhenti dan simpan', format: 'Simpan sebagai', rec: 'Merekam… {t}', saving: 'Menyimpan…', saved: 'Tersimpan {t} — {size}.', denied: 'Browser tidak mendapat mikrofon. Izinkan di bilah alamat lalu coba lagi.', unsupported: 'Browser ini tidak bisa merekam suara. Chrome, Edge, Firefox dan Safari bisa.', failed: 'Gagal menyimpan — {msg}', again: 'Rekam lagi' },
+  tr: { next: 'Metne dönüştür →', start: 'Kaydı başlat', stop: 'Durdur ve kaydet', format: 'Biçim', rec: 'Kaydediliyor… {t}', saving: 'Kaydediliyor…', saved: 'Kaydedildi {t} — {size}.', denied: 'Tarayıcı mikrofona erişemedi. Adres çubuğundan izin verip tekrar deneyin.', unsupported: 'Bu tarayıcı ses kaydedemiyor. Chrome, Edge, Firefox ve Safari kaydedebilir.', failed: 'Kayıt saklanamadı — {msg}', again: 'Yeniden kaydet' },
+  ar: { next: 'حوّله إلى نص ←', start: 'ابدأ التسجيل', stop: 'أوقف واحفظ', format: 'احفظ بصيغة', rec: 'جارٍ التسجيل… {t}', saving: 'جارٍ الحفظ…', saved: 'تم الحفظ {t} — {size}.', denied: 'لم يحصل المتصفح على الميكروفون. اسمح به من شريط العنوان وحاول مجددًا.', unsupported: 'هذا المتصفح لا يسجل الصوت. Chrome وEdge وFirefox وSafari تسجّل.', failed: 'تعذّر حفظ التسجيل — {msg}', again: 'سجّل مرة أخرى' },
 };
 const words = WORDS[lang] ?? WORDS.en!;
+const nextHref = lang === 'en' ? '/tools/auto-subtitles/' : `/${lang}/tools/auto-subtitles/`;
 ---
 
 <div class="tool" slot="tool">
@@ -31,6 +32,7 @@ const words = WORDS[lang] ?? WORDS.en!;
   </div>
   <canvas id="level" width="600" height="48" hidden></canvas>
   <audio id="play" controls hidden></audio>
+  <p id="next" hidden><a href={nextHref} data-sda-event="cta_click" data-sda-placement="result">{words.next}</a></p>
   <div id="status" class="status" hidden>
     <div class="statustext" id="statusText"></div>
   </div>
@@ -113,6 +115,7 @@ const words = WORDS[lang] ?? WORDS.en!;
         const play = el<HTMLAudioElement>('play');
         play.src = URL.createObjectURL(blob);
         play.hidden = false;
+        el('next').hidden = false;
         saveBlob(blob, `voice-${stamp}.${format}`);
         track('result_saved', { placement: 'result', format }, { seconds: Math.round(seconds), size_kb: Math.round(blob.size / 1024) });
         status(w.saved.replace('{t}', preciseClock(seconds)).replace('{size}', formatBytes(blob.size)));
