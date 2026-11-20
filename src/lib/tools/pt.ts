@@ -170,6 +170,10 @@ export const pt: ToolTranslations = {
     ],
     faq: [
       {
+        q: 'Como mudar o ângulo de um vídeo gravado de lado?',
+        a: 'Abra o vídeo aqui, escolha 90° à direita ou à esquerda (ou 180° se estiver de cabeça para baixo) e salve. O vídeo fica em pé sem perder qualidade, e nada precisa ser instalado nem enviado.',
+      },
+      {
         q: 'Girar perde qualidade?',
         a: 'Por padrão, não. O arquivo tem uma marca de rotação que os players leem: a ferramenta define essa marca e copia os quadros como estão. Se marcar «desenhar nos quadros», a imagem é recodificada e perde um pouco de qualidade uma vez.',
       },
