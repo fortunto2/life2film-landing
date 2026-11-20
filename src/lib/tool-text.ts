@@ -541,4 +541,44 @@ export const TEXT_TOOLS: Tool[] = [
     facts: ['A one- or two-second fade out is the usual way to end a clip without an abrupt cut.'],
     agentJob: 'Fading a video in and out, locally',
   },
+  {
+    // 20 Nov 2026: «resize video», «change video resolution», «4k to 1080p», «изменить разрешение видео».
+    slug: 'resize-video',
+    group: 'everyday',
+    name: 'Resize Video',
+    appName: 'Resize Video',
+    blurb: 'Change a video’s resolution: 4K to 1080p, 1080p to 720p and so on, shape kept.',
+
+    searchPhrase: 'Resize Video Online',
+    title: 'Resize Video Online Free | change resolution (4K, 1080p, 720p), no upload',
+    description: 'Change a video’s resolution online for free: 4K to 1080p, 1080p to 720p, 480p or 360p, vertical or horizontal, with its shape kept. Runs in your browser; nothing is uploaded, no watermark.',
+    heading: 'Resize',
+    accent: 'video',
+    lede: 'A smaller resolution in one step. The video stays on your device.',
+    featureList: [
+      '2160p, 1440p, 1080p, 720p, 480p or 360p',
+      'Vertical and horizontal videos, shape kept',
+      'Never scaled up past the original',
+      'Sound copied as is',
+      'Nothing uploaded, no watermark',
+    ],
+    faq: [
+      {
+        q: 'What does 720p mean for a vertical video?',
+        a: 'The same thing turned on its side: 720x1280. The longer edge is what the setting chooses.',
+      },
+      {
+        q: 'I need a smaller file, not a smaller picture.',
+        a: 'Video Compressor aims at a file size directly; a lower resolution is one of the things it may use.',
+      },
+      {
+        q: 'Is the video uploaded?',
+        a: 'No. Your browser decodes, scales and encodes it.',
+      },
+    ],
+
+    summary: 'Change a video’s resolution (2160p to 360p), shape kept, in the browser.',
+    facts: ['A 1080p phone clip at 720p has about 44% of the pixels.'],
+    agentJob: 'Changing a video’s resolution, locally',
+  },
 ];

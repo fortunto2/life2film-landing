@@ -1,0 +1,98 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { size: 'Resolution', run: 'Resize', source: 'Source: {w}x{h}', working: 'Resizing… {n}%', saved: 'Saved — {w}x{h}, {size}.', failed: 'Could not resize — {msg}', up: 'Already that size or smaller; nothing is scaled up.' },
+  ru: { size: 'Разрешение', run: 'Изменить размер', source: 'Исходник: {w}x{h}', working: 'Меняем размер… {n}%', saved: 'Сохранено — {w}x{h}, {size}.', failed: 'Не удалось — {msg}', up: 'Видео уже такого размера или меньше; увеличивать не будем.' },
+  es: { size: 'Resolución', run: 'Cambiar tamaño', source: 'Original: {w}x{h}', working: 'Redimensionando… {n}%', saved: 'Guardado — {w}x{h}, {size}.', failed: 'No se pudo — {msg}', up: 'Ya tiene ese tamaño o menos; no se amplía.' },
+  pt: { size: 'Resolução', run: 'Redimensionar', source: 'Original: {w}x{h}', working: 'Redimensionando… {n}%', saved: 'Salvo — {w}x{h}, {size}.', failed: 'Não foi possível — {msg}', up: 'Já tem esse tamanho ou menor; nada é ampliado.' },
+  id: { size: 'Resolusi', run: 'Ubah ukuran', source: 'Sumber: {w}x{h}', working: 'Mengubah ukuran… {n}%', saved: 'Tersimpan — {w}x{h}, {size}.', failed: 'Gagal — {msg}', up: 'Sudah sebesar itu atau lebih kecil; tidak diperbesar.' },
+  tr: { size: 'Çözünürlük', run: 'Boyutlandır', source: 'Kaynak: {w}x{h}', working: 'Boyutlandırılıyor… %{n}', saved: 'Kaydedildi — {w}x{h}, {size}.', failed: 'Yapılamadı — {msg}', up: 'Zaten bu boyutta veya küçük; büyütülmez.' },
+  ar: { size: 'الدقة', run: 'غيّر الحجم', source: 'الأصل: {w}x{h}', working: 'جارٍ تغيير الحجم… {n}%', saved: 'تم الحفظ — {w}x{h}، {size}.', failed: 'تعذّر — {msg}', up: 'الفيديو بهذا الحجم أو أصغر؛ لا يتم التكبير.' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+// Label -> the longest edge it means (1080p = 1920 on the long side, either orientation).
+const SIZES: [string, number][] = [['2160p (4K)', 3840], ['1440p', 2560], ['1080p', 1920], ['720p', 1280], ['480p', 854], ['360p', 640]];
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="video/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP4, MOV, WebM</span>
+  </label>
+  <div class="controls">
+    <label class="control"><span class="muted">{words.size}</span>
+      <select id="size">{SIZES.map(([n, v]) => <option value={v} selected={v === 1280}>{n}</option>)}</select></label>
+    <span class="spacer"></span>
+    <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { saveBlob, formatBytes, probe, encode, type Probe } from '../../lib/encode';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  let file: File | null = null;
+  let info: Probe | null = null;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  el('run').addEventListener('click', async () => {
+    if (!file || busy) return;
+    const edge = Number(el<HTMLSelectElement>('size').value);
+    const W = info?.width ?? 0, H = info?.height ?? 0;
+    if (W && H && Math.max(W, H) <= edge) { status(w.up, 1, true); return; }
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    try {
+      // encode()'s `width` is the longest edge for either orientation; `height` alone is ignored.
+      const blob = await encode(file, { container: 'mp4', width: edge, quality: 'high', onProgress: (f) => status(w.working.replace('{n}', String(Math.round(f * 100))), f) });
+      // Report what the file actually is, not what was asked for.
+      const out = await probe(new File([blob], 'out.mp4', { type: 'video/mp4' })).catch(() => ({ width: 0, height: 0 }));
+      saveBlob(blob, `${file.name.replace(/\.[^.]+$/, '')}-${edge}.mp4`);
+      track('result_saved', { placement: 'result' }, { edge, size_mb: Math.round(blob.size / 104_857.6) / 10 });
+      status(w.saved.replace('{w}', String(out.width)).replace('{h}', String(out.height)).replace('{size}', formatBytes(blob.size)), 1);
+    } catch (error) {
+      toolFailed('run', error, file);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  async function take(f: File | undefined, how: 'picker' | 'drop') {
+    if (!f) return;
+    file = f;
+    fileChosen(f, how);
+    info = await probe(f).catch(() => null);
+    status(info?.width ? w.source.replace('{w}', String(info.width)).replace('{h}', String(info.height)) : f.name);
+  }
+  el<HTMLInputElement>('file').addEventListener('change', (e) => void take((e.target as HTMLInputElement).files?.[0], 'picker'));
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => void take((e as DragEvent).dataTransfer?.files?.[0], 'drop'));
+</script>

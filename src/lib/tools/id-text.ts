@@ -357,4 +357,30 @@ export const idText: ToolTranslations = {
       },
     ],
   },
+  'resize-video': {
+    searchPhrase: 'Ubah resolusi video online',
+    title: 'Ubah Ukuran Video Online Gratis — 4K ke 1080p, 720p, tanpa unggah',
+    description:
+      'Ubah resolusi video secara online dan gratis: 4K ke 1080p, 1080p ke 720p, 480p atau 360p, vertikal atau horizontal, bentuk tetap. Di browser, tanpa unggah.',
+    heading: 'Ubah ukuran',
+    accent: 'video',
+    lede: 'Resolusi lebih kecil dalam satu langkah.',
+    blurb: 'Ubah resolusi: 4K ke 1080p, 1080p ke 720p…',
+    featureList: [
+      'Dari 2160p sampai 360p',
+      'Vertikal atau horizontal, bentuk tetap',
+      'Tidak pernah diperbesar',
+      'Tanpa unggah dan watermark',
+    ],
+    faq: [
+      {
+        q: 'Apa arti 720p untuk video vertikal?',
+        a: '720x1280: yang dipilih sisi panjangnya.',
+      },
+      {
+        q: 'Apakah video diunggah?',
+        a: 'Tidak. Browser Anda yang memprosesnya.',
+      },
+    ],
+  },
 };

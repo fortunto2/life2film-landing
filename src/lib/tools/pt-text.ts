@@ -357,4 +357,30 @@ export const ptText: ToolTranslations = {
       },
     ],
   },
+  'resize-video': {
+    searchPhrase: 'Mudar a resolução de um vídeo online',
+    title: 'Redimensionar vídeo online grátis — 4K para 1080p, 720p, sem upload',
+    description:
+      'Mude a resolução de um vídeo online e grátis: 4K para 1080p, 1080p para 720p, 480p ou 360p, vertical ou horizontal, mantendo o formato. No navegador, sem upload.',
+    heading: 'Redimensionar',
+    accent: 'vídeo',
+    lede: 'Resolução menor em um passo.',
+    blurb: 'Mude a resolução: 4K para 1080p, 1080p para 720p…',
+    featureList: [
+      'De 2160p a 360p',
+      'Vertical ou horizontal, formato mantido',
+      'Nunca amplia',
+      'Sem upload nem marca d’água',
+    ],
+    faq: [
+      {
+        q: 'O que é 720p na vertical?',
+        a: '720x1280: escolhe-se o lado maior.',
+      },
+      {
+        q: 'O vídeo é enviado?',
+        a: 'Não. O navegador o processa.',
+      },
+    ],
+  },
 };

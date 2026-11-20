@@ -357,4 +357,30 @@ export const esText: ToolTranslations = {
       },
     ],
   },
+  'resize-video': {
+    searchPhrase: 'Cambiar la resolución de un video online',
+    title: 'Cambiar tamaño de video online gratis — 4K a 1080p, 720p, sin subir',
+    description:
+      'Cambia la resolución de un video online y gratis: 4K a 1080p, 1080p a 720p, 480p o 360p, vertical u horizontal, con su forma. En tu navegador, sin subir.',
+    heading: 'Cambiar tamaño',
+    accent: 'de video',
+    lede: 'Menor resolución en un paso.',
+    blurb: 'Cambia la resolución: 4K a 1080p, 1080p a 720p…',
+    featureList: [
+      'De 2160p a 360p',
+      'Vertical u horizontal, forma conservada',
+      'Nunca amplía',
+      'Sin subidas ni marca de agua',
+    ],
+    faq: [
+      {
+        q: '¿Qué es 720p en vertical?',
+        a: '720x1280: se elige el lado largo.',
+      },
+      {
+        q: '¿Se sube el video?',
+        a: 'No. Tu navegador lo procesa.',
+      },
+    ],
+  },
 };

@@ -357,4 +357,30 @@ export const trText: ToolTranslations = {
       },
     ],
   },
+  'resize-video': {
+    searchPhrase: 'Video çözünürlüğünü online değiştir',
+    title: 'Video Boyutlandırma Online Ücretsiz — 4K’dan 1080p, 720p, yükleme yok',
+    description:
+      'Bir videonun çözünürlüğünü online ve ücretsiz değiştirin: 4K’dan 1080p’ye, 1080p’den 720p, 480p veya 360p’ye, dikey ya da yatay, oranı korunarak. Tarayıcıda, yükleme yok.',
+    heading: 'Video',
+    accent: 'boyutlandır',
+    lede: 'Tek adımda daha düşük çözünürlük.',
+    blurb: 'Çözünürlüğü değiştirin: 4K’dan 1080p’ye, 1080p’den 720p’ye…',
+    featureList: [
+      '2160p’den 360p’ye',
+      'Dikey veya yatay, oran korunur',
+      'Asla büyütmez',
+      'Yükleme ve filigran yok',
+    ],
+    faq: [
+      {
+        q: 'Dikey videoda 720p ne demek?',
+        a: '720x1280: uzun kenar seçilir.',
+      },
+      {
+        q: 'Video yükleniyor mu?',
+        a: 'Hayır. Tarayıcınız işler.',
+      },
+    ],
+  },
 };
