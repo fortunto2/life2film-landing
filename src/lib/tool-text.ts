@@ -661,4 +661,39 @@ export const TEXT_TOOLS: Tool[] = [
     facts: ['A seamless boomerang skips the two turnaround frames, so the motion never pauses.'],
     agentJob: 'Making a boomerang from a video, locally',
   },
+  {
+    // 20 Nov 2026: «add progress bar to video», «video progress bar overlay».
+    slug: 'video-progress-bar',
+    group: 'create',
+    name: 'Add Progress Bar to Video',
+    appName: 'Progress Bar',
+    blurb: 'A thin bar along the edge that fills as the video plays.',
+
+    searchPhrase: 'Add Progress Bar to Video Online',
+    title: 'Add Progress Bar to Video Online Free | for Shorts, Reels, TikTok, no upload',
+    description: 'Add a progress bar to a video online for free: a thin bar along the top or bottom edge that fills as it plays, in white, red, yellow, green or blue. Keeps viewers watching to the end. Runs in your browser; nothing is uploaded.',
+    heading: 'Progress bar',
+    accent: 'for video',
+    lede: 'Show how much is left, so people stay to the end. The video stays on your device.',
+    featureList: [
+      'A bar that fills from left to right over the whole video',
+      'Top or bottom edge, five colours, a dark track behind it',
+      'Sound and size kept',
+      'Nothing uploaded, no watermark',
+    ],
+    faq: [
+      {
+        q: 'Why add one when the player has its own?',
+        a: 'Short-video players hide theirs. A bar in the picture tells a viewer the clip is nearly over, which is when most of them swipe away.',
+      },
+      {
+        q: 'Is the video uploaded?',
+        a: 'No. Your browser redraws the frames and encodes the result.',
+      },
+    ],
+
+    summary: 'A progress bar drawn into the video (top or bottom, five colours), sound kept, in the browser.',
+    facts: ['The bar is about 0.8% of the short edge: 9 px on a 1080x1920 video.'],
+    agentJob: 'Adding a progress bar to a video, locally',
+  },
 ];

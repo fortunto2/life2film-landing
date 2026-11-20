@@ -435,4 +435,26 @@ export const idText: ToolTranslations = {
       },
     ],
   },
+  'video-progress-bar': {
+    searchPhrase: 'Progress bar di video online',
+    title: 'Tambah Progress Bar ke Video Online Gratis — untuk Shorts, Reels, TikTok, tanpa unggah',
+    description:
+      'Tambahkan progress bar ke video secara online dan gratis: bilah tipis di atas atau bawah yang terisi saat video diputar, lima warna. Di browser, tanpa unggah.',
+    heading: 'Progress bar',
+    accent: 'untuk video',
+    lede: 'Tunjukkan sisa durasinya.',
+    blurb: 'Bilah tipis di tepi yang terisi seiring video.',
+    featureList: [
+      'Terisi dari kiri ke kanan',
+      'Atas atau bawah, lima warna',
+      'Suara dan ukuran tetap',
+      'Tanpa unggah dan watermark',
+    ],
+    faq: [
+      {
+        q: 'Apakah video diunggah?',
+        a: 'Tidak. Browser Anda yang memprosesnya.',
+      },
+    ],
+  },
 };

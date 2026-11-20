@@ -435,4 +435,26 @@ export const esText: ToolTranslations = {
       },
     ],
   },
+  'video-progress-bar': {
+    searchPhrase: 'Barra de progreso en un video online',
+    title: 'Añadir barra de progreso a un video online gratis — para Shorts, Reels y TikTok, sin subir',
+    description:
+      'Añade una barra de progreso a un video online y gratis: una barra fina arriba o abajo que se llena mientras se reproduce, en cinco colores. En tu navegador, sin subir.',
+    heading: 'Barra de progreso',
+    accent: 'para video',
+    lede: 'Muestra cuánto falta.',
+    blurb: 'Una barra fina en el borde que se llena con el video.',
+    featureList: [
+      'Se llena de izquierda a derecha',
+      'Arriba o abajo, cinco colores',
+      'Sonido y tamaño conservados',
+      'Sin subidas ni marca de agua',
+    ],
+    faq: [
+      {
+        q: '¿Se sube el video?',
+        a: 'No. Tu navegador lo procesa.',
+      },
+    ],
+  },
 };

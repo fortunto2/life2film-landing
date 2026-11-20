@@ -435,4 +435,26 @@ export const trText: ToolTranslations = {
       },
     ],
   },
+  'video-progress-bar': {
+    searchPhrase: 'Videoya ilerleme çubuğu online',
+    title: 'Videoya İlerleme Çubuğu Ekle Online Ücretsiz — Shorts, Reels, TikTok için, yükleme yok',
+    description:
+      'Bir videoya online ve ücretsiz ilerleme çubuğu ekleyin: üstte veya altta, video oynadıkça dolan ince bir çubuk, beş renk. Tarayıcıda, yükleme yok.',
+    heading: 'İlerleme çubuğu',
+    accent: 'video için',
+    lede: 'Ne kadar kaldığını gösterin.',
+    blurb: 'Kenarda, videoyla birlikte dolan ince bir çubuk.',
+    featureList: [
+      'Soldan sağa dolar',
+      'Üst veya alt, beş renk',
+      'Ses ve boyut korunur',
+      'Yükleme ve filigran yok',
+    ],
+    faq: [
+      {
+        q: 'Video yükleniyor mu?',
+        a: 'Hayır. Tarayıcınız işler.',
+      },
+    ],
+  },
 };

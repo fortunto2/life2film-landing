@@ -1,5 +1,6 @@
 /**
- * Fade a video in from black and out to black, the sound following the picture. In the browser.
+ * Redraw every frame of a video on a canvas (fade, progress bar…) and keep its sound, optionally
+ * faded with the picture. In the browser.
  */
 import { PieceSink } from './sink';
 import { loadMediabunny, encodableCodec } from './encode';
@@ -13,7 +14,14 @@ export function fadeGain(t: number, duration: number, fin: number, fout: number)
   return Math.min(a, b);
 }
 
-export async function fadeVideo(file: File, fin: number, fout: number, onProgress?: (f: number) => void): Promise<{ blob: Blob; duration: number }> {
+export type Decorate = (ctx: OffscreenCanvasRenderingContext2D, t: number, duration: number, width: number, height: number) => void;
+
+export function fadeVideo(file: File, fin: number, fout: number, onProgress?: (f: number) => void) {
+  return redrawVideo(file, { fin, fout }, onProgress);
+}
+
+export async function redrawVideo(file: File, o: { fin?: number; fout?: number; decorate?: Decorate }, onProgress?: (f: number) => void): Promise<{ blob: Blob; duration: number }> {
+  const fin = o.fin ?? 0, fout = o.fout ?? 0;
   const { Input, BlobSource, ALL_FORMATS, Output, StreamTarget, Mp4OutputFormat, CanvasSink, CanvasSource, AudioBufferSink, AudioBufferSource, getFirstEncodableAudioCodec, QUALITY_HIGH } = await loadMediabunny();
   const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
   const video = await input.getPrimaryVideoTrack();
@@ -52,6 +60,7 @@ export async function fadeVideo(file: File, fin: number, fout: number, onProgres
       ctx.drawImage(wrapped.canvas as OffscreenCanvas, 0, 0, width, height);
       ctx.globalAlpha = 1;
     }
+    o.decorate?.(ctx, t, duration, width, height);
     await vsource.add(t, 1 / FPS);
     if (i % 15 === 0) onProgress?.(Math.min(0.9, (i / count) * 0.9));
     i++;

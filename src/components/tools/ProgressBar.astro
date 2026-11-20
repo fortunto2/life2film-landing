@@ -1,0 +1,89 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { color: 'Colour', pos: 'Position', bottom: 'Bottom', top: 'Top', run: 'Add progress bar', working: 'Drawing… {n}%', saved: 'Saved — {size}, {len}.', failed: 'Could not add it — {msg}' },
+  ru: { color: 'Цвет', pos: 'Где', bottom: 'Снизу', top: 'Сверху', run: 'Добавить полосу', working: 'Рисуем… {n}%', saved: 'Сохранено — {size}, {len}.', failed: 'Не удалось — {msg}' },
+  es: { color: 'Color', pos: 'Posición', bottom: 'Abajo', top: 'Arriba', run: 'Añadir barra', working: 'Dibujando… {n}%', saved: 'Guardado — {size}, {len}.', failed: 'No se pudo — {msg}' },
+  pt: { color: 'Cor', pos: 'Posição', bottom: 'Embaixo', top: 'Em cima', run: 'Adicionar barra', working: 'Desenhando… {n}%', saved: 'Salvo — {size}, {len}.', failed: 'Não foi possível — {msg}' },
+  id: { color: 'Warna', pos: 'Posisi', bottom: 'Bawah', top: 'Atas', run: 'Tambah progress bar', working: 'Menggambar… {n}%', saved: 'Tersimpan — {size}, {len}.', failed: 'Gagal — {msg}' },
+  tr: { color: 'Renk', pos: 'Konum', bottom: 'Alt', top: 'Üst', run: 'İlerleme çubuğu ekle', working: 'Çiziliyor… %{n}', saved: 'Kaydedildi — {size}, {len}.', failed: 'Yapılamadı — {msg}' },
+  ar: { color: 'اللون', pos: 'الموضع', bottom: 'أسفل', top: 'أعلى', run: 'أضف شريط التقدم', working: 'جارٍ الرسم… {n}%', saved: 'تم الحفظ — {size}، {len}.', failed: 'تعذّر — {msg}' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+const COLORS = [['#ffffff', '⬜'], ['#ff2d55', '🟥'], ['#ffcc00', '🟨'], ['#34c759', '🟩'], ['#0a84ff', '🟦']];
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="video/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP4, MOV, WebM</span>
+  </label>
+  <div class="controls">
+    <label class="control"><span class="muted">{words.color}</span>
+      <select id="color">{COLORS.map(([v, n]) => <option value={v}>{n}</option>)}</select></label>
+    <label class="control"><span class="muted">{words.pos}</span>
+      <select id="pos"><option value="bottom" selected>{words.bottom}</option><option value="top">{words.top}</option></select></label>
+    <span class="spacer"></span>
+    <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { saveBlob, formatBytes, preciseClock } from '../../lib/encode';
+  import { addProgressBar, type BarPosition } from '../../lib/progress-bar';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  let file: File | null = null;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  el('run').addEventListener('click', async () => {
+    if (!file || busy) return;
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    const color = el<HTMLSelectElement>('color').value;
+    const pos = el<HTMLSelectElement>('pos').value as BarPosition;
+    try {
+      const { blob, duration } = await addProgressBar(file, color, pos, (f) => status(w.working.replace('{n}', String(Math.round(f * 100))), f));
+      saveBlob(blob, `${file.name.replace(/\.[^.]+$/, '')}-progress.mp4`);
+      track('result_saved', { placement: 'result', pos }, { seconds: Math.round(duration) });
+      status(w.saved.replace('{size}', formatBytes(blob.size)).replace('{len}', preciseClock(duration)), 1);
+    } catch (error) {
+      toolFailed('run', error, file);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  const take = (f: File | undefined, how: 'picker' | 'drop') => { if (!f) return; file = f; fileChosen(f, how); status(f.name); };
+  el<HTMLInputElement>('file').addEventListener('change', (e) => take((e.target as HTMLInputElement).files?.[0], 'picker'));
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => take((e as DragEvent).dataTransfer?.files?.[0], 'drop'));
+</script>
