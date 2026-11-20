@@ -1,0 +1,111 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { times: 'Play it', x: 'times', run: 'Loop', saved: 'Saved — {size}, {len}.', failed: 'Could not loop — {msg}' },
+  ru: { times: 'Повторить', x: 'раз', run: 'Зациклить', saved: 'Сохранено — {size}, {len}.', failed: 'Не удалось зациклить — {msg}' },
+  es: { times: 'Repetir', x: 'veces', run: 'Repetir', saved: 'Guardado — {size}, {len}.', failed: 'No se pudo repetir — {msg}' },
+  pt: { times: 'Repetir', x: 'vezes', run: 'Repetir', saved: 'Salvo — {size}, {len}.', failed: 'Não foi possível repetir — {msg}' },
+  id: { times: 'Ulangi', x: 'kali', run: 'Ulangi', saved: 'Tersimpan — {size}, {len}.', failed: 'Gagal mengulang — {msg}' },
+  tr: { times: 'Tekrarla', x: 'kez', run: 'Döngüye al', saved: 'Kaydedildi — {size}, {len}.', failed: 'Döngüye alınamadı — {msg}' },
+  ar: { times: 'كرّر', x: 'مرات', run: 'كرّر', saved: 'تم الحفظ — {size}، {len}.', failed: 'تعذّر التكرار — {msg}' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="video/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP4, MOV, WebM</span>
+  </label>
+  <div id="editor" hidden>
+    <div class="facts" id="facts"></div>
+    <div class="controls">
+      <label class="control"><span class="muted">{words.times}</span>
+        <select id="times"><option>2</option><option selected>3</option><option>4</option><option>5</option><option>10</option></select>
+        <span class="muted">{words.x}</span></label>
+      <span class="spacer"></span>
+      <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+    </div>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<style>
+  .check { display: flex; gap: 8px; align-items: center; }
+</style>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { toolStrings, fill } from '../../lib/strings';
+  import { probe, saveBlob, formatBytes, preciseClock } from '../../lib/encode';
+  import { mergeVideos } from '../../lib/merge';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const say = toolStrings();
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  const fileInput = el<HTMLInputElement>('file');
+  let file: File | null = null;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  async function open(chosen: File) {
+    file = chosen;
+    try {
+      status(say.reading);
+      const info = await probe(chosen);
+      if (!info.width) throw new Error('That file has no video track.');
+      el('editor').hidden = false;
+      statusEl.hidden = true;
+      el('facts').innerHTML = `<span>${info.width}×${info.height}</span><span>${preciseClock(info.duration)}</span><span>${formatBytes(info.size)}</span>`;
+    } catch (error) {
+      toolFailed('open', error, chosen);
+      status(error instanceof Error ? error.message : 'Could not read that file.', 1, true);
+    }
+  }
+
+  el<HTMLButtonElement>('run').addEventListener('click', async () => {
+    if (!file || busy) return;
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    try {
+      status(fill(say.working, { n: 0 }), 0);
+      const n = Number(el<HTMLSelectElement>('times').value) || 2;
+      const result = await mergeVideos(Array.from({ length: n }, () => file!), (p) => status(fill(say.working, { n: Math.round(p * 100) }), p));
+      saveBlob(result.blob, `${file.name.replace(/\.[^.]+$/, '') || 'video'}-x${n}.mp4`);
+      track('result_saved', { placement: 'result', format: 'mp4', times: String(n) }, { size_mb: Math.round(result.blob.size / 104_857.6) / 10 });
+      status(w.saved.replace('{size}', formatBytes(result.blob.size)).replace('{len}', preciseClock(result.duration)), 1);
+    } catch (error) {
+      toolFailed('run', error, file);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  fileInput.addEventListener('change', () => { const f = fileInput.files?.[0]; if (f) { fileChosen(f, 'picker'); void open(f); } });
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => { const f = (e as DragEvent).dataTransfer?.files?.[0]; if (f) { fileChosen(f, 'drop'); void open(f); } });
+</script>

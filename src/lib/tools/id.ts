@@ -476,6 +476,27 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'loop-video': {
+    searchPhrase: 'Video loop online',
+    title: 'Loop Video Online Gratis — ulangi video 2-10 kali, tanpa unggah',
+    description:
+      'Buat video berulang secara online dan gratis: ulangi klip 2, 3, 4, 5 atau 10 kali dalam satu MP4, dengan suaranya. Di browser, tanpa unggah.',
+    heading: 'Loop',
+    accent: 'video',
+    lede: 'Jadikan klip pendek lebih panjang dan berulang. Tidak ada yang keluar dari perangkat.',
+    blurb: 'Ulangi klip 2–10 kali dalam satu file, dengan suara.',
+    featureList: [
+      'Ulangi 2, 3, 4, 5 atau 10 kali',
+      'Suara ikut berulang',
+      'Semua di browser: tanpa unggah',
+    ],
+    faq: [
+      {
+        q: 'Apakah video saya diunggah?',
+        a: 'Tidak. Browser mendekode dan meng-encode sendiri.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',

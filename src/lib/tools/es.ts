@@ -479,6 +479,27 @@ export const es: ToolTranslations = {
       },
     ],
   },
+  'loop-video': {
+    searchPhrase: 'Video en bucle online',
+    title: 'Poner un video en bucle online gratis — repetir 2-10 veces, sin subir',
+    description:
+      'Pon un video en bucle online gratis: repite un clip 2, 3, 4, 5 o 10 veces en un MP4, con su sonido. En tu navegador, sin subir nada.',
+    heading: 'Video en',
+    accent: 'bucle',
+    lede: 'Convierte un clip corto en uno más largo que se repite. Nada sale de tu dispositivo.',
+    blurb: 'Repite un clip de 2 a 10 veces en un archivo, con sonido.',
+    featureList: [
+      'Repite 2, 3, 4, 5 o 10 veces',
+      'El sonido se repite con la imagen',
+      'Todo en el navegador: sin subidas',
+    ],
+    faq: [
+      {
+        q: '¿Se sube mi video?',
+        a: 'No. Tu navegador lo decodifica y codifica.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Convertidor de vídeo online',
     title: 'Convertidor de Vídeo Online Gratis — MP4, WebM, MOV sin subir nada',

@@ -480,6 +480,27 @@ export const pt: ToolTranslations = {
       },
     ],
   },
+  'loop-video': {
+    searchPhrase: 'Vídeo em loop online',
+    title: 'Colocar vídeo em loop online grátis — repetir 2-10 vezes, sem upload',
+    description:
+      'Coloque um vídeo em loop online e grátis: repita um clipe 2, 3, 4, 5 ou 10 vezes num MP4, com o som. No navegador, sem upload.',
+    heading: 'Vídeo em',
+    accent: 'loop',
+    lede: 'Transforme um clipe curto num mais longo que se repete. Nada sai do seu aparelho.',
+    blurb: 'Repita um clipe de 2 a 10 vezes num arquivo, com som.',
+    featureList: [
+      'Repita 2, 3, 4, 5 ou 10 vezes',
+      'O som se repete com a imagem',
+      'Tudo no navegador: sem upload',
+    ],
+    faq: [
+      {
+        q: 'Meu vídeo é enviado?',
+        a: 'Não. O navegador decodifica e codifica.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Conversor de vídeo online',
     title: 'Conversor de Vídeo Online Grátis — MP4, WebM, MOV sem enviar nada',

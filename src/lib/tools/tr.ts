@@ -476,6 +476,27 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'loop-video': {
+    searchPhrase: 'Video döngü online',
+    title: 'Videoyu Döngüye Al Online Ücretsiz — 2-10 kez tekrarla, yükleme yok',
+    description:
+      'Videoyu online ve ücretsiz döngüye alın: bir klibi sesiyle birlikte tek MP4 içinde 2, 3, 4, 5 veya 10 kez tekrarlayın. Tarayıcıda, yükleme yok.',
+    heading: 'Videoyu',
+    accent: 'döngüye al',
+    lede: 'Kısa bir klibi tekrar eden daha uzun bir klibe dönüştürün. Cihazınızdan hiçbir şey çıkmaz.',
+    blurb: 'Bir klibi tek dosyada 2–10 kez, sesiyle tekrarlayın.',
+    featureList: [
+      '2, 3, 4, 5 veya 10 kez tekrar',
+      'Ses görüntüyle birlikte tekrarlanır',
+      'Her şey tarayıcıda: yükleme yok',
+    ],
+    faq: [
+      {
+        q: 'Videom yükleniyor mu?',
+        a: 'Hayır. Tarayıcınız kendisi çözer ve kodlar.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',

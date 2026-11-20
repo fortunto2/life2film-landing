@@ -743,4 +743,39 @@ Reference implementation: https://life2film.com/tools/audio-cutter/`,
     ],
     agentJob: 'Making a video louder, locally',
   },
+  {
+    // 20 Nov 2026: «loop video» / «зациклить видео» — the merge engine fed one clip N times.
+    slug: 'loop-video',
+    group: 'everyday',
+    name: 'Loop Video',
+    appName: 'Loop Video',
+    blurb: 'Repeat a clip two to ten times in one file, sound included.',
+
+    searchPhrase: 'Loop Video Online',
+    title: 'Loop Video Online Free | repeat a video 2-10 times, no upload',
+    description: 'Loop a video online for free: repeat a clip 2, 3, 4, 5 or 10 times in one MP4, with its sound. For short clips, GIF-like posts and background videos. In your browser: nothing is uploaded, no watermark.',
+    heading: 'Loop',
+    accent: 'video',
+    lede: 'Turn a short clip into a longer one that repeats. Nothing leaves your device.',
+    featureList: [
+      'Repeat 2, 3, 4, 5 or 10 times',
+      'Sound repeats with the picture',
+      'One MP4 out, H.264 where the browser has it',
+      'Runs fully client-side: no upload, no watermark',
+    ],
+    faq: [
+      {
+        q: 'Can I loop a video for Instagram or a background?',
+        a: 'Yes. Instagram plays reels in a loop by itself, but a story or a background video often needs the length: repeat a 5-second clip three times for 15 seconds.',
+      },
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. Your browser decodes and encodes it.',
+      },
+    ],
+
+    summary: 'Repeat a video N times in one file in the browser, with its sound.',
+    facts: ['Looping is concatenation of one clip with itself; packets are re-encoded once so the timestamps run on.'],
+    agentJob: 'Looping a video, locally',
+  },
 ];
