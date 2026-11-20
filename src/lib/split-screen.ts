@@ -5,6 +5,7 @@
  */
 import { PieceSink } from './sink';
 import { loadMediabunny, encodableCodec } from './encode';
+import { RATE, pushStereo, trackStereo } from './audio-io';
 import { cover, type Rect } from './blur-fill';
 
 export type Layout = 'side' | 'stack' | 'pip';
@@ -66,7 +67,7 @@ export function collage(files: File[], onProgress?: (f: number) => void) {
 
 /** Draw each clip into its cell (cropped to cover) for as long as the shortest; mix the chosen sounds. */
 async function compose(files: File[], frame: { width: number; height: number; cells: Rect[] }, soundFrom: number[], onProgress?: (f: number) => void): Promise<{ blob: Blob; duration: number }> {
-  const { Input, BlobSource, ALL_FORMATS, Output, StreamTarget, Mp4OutputFormat, CanvasSink, CanvasSource, AudioBufferSink, AudioBufferSource, getFirstEncodableAudioCodec, QUALITY_HIGH } = await loadMediabunny();
+  const { Input, BlobSource, ALL_FORMATS, Output, StreamTarget, Mp4OutputFormat, CanvasSink, CanvasSource, AudioBufferSource, getFirstEncodableAudioCodec, QUALITY_HIGH } = await loadMediabunny();
   const open = async (f: File) => {
     const input = new Input({ source: new BlobSource(f), formats: ALL_FORMATS });
     const video = await input.getPrimaryVideoTrack();
@@ -75,14 +76,13 @@ async function compose(files: File[], frame: { width: number; height: number; ce
     return { input, video, audio: await input.getPrimaryAudioTrack(), duration: await input.computeDuration() };
   };
   const clips: Awaited<ReturnType<typeof open>>[] = [];
-  for (const f of files) clips.push(await open(f));
+  clips.push(...(await Promise.all(files.map(open))));
   const duration = Math.min(...clips.map((c) => c.duration));
   const { width, height } = frame;
   const format = new Mp4OutputFormat();
   const vcodec = await encodableCodec('mp4', { width, height });
   if (!vcodec) throw new Error('This browser cannot encode MP4 video. Chrome or Edge usually can.');
-  const rate = 48_000;
-  const acodec = await getFirstEncodableAudioCodec(format.getSupportedAudioCodecs(), { numberOfChannels: 2, sampleRate: rate, bitrate: 192_000 });
+  const acodec = await getFirstEncodableAudioCodec(format.getSupportedAudioCodecs(), { numberOfChannels: 2, sampleRate: RATE, bitrate: 192_000 });
 
   const canvas = new OffscreenCanvas(width, height);
   const ctx = canvas.getContext('2d');
@@ -118,35 +118,9 @@ async function compose(files: File[], frame: { width: number; height: number; ce
   vsource.close();
 
   if (asource) {
-    const grab = async (t: (typeof clips)[number]): Promise<Float32Array[] | null> => {
-      if (!t.audio || !(await t.audio.canDecode().catch(() => false))) return null;
-      const parts: AudioBuffer[] = [];
-      for await (const { buffer } of new AudioBufferSink(t.audio).buffers(0, duration)) parts.push(buffer);
-      if (!parts.length) return null;
-      const off = new OfflineAudioContext(2, Math.round(duration * rate), rate);
-      let at = 0;
-      for (const p of parts) {
-        const s = off.createBufferSource();
-        s.buffer = p;
-        s.connect(off.destination);
-        s.start(at);
-        at += p.duration;
-      }
-      const r = await off.startRendering();
-      return [r.getChannelData(0), r.getChannelData(1)];
-    };
-    const sa = soundFrom[0] !== undefined ? await grab(clips[soundFrom[0]]) : null;
-    const sb = soundFrom[1] !== undefined ? await grab(clips[soundFrom[1]]) : null;
-    const n = Math.round(duration * rate);
-    const [L, R] = mixStereo(sa, sb, n);
-    for (let o = 0; o < n; o += rate) {
-      const len = Math.min(rate, n - o);
-      const buf = new AudioBuffer({ length: len, numberOfChannels: 2, sampleRate: rate });
-      buf.getChannelData(0).set(L.subarray(o, o + len));
-      buf.getChannelData(1).set(R.subarray(o, o + len));
-      await asource.add(buf);
-    }
-    asource.close();
+    const [sa, sb] = await Promise.all(soundFrom.slice(0, 2).map((i) => trackStereo(clips[i].audio, duration)));
+    const [L, R] = mixStereo(sa ?? null, sb ?? null, Math.round(duration * RATE));
+    await pushStereo(asource, L, R);
   }
   await output.finalize();
   onProgress?.(1);

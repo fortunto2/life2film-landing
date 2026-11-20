@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import { GROUPS, TOOLS, byGroup } from '../lib/tools';
-import { TRANSLATIONS, toolPath } from '../lib/tools/index';
+import { TRANSLATIONS, toolName, toolPath } from '../lib/tools/index';
 import { HUB } from '../lib/tools-i18n';
 import { localePath, type Lang } from '../i18n';
 import { homeNote } from '../lib/related';
@@ -20,10 +20,6 @@ const note = homeNote(lang, true);
  * every non-English hub showed English names («Trim Video») over translated blurbs.
  */
 const blurbFor = (slug: string, fallback: string) => TRANSLATIONS[lang]?.[slug]?.blurb ?? fallback;
-const nameFor = (slug: string, fallback: string) => {
-  const t = TRANSLATIONS[lang]?.[slug];
-  return t ? `${t.heading} ${t.accent}` : fallback;
-};
 
 /** Locales that have at least one tool translated — the hub exists wherever the tools do. */
 const locales = ['en', ...(Object.keys(TRANSLATIONS) as Lang[])] as Lang[];
@@ -67,7 +63,7 @@ const jsonLd = {
             <div class="grid cols-2 tools">
               {byGroup(group.id).map((tool) => (
                 <a class="card tool" href={toolPath(lang, tool.slug)}>
-                  <h3>{nameFor(tool.slug, tool.name)}</h3>
+                  <h3>{toolName(tool.slug, lang, tool.name)}</h3>
                   <p>{blurbFor(tool.slug, tool.blurb)}</p>
                   <span class="go">{words.open}</span>
                 </a>

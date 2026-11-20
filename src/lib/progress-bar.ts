@@ -1,5 +1,5 @@
 /** A bar that fills as the video plays: geometry here, drawing through redrawVideo. */
-import { redrawVideo, type Decorate } from './fade';
+import { FPS, redrawVideo, type Decorate } from './redraw';
 
 export type BarPosition = 'top' | 'bottom';
 
@@ -12,7 +12,7 @@ export function barRect(t: number, duration: number, width: number, height: numb
 
 export function addProgressBar(file: File, color: string, position: BarPosition, onProgress?: (f: number) => void) {
   const decorate: Decorate = (ctx, t, duration, width, height) => {
-    const r = barRect(t + 1 / 30, duration, width, height, position);
+    const r = barRect(t + 1 / FPS, duration, width, height, position);
     ctx.fillStyle = 'rgba(0,0,0,0.35)';
     ctx.fillRect(0, r.y, width, r.h);
     ctx.fillStyle = color;

@@ -5,6 +5,7 @@
  */
 import { PieceSink } from './sink';
 import { loadMediabunny, encodableCodec } from './encode';
+import { RATE, pushStereo, trackStereo } from './audio-io';
 
 const FPS = 30;
 export const WINDOW = 0.02;
@@ -54,26 +55,21 @@ export function keepRanges(rms: Float32Array, duration: number, threshold: numbe
 /** dBFS (e.g. -40) to linear RMS. */
 export const fromDb = (db: number) => 10 ** (db / 20);
 
-/** Decode the whole sound once to 48 kHz stereo. */
-async function decodeStereo(file: File, rate: number): Promise<[Float32Array, Float32Array]> {
-  const ac = new AudioContext();
-  let raw: AudioBuffer;
-  try { raw = await ac.decodeAudioData(await file.arrayBuffer()); } catch { throw new Error('This browser cannot decode the sound of that file. MP4 and MOV usually work.'); } finally { void ac.close(); }
-  const off = new OfflineAudioContext(2, Math.max(1, Math.round(raw.duration * rate)), rate);
-  const node = off.createBufferSource();
-  node.buffer = raw;
-  node.connect(off.destination);
-  node.start();
-  const pcm = await off.startRendering();
-  return [pcm.getChannelData(0), pcm.getChannelData(1)];
+/** The file's sound as 48 kHz stereo, read through mediabunny (the video itself is never loaded whole). */
+async function decodeStereo(file: File): Promise<[Float32Array, Float32Array]> {
+  const { Input, BlobSource, ALL_FORMATS } = await loadMediabunny();
+  const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
+  const pcm = await trackStereo(await input.getPrimaryAudioTrack(), await input.computeDuration());
+  if (!pcm) throw new Error('This browser cannot decode the sound of that file. MP4 and MOV usually work.');
+  return pcm;
 }
 
 export async function removeSilence(file: File, thresholdDb: number, minSilence: number, onProgress?: (f: number) => void): Promise<{ blob: Blob; before: number; after: number; cuts: number }> {
-  const [L, R] = await decodeStereo(file, 48_000);
+  const [L, R] = await decodeStereo(file);
   const mono = new Float32Array(L.length);
   for (let i = 0; i < L.length; i++) mono[i] = (L[i] + R[i]) / 2;
-  const before = L.length / 48_000;
-  const ranges = keepRanges(windowRms(mono, 48_000), before, fromDb(thresholdDb), minSilence);
+  const before = L.length / RATE;
+  const ranges = keepRanges(windowRms(mono, RATE), before, fromDb(thresholdDb), minSilence);
   if (!ranges.length) throw new Error('Nothing louder than the threshold was found. Try a lower threshold.');
   const r = await renderRanges(file, ranges, onProgress, [L, R]);
   return { blob: r.blob, before: r.before, after: r.after, cuts: Math.max(0, ranges.length - 1) };
@@ -85,7 +81,7 @@ export async function removeSilence(file: File, thresholdDb: number, minSilence:
  */
 export async function renderRanges(file: File, ranges: [number, number][], onProgress?: (f: number) => void, pcm?: [Float32Array, Float32Array]): Promise<{ blob: Blob; before: number; after: number }> {
   const { Input, BlobSource, ALL_FORMATS, Output, StreamTarget, Mp4OutputFormat, CanvasSink, CanvasSource, AudioBufferSource, getFirstEncodableAudioCodec, QUALITY_HIGH } = await loadMediabunny();
-  const rate = 48_000;
+  const rate = RATE;
   const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
   const video = await input.getPrimaryVideoTrack();
   if (!video) throw new Error('That file has no picture.');
@@ -94,7 +90,7 @@ export async function renderRanges(file: File, ranges: [number, number][], onPro
   ranges = ranges.map(([a, b]) => [Math.max(0, a), Math.min(before, b)] as [number, number]).filter(([a, b]) => b - a > 1 / FPS);
   if (!ranges.length) throw new Error('Nothing would be left.');
   const audio = await input.getPrimaryAudioTrack();
-  const [L, R] = pcm ?? (audio ? await decodeStereo(file, rate) : [new Float32Array(0), new Float32Array(0)]);
+  const [L, R] = pcm ?? (audio ? await decodeStereo(file) : [new Float32Array(0), new Float32Array(0)]);
   const after = ranges.reduce((s, [a, b]) => s + (b - a), 0);
   const width = video.displayWidth - (video.displayWidth % 2), height = video.displayHeight - (video.displayHeight % 2);
   const format = new Mp4OutputFormat();
@@ -145,14 +141,7 @@ export async function renderRanges(file: File, ranges: [number, number][], onPro
       }
       o += len;
     }
-    for (let p = 0; p < n; p += rate) {
-      const len = Math.min(rate, n - p);
-      const buf = new AudioBuffer({ length: len, numberOfChannels: 2, sampleRate: rate });
-      buf.getChannelData(0).set(oL.subarray(p, p + len));
-      buf.getChannelData(1).set(oR.subarray(p, p + len));
-      await asource.add(buf);
-    }
-    asource.close();
+    await pushStereo(asource, oL, oR);
   }
   await output.finalize();
   onProgress?.(1);

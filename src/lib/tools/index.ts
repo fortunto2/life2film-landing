@@ -16,6 +16,12 @@ import { tr } from './tr';
  */
 export const TRANSLATIONS: Partial<Record<Lang, ToolTranslations>> = { ar, es, id, pt, ru, tr };
 
+/** A tool's name in `lang` (its heading + accent), or `fallback` (the English name) when untranslated. */
+export function toolName(slug: string, lang: Lang, fallback: string): string {
+  const t = TRANSLATIONS[lang]?.[slug];
+  return t ? `${t.heading} ${t.accent}` : fallback;
+}
+
 /**
  * The path to a tool's page in `lang`, falling back to the English page when that locale has no
  * translation. `localePath` alone linked /es/tools/video-to-frames/ from every Spanish tool page the

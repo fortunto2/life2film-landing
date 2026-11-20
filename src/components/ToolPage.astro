@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import AgentBlock from './AgentBlock.astro';
 import { TOOL, TOOLS } from '../lib/tools';
-import { TRANSLATIONS, localesFor, toolPath } from '../lib/tools/index';
+import { TRANSLATIONS, toolName, localesFor, toolPath } from '../lib/tools/index';
 import { CHROME, asTranslation } from '../lib/tools-i18n';
 import { localePath, type Lang } from '../i18n';
 import { relatedForTool } from '../lib/related';
@@ -51,7 +51,7 @@ const others = TOOLS.filter((other) => other.slug !== slug).map((other) => ({
   slug: other.slug,
   // The name is the page's own H1 in this language (heading + accent); English only where the tool
   // has no translation. Until 20 Nov 2026 every non-English page linked 37 tools by English names.
-  name: TRANSLATIONS[lang]?.[other.slug] ? `${TRANSLATIONS[lang]![other.slug]!.heading} ${TRANSLATIONS[lang]![other.slug]!.accent}` : other.name,
+  name: toolName(other.slug, lang, other.name),
   blurb: TRANSLATIONS[lang]?.[other.slug]?.blurb ?? other.blurb,
 }));
 
