@@ -45,8 +45,8 @@ importers:
         specifier: git+file:///Users/rustam/startups/shared/superduper-site-kit
         version: git+file:///Users/rustam/startups/shared/superduper-site-kit#2304fb61a3c4dfe29d7ea198cc5fd97bc89c5936(astro@6.4.8(@types/node@24.13.3)(rollup@4.62.3)(yaml@2.9.0))
       superduper-tools:
-        specifier: git+file:///Users/rustam/startups/shared/superduper-tools#30b10d3b1789f7c2b56973d4d24874c02dad7bab
-        version: git+file:///Users/rustam/startups/shared/superduper-tools#30b10d3b1789f7c2b56973d4d24874c02dad7bab(astro@6.4.8(@types/node@24.13.3)(rollup@4.62.3)(yaml@2.9.0))
+        specifier: git+file:///Users/rustam/startups/shared/superduper-tools#2c8662928de1bb12f78152ad0886aeb8a884bb27
+        version: git+file:///Users/rustam/startups/shared/superduper-tools#2c8662928de1bb12f78152ad0886aeb8a884bb27(astro@6.4.8(@types/node@24.13.3)(rollup@4.62.3)(yaml@2.9.0))
     devDependencies:
       '@astrojs/check':
         specifier: ^0.9.12
@@ -2058,8 +2058,8 @@ packages:
       astro:
         optional: true
 
-  superduper-tools@git+file:///Users/rustam/startups/shared/superduper-tools#30b10d3b1789f7c2b56973d4d24874c02dad7bab:
-    resolution: {commit: 30b10d3b1789f7c2b56973d4d24874c02dad7bab, repo: file:///Users/rustam/startups/shared/superduper-tools, type: git}
+  superduper-tools@git+file:///Users/rustam/startups/shared/superduper-tools#2c8662928de1bb12f78152ad0886aeb8a884bb27:
+    resolution: {commit: 2c8662928de1bb12f78152ad0886aeb8a884bb27, repo: file:///Users/rustam/startups/shared/superduper-tools, type: git}
     version: 0.1.1
     peerDependencies:
       astro: '>=5.0.0'
@@ -4737,7 +4737,7 @@ snapshots:
     optionalDependencies:
       astro: 6.4.8(@types/node@24.13.3)(rollup@4.62.3)(yaml@2.9.0)
 
-  superduper-tools@git+file:///Users/rustam/startups/shared/superduper-tools#30b10d3b1789f7c2b56973d4d24874c02dad7bab(astro@6.4.8(@types/node@24.13.3)(rollup@4.62.3)(yaml@2.9.0)):
+  superduper-tools@git+file:///Users/rustam/startups/shared/superduper-tools#2c8662928de1bb12f78152ad0886aeb8a884bb27(astro@6.4.8(@types/node@24.13.3)(rollup@4.62.3)(yaml@2.9.0)):
     optionalDependencies:
       astro: 6.4.8(@types/node@24.13.3)(rollup@4.62.3)(yaml@2.9.0)
 
