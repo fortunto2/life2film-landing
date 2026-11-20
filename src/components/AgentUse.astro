@@ -1,30 +1,37 @@
 ---
-import { mcpSetup, agentPrompt } from 'superduper-tools/agent';
+import { mcpSetup } from 'superduper-tools/agent';
+import { ALL_TOOLS } from 'superduper-tools/registry';
 import type { Lang } from '../i18n';
 
 /**
- * "Use it from your agent": collapsed, under the FAQ. The MCP add command, the tool's SKILL.md, and
- * one sentence to hand an agent. Commands stay English in every locale; only the labels translate.
+ * "Let your agent <do this>": one visible line + the MCP add command, phrased for this tool from
+ * its name; details hold a ready prompt for this tool, get_tool("<slug>") and the skill link.
+ * The shared MCP knows every tool of every site, so the pitch names them all.
  */
 interface Props { slug: string; name: string; lang?: Lang }
 const { slug, name, lang = 'en' } = Astro.props;
-const L: Record<string, { summary: string; mcp: string; skill: string; say: string }> = {
-  en: { summary: 'Use it from your agent', mcp: 'Add the Life2Film MCP (Claude Code):', skill: 'Skill file', say: 'Or tell your agent:' },
-  ru: { summary: 'Подключить к своему агенту', mcp: 'Добавьте MCP Life2Film (Claude Code):', skill: 'Файл навыка', say: 'Или скажите агенту:' },
+const VERBS = /^(trim|compress|convert|remove|rotate|crop|add|merge|cut|reverse|loop|fade|resize|normalize|change|burn|blur|split|make|record|join|boost|find|detect|check|reduce|prepare)\b/i;
+const verb = VERBS.test(name);
+const n = ALL_TOOLS.length;
+const L = {
+  en: { pitch: verb ? `Let your agent ${name.toLowerCase()}` : `Let your agent use the ${name}`, mcp: `connect Life2Film's MCP (all ${n} tools of Life2Film, SuperDuper, VisaYes)`, more: 'Prompt, skill', prompt: 'Paste to your agent:', skill: 'Skill file' },
+  ru: { pitch: `Пусть это сделает ваш агент: ${name}`, mcp: `подключите MCP Life2Film (все ${n} инструментов Life2Film, SuperDuper, VisaYes)`, more: 'Промпт, навык', prompt: 'Вставьте агенту:', skill: 'Файл навыка' },
 };
-const t = L[lang] ?? L.en;
+const t = L[lang as 'ru'] ?? L.en;
 const setup = mcpSetup('life2film');
-const say = agentPrompt(name, `https://life2film.com/tools/${slug}/`);
+const ask = `Use Life2Film's ${slug} on my file: call get_tool("${slug}") on the life2film MCP, then do it.`;
 ---
-<details class="agent-use" data-sda-placement={`agent-use-${slug}`}>
-  <summary>{t.summary}</summary>
-  <p>{t.mcp}</p>
+<div class="agent-use">
+  <p class="pitch"><strong>{t.pitch}:</strong> {t.mcp}</p>
   <div class="row"><code>{setup.claudeCode}</code><button type="button" class="au-copy" data-text={setup.claudeCode}>Copy</button></div>
-  <p class="muted small">Claude.ai / ChatGPT connector: <code>{setup.connector}</code> · Cursor: <code>{setup.cursor}</code></p>
-  <p>{t.say}</p>
-  <div class="row"><code>{say}</code><button type="button" class="au-copy" data-text={say}>Copy</button></div>
-  <p class="small"><a href={`/tools/${slug}/skill.md`}>{t.skill}: /tools/{slug}/skill.md</a> · <a href="/.well-known/agent-skills/index.json">all skills</a></p>
-</details>
+  <details>
+    <summary>{t.more}</summary>
+    <p>{t.prompt}</p>
+    <div class="row"><code>{ask}</code><button type="button" class="au-copy" data-text={ask}>Copy</button></div>
+    <p class="small">Claude.ai / ChatGPT connector: <code>{setup.connector}</code> · Cursor: <code>{setup.cursor}</code></p>
+    <p class="small"><code>get_tool("{slug}")</code> · <a href={`/tools/${slug}/skill.md`}>{t.skill}: /tools/{slug}/skill.md</a> · <a href="/.well-known/agent-skills/index.json">all skills</a></p>
+  </details>
+</div>
 <script>
   for (const b of document.querySelectorAll<HTMLButtonElement>('.au-copy')) {
     b.addEventListener('click', () => {
@@ -34,8 +41,8 @@ const say = agentPrompt(name, `https://life2film.com/tools/${slug}/`);
 </script>
 <style>
   .agent-use { margin: 28px 0 8px; border: 1px solid var(--line, rgba(255,255,255,.12)); border-radius: 10px; padding: 10px 14px; font-size: 14px; }
-  .agent-use summary { cursor: pointer; color: var(--muted); font-weight: 500; }
-  .agent-use[open] summary { margin-bottom: 8px; }
+  .agent-use .pitch { margin: 0 0 8px; }
+  .agent-use summary { cursor: pointer; color: var(--muted); font-size: 13px; margin-top: 8px; }
   .agent-use p { margin: 8px 0 4px; }
   .agent-use .row { display: flex; gap: 8px; align-items: center; }
   .agent-use .row code { flex: 1; overflow-x: auto; white-space: nowrap; padding: 6px 8px; border-radius: 6px; background: rgba(127,127,127,.12); font-size: 13px; }
