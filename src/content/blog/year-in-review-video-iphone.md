@@ -4,6 +4,12 @@ description: "Three shapes of a year recap video and how to make each from the c
 date: 2026-10-17
 ---
 
+**How do you make a year in review video on iPhone?** Pick the year's best clips, put them in order
+or to one song, and export a vertical or a wide film. Apple Photos can make a Memory from an album
+by date; Life2Film, an iPhone app, picks the moments by what is in them and cuts the whole year
+month by month on the phone, with nothing uploaded. Its 15-second version is free. *Updated 20 Nov
+2026.*
+
 By December a phone holds a year: a few hundred clips, most never watched twice. A year in review
 video is the one piece of editing almost everyone wants to have done and almost nobody does,
 because picking two minutes out of six hours is the job. There are three shapes it can take, and
