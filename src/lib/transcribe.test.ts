@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { toCues, toSrt, toVtt } from './transcribe';
+import { groupWords, toCues, toSrt, toVtt } from './transcribe';
 import { parseCues } from './subtitles';
 
 describe('toCues', () => {
@@ -42,5 +42,23 @@ describe('toSrt / toVtt', () => {
   });
   it('writes SRT stamps with commas and hours', () => {
     expect(toSrt(cues)).toContain('01:01:01,250 --> 01:01:02,000');
+  });
+});
+
+describe('groupWords', () => {
+  const w = (start: number, end: number, text: string) => ({ timestamp: [start, end] as [number, number], text: ` ${text}` });
+  it('groups up to N words and breaks after a sentence end', () => {
+    const cues = groupWords([w(0, 0.3, 'one'), w(0.3, 0.6, 'two'), w(0.6, 0.9, 'three'), w(0.9, 1.2, 'four.'), w(1.3, 1.6, 'Five')], 3, 3);
+    expect(cues.map((c) => c.text)).toEqual(['one two three', 'four.', 'Five']);
+  });
+  it('breaks on a pause and holds a caption until the next one, at most 1.5 s past its last word', () => {
+    const cues = groupWords([w(0, 0.4, 'hello'), w(0.5, 0.9, 'there'), w(3, 3.3, 'again'), w(10, 10.2, 'late')], 11, 3);
+    expect(cues.map((c) => c.text)).toEqual(['hello there', 'again', 'late']);
+    expect(cues[0].end).toBeCloseTo(2.4);
+    expect(cues[1].end).toBeCloseTo(4.8);
+  });
+  it('never overlaps the next caption', () => {
+    const cues = groupWords([w(0, 1, 'a'), w(1.05, 2, 'b'), w(2.05, 3, 'c'), w(3.05, 4, 'd')], 5, 1);
+    for (let i = 1; i < cues.length; i++) expect(cues[i - 1].end).toBeLessThanOrEqual(cues[i].start);
   });
 });

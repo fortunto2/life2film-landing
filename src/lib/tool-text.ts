@@ -466,4 +466,44 @@ export const TEXT_TOOLS: Tool[] = [
     facts: ['A reaction or before/after video is the common use; stacked 9:16 fits a phone feed.'],
     agentJob: 'Putting two videos in one frame, locally',
   },
+  {
+    // 20 Nov 2026: «субтитры как в TikTok», «auto captions for reels», «tiktok captions generator».
+    slug: 'tiktok-captions',
+    group: 'create',
+    name: 'TikTok-style Captions',
+    appName: 'Short Captions',
+    blurb: 'Big bold captions, a few words at a time in the middle of the frame, made from the speech.',
+
+    searchPhrase: 'TikTok Captions Generator',
+    title: 'TikTok-style Auto Captions Online Free | big word-by-word captions, no upload',
+    description: 'Add TikTok and Reels style captions to a video automatically, online and free: Whisper hears the speech in your browser and burns big bold captions, 1 to 4 words at a time, in the middle of the frame. No upload, no watermark.',
+    heading: 'TikTok-style',
+    accent: 'captions',
+    lede: 'Speech to big punchy captions in one step. The video stays on your device.',
+    featureList: [
+      'Word-level timing from Whisper, 1 to 4 words per caption',
+      'Bold white captions with a dark outline, centred',
+      'New caption at every sentence end or pause',
+      '99 languages, detected or chosen',
+      'No upload, no watermark',
+    ],
+    faq: [
+      {
+        q: 'Can I fix a misheard word?',
+        a: 'Not here: this one goes straight to the video. For control, make an SRT with Auto Subtitles, fix it in any text editor, then burn it with Add Subtitles to Video.',
+      },
+      {
+        q: 'How long does it take?',
+        a: 'The first run downloads the speech model (about 80 MB for the fast one); then recognition plus drawing every frame, faster with WebGPU in recent Chrome or Edge.',
+      },
+      {
+        q: 'Is the video uploaded?',
+        a: 'No. Recognition and drawing both run in your browser.',
+      },
+    ],
+
+    summary: 'Word-timed Whisper captions burned big and centred (TikTok/Reels style), in the browser.',
+    facts: ['Short captions read best broken at sentence ends and pauses, not at a fixed word count alone.'],
+    agentJob: 'Adding TikTok-style captions to a video, locally',
+  },
 ];

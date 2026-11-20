@@ -71,7 +71,9 @@ export function wrap(text: string, max: number, measure: (s: string) => number):
 
 export interface BurnOptions {
   size: 's' | 'm' | 'l';
-  position: 'bottom' | 'top';
+  position: 'bottom' | 'top' | 'middle';
+  /** Font weight; 600 by default, 800 for the bold short-caption look. */
+  weight?: number;
   onProgress?: (fraction: number) => void;
 }
 
@@ -95,7 +97,7 @@ export async function burnSubtitles(file: File, cues: Cue[], o: BurnOptions): Pr
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Canvas is unavailable in this browser.');
   const px = Math.round(Math.min(width, height) * { s: 0.045, m: 0.06, l: 0.08 }[o.size]);
-  ctx.font = `600 ${px}px system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif`;
+  ctx.font = `${o.weight ?? 600} ${px}px system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", Arial, sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.lineJoin = 'round';
@@ -119,7 +121,7 @@ export async function burnSubtitles(file: File, cues: Cue[], o: BurnOptions): Pr
           const lines = wrap(cue.text, width * 0.9, (s) => ctx.measureText(s).width);
           const lh = px * 1.25;
           const block = lh * lines.length;
-          const top = o.position === 'bottom' ? height - height * 0.07 - block : height * 0.07;
+          const top = o.position === 'bottom' ? height - height * 0.07 - block : o.position === 'middle' ? (height - block) / 2 : height * 0.07;
           lines.forEach((line, i) => {
             const y = top + lh * (i + 0.5);
             ctx.lineWidth = px * 0.18;

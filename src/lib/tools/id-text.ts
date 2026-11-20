@@ -306,4 +306,30 @@ export const idText: ToolTranslations = {
       },
     ],
   },
+  'tiktok-captions': {
+    searchPhrase: 'Caption gaya TikTok',
+    title: 'Caption Gaya TikTok Online Gratis — caption besar per kata, tanpa unggah',
+    description:
+      'Tambahkan caption gaya TikTok dan Reels ke video secara otomatis, online dan gratis: Whisper mendengar ucapan di browser dan menanamkan caption tebal besar, 1–4 kata, di tengah frame. Tanpa unggah, tanpa watermark.',
+    heading: 'Caption',
+    accent: 'gaya TikTok',
+    lede: 'Dari ucapan ke caption besar dalam satu langkah.',
+    blurb: 'Caption tebal besar beberapa kata di tengah, dari ucapan.',
+    featureList: [
+      'Waktu per kata dari Whisper, 1–4 kata',
+      'Putih tebal bergaris tepi, di tengah',
+      '99 bahasa',
+      'Tanpa unggah dan watermark',
+    ],
+    faq: [
+      {
+        q: 'Bisakah memperbaiki kata yang salah dengar?',
+        a: 'Tidak di sini. Untuk kontrol, buat SRT dengan Subtitle otomatis, perbaiki, lalu tanamkan.',
+      },
+      {
+        q: 'Apakah video diunggah?',
+        a: 'Tidak. Semuanya di browser.',
+      },
+    ],
+  },
 };

@@ -22,6 +22,11 @@ const MODELS: Record<ModelSize, string> = {
   base: 'onnx-community/whisper-base',
   small: 'onnx-community/whisper-small',
 };
+/** Word timestamps need cross-attention outputs, which only the `_timestamped` exports carry. */
+const WORD_MODELS: Record<ModelSize, string> = {
+  base: 'onnx-community/whisper-base_timestamped',
+  small: 'onnx-community/whisper-small_timestamped',
+};
 
 const stamp = (t: number) => {
   const ms = Math.max(0, Math.round(t * 1000));
@@ -66,6 +71,34 @@ export function toCues(chunks: { timestamp: [number, number | null]; text: strin
   return out;
 }
 
+/**
+ * Word timestamps into short captions: up to `perCaption` words, a new caption after a sentence end
+ * or a pause longer than `gap` seconds, each shown until the next begins (no flicker between words
+ * of one phrase) but never longer than 1.5 s past its last word.
+ */
+export function groupWords(words: { timestamp: [number, number | null]; text: string }[], fallbackEnd: number, perCaption = 3, gap = 0.6): Chunk[] {
+  const clean = words
+    .map((w, i) => ({ start: w.timestamp[0], end: w.timestamp[1] ?? words[i + 1]?.timestamp[0] ?? fallbackEnd, text: w.text.trim() }))
+    .filter((w) => w.text);
+  const out: Chunk[] = [];
+  let cur: typeof clean = [];
+  const flush = () => {
+    if (cur.length) out.push({ start: cur[0].start, end: cur[cur.length - 1].end, text: cur.map((w) => w.text).join(' ') });
+    cur = [];
+  };
+  for (const w of clean) {
+    const last = cur[cur.length - 1];
+    if (cur.length >= perCaption || (last && (w.start - last.end > gap || /[.!?…]$/.test(last.text)))) flush();
+    cur.push(w);
+  }
+  flush();
+  for (let i = 0; i < out.length; i++) {
+    const next = out[i + 1]?.start ?? Infinity;
+    out[i].end = Math.min(Math.max(out[i].end, Math.min(next, out[i].end + 1.5)), next);
+  }
+  return out;
+}
+
 export function toSrt(cues: Chunk[]): string {
   return cues.map((c, i) => `${i + 1}\n${stamp(c.start)} --> ${stamp(c.end)}\n${c.text}\n`).join('\n');
 }
@@ -95,6 +128,10 @@ export interface TranscribeOptions {
   model: ModelSize;
   /** ISO code ('en', 'ru'…) or null to let Whisper detect it. */
   language: string | null;
+  /** Word-level timestamps instead of phrase chunks (for short, punchy captions). */
+  words?: boolean;
+  /** With `words`: how many words per caption (default 3). */
+  perCaption?: number;
   onStage?: (stage: 'audio' | 'model' | 'listening', fraction?: number) => void;
 }
 
@@ -106,7 +143,7 @@ export async function transcribe(file: File, o: TranscribeOptions): Promise<{ cu
   const gpu = typeof navigator !== 'undefined' && 'gpu' in navigator && !!(await (navigator as Navigator & { gpu?: { requestAdapter(): Promise<unknown> } }).gpu?.requestAdapter().catch(() => null));
   const files = new Map<string, number>();
   o.onStage?.('model', 0);
-  const asr = await pipeline('automatic-speech-recognition', MODELS[o.model], {
+  const asr = await pipeline('automatic-speech-recognition', (o.words ? WORD_MODELS : MODELS)[o.model], {
     device: gpu ? 'webgpu' : 'wasm',
     dtype: gpu ? { encoder_model: 'fp32', decoder_model_merged: 'q4' } : 'q8',
     progress_callback: (p: { status: string; file?: string; loaded?: number; total?: number }) => {
@@ -119,7 +156,7 @@ export async function transcribe(file: File, o: TranscribeOptions): Promise<{ cu
   });
   o.onStage?.('listening');
   const result = (await asr(audio, {
-    return_timestamps: true,
+    return_timestamps: o.words ? 'word' : true,
     chunk_length_s: 30,
     stride_length_s: 5,
     task: 'transcribe',
@@ -127,5 +164,5 @@ export async function transcribe(file: File, o: TranscribeOptions): Promise<{ cu
   })) as { chunks?: { timestamp: [number, number | null]; text: string }[]; text: string };
   await asr.dispose?.();
   const chunks = result.chunks?.length ? result.chunks : [{ timestamp: [0, duration] as [number, number], text: result.text }];
-  return { cues: toCues(chunks, duration), duration, device: gpu ? 'webgpu' : 'wasm' };
+  return { cues: o.words ? groupWords(chunks, duration, o.perCaption ?? 3) : toCues(chunks, duration), duration, device: gpu ? 'webgpu' : 'wasm' };
 }

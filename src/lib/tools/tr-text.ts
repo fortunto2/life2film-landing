@@ -306,4 +306,30 @@ export const trText: ToolTranslations = {
       },
     ],
   },
+  'tiktok-captions': {
+    searchPhrase: 'TikTok tarzı altyazı',
+    title: 'TikTok Tarzı Altyazı Online Ücretsiz — kelime kelime büyük altyazı, yükleme yok',
+    description:
+      'Bir videoya TikTok ve Reels tarzı altyazıyı otomatik, online ve ücretsiz ekleyin: Whisper konuşmayı tarayıcıda dinler, karenin ortasına 1–4 kelimelik büyük kalın altyazılar gömer. Yükleme ve filigran yok.',
+    heading: 'TikTok tarzı',
+    accent: 'altyazı',
+    lede: 'Konuşmadan büyük altyazıya tek adımda.',
+    blurb: 'Konuşmadan, ortada birkaç kelimelik büyük kalın altyazılar.',
+    featureList: [
+      'Whisper ile kelime zamanlaması, 1–4 kelime',
+      'Kenarlı kalın beyaz, ortada',
+      '99 dil',
+      'Yükleme ve filigran yok',
+    ],
+    faq: [
+      {
+        q: 'Yanlış duyulan kelimeyi düzeltebilir miyim?',
+        a: 'Burada hayır. Kontrol için Otomatik altyazı ile SRT yapın, düzeltin ve videoya gömün.',
+      },
+      {
+        q: 'Video yükleniyor mu?',
+        a: 'Hayır. Her şey tarayıcıda çalışır.',
+      },
+    ],
+  },
 };

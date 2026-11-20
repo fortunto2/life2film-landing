@@ -306,4 +306,30 @@ export const ptText: ToolTranslations = {
       },
     ],
   },
+  'tiktok-captions': {
+    searchPhrase: 'Legendas estilo TikTok',
+    title: 'Legendas estilo TikTok online grátis — legendas grandes palavra por palavra, sem upload',
+    description:
+      'Adicione legendas estilo TikTok e Reels a um vídeo automaticamente, online e grátis: o Whisper ouve a fala no navegador e grava legendas grandes em negrito, de 1 a 4 palavras, no centro. Sem upload, sem marca d’água.',
+    heading: 'Legendas',
+    accent: 'estilo TikTok',
+    lede: 'Da fala a legendas grandes em um passo.',
+    blurb: 'Legendas grandes de poucas palavras no centro, a partir da fala.',
+    featureList: [
+      'Tempo por palavra com Whisper, 1–4 palavras',
+      'Branco em negrito com contorno, centralizado',
+      '99 idiomas',
+      'Sem upload nem marca d’água',
+    ],
+    faq: [
+      {
+        q: 'Posso corrigir uma palavra?',
+        a: 'Aqui não. Para controlar, crie um SRT em Legendas automáticas, corrija e grave com Embutir legendas.',
+      },
+      {
+        q: 'O vídeo é enviado?',
+        a: 'Não. Tudo roda no navegador.',
+      },
+    ],
+  },
 };

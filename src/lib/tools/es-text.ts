@@ -306,4 +306,30 @@ export const esText: ToolTranslations = {
       },
     ],
   },
+  'tiktok-captions': {
+    searchPhrase: 'Subtítulos estilo TikTok',
+    title: 'Subtítulos estilo TikTok online gratis — subtítulos grandes palabra a palabra, sin subir',
+    description:
+      'Añade subtítulos estilo TikTok y Reels a un video automáticamente, online y gratis: Whisper escucha la voz en tu navegador e incrusta subtítulos grandes en negrita, de 1 a 4 palabras, en el centro. Sin subir, sin marca de agua.',
+    heading: 'Subtítulos',
+    accent: 'estilo TikTok',
+    lede: 'De la voz a subtítulos grandes en un paso.',
+    blurb: 'Subtítulos grandes de pocas palabras en el centro, desde la voz.',
+    featureList: [
+      'Tiempos por palabra con Whisper, 1–4 palabras',
+      'Blanco en negrita con contorno, centrado',
+      '99 idiomas',
+      'Sin subidas ni marca de agua',
+    ],
+    faq: [
+      {
+        q: '¿Puedo corregir una palabra?',
+        a: 'Aquí no. Para controlar, crea un SRT con Subtítulos automáticos, corrígelo y grábalo con Añadir subtítulos al video.',
+      },
+      {
+        q: '¿Se sube el video?',
+        a: 'No. Todo funciona en tu navegador.',
+      },
+    ],
+  },
 };

@@ -1,0 +1,110 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { per: 'Words per caption', model: 'Model', base: 'Fast (~80 MB once)', small: 'Accurate (~250 MB once)', language: 'Language', auto: 'Detect', run: 'Add captions', audio: 'Reading the sound…', loading: 'Loading the speech model, once: {n}%', listening: 'Listening…', burning: 'Drawing captions… {n}%', saved: 'Saved — {size}, {n} captions.', failed: 'Could not add captions — {msg}', note: 'Speech is recognised by Whisper in your browser; the model downloads once. Your video is not uploaded.' },
+  ru: { per: 'Слов в титре', model: 'Модель', base: 'Быстрая (~80 МБ один раз)', small: 'Точная (~250 МБ один раз)', language: 'Язык', auto: 'Определить', run: 'Добавить субтитры', audio: 'Читаем звук…', loading: 'Загружаем модель речи, один раз: {n}%', listening: 'Слушаем…', burning: 'Рисуем субтитры… {n}%', saved: 'Сохранено — {size}, титров: {n}.', failed: 'Не удалось добавить субтитры — {msg}', note: 'Речь распознаёт Whisper прямо в браузере; модель скачивается один раз. Видео никуда не загружается.' },
+  es: { per: 'Palabras por subtítulo', model: 'Modelo', base: 'Rápido (~80 MB una vez)', small: 'Preciso (~250 MB una vez)', language: 'Idioma', auto: 'Detectar', run: 'Añadir subtítulos', audio: 'Leyendo el sonido…', loading: 'Cargando el modelo, una vez: {n}%', listening: 'Escuchando…', burning: 'Dibujando subtítulos… {n}%', saved: 'Guardado — {size}, {n} subtítulos.', failed: 'No se pudieron añadir — {msg}', note: 'Whisper reconoce la voz en tu navegador; el modelo se descarga una vez. Tu video no se sube.' },
+  pt: { per: 'Palavras por legenda', model: 'Modelo', base: 'Rápido (~80 MB uma vez)', small: 'Preciso (~250 MB uma vez)', language: 'Idioma', auto: 'Detectar', run: 'Adicionar legendas', audio: 'Lendo o som…', loading: 'Carregando o modelo, uma vez: {n}%', listening: 'Ouvindo…', burning: 'Desenhando legendas… {n}%', saved: 'Salvo — {size}, {n} legendas.', failed: 'Não foi possível adicionar — {msg}', note: 'O Whisper reconhece a fala no navegador; o modelo baixa uma vez. Seu vídeo não é enviado.' },
+  id: { per: 'Kata per caption', model: 'Model', base: 'Cepat (~80 MB sekali)', small: 'Akurat (~250 MB sekali)', language: 'Bahasa', auto: 'Deteksi', run: 'Tambah caption', audio: 'Membaca suara…', loading: 'Memuat model, sekali: {n}%', listening: 'Mendengarkan…', burning: 'Menggambar caption… {n}%', saved: 'Tersimpan — {size}, {n} caption.', failed: 'Gagal menambah caption — {msg}', note: 'Whisper mengenali ucapan di browser; model diunduh sekali. Video Anda tidak diunggah.' },
+  tr: { per: 'Altyazı başına kelime', model: 'Model', base: 'Hızlı (bir kez ~80 MB)', small: 'Doğru (bir kez ~250 MB)', language: 'Dil', auto: 'Algıla', run: 'Altyazı ekle', audio: 'Ses okunuyor…', loading: 'Model bir kez yükleniyor: %{n}', listening: 'Dinleniyor…', burning: 'Altyazılar çiziliyor… %{n}', saved: 'Kaydedildi — {size}, {n} altyazı.', failed: 'Altyazı eklenemedi — {msg}', note: 'Konuşmayı Whisper tarayıcıda tanır; model bir kez iner. Videonuz yüklenmez.' },
+  ar: { per: 'كلمات لكل سطر', model: 'النموذج', base: 'سريع (~80 ميغابايت مرة واحدة)', small: 'دقيق (~250 ميغابايت مرة واحدة)', language: 'اللغة', auto: 'اكتشاف', run: 'أضف الترجمة', audio: 'جارٍ قراءة الصوت…', loading: 'جارٍ تحميل النموذج مرة واحدة: {n}%', listening: 'جارٍ الاستماع…', burning: 'جارٍ رسم الترجمة… {n}%', saved: 'تم الحفظ — {size}، {n} سطرًا.', failed: 'تعذّرت إضافة الترجمة — {msg}', note: 'يتعرف Whisper على الكلام في متصفحك؛ يُنزَّل النموذج مرة واحدة. لا يُرفع الفيديو.' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+const LANGS = [['en', 'English'], ['ru', 'Русский'], ['es', 'Español'], ['pt', 'Português'], ['id', 'Bahasa Indonesia'], ['tr', 'Türkçe'], ['ar', 'العربية'], ['de', 'Deutsch'], ['fr', 'Français'], ['it', 'Italiano'], ['uk', 'Українська'], ['ja', '日本語'], ['zh', '中文'], ['ko', '한국어'], ['hi', 'हिन्दी']];
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="video/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP4, MOV, WebM</span>
+  </label>
+  <div class="controls">
+    <label class="control"><span class="muted">{words.per}</span>
+      <select id="per"><option value="1">1</option><option value="2">2</option><option value="3" selected>3</option><option value="4">4</option></select></label>
+    <label class="control"><span class="muted">{words.model}</span>
+      <select id="model"><option value="base" selected>{words.base}</option><option value="small">{words.small}</option></select></label>
+    <label class="control"><span class="muted">{words.language}</span>
+      <select id="language"><option value="" selected>{words.auto}</option>{LANGS.map(([v, n]) => <option value={v}>{n}</option>)}</select></label>
+    <span class="spacer"></span>
+    <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+  </div>
+  <p class="muted small">{words.note}</p>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<style>
+  .small { font-size: 0.85rem; }
+</style>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { saveBlob, formatBytes } from '../../lib/encode';
+  import { transcribe, type ModelSize } from '../../lib/transcribe';
+  import { burnSubtitles } from '../../lib/subtitles';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  let file: File | null = null;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  el('run').addEventListener('click', async () => {
+    if (!file || busy) return;
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    const per = Number(el<HTMLSelectElement>('per').value);
+    const model = el<HTMLSelectElement>('model').value as ModelSize;
+    const language = el<HTMLSelectElement>('language').value || null;
+    try {
+      const t = await transcribe(file, {
+        model,
+        language,
+        words: true,
+        perCaption: per,
+        onStage: (stage, f) => {
+          if (stage === 'audio') status(w.audio, 0.02);
+          else if (stage === 'model') status(w.loading.replace('{n}', String(Math.round((f ?? 0) * 100))), 0.05 + (f ?? 0) * 0.25);
+          else status(w.listening, 0.35);
+        },
+      });
+      const cues = t.cues;
+      const { blob } = await burnSubtitles(file, cues, { size: 'l', position: 'middle', weight: 800, onProgress: (f) => status(w.burning.replace('{n}', String(Math.round(f * 100))), 0.5 + f * 0.5) });
+      saveBlob(blob, `${file.name.replace(/\.[^.]+$/, '')}-captions.mp4`);
+      track('result_saved', { placement: 'result', model, device: t.device, language: language ?? 'auto' }, { seconds: Math.round(t.duration), captions: cues.length, per });
+      status(w.saved.replace('{size}', formatBytes(blob.size)).replace('{n}', String(cues.length)), 1);
+    } catch (error) {
+      toolFailed('run', error, file);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  const take = (f: File | undefined, how: 'picker' | 'drop') => { if (!f) return; file = f; fileChosen(f, how); status(f.name); };
+  el<HTMLInputElement>('file').addEventListener('change', (e) => take((e.target as HTMLInputElement).files?.[0], 'picker'));
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => take((e as DragEvent).dataTransfer?.files?.[0], 'drop'));
+</script>
