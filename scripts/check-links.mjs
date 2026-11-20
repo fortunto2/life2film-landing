@@ -22,4 +22,19 @@ if (missing.size) {
   console.error(`${missing.size} internal links point at nothing`);
   process.exit(1);
 }
-console.log(`links ok: ${files.length} pages checked`);
+// Links to our other sites (from the shared registry) must answer 200 too: on 20 Nov 2026 every
+// locale hub shipped visayes.app/ru/en/... for a week, and only an internal check had run.
+const ours = /href="(https:\/\/(?:visayes\.app|superduperai\.co)\/[^"#?]*)/g;
+const external = new Map();
+for (const f of files) for (const [, u] of readFileSync(f, 'utf8').matchAll(ours)) external.set(u, f);
+const dead = [];
+await Promise.all([...external].map(async ([u, f]) => {
+  const r = await fetch(u, { method: 'HEAD', redirect: 'follow' }).catch(() => null);
+  if (!r || r.status !== 200) dead.push(`${r?.status ?? 'no answer'} ${u}  (linked from ${f})`);
+}));
+if (dead.length) {
+  for (const d of dead.slice(0, 20)) console.error(d);
+  console.error(`${dead.length} links to our other sites are dead`);
+  process.exit(1);
+}
+console.log(`links ok: ${files.length} pages checked, ${external.size} links to our other sites answer 200`);

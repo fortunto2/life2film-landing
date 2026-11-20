@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 import { GROUPS, TOOLS, byGroup } from '../lib/tools';
 import { TRANSLATIONS, toolName, toolPath } from '../lib/tools/index';
 import { ELSEWHERE, HUB } from '../lib/tools-i18n';
-import { SITES, externalFor, localizedPath } from 'superduper-tools/registry';
+import { SITES, externalFor, toolAbsoluteUrl } from 'superduper-tools/registry';
 import { localePath, type Lang } from '../i18n';
 import { homeNote } from '../lib/related';
 
@@ -23,7 +23,7 @@ const note = homeNote(lang, true);
 /** Tools whose home is another of our sites (shared registry): linked in this language when it has one. */
 const elsewhere = externalFor('life2film').map((t) => ({
   ...t,
-  href: `${SITES[t.canonical_site].url}${t.languages.includes(lang) ? localizedPath(t, lang) : t.path}`,
+  href: toolAbsoluteUrl(t, lang),
   site: SITES[t.canonical_site].name,
 }));
 

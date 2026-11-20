@@ -15,8 +15,7 @@ const WORDS: Partial<Record<Lang, Record<string, string>>> = {
 const words = WORDS[lang] ?? WORDS.en!;
 // The photo version lives on VisaYes; its address comes from the shared registry, never typed here.
 const photoTool = toolById('visayes-background');
-// VisaYes puts the language first (/ru/background/), so swap it in when that locale exists.
-const photoUrl = photoTool && toolAbsoluteUrl(photoTool.languages.includes(lang) ? { ...photoTool, path: photoTool.path.replace(/^\/en\//, `/${lang}/`) } : photoTool);
+const photoUrl = photoTool && toolAbsoluteUrl(photoTool, lang);
 ---
 
 <div class="tool" slot="tool">
