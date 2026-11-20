@@ -7,7 +7,7 @@ import { PieceSink } from './sink';
 import { loadMediabunny, encodableCodec } from './encode';
 import { cover, type Rect } from './blur-fill';
 
-export type Layout = 'side' | 'stack';
+export type Layout = 'side' | 'stack' | 'pip';
 export type SoundFrom = 'a' | 'b' | 'both';
 const FPS = 30;
 
@@ -16,6 +16,11 @@ export function cells(layout: Layout, gap = 8): { width: number; height: number;
   if (layout === 'side') {
     const width = 1920, height = 1080, cw = (width - gap) / 2;
     return { width, height, a: { x: 0, y: 0, w: cw, h: height }, b: { x: cw + gap, y: 0, w: cw, h: height } };
+  }
+  if (layout === 'pip') {
+    // The first fills a 16:9 frame; the second sits in the bottom-right quarter-width corner.
+    const width = 1920, height = 1080, w = 480, h = 270, m = 32;
+    return { width, height, a: { x: 0, y: 0, w: width, h: height }, b: { x: width - w - m, y: height - h - m, w, h } };
   }
   const width = 1080, height = 1920, ch = (height - gap) / 2;
   return { width, height, a: { x: 0, y: 0, w: width, h: ch }, b: { x: 0, y: ch + gap, w: width, h: ch } };

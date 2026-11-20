@@ -8,13 +8,13 @@ const chrome = CHROME[lang];
 const status = STATUS[lang];
 
 const WORDS: Partial<Record<Lang, Record<string, string>>> = {
-  en: { pick: 'Choose two videos', layout: 'Layout', side: 'Side by side (16:9)', stack: 'One above the other (9:16)', sound: 'Sound', a: 'first video', b: 'second video', both: 'both', run: 'Put them together', need: 'Choose two videos.', working: 'Combining… {n}%', saved: 'Saved — {size}, {len}.', failed: 'Could not combine — {msg}' },
-  ru: { pick: 'Выберите два видео', layout: 'Расположение', side: 'Рядом (16:9)', stack: 'Друг над другом (9:16)', sound: 'Звук', a: 'первого видео', b: 'второго видео', both: 'обоих', run: 'Соединить', need: 'Выберите два видео.', working: 'Соединяем… {n}%', saved: 'Сохранено — {size}, {len}.', failed: 'Не удалось соединить — {msg}' },
-  es: { pick: 'Elige dos videos', layout: 'Disposición', side: 'Lado a lado (16:9)', stack: 'Uno sobre otro (9:16)', sound: 'Sonido', a: 'primer video', b: 'segundo video', both: 'ambos', run: 'Unirlos', need: 'Elige dos videos.', working: 'Uniendo… {n}%', saved: 'Guardado — {size}, {len}.', failed: 'No se pudo unir — {msg}' },
-  pt: { pick: 'Escolha dois vídeos', layout: 'Disposição', side: 'Lado a lado (16:9)', stack: 'Um sobre o outro (9:16)', sound: 'Som', a: 'primeiro vídeo', b: 'segundo vídeo', both: 'ambos', run: 'Juntar', need: 'Escolha dois vídeos.', working: 'Juntando… {n}%', saved: 'Salvo — {size}, {len}.', failed: 'Não foi possível juntar — {msg}' },
-  id: { pick: 'Pilih dua video', layout: 'Tata letak', side: 'Berdampingan (16:9)', stack: 'Atas bawah (9:16)', sound: 'Suara', a: 'video pertama', b: 'video kedua', both: 'keduanya', run: 'Gabungkan', need: 'Pilih dua video.', working: 'Menggabungkan… {n}%', saved: 'Tersimpan — {size}, {len}.', failed: 'Gagal menggabungkan — {msg}' },
-  tr: { pick: 'İki video seçin', layout: 'Düzen', side: 'Yan yana (16:9)', stack: 'Üst üste (9:16)', sound: 'Ses', a: 'ilk video', b: 'ikinci video', both: 'ikisi', run: 'Birleştir', need: 'İki video seçin.', working: 'Birleştiriliyor… %{n}', saved: 'Kaydedildi — {size}, {len}.', failed: 'Birleştirilemedi — {msg}' },
-  ar: { pick: 'اختر فيديوهين', layout: 'التخطيط', side: 'جنبًا إلى جنب (16:9)', stack: 'أحدهما فوق الآخر (9:16)', sound: 'الصوت', a: 'الفيديو الأول', b: 'الفيديو الثاني', both: 'كلاهما', run: 'اجمعهما', need: 'اختر فيديوهين.', working: 'جارٍ الجمع… {n}%', saved: 'تم الحفظ — {size}، {len}.', failed: 'تعذّر الجمع — {msg}' },
+  en: { pick: 'Choose two videos', layout: 'Layout', side: 'Side by side (16:9)', stack: 'One above the other (9:16)', pip: 'Picture in picture', sound: 'Sound', a: 'first video', b: 'second video', both: 'both', run: 'Put them together', need: 'Choose two videos.', working: 'Combining… {n}%', saved: 'Saved — {size}, {len}.', failed: 'Could not combine — {msg}' },
+  ru: { pick: 'Выберите два видео', layout: 'Расположение', side: 'Рядом (16:9)', stack: 'Друг над другом (9:16)', pip: 'Картинка в картинке', sound: 'Звук', a: 'первого видео', b: 'второго видео', both: 'обоих', run: 'Соединить', need: 'Выберите два видео.', working: 'Соединяем… {n}%', saved: 'Сохранено — {size}, {len}.', failed: 'Не удалось соединить — {msg}' },
+  es: { pick: 'Elige dos videos', layout: 'Disposición', side: 'Lado a lado (16:9)', stack: 'Uno sobre otro (9:16)', pip: 'Imagen en imagen', sound: 'Sonido', a: 'primer video', b: 'segundo video', both: 'ambos', run: 'Unirlos', need: 'Elige dos videos.', working: 'Uniendo… {n}%', saved: 'Guardado — {size}, {len}.', failed: 'No se pudo unir — {msg}' },
+  pt: { pick: 'Escolha dois vídeos', layout: 'Disposição', side: 'Lado a lado (16:9)', stack: 'Um sobre o outro (9:16)', pip: 'Picture-in-picture', sound: 'Som', a: 'primeiro vídeo', b: 'segundo vídeo', both: 'ambos', run: 'Juntar', need: 'Escolha dois vídeos.', working: 'Juntando… {n}%', saved: 'Salvo — {size}, {len}.', failed: 'Não foi possível juntar — {msg}' },
+  id: { pick: 'Pilih dua video', layout: 'Tata letak', side: 'Berdampingan (16:9)', stack: 'Atas bawah (9:16)', pip: 'Gambar dalam gambar', sound: 'Suara', a: 'video pertama', b: 'video kedua', both: 'keduanya', run: 'Gabungkan', need: 'Pilih dua video.', working: 'Menggabungkan… {n}%', saved: 'Tersimpan — {size}, {len}.', failed: 'Gagal menggabungkan — {msg}' },
+  tr: { pick: 'İki video seçin', layout: 'Düzen', side: 'Yan yana (16:9)', stack: 'Üst üste (9:16)', pip: 'Resim içinde resim', sound: 'Ses', a: 'ilk video', b: 'ikinci video', both: 'ikisi', run: 'Birleştir', need: 'İki video seçin.', working: 'Birleştiriliyor… %{n}', saved: 'Kaydedildi — {size}, {len}.', failed: 'Birleştirilemedi — {msg}' },
+  ar: { pick: 'اختر فيديوهين', layout: 'التخطيط', side: 'جنبًا إلى جنب (16:9)', stack: 'أحدهما فوق الآخر (9:16)', pip: 'صورة داخل صورة', sound: 'الصوت', a: 'الفيديو الأول', b: 'الفيديو الثاني', both: 'كلاهما', run: 'اجمعهما', need: 'اختر فيديوهين.', working: 'جارٍ الجمع… {n}%', saved: 'تم الحفظ — {size}، {len}.', failed: 'تعذّر الجمع — {msg}' },
 };
 const words = WORDS[lang] ?? WORDS.en!;
 ---
@@ -29,7 +29,7 @@ const words = WORDS[lang] ?? WORDS.en!;
   </label>
   <div class="controls">
     <label class="control"><span class="muted">{words.layout}</span>
-      <select id="layout"><option value="side" selected>{words.side}</option><option value="stack">{words.stack}</option></select></label>
+      <select id="layout"><option value="side" selected>{words.side}</option><option value="stack">{words.stack}</option><option value="pip">{words.pip}</option></select></label>
     <label class="control"><span class="muted">{words.sound}</span>
       <select id="sound"><option value="a" selected>{words.a}</option><option value="b">{words.b}</option><option value="both">{words.both}</option></select></label>
     <span class="spacer"></span>

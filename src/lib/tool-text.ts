@@ -445,7 +445,7 @@ export const TEXT_TOOLS: Tool[] = [
     accent: 'video',
     lede: 'Two clips, one frame, in sync. The videos stay on your device.',
     featureList: [
-      'Side by side (1920x1080) or stacked (1080x1920)',
+      'Side by side (1920x1080), stacked (1080x1920) or picture in picture',
       'Each clip fills its half, cropped to cover, never stretched',
       'Sound from the first, the second, or both',
       'Plays for as long as the shorter clip',

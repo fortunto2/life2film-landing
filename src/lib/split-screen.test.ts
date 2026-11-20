@@ -17,6 +17,15 @@ describe('cells', () => {
   });
 });
 
+describe('cells pip', () => {
+  it('first fills the frame, second is a corner inset inside it', () => {
+    const c = cells('pip');
+    expect(c.a).toEqual({ x: 0, y: 0, w: 1920, h: 1080 });
+    expect(c.b.x + c.b.w).toBeLessThan(1920);
+    expect(c.b.y + c.b.h).toBeLessThan(1080);
+  });
+});
+
 describe('mixStereo', () => {
   it('one source passes through, mono becomes both channels', () => {
     const [L, R] = mixStereo([Float32Array.of(0.5, -0.5)], null, 2);
