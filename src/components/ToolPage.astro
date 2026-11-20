@@ -1,4 +1,5 @@
 ---
+import QRCode from 'qrcode';
 import Base from '../layouts/Base.astro';
 import AgentBlock from './AgentBlock.astro';
 import { TOOL, TOOLS } from '../lib/tools';
@@ -23,6 +24,9 @@ const savedSplit = (text: string): [string, string] => {
 const waitMode = ['video-splitter', 'scene-detector', 'bpm-detector', 'key-finder'].includes(slug)
   ? 'file'
   : slug === 'video-trimmer' ? 'none' : 'run';
+// On a computer the App Store button leads nowhere useful; a QR code hands the page to the phone.
+// Its own `ct` so App Store Connect counts installs that came through it.
+const qrSvg = await QRCode.toString(`https://apps.apple.com/app/id6761656888?pt=128499174&ct=tool-${slug}-qr&mt=8`, { type: 'svg', margin: 1, width: 112, color: { dark: '#000000', light: '#ffffff' } });
 const STUDIO_DMG = 'https://github.com/fortunto2/life2film-landing/releases/latest/download/Life2FilmStudio.dmg';
 const base = TOOL[slug];
 
@@ -30,9 +34,10 @@ const base = TOOL[slug];
 const tool = lang === 'en' ? asTranslation(base) : TRANSLATIONS[lang]?.[slug] ?? asTranslation(base);
 const chrome = CHROME[lang];
 // A song is on the table on both pages: the offer that names cutting to a track's beat fits there.
-const phoneAfter = slug === 'photos-to-video'
-  ? chrome.appAfterPhotos
-  : ['bpm-detector', 'add-music-to-video', 'key-finder'].includes(slug) ? chrome.appAfterBeat : chrome.appAfter;
+// A line about what the app would do with THIS result where the locale wrote one; the general lines otherwise.
+const phoneAfter = chrome.appAfterBy?.[slug]
+  ?? (slug === 'photos-to-video' ? chrome.appAfterPhotos
+    : ['bpm-detector', 'add-music-to-video', 'key-finder'].includes(slug) ? chrome.appAfterBeat : chrome.appAfter);
 const path = localePath(lang, `/tools/${slug}/`);
 
 /** Only the locales that actually have this page — never claim a translation that does not exist. */
@@ -91,6 +96,10 @@ const jsonLd = {
         <a class="back" href={localePath(lang, '/tools/')}>{chrome.allTools}</a>
         <h1>{tool.heading} <span class="gradient-text">{tool.accent}</span></h1>
         <p class="lede">{tool.lede}</p>
+        {chrome.appTop && (
+          <p class="app-top"><a href={`https://apps.apple.com/app/id6761656888?pt=128499174&ct=tool-${slug}-top&mt=8`} target="_blank" rel="noopener"
+             data-sda-event="app_store_opened" data-sda-placement={`tool-${slug}-top`}><img src="/img/app-icon.png" alt="" width="20" height="20" />{chrome.appTop}</a></p>
+        )}
 
         <slot name="tool" />
 
@@ -105,6 +114,10 @@ const jsonLd = {
             <span><span class="when-saved">{savedSplit(phoneAfter)[0]} </span>{savedSplit(phoneAfter)[1]}</span>
             <a class="ghost primary" href={`https://apps.apple.com/app/id6761656888?pt=128499174&ct=tool-${slug}-result&mt=8`}
                target="_blank" rel="noopener" data-sda-event="app_store_opened" data-sda-placement={`tool-${slug}-result`}>{chrome.appCta}</a>
+          </div>
+          <div class="offer qr" data-offer="qr" hidden>
+            <span class="qr-code" set:html={qrSvg} aria-hidden="true"></span>
+            <span><span class="when-saved">{savedSplit(phoneAfter)[0]} </span>{savedSplit(phoneAfter)[1]} <small class="muted">{chrome.qrNote ?? CHROME.en.qrNote}</small></span>
           </div>
           <div class="offer" data-offer="mac" hidden>
             <img src="/img/studio-icon.png" alt="" width="48" height="48" />
@@ -175,9 +188,16 @@ const jsonLd = {
             the iPhone offer, as before. Runs before paint of the cards below the tool, no flash on top. */}
         <script is:inline>
           (() => {
-            const mac = /Macintosh/.test(navigator.userAgent) && !navigator.maxTouchPoints;
-            if (!mac) return;
-            for (const n of document.querySelectorAll('[data-offer]')) n.hidden = n.dataset.offer !== 'mac';
+            // A computer: no touch and no phone in the user agent. It gets the QR for the iPhone
+            // instead of a button that opens the App Store on the desktop; a Mac also gets Studio.
+            const ua = navigator.userAgent;
+            const touch = navigator.maxTouchPoints > 0 || /iPhone|iPad|iPod|Android|Mobile/i.test(ua);
+            if (touch) return;
+            const mac = /Macintosh/.test(ua);
+            for (const n of document.querySelectorAll('[data-offer]')) {
+              const o = n.dataset.offer;
+              n.hidden = !(o === 'qr' || (o === 'mac' && mac) || (o === 'phone' && !n.closest('#appAfter')));
+            }
           })();
         </script>
       </div>
@@ -324,9 +344,18 @@ const jsonLd = {
     .app-after { margin-top: 14px; border-color: rgba(0,242,224,.45); color: var(--fg); }
     .app-after[hidden], .offer[hidden] { display: none; }
     .offer { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: center; }
+    .app-top { margin-top: 10px; font-size: 14px; }
+    .app-top a { display: inline-flex; gap: 8px; align-items: center; color: var(--muted); text-decoration: none; }
+    .app-top a:hover { color: var(--fg); }
+    .app-top img { border-radius: 5px; flex: none; }
+    .qr-code { display: block; width: 112px; height: 112px; border-radius: 8px; overflow: hidden; flex: none; }
+    .qr-code :global(svg) { width: 112px; height: 112px; display: block; }
+    .offer.qr { justify-content: flex-start; }
+    .offer.qr > span:last-child { flex: 1; min-width: 200px; text-align: left; }
     .offer img { width: 48px; height: 48px; border-radius: 11px; flex: none; }
     .offer span { flex: 1 1 28ch; }
     .offer small { display: block; margin-top: 4px; font-size: 13px; }
+    .offer .qr-code { flex: none; }
     .offer a { text-decoration: none; white-space: nowrap; }
     .prose .q { margin: 28px 0 8px; font-size: 17px; }
 

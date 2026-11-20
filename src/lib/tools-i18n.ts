@@ -58,10 +58,17 @@ export interface ToolChrome {
   appAfterBeat: string;
   /** After a slideshow: the app does the same from photos AND videos, choosing the moments itself. */
   appAfterPhotos: string;
+  /** Per-tool line under a saved result, naming what the app would do with THIS result. Falls back to appAfter. */
+  appAfterBy?: Record<string, string>;
+  /** Beside the QR code on a computer: the app is for the phone in their pocket. */
+  qrNote?: string;
+  /** One line under the tool's lede: who makes the tool, and the app that does the whole edit. */
+  appTop?: string;
 }
 
 export const CHROME: Record<Lang, ToolChrome> = {
   en: {
+    appTop: 'Free tools from Life2Film, the iPhone app that edits your day into a film by itself.',
     allTools: '← All tools',
     chooseFile: 'Choose a file',
     chooseVideo: 'Choose a video file',
@@ -87,8 +94,20 @@ export const CHROME: Record<Lang, ToolChrome> = {
     studioNote: "Apple Silicon · macOS 15+ · free in beta",
     appAfterBeat: 'Saved. Life2Film cuts your iPhone videos to the beat of a track like this one by itself: pick the song, it picks the moments.',
     appAfterPhotos: 'Saved. Life2Film makes this from your iPhone\'s photos and videos together, by itself: you pick the song, it picks the moments and cuts on the beat.',
+    appAfterBy: {
+      'video-splitter': 'Saved. Now make a film of those parts: Life2Film picks the best moments from them and cuts them to music, on your iPhone.',
+      'video-to-frames': 'Saved. Life2Film finds the best frames in your camera roll by itself and turns the day into a film cut to music, on iPhone.',
+      'scene-detector': 'Those are the cuts in your video. Life2Film keeps only the best scenes and edits them to a song, on your iPhone.',
+      'video-trimmer': 'Saved. Trimming one clip is step one; Life2Film trims all of a day\'s clips and joins the best moments to music, on iPhone.',
+      'video-compressor': 'Saved. Life2Film makes a short film out of a long day of clips, small enough to send, on your iPhone.',
+      'crop-video': 'Saved. Life2Film makes vertical films for Reels and TikTok from your clips by itself, cut to music, on iPhone.',
+      'auto-montage': 'Saved. The Life2Film app does this with your whole camera roll, in 4K, with titles and photos, on iPhone.',
+      'remove-video-background': 'Saved. Life2Film turns your clips into a finished film cut to music, on your iPhone.',
+    },
+    qrNote: 'On your computer? Scan to open Life2Film on your iPhone.',
   },
   es: {
+    appTop: 'Herramientas gratis de Life2Film, la app de iPhone que convierte tu día en una película por sí sola.',
     allTools: '← Todas las herramientas',
     chooseFile: 'Elige un archivo',
     chooseVideo: 'Elige un vídeo',
@@ -116,6 +135,7 @@ export const CHROME: Record<Lang, ToolChrome> = {
     appAfterPhotos: 'Guardado. Life2Film hace esto solo con las fotos y los vídeos de tu iPhone juntos: tú eliges la canción, él elige los momentos y corta al ritmo.',
   },
   pt: {
+    appTop: 'Ferramentas grátis do Life2Film, o app de iPhone que transforma seu dia em um filme sozinho.',
     allTools: '← Todas as ferramentas',
     chooseFile: 'Escolha um ficheiro',
     chooseVideo: 'Escolha um vídeo',
@@ -143,6 +163,7 @@ export const CHROME: Record<Lang, ToolChrome> = {
     appAfterPhotos: 'Salvo. O Life2Film faz isso sozinho com as fotos e os vídeos do seu iPhone juntos: você escolhe a música, ele escolhe os momentos e corta no ritmo.',
   },
   id: {
+    appTop: 'Alat gratis dari Life2Film, aplikasi iPhone yang mengubah harimu menjadi film dengan sendirinya.',
     allTools: '← Semua alat',
     chooseFile: 'Pilih berkas',
     chooseVideo: 'Pilih berkas video',
@@ -170,6 +191,7 @@ export const CHROME: Record<Lang, ToolChrome> = {
     appAfterPhotos: 'Tersimpan. Life2Film membuat ini sendiri dari foto dan video iPhone Anda sekaligus: Anda pilih lagunya, ia pilih momen dan memotong mengikuti ketukan.',
   },
   ar: {
+    appTop: 'أدوات مجانية من Life2Film، تطبيق iPhone الذي يحوّل يومك إلى فيلم بنفسه.',
     allTools: '← كل الأدوات',
     chooseFile: 'اختر ملفًا',
     chooseVideo: 'اختر ملف فيديو',
@@ -197,6 +219,7 @@ export const CHROME: Record<Lang, ToolChrome> = {
     appAfterPhotos: 'تم الحفظ. يصنع Life2Film هذا بنفسه من صور الآيفون ومقاطعه معًا: أنت تختار الأغنية، وهو يختار اللحظات ويقطع على الإيقاع.',
   },
   ru: {
+    appTop: 'Бесплатные инструменты от Life2Film — приложения для iPhone, которое само монтирует ваш день в фильм.',
     allTools: '← Все инструменты',
     chooseFile: 'Выберите файл',
     chooseVideo: 'Выберите видеофайл',
@@ -222,8 +245,20 @@ export const CHROME: Record<Lang, ToolChrome> = {
     studioNote: "Apple Silicon · macOS 15+ · бесплатно на время беты",
     appAfterBeat: 'Сохранено. Life2Film сам режет видео с iPhone в бит такого трека: вы выбираете песню, он выбирает моменты.',
     appAfterPhotos: 'Сохранено. Life2Film делает такое сам — из фото и видео с iPhone вместе: вы выбираете песню, он выбирает моменты и режет в бит.',
+    appAfterBy: {
+      'video-splitter': 'Сохранено. Теперь сделайте из этих частей фильм: Life2Film выберет лучшие моменты и смонтирует их под музыку на iPhone.',
+      'video-to-frames': 'Сохранено. Life2Film сам находит лучшие кадры в галерее и монтирует из дня фильм под музыку на iPhone.',
+      'scene-detector': 'Это склейки вашего видео. Life2Film оставит только лучшие сцены и смонтирует их под песню на iPhone.',
+      'video-trimmer': 'Сохранено. Обрезать один клип — первый шаг; Life2Film обрежет все клипы дня и склеит лучшее под музыку на iPhone.',
+      'video-compressor': 'Сохранено. Life2Film делает из длинного дня короткий фильм, который легко отправить, прямо на iPhone.',
+      'crop-video': 'Сохранено. Life2Film сам делает вертикальные ролики для Reels и TikTok из ваших клипов, под музыку, на iPhone.',
+      'auto-montage': 'Сохранено. Приложение Life2Film делает такой монтаж из всей галереи, в 4K, с титрами и фото, на iPhone.',
+      'remove-video-background': 'Сохранено. Life2Film превращает ваши клипы в готовый фильм под музыку на iPhone.',
+    },
+    qrNote: 'Вы за компьютером? Наведите камеру телефона — Life2Film откроется на iPhone.',
   },
   tr: {
+    appTop: "Life2Film'in ücretsiz araçları: gününüzü kendi başına filme dönüştüren iPhone uygulaması.",
     allTools: '← Tüm araçlar',
     chooseFile: 'Bir dosya seçin',
     chooseVideo: 'Bir video dosyası seçin',

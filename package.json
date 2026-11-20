@@ -27,6 +27,7 @@
     "astro": "^6.4.8",
     "gifenc": "1.0.3",
     "mediabunny": "^1.66.2",
+    "qrcode": "1.5.4",
     "superduper-site-kit": "git+file:///Users/rustam/startups/shared/superduper-site-kit",
     "superduper-tools": "git+file:///Users/rustam/startups/shared/superduper-tools#fed9bb7b8c5650f1d466b930771e4f0f0bc82aed"
   },
@@ -35,6 +36,7 @@
     "@fontsource/inter": "5.3.0",
     "@fontsource/space-grotesk": "5.3.0",
     "@resvg/resvg-js": "2.6.2",
+    "@types/qrcode": "^1.5.6",
     "life2film-engine": "^0.2.0",
     "satori": "0.12.2",
     "sharp": "0.34.5",
