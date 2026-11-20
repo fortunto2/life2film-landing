@@ -25,6 +25,9 @@ interface Copy {
   autoSubs: string;
   tiktok: string;
   burn: string;
+  trim: string;
+  cutPart: string;
+  silence: string;
   hub: string;
   homeNote: (hub: string, frames: string, guides: string) => string;
   hubNote: (frames: string, guides: string) => string;
@@ -43,6 +46,9 @@ const COPY: Partial<Record<Lang, Copy>> = {
     autoSubs: 'Make an editable SRT from the speech (auto subtitles)',
     tiktok: 'Big word-by-word captions in the middle, TikTok style',
     burn: 'Burn an SRT or VTT into the video',
+    trim: 'Keep one part and drop both ends (trim)',
+    cutPart: 'Take one section out of the middle',
+    silence: 'Cut every pause out of a talking video automatically',
     hub: 'All free video tools',
     homeNote: (hub, frames, guides) =>
       `Free in the browser: <a href="${hub}">video tools</a> such as <a href="${frames}">splitting a video into frames</a>, and <a href="${guides}">guides to editing video with an AI agent</a>.`,
@@ -61,6 +67,9 @@ const COPY: Partial<Record<Lang, Copy>> = {
     autoSubs: 'Сделать SRT из речи, чтобы поправить текст (автоматические субтитры)',
     tiktok: 'Крупные титры по словам в центре кадра, как в TikTok',
     burn: 'Вшить SRT или VTT в видео',
+    trim: 'Оставить одну часть и убрать оба конца (обрезка)',
+    cutPart: 'Вырезать кусок из середины',
+    silence: 'Автоматически вырезать все паузы из видео с речью',
     hub: 'Все бесплатные видеоинструменты',
     homeNote: (hub, frames, guides) =>
       `Бесплатно в браузере: <a href="${hub}">видеоинструменты</a>, например <a href="${frames}">разбить видео на кадры</a>, и <a href="${guides}">руководства по монтажу видео с ИИ-агентом</a>.`,
@@ -99,6 +108,19 @@ export function relatedForTool(slug: string, lang: Lang): { heading: string; lin
     'burn-subtitles': [
       { href: toolPath(lang, 'auto-subtitles'), text: c.autoSubs },
       { href: toolPath(lang, 'tiktok-captions'), text: c.tiktok },
+    ],
+    // 20 Nov 2026: three ways to cut — keep a part, drop a part, drop every pause.
+    'video-trimmer': [
+      { href: toolPath(lang, 'cut-part-of-video'), text: c.cutPart },
+      { href: toolPath(lang, 'remove-silence-from-video'), text: c.silence },
+    ],
+    'cut-part-of-video': [
+      { href: toolPath(lang, 'video-trimmer'), text: c.trim },
+      { href: toolPath(lang, 'remove-silence-from-video'), text: c.silence },
+    ],
+    'remove-silence-from-video': [
+      { href: toolPath(lang, 'cut-part-of-video'), text: c.cutPart },
+      { href: toolPath(lang, 'video-trimmer'), text: c.trim },
     ],
     'video-splitter': [frames, guide],
     'video-to-frames': [splitter, guide],
