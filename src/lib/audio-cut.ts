@@ -11,6 +11,8 @@ export interface CutOptions {
   /** Seconds of fade at each end; 0 for a hard cut. */
   fade: number;
   format: 'mp3' | 'wav';
+  /** Linear gain applied to every sample, clamped to ±1 (used by normalize). */
+  gain?: number;
   onProgress?: (fraction: number) => void;
 }
 
@@ -50,6 +52,7 @@ export async function cutAudio(file: File, o: CutOptions): Promise<{ blob: Blob;
     for (let c = 0; c < buffer.numberOfChannels; c++) {
       const d = out.getChannelData(c);
       d.set(buffer.getChannelData(c).subarray(from, to));
+      if (o.gain !== undefined && o.gain !== 1) for (let i = 0; i < d.length; i++) d[i] = Math.max(-1, Math.min(1, d[i] * o.gain));
       if (o.fade > 0) {
         for (let i = 0; i < d.length; i++) {
           const t = t0 + i / rate;

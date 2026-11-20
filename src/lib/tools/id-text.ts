@@ -505,4 +505,26 @@ export const idText: ToolTranslations = {
       },
     ],
   },
+  'normalize-audio': {
+    searchPhrase: 'Normalisasi audio online',
+    title: 'Normalisasi Audio Online Gratis — lebih keras tanpa clipping, MP3 atau WAV, tanpa unggah',
+    description:
+      'Normalisasi file audio secara online dan gratis: ke kenyaringan standar (-16 dB) atau sekeras mungkin tanpa clipping, MP3 atau WAV. Di browser, tanpa unggah.',
+    heading: 'Normalisasi',
+    accent: 'audio',
+    lede: 'Satu level untuk semua rekaman.',
+    blurb: 'Bawa rekaman ke kenyaringan standar atau maksimum tanpa clipping.',
+    featureList: [
+      '-16 dB RMS atau puncak -1 dB',
+      'Tidak pernah clipping',
+      'MP3 atau WAV',
+      'Tanpa unggah',
+    ],
+    faq: [
+      {
+        q: 'Apakah file diunggah?',
+        a: 'Tidak.',
+      },
+    ],
+  },
 };

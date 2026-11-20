@@ -1,0 +1,88 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { mode: 'Make it', peak: 'as loud as possible without clipping', loud: 'a common loudness (-16 dB)', fmt: 'Save as', run: 'Normalize', working: 'Normalizing… {n}%', saved: 'Saved — {gain} dB, {size}.', failed: 'Could not normalize — {msg}' },
+  ru: { mode: 'Сделать', peak: 'максимально громко без перегруза', loud: 'стандартной громкости (−16 дБ)', fmt: 'Сохранить как', run: 'Нормализовать', working: 'Нормализуем… {n}%', saved: 'Сохранено — {gain} дБ, {size}.', failed: 'Не удалось — {msg}' },
+  es: { mode: 'Dejarlo', peak: 'lo más alto posible sin saturar', loud: 'a volumen estándar (-16 dB)', fmt: 'Guardar como', run: 'Normalizar', working: 'Normalizando… {n}%', saved: 'Guardado — {gain} dB, {size}.', failed: 'No se pudo — {msg}' },
+  pt: { mode: 'Deixar', peak: 'o mais alto possível sem distorcer', loud: 'em volume padrão (-16 dB)', fmt: 'Salvar como', run: 'Normalizar', working: 'Normalizando… {n}%', saved: 'Salvo — {gain} dB, {size}.', failed: 'Não foi possível — {msg}' },
+  id: { mode: 'Jadikan', peak: 'sekeras mungkin tanpa clipping', loud: 'kenyaringan standar (-16 dB)', fmt: 'Simpan sebagai', run: 'Normalisasi', working: 'Menormalkan… {n}%', saved: 'Tersimpan — {gain} dB, {size}.', failed: 'Gagal — {msg}' },
+  tr: { mode: 'Ses', peak: 'bozulmadan en yüksek', loud: 'standart yükseklik (-16 dB)', fmt: 'Kaydet', run: 'Normalleştir', working: 'Normalleştiriliyor… %{n}', saved: 'Kaydedildi — {gain} dB, {size}.', failed: 'Yapılamadı — {msg}' },
+  ar: { mode: 'اجعله', peak: 'أعلى ما يمكن دون تشويه', loud: 'بارتفاع قياسي (-16 ديسيبل)', fmt: 'احفظ بصيغة', run: 'سوِّ الصوت', working: 'جارٍ التسوية… {n}%', saved: 'تم الحفظ — {gain} ديسيبل، {size}.', failed: 'تعذّر — {msg}' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="audio/*,video/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP3, M4A, WAV, MP4</span>
+  </label>
+  <div class="controls">
+    <label class="control"><span class="muted">{words.mode}</span>
+      <select id="mode"><option value="loud" selected>{words.loud}</option><option value="peak">{words.peak}</option></select></label>
+    <label class="control"><span class="muted">{words.fmt}</span>
+      <select id="fmt"><option value="mp3" selected>MP3</option><option value="wav">WAV</option></select></label>
+    <span class="spacer"></span>
+    <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { saveBlob, formatBytes } from '../../lib/encode';
+  import { normalize, type NormalizeMode } from '../../lib/normalize';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  let file: File | null = null;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  el('run').addEventListener('click', async () => {
+    if (!file || busy) return;
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    const mode = el<HTMLSelectElement>('mode').value as NormalizeMode;
+    const fmt = el<HTMLSelectElement>('fmt').value as 'mp3' | 'wav';
+    try {
+      const { blob, duration, gainDb } = await normalize(file, mode, fmt, (f) => status(w.working.replace('{n}', String(Math.round(f * 100))), f));
+      saveBlob(blob, `${file.name.replace(/\.[^.]+$/, '')}-normalized.${fmt}`);
+      track('result_saved', { placement: 'result', mode, format: fmt }, { seconds: Math.round(duration), gain_db: Math.round(gainDb * 10) / 10 });
+      status(w.saved.replace('{gain}', `${gainDb >= 0 ? '+' : ''}${gainDb.toFixed(1)}`).replace('{size}', formatBytes(blob.size)), 1);
+    } catch (error) {
+      toolFailed('run', error, file);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  const take = (f: File | undefined, how: 'picker' | 'drop') => { if (!f) return; file = f; fileChosen(f, how); status(f.name); };
+  el<HTMLInputElement>('file').addEventListener('change', (e) => take((e.target as HTMLInputElement).files?.[0], 'picker'));
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => take((e as DragEvent).dataTransfer?.files?.[0], 'drop'));
+</script>

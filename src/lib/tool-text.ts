@@ -771,4 +771,40 @@ export const TEXT_TOOLS: Tool[] = [
     facts: ['For two clips side by side, stacked or picture-in-picture, Split Screen has more choices.'],
     agentJob: 'Making a collage of several videos, locally',
   },
+  {
+    // 20 Nov 2026: «normalize audio online», «make audio louder without clipping», «нормализовать звук».
+    slug: 'normalize-audio',
+    group: 'audio',
+    name: 'Normalize Audio',
+    appName: 'Normalize Audio',
+    blurb: 'Bring a recording to a standard loudness, or as loud as it goes without clipping.',
+
+    searchPhrase: 'Normalize Audio Online',
+    title: 'Normalize Audio Online Free | louder without clipping, MP3 or WAV, no upload',
+    description: 'Normalize an audio file online for free: bring a voice note, podcast or song to a standard loudness (-16 dB) or to the loudest it can be without clipping, saved as MP3 or WAV. Runs in your browser; nothing is uploaded.',
+    heading: 'Normalize',
+    accent: 'audio',
+    lede: 'One level for every recording. The file stays on your device.',
+    featureList: [
+      'Standard loudness (-16 dB RMS) or peak to -1 dB',
+      'Never clips: the gain stops at the peak ceiling',
+      'Tells you how many dB it changed',
+      'MP3 or WAV out; the sound of a video works too',
+      'Nothing uploaded',
+    ],
+    faq: [
+      {
+        q: 'Why did it not get louder?',
+        a: 'Its loudest moment is already near the top; raising it further would clip. A compressor would be needed, which this does not do.',
+      },
+      {
+        q: 'Is the file uploaded?',
+        a: 'No. Your browser measures and re-encodes it.',
+      },
+    ],
+
+    summary: 'Normalize audio to -16 dB RMS or a -1 dB peak, never clipping, MP3/WAV, in the browser.',
+    facts: ['Loudness mode stops at the -1 dB peak ceiling, so a spiky recording may stay below -16 dB.'],
+    agentJob: 'Normalizing the loudness of a recording, locally',
+  },
 ];

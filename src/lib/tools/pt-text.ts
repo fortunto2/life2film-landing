@@ -505,4 +505,26 @@ export const ptText: ToolTranslations = {
       },
     ],
   },
+  'normalize-audio': {
+    searchPhrase: 'Normalizar áudio online',
+    title: 'Normalizar áudio online grátis — mais alto sem distorcer, MP3 ou WAV, sem upload',
+    description:
+      'Normalize um arquivo de áudio online e grátis: volume padrão (-16 dB) ou o mais alto possível sem distorcer, em MP3 ou WAV. No navegador, sem upload.',
+    heading: 'Normalizar',
+    accent: 'áudio',
+    lede: 'Um nível para cada gravação.',
+    blurb: 'Leve uma gravação ao volume padrão ou ao máximo sem distorcer.',
+    featureList: [
+      '-16 dB RMS ou pico a -1 dB',
+      'Nunca distorce',
+      'MP3 ou WAV',
+      'Sem upload',
+    ],
+    faq: [
+      {
+        q: 'O arquivo é enviado?',
+        a: 'Não.',
+      },
+    ],
+  },
 };

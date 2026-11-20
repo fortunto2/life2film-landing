@@ -505,4 +505,26 @@ export const trText: ToolTranslations = {
       },
     ],
   },
+  'normalize-audio': {
+    searchPhrase: 'Sesi online normalleştir',
+    title: 'Ses Normalleştirme Online Ücretsiz — bozulmadan daha yüksek, MP3 veya WAV, yükleme yok',
+    description:
+      'Bir ses dosyasını online ve ücretsiz normalleştirin: standart yükseklik (-16 dB) veya bozulmadan en yüksek seviye, MP3 ya da WAV. Tarayıcıda, yükleme yok.',
+    heading: 'Sesi',
+    accent: 'normalleştir',
+    lede: 'Her kayıt için tek seviye.',
+    blurb: 'Kaydı standart yüksekliğe ya da bozulmadan en yükseğe getirin.',
+    featureList: [
+      '-16 dB RMS veya -1 dB tepe',
+      'Asla bozulmaz',
+      'MP3 veya WAV',
+      'Yükleme yok',
+    ],
+    faq: [
+      {
+        q: 'Dosya yükleniyor mu?',
+        a: 'Hayır.',
+      },
+    ],
+  },
 };
