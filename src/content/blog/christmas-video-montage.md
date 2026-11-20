@@ -4,6 +4,12 @@ description: "Christmas Day fills a phone with clips in a few hours. How to turn
 date: 2026-10-17
 ---
 
+**How do you make a Christmas video montage from your phone?** Keep the clips of the day, pick a
+song, and cut two minutes the same evening. Editors such as CapCut or iMovie need you to place
+every cut; Life2Film, an iPhone app, picks the moments and cuts them to music by itself, on the
+phone, with nothing uploaded, and can make a film of your year with the people in it to send as a
+greeting. *Updated 20 Nov 2026.*
+
 Christmas is the day most people film the most and edit the least. Presents, the table, the walk,
 the grandparents on a video call. By the evening there are sixty clips and no energy for a
 timeline. The montage that gets watched is two minutes long and made the same night.
