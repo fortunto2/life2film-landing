@@ -483,4 +483,26 @@ export const trText: ToolTranslations = {
       },
     ],
   },
+  'video-collage': {
+    searchPhrase: 'Video kolajı online',
+    title: 'Video Kolaj Online Ücretsiz — tek karede 2–4 video, yükleme yok',
+    description:
+      'Online ve ücretsiz video kolajı yapın: tek 16:9 karede ızgara halinde, aynı anda oynayan iki ila dört klip, ilkinin sesiyle. Tarayıcıda, yükleme yok.',
+    heading: 'Video',
+    accent: 'kolajı',
+    lede: 'Tek karede birkaç an.',
+    blurb: 'Izgarada, aynı anda oynayan iki ila dört video.',
+    featureList: [
+      '1920x1080’de 2, 3 veya 4 klip',
+      'Her klip hücresini esnemeden doldurur',
+      'İlk klibin sesi',
+      'Yükleme ve filigran yok',
+    ],
+    faq: [
+      {
+        q: 'Videolar yükleniyor mu?',
+        a: 'Hayır. Tarayıcınız işler.',
+      },
+    ],
+  },
 };

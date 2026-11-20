@@ -483,4 +483,26 @@ export const esText: ToolTranslations = {
       },
     ],
   },
+  'video-collage': {
+    searchPhrase: 'Collage de videos online',
+    title: 'Collage de videos online gratis — 2 a 4 videos en un cuadro, sin subir',
+    description:
+      'Crea un collage de videos online y gratis: de dos a cuatro clips en un cuadro 16:9, en cuadrícula, a la vez, con el sonido del primero. En tu navegador, sin subir.',
+    heading: 'Collage',
+    accent: 'de videos',
+    lede: 'Varios momentos en un cuadro.',
+    blurb: 'De dos a cuatro videos en cuadrícula, a la vez.',
+    featureList: [
+      '2, 3 o 4 clips en 1920x1080',
+      'Cada clip llena su celda sin deformarse',
+      'Sonido del primero',
+      'Sin subidas ni marca de agua',
+    ],
+    faq: [
+      {
+        q: '¿Se suben los videos?',
+        a: 'No. Tu navegador los procesa.',
+      },
+    ],
+  },
 };

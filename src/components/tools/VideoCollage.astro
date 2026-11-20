@@ -1,0 +1,89 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { pick: 'Choose 2 to 4 videos', run: 'Make the collage', need: 'Choose at least two videos.', working: 'Combining… {n}%', saved: 'Saved — {size}, {len}.', failed: 'Could not combine — {msg}' },
+  ru: { pick: 'Выберите от 2 до 4 видео', run: 'Сделать коллаж', need: 'Выберите хотя бы два видео.', working: 'Соединяем… {n}%', saved: 'Сохранено — {size}, {len}.', failed: 'Не удалось — {msg}' },
+  es: { pick: 'Elige de 2 a 4 videos', run: 'Crear collage', need: 'Elige al menos dos videos.', working: 'Uniendo… {n}%', saved: 'Guardado — {size}, {len}.', failed: 'No se pudo — {msg}' },
+  pt: { pick: 'Escolha de 2 a 4 vídeos', run: 'Criar colagem', need: 'Escolha pelo menos dois vídeos.', working: 'Juntando… {n}%', saved: 'Salvo — {size}, {len}.', failed: 'Não foi possível — {msg}' },
+  id: { pick: 'Pilih 2 sampai 4 video', run: 'Buat kolase', need: 'Pilih minimal dua video.', working: 'Menggabungkan… {n}%', saved: 'Tersimpan — {size}, {len}.', failed: 'Gagal — {msg}' },
+  tr: { pick: '2 ila 4 video seçin', run: 'Kolaj yap', need: 'En az iki video seçin.', working: 'Birleştiriliyor… %{n}', saved: 'Kaydedildi — {size}, {len}.', failed: 'Yapılamadı — {msg}' },
+  ar: { pick: 'اختر من 2 إلى 4 فيديوهات', run: 'اصنع الكولاج', need: 'اختر فيديوهين على الأقل.', working: 'جارٍ الجمع… {n}%', saved: 'تم الحفظ — {size}، {len}.', failed: 'تعذّر — {msg}' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="video/*" multiple hidden />
+    <strong>{words.pick}</strong>
+    <span class="muted">{chrome.dragHint} — MP4, MOV, WebM</span>
+  </label>
+  <div class="controls">
+    <span class="spacer"></span>
+    <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { saveBlob, formatBytes, preciseClock } from '../../lib/encode';
+  import { collage } from '../../lib/split-screen';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  let files: File[] = [];
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  function take(list: FileList | null | undefined, how: 'picker' | 'drop') {
+    const vids = Array.from(list ?? []).filter((f) => f.type.startsWith('video/') || /\.(mp4|mov|m4v|webm|mkv)$/i.test(f.name));
+    files = [...files, ...vids].slice(-4);
+    vids.forEach((f) => fileChosen(f, how));
+    status(files.map((f, i) => `${i + 1}. ${f.name}`).join('   '));
+  }
+
+  el('run').addEventListener('click', async () => {
+    if (busy) return;
+    if (files.length < 2) { status(w.need, 1, true); return; }
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    try {
+      const { blob, duration } = await collage(files, (f) => status(w.working.replace('{n}', String(Math.round(f * 100))), f));
+      saveBlob(blob, 'video-collage.mp4');
+      track('result_saved', { placement: 'result' }, { seconds: Math.round(duration), size_mb: Math.round(blob.size / 104_857.6) / 10, clips: files.length });
+      status(w.saved.replace('{size}', formatBytes(blob.size)).replace('{len}', preciseClock(duration)), 1);
+    } catch (error) {
+      toolFailed('run', error, files[0]);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  el<HTMLInputElement>('file').addEventListener('change', (e) => take((e.target as HTMLInputElement).files, 'picker'));
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => take((e as DragEvent).dataTransfer?.files, 'drop'));
+</script>

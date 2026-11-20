@@ -483,4 +483,26 @@ export const ptText: ToolTranslations = {
       },
     ],
   },
+  'video-collage': {
+    searchPhrase: 'Colagem de vídeos online',
+    title: 'Colagem de vídeos online grátis — 2 a 4 vídeos em um quadro, sem upload',
+    description:
+      'Crie uma colagem de vídeos online e grátis: de dois a quatro clipes em um quadro 16:9, em grade, ao mesmo tempo, com o som do primeiro. No navegador, sem upload.',
+    heading: 'Colagem',
+    accent: 'de vídeos',
+    lede: 'Vários momentos em um quadro.',
+    blurb: 'De dois a quatro vídeos em grade, ao mesmo tempo.',
+    featureList: [
+      '2, 3 ou 4 clipes em 1920x1080',
+      'Cada clipe preenche sua célula sem distorcer',
+      'Som do primeiro',
+      'Sem upload nem marca d’água',
+    ],
+    faq: [
+      {
+        q: 'Os vídeos são enviados?',
+        a: 'Não. O navegador os processa.',
+      },
+    ],
+  },
 };

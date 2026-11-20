@@ -735,4 +735,40 @@ export const TEXT_TOOLS: Tool[] = [
     facts: ['Times can be typed as 75, 1:15 or 0:01:15.'],
     agentJob: 'Cutting a section out of a video, locally',
   },
+  {
+    // 20 Nov 2026: «video collage maker», «put 4 videos in one screen», «коллаж из видео».
+    slug: 'video-collage',
+    group: 'create',
+    name: 'Video Collage Maker',
+    appName: 'Video Collage',
+    blurb: 'Two to four videos in one frame, in a grid, playing together.',
+
+    searchPhrase: 'Video Collage Maker Online',
+    title: 'Video Collage Maker Online Free | 2 to 4 videos in one frame, no upload',
+    description: 'Make a video collage online for free: two to four clips in one 16:9 frame, in a grid, playing together, with the sound of the first. Runs in your browser; nothing is uploaded, no watermark.',
+    heading: 'Video collage',
+    accent: 'maker',
+    lede: 'Several moments in one frame. The videos stay on your device.',
+    featureList: [
+      '2, 3 or 4 clips in a 1920x1080 grid (three: one large, two small)',
+      'Each clip fills its cell, cropped to cover, never stretched',
+      'Sound from the first clip',
+      'As long as the shortest clip',
+      'Nothing uploaded, no watermark',
+    ],
+    faq: [
+      {
+        q: 'Which clip gets the big cell with three?',
+        a: 'The first one you chose. Choose them again in another order to change it.',
+      },
+      {
+        q: 'Are the videos uploaded?',
+        a: 'No. Your browser decodes all of them, draws them into one frame and encodes the result.',
+      },
+    ],
+
+    summary: '2–4 videos in a 1920x1080 grid, playing together, sound from the first, in the browser.',
+    facts: ['For two clips side by side, stacked or picture-in-picture, Split Screen has more choices.'],
+    agentJob: 'Making a collage of several videos, locally',
+  },
 ];

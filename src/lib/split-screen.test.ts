@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { cells, mixStereo } from './split-screen';
+import { cells, gridCells, mixStereo } from './split-screen';
 
 describe('cells', () => {
   it('side by side: two equal halves of 1920x1080 with the gap between', () => {
@@ -40,5 +40,20 @@ describe('mixStereo', () => {
   it('pads a short source with silence', () => {
     const [L] = mixStereo([Float32Array.of(0.3)], null, 3);
     expect(Array.from(L).map((v) => Math.round(v * 10) / 10)).toEqual([0.3, 0, 0]);
+  });
+});
+
+describe('gridCells', () => {
+  it('four clips: 2x2 inside 1920x1080, no overlap', () => {
+    const g = gridCells(4);
+    expect(g.cells.length).toBe(4);
+    expect(g.cells[3].x + g.cells[3].w).toBe(1920);
+    expect(g.cells[3].y + g.cells[3].h).toBe(1080);
+    expect(g.cells[1].x).toBeGreaterThan(g.cells[0].x + g.cells[0].w);
+  });
+  it('three clips: the first takes the left half at full height', () => {
+    const g = gridCells(3);
+    expect(g.cells[0]).toEqual({ x: 0, y: 0, w: 956, h: 1080 });
+    expect(g.cells.length).toBe(3);
   });
 });

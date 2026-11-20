@@ -483,4 +483,26 @@ export const idText: ToolTranslations = {
       },
     ],
   },
+  'video-collage': {
+    searchPhrase: 'Kolase video online',
+    title: 'Kolase Video Online Gratis — 2 sampai 4 video dalam satu frame, tanpa unggah',
+    description:
+      'Buat kolase video secara online dan gratis: dua sampai empat klip dalam satu frame 16:9, berbentuk grid, diputar bersamaan, dengan suara klip pertama. Di browser, tanpa unggah.',
+    heading: 'Kolase',
+    accent: 'video',
+    lede: 'Beberapa momen dalam satu frame.',
+    blurb: 'Dua sampai empat video dalam grid, diputar bersamaan.',
+    featureList: [
+      '2, 3 atau 4 klip dalam 1920x1080',
+      'Setiap klip mengisi selnya tanpa melar',
+      'Suara klip pertama',
+      'Tanpa unggah dan watermark',
+    ],
+    faq: [
+      {
+        q: 'Apakah video diunggah?',
+        a: 'Tidak. Browser Anda yang memprosesnya.',
+      },
+    ],
+  },
 };
