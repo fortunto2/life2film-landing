@@ -22,6 +22,9 @@ interface Copy {
   key: string;
   changeKey: string;
   speed: string;
+  autoSubs: string;
+  tiktok: string;
+  burn: string;
   hub: string;
   homeNote: (hub: string, frames: string, guides: string) => string;
   hubNote: (frames: string, guides: string) => string;
@@ -37,6 +40,9 @@ const COPY: Partial<Record<Lang, Copy>> = {
     key: 'Find the key of a song (and its Camelot code)',
     changeKey: 'Change the key of a song without changing its tempo',
     speed: 'Make a sped up or slowed + reverb version',
+    autoSubs: 'Make an editable SRT from the speech (auto subtitles)',
+    tiktok: 'Big word-by-word captions in the middle, TikTok style',
+    burn: 'Burn an SRT or VTT into the video',
     hub: 'All free video tools',
     homeNote: (hub, frames, guides) =>
       `Free in the browser: <a href="${hub}">video tools</a> such as <a href="${frames}">splitting a video into frames</a>, and <a href="${guides}">guides to editing video with an AI agent</a>.`,
@@ -52,6 +58,9 @@ const COPY: Partial<Record<Lang, Copy>> = {
     key: 'Определить тональность песни (и код Camelot)',
     changeKey: 'Изменить тональность песни без изменения темпа',
     speed: 'Ускорить песню (sped up) или замедлить с ревербом',
+    autoSubs: 'Сделать SRT из речи, чтобы поправить текст (автоматические субтитры)',
+    tiktok: 'Крупные титры по словам в центре кадра, как в TikTok',
+    burn: 'Вшить SRT или VTT в видео',
     hub: 'Все бесплатные видеоинструменты',
     homeNote: (hub, frames, guides) =>
       `Бесплатно в браузере: <a href="${hub}">видеоинструменты</a>, например <a href="${frames}">разбить видео на кадры</a>, и <a href="${guides}">руководства по монтажу видео с ИИ-агентом</a>.`,
@@ -77,6 +86,19 @@ export function relatedForTool(slug: string, lang: Lang): { heading: string; lin
       { href: toolPath(lang, 'change-key'), text: c.changeKey },
       { href: toolPath(lang, 'sped-up-slowed-reverb'), text: c.speed },
       { ...guide, text: c.guideMusic },
+    ],
+    // 20 Nov 2026: the three subtitle tools lead into each other (make -> fix -> burn, or one step).
+    'auto-subtitles': [
+      { href: toolPath(lang, 'burn-subtitles'), text: c.burn },
+      { href: toolPath(lang, 'tiktok-captions'), text: c.tiktok },
+    ],
+    'tiktok-captions': [
+      { href: toolPath(lang, 'auto-subtitles'), text: c.autoSubs },
+      { href: toolPath(lang, 'burn-subtitles'), text: c.burn },
+    ],
+    'burn-subtitles': [
+      { href: toolPath(lang, 'auto-subtitles'), text: c.autoSubs },
+      { href: toolPath(lang, 'tiktok-captions'), text: c.tiktok },
     ],
     'video-splitter': [frames, guide],
     'video-to-frames': [splitter, guide],
