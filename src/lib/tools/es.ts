@@ -432,6 +432,27 @@ export const es: ToolTranslations = {
       },
     ],
   },
+  'reverse-video': {
+    searchPhrase: 'Invertir video online',
+    title: 'Invertir video online gratis — reproducir un video al revés, sin subir',
+    description:
+      'Invierte un video online gratis: el clip se reproduce al revés y el sonido también puede invertirse. Clips de hasta 60 segundos. En tu navegador, sin subir nada.',
+    heading: 'Invertir',
+    accent: 'video',
+    lede: 'Haz que un clip se reproduzca al revés. Nada sale de tu dispositivo.',
+    blurb: 'Un clip al revés, con el sonido invertido o sin él.',
+    featureList: [
+      'Clips de hasta 60 segundos',
+      'Sonido invertido o quitado',
+      'Todo en el navegador: sin subidas',
+    ],
+    faq: [
+      {
+        q: '¿Por qué solo 60 segundos?',
+        a: 'Invertir exige decodificar todo el clip antes de escribir el primer fotograma; en una pestaña cabe un minuto con holgura.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Convertidor de vídeo online',
     title: 'Convertidor de Vídeo Online Gratis — MP4, WebM, MOV sin subir nada',

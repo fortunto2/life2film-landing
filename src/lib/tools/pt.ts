@@ -433,6 +433,27 @@ export const pt: ToolTranslations = {
       },
     ],
   },
+  'reverse-video': {
+    searchPhrase: 'Inverter vídeo online',
+    title: 'Inverter vídeo online grátis — vídeo de trás para frente, sem upload',
+    description:
+      'Inverta um vídeo online e grátis: o clipe toca de trás para frente e o som também pode ser invertido. Clipes de até 60 segundos. No navegador, sem upload.',
+    heading: 'Inverter',
+    accent: 'vídeo',
+    lede: 'Faça um clipe tocar de trás para frente. Nada sai do seu aparelho.',
+    blurb: 'Um clipe de trás para frente, com o som invertido ou sem som.',
+    featureList: [
+      'Clipes de até 60 segundos',
+      'Som invertido ou removido',
+      'Tudo no navegador: sem upload',
+    ],
+    faq: [
+      {
+        q: 'Por que só 60 segundos?',
+        a: 'Inverter exige decodificar o clipe inteiro antes do primeiro quadro do resultado; numa aba cabe um minuto com folga.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Conversor de vídeo online',
     title: 'Conversor de Vídeo Online Grátis — MP4, WebM, MOV sem enviar nada',

@@ -665,4 +665,39 @@ Reference implementation: https://life2film.com/tools/audio-cutter/`,
     ],
     agentJob: 'Converting audio formats, locally',
   },
+  {
+    // 20 Nov 2026: «reverse video» / «видео задом наперёд».
+    slug: 'reverse-video',
+    group: 'everyday',
+    name: 'Reverse Video',
+    appName: 'Reverse Video',
+    blurb: 'Play a clip backwards, with or without its sound reversed too.',
+
+    searchPhrase: 'Reverse Video Online',
+    title: 'Reverse Video Online Free | play a video backwards, no upload',
+    description: 'Reverse a video online for free: the clip plays backwards, and the sound can be reversed too. Clips up to 60 seconds, MP4, MOV or WebM. In your browser: nothing is uploaded, no watermark.',
+    heading: 'Reverse',
+    accent: 'video',
+    lede: 'Make a clip play backwards. Nothing leaves your device.',
+    featureList: [
+      'Clips up to 60 seconds',
+      'Sound reversed too, or left out',
+      'Keeps the clip\'s frame rate (up to 30 fps)',
+      'Runs fully client-side: no upload, no watermark',
+    ],
+    faq: [
+      {
+        q: 'Why only 60 seconds?',
+        a: 'Reversing needs the whole clip decoded before the first frame of the result can be written; in a browser tab a minute is what fits comfortably in memory. Trim a longer video first with the trimmer.',
+      },
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. Your browser decodes and encodes it.',
+      },
+    ],
+
+    summary: 'Reverse a short video in the browser by reading frames from the end and reversing the sound samples.',
+    facts: ['Reading frames from last to first costs a seek per frame; canvasesAtTimestamps with a descending list keeps it practical for short clips.'],
+    agentJob: 'Reversing a video, locally',
+  },
 ];

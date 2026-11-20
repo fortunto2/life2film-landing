@@ -429,6 +429,27 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'reverse-video': {
+    searchPhrase: 'Videoyu tersine çevirme online',
+    title: 'Videoyu Tersine Çevir Online Ücretsiz — geriye oynat, yükleme yok',
+    description:
+      'Videoyu online ve ücretsiz tersine çevirin: klip geriye oynar, ses de ters çevrilebilir. 60 saniyeye kadar klipler. Tarayıcıda, yükleme yok.',
+    heading: 'Videoyu',
+    accent: 'tersine çevir',
+    lede: 'Bir klibi geriye oynatın. Cihazınızdan hiçbir şey çıkmaz.',
+    blurb: 'Klip geriye, sesi ters çevrilmiş ya da sessiz.',
+    featureList: [
+      '60 saniyeye kadar klipler',
+      'Ses de ters çevrilir ya da kaldırılır',
+      'Her şey tarayıcıda: yükleme yok',
+    ],
+    faq: [
+      {
+        q: 'Neden yalnızca 60 saniye?',
+        a: 'Ters çevirmek için sonucun ilk karesinden önce tüm klibin çözülmesi gerekir; bir sekmeye bir dakika rahatça sığar.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',

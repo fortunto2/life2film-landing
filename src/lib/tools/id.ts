@@ -429,6 +429,27 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'reverse-video': {
+    searchPhrase: 'Balik video online',
+    title: 'Balik Video Online Gratis — putar video mundur, tanpa unggah',
+    description:
+      'Balik video secara online dan gratis: klip diputar mundur, suaranya juga bisa dibalik. Klip hingga 60 detik. Di browser, tanpa unggah.',
+    heading: 'Balik',
+    accent: 'video',
+    lede: 'Putar klip secara mundur. Tidak ada yang keluar dari perangkat.',
+    blurb: 'Klip diputar mundur, dengan suara terbalik atau tanpa suara.',
+    featureList: [
+      'Klip hingga 60 detik',
+      'Suara ikut dibalik atau dibuang',
+      'Semua di browser: tanpa unggah',
+    ],
+    faq: [
+      {
+        q: 'Kenapa hanya 60 detik?',
+        a: 'Membalik butuh seluruh klip didekode sebelum frame pertama hasil ditulis; di tab browser satu menit muat dengan nyaman.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',
