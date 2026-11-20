@@ -1,0 +1,46 @@
+---
+import { mcpSetup, agentPrompt } from 'superduper-tools/agent';
+import type { Lang } from '../i18n';
+
+/**
+ * "Use it from your agent": collapsed, under the FAQ. The MCP add command, the tool's SKILL.md, and
+ * one sentence to hand an agent. Commands stay English in every locale; only the labels translate.
+ */
+interface Props { slug: string; name: string; lang?: Lang }
+const { slug, name, lang = 'en' } = Astro.props;
+const L: Record<string, { summary: string; mcp: string; skill: string; say: string }> = {
+  en: { summary: 'Use it from your agent', mcp: 'Add the Life2Film MCP (Claude Code):', skill: 'Skill file', say: 'Or tell your agent:' },
+  ru: { summary: 'Подключить к своему агенту', mcp: 'Добавьте MCP Life2Film (Claude Code):', skill: 'Файл навыка', say: 'Или скажите агенту:' },
+};
+const t = L[lang] ?? L.en;
+const setup = mcpSetup('life2film');
+const say = agentPrompt(name, `https://life2film.com/tools/${slug}/`);
+---
+<details class="agent-use" data-sda-placement={`agent-use-${slug}`}>
+  <summary>{t.summary}</summary>
+  <p>{t.mcp}</p>
+  <div class="row"><code>{setup.claudeCode}</code><button type="button" class="au-copy" data-text={setup.claudeCode}>Copy</button></div>
+  <p class="muted small">Claude.ai / ChatGPT connector: <code>{setup.connector}</code> · Cursor: <code>{setup.cursor}</code></p>
+  <p>{t.say}</p>
+  <div class="row"><code>{say}</code><button type="button" class="au-copy" data-text={say}>Copy</button></div>
+  <p class="small"><a href={`/tools/${slug}/skill.md`}>{t.skill}: /tools/{slug}/skill.md</a> · <a href="/.well-known/agent-skills/index.json">all skills</a></p>
+</details>
+<script>
+  for (const b of document.querySelectorAll<HTMLButtonElement>('.au-copy')) {
+    b.addEventListener('click', () => {
+      navigator.clipboard?.writeText(b.dataset.text ?? '').then(() => { b.textContent = '✓'; setTimeout(() => (b.textContent = 'Copy'), 1500); });
+    });
+  }
+</script>
+<style>
+  .agent-use { margin: 28px 0 8px; border: 1px solid var(--line, rgba(255,255,255,.12)); border-radius: 10px; padding: 10px 14px; font-size: 14px; }
+  .agent-use summary { cursor: pointer; color: var(--muted); font-weight: 500; }
+  .agent-use[open] summary { margin-bottom: 8px; }
+  .agent-use p { margin: 8px 0 4px; }
+  .agent-use .row { display: flex; gap: 8px; align-items: center; }
+  .agent-use .row code { flex: 1; overflow-x: auto; white-space: nowrap; padding: 6px 8px; border-radius: 6px; background: rgba(127,127,127,.12); font-size: 13px; }
+  .agent-use .small { font-size: 13px; }
+  .agent-use .small code { font-size: 12px; word-break: break-all; }
+  .au-copy { font: inherit; font-size: 12px; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--line, rgba(127,127,127,.4)); background: transparent; color: inherit; cursor: pointer; }
+  .agent-use a { color: var(--cyan); }
+</style>

@@ -8,6 +8,9 @@ import { getCollection } from 'astro:content';
 import { TOOLS } from '../lib/tools';
 import { localesFor } from '../lib/tools/index';
 import { BASE } from '../lib/agent';
+import { ALL_TOOLS, SITES, toolAbsoluteUrl } from 'superduper-tools/registry';
+import { skillUrl } from 'superduper-tools/agent';
+import { skillPathOf } from '../lib/skills';
 
 const EXCERPT = 4000;
 const plain = (md: string) => md.replace(/```[\s\S]*?```/g, ' ').replace(/[#>*_`|]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, EXCERPT);
@@ -23,10 +26,15 @@ export const GET: APIRoute = async () => {
   }));
   const tools = TOOLS.map((t) => ({
     slug: t.slug, name: t.name, group: t.group, blurb: t.blurb, summary: t.summary, facts: t.facts,
-    url: `${BASE}/tools/${t.slug}/`, markdown: `${BASE}/tools/${t.slug}.md`, languages: localesFor(t.slug),
+    url: `${BASE}/tools/${t.slug}/`, markdown: `${BASE}/tools/${t.slug}.md`, skill: `${BASE}${skillPathOf(t.slug)}`, languages: localesFor(t.slug),
     runs: 'in the visitor\'s browser (WebCodecs, WebAssembly); nothing is uploaded',
   }));
-  return new Response(JSON.stringify({ documents: [...guides, ...blog], tools }), {
+  // Every tool of every SuperDuperAI site (the shared registry), so list_tools on this MCP knows
+  // VisaYes and SuperDuper tools too. This site's own rows come from `tools` above.
+  const registry = ALL_TOOLS.filter((t) => t.canonical_site !== 'life2film').map((t) => ({
+    slug: t.id, name: t.name, blurb: t.blurb, category: t.category, site: SITES[t.canonical_site].name, url: toolAbsoluteUrl(t), skill: skillUrl(t), languages: t.languages,
+  }));
+  return new Response(JSON.stringify({ documents: [...guides, ...blog], tools, registry }), {
     headers: { 'content-type': 'application/json; charset=utf-8', 'access-control-allow-origin': '*', 'cache-control': 'public, max-age=3600' },
   });
 };

@@ -2,6 +2,7 @@
 import QRCode from 'qrcode';
 import Base from '../layouts/Base.astro';
 import AgentBlock from './AgentBlock.astro';
+import AgentUse from './AgentUse.astro';
 import { TOOL, TOOLS } from '../lib/tools';
 import { TRANSLATIONS, toolName, localesFor, toolPath } from '../lib/tools/index';
 import { CHROME, asTranslation } from '../lib/tools-i18n';
@@ -217,6 +218,8 @@ const jsonLd = {
             <p>{a}</p>
           </>
         ))}
+
+        <AgentUse slug={slug} name={base.name} lang={lang} />
 
         {lang === 'en' && base.reading && (
           <>

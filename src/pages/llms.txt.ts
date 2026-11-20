@@ -58,9 +58,14 @@ The site is also available in Spanish, Portuguese, Indonesian, Arabic, Russian a
 ## For agents
 
 - MCP server: https://life2film.com/mcp (Streamable HTTP, no key, read-only). Tools: search_guides,
-  get_guide (any language), list_tools. It reads the guides, the blog and the tool descriptions; it
-  stores nothing and takes no user data. The browser tools run in the visitor's browser and cannot be
-  called through it.
+  get_guide (any language), list_tools (every browser tool on life2film.com, superduperai.co and
+  visayes.app), get_tool (one tool as a SKILL.md). It stores nothing and takes no user data. The
+  browser tools run in the visitor's browser and cannot be called through it.
+  Claude Code: \`claude mcp add --transport http life2film https://life2film.com/mcp\`; Claude.ai and
+  ChatGPT: a custom connector with that URL.
+- Agent skills: every tool has a SKILL.md at /tools/<slug>/skill.md (e.g.
+  https://life2film.com/tools/video-compressor/skill.md), all listed in
+  /.well-known/agent-skills/index.json.
 - Every guide, blog post and tool page has a markdown twin (append \`.md\`), and any of them, and the
   home page, answers \`Accept: text/markdown\`.
 - Policy: https://life2film.com/agents.txt · MCP server card: /.well-known/mcp/server-card.json ·

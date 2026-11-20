@@ -8,8 +8,9 @@ import { createMcpHandler, loadJson, loadMarkdown, scoreDoc, type McpTool } from
 
 type Env = { ASSETS: { fetch(r: Request): Promise<Response> } };
 type Doc = { kind: 'guide' | 'blog'; lang: string; slug: string; title: string; description: string; url: string; markdown: string; excerpt: string };
-type ToolRow = { slug: string; name: string; group: string; blurb: string; summary: string; facts: string[]; url: string; markdown: string; languages: string[]; runs: string };
-type Index = { documents: Doc[]; tools: ToolRow[] };
+type ToolRow = { slug: string; name: string; group: string; blurb: string; summary: string; facts: string[]; url: string; markdown: string; skill: string; languages: string[]; runs: string };
+type RegRow = { slug: string; name: string; blurb: string; category: string; site: string; url: string; skill: string; languages: string[] };
+type Index = { documents: Doc[]; tools: ToolRow[]; registry?: RegRow[] };
 
 const READ_ONLY = { readOnlyHint: true, openWorldHint: false };
 const LANGS = ['en', 'es', 'pt', 'id', 'ar', 'ru', 'tr'];
@@ -79,18 +80,55 @@ const tools: McpTool<Env>[] = [
   },
   {
     name: 'list_tools',
-    title: 'List the browser video tools',
+    title: 'List the browser tools (Life2Film, SuperDuperAI, VisaYes)',
     description:
-      'The free tools on life2film.com (compress, convert, trim, split, video to MP3, video to frames, BPM and scene detection). They run in the ' +
-      'visitor\'s own browser and nothing is uploaded, so they cannot be run through this server; it returns what each does, its measured facts, its page and its markdown twin.',
-    inputSchema: { type: 'object', properties: { group: { type: 'string', enum: ['everyday', 'engine'], description: 'everyday = utilities, engine = beat/scene/frame analysis.' } } },
+      'Every free browser tool on life2film.com (video and audio: compress, convert, trim, merge, subtitles, BPM, scenes...) and on our other sites, ' +
+      'superduperai.co (prompts, frames, captions) and visayes.app (visa and passport photos). They run in the visitor\'s own browser and nothing is uploaded, ' +
+      'so they are not callable here: each row gives the page to open, and get_tool returns its SKILL.md. Set site to narrow.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        site: { type: 'string', enum: ['life2film', 'superduperai', 'visayes'], description: 'Only this site\'s tools. Default: all.' },
+        query: { type: 'string', description: 'Words to filter by, e.g. "subtitles".' },
+      },
+    },
     annotations: READ_ONLY,
     async run(args, { env, origin }) {
-      const { tools: rows } = await loadJson<Index>(env, origin, '/agent-index.json');
-      const list = rows.filter((t) => !args.group || t.group === args.group);
-      return {
-        text: list.map((t) => `## ${t.name}\n${t.url}  ·  markdown: ${t.markdown}\n\n${t.summary}\n\nRuns ${t.runs}. Languages: ${t.languages.join(', ')}.\n${t.facts.map((f) => `- ${f}`).join('\n')}`).join('\n\n---\n\n'),
-      };
+      const { tools: rows, registry = [] } = await loadJson<Index>(env, origin, '/agent-index.json');
+      const all = [
+        ...rows.map((t) => ({ slug: t.slug, name: t.name, blurb: t.summary || t.blurb, site: 'Life2Film', url: t.url, skill: t.skill })),
+        ...registry.map((t) => ({ slug: t.slug, name: t.name, blurb: t.blurb, site: t.site, url: t.url, skill: t.skill })),
+      ];
+      const siteName = { life2film: 'Life2Film', superduperai: 'SuperDuperAI', visayes: 'VisaYes' }[String(args.site ?? '')];
+      const terms = String(args.query ?? '').toLowerCase().split(/\s+/).filter(Boolean);
+      const list = all.filter((t) => (!siteName || t.site === siteName) && terms.every((w) => `${t.slug} ${t.name} ${t.blurb}`.toLowerCase().includes(w)));
+      if (list.length === 0) return { text: 'No tool matched. Call list_tools with no arguments for all of them.' };
+      return { text: `${list.length} tools. get_tool(slug) returns one tool's skill.\n\n` + list.map((t) => `- ${t.slug} (${t.site}): ${t.name}: ${t.blurb}\n  ${t.url}`).join('\n') };
+    },
+  },
+  {
+    name: 'get_tool',
+    title: 'Get a tool\'s skill',
+    description: 'One browser tool as an agent skill (SKILL.md): what it does, limits, how to use it for the person, the page URL. Any slug from list_tools, on any of our sites.',
+    inputSchema: { type: 'object', properties: { slug: { type: 'string', description: 'e.g. video-compressor, or a tool page URL.' } }, required: ['slug'] },
+    annotations: READ_ONLY,
+    async run(args, { env, origin }) {
+      const slug = String(args.slug ?? '').trim().replace(/\/+$/, '').split('/').pop()?.replace(/\.md$/, '') ?? '';
+      if (!/^[a-z0-9-]+$/.test(slug)) return { text: `Not a slug: ${String(args.slug)}. Use list_tools.`, isError: true };
+      const { tools: rows, registry = [] } = await loadJson<Index>(env, origin, '/agent-index.json');
+      const own = rows.find((t) => t.slug === slug);
+      if (own) {
+        const md = await loadMarkdown(env, origin, `/tools/${slug}/skill.md`);
+        return { text: `Page: ${own.url}\nSkill: ${own.skill}\n\n${md ?? own.summary}` };
+      }
+      const ext = registry.find((t) => t.slug === slug);
+      if (!ext) return { text: `No tool "${slug}". Use list_tools.`, isError: true };
+      let md = '';
+      try {
+        const r = await fetch(ext.skill, { headers: { accept: 'text/markdown' } });
+        if (r.ok && (r.headers.get('content-type') ?? '').includes('markdown')) md = await r.text();
+      } catch { /* the other site is down: the row below still answers */ }
+      return { text: `Page: ${ext.url}\nSkill: ${ext.skill}\nSite: ${ext.site}\n\n${md || `${ext.name}: ${ext.blurb} Runs in the visitor's browser; nothing is uploaded. Open the page for the person.`}` };
     },
   },
 ];
@@ -99,7 +137,7 @@ export const onRequest = createMcpHandler<Env>({
   server: { name: 'life2film.com', title: 'Life2Film: guides and browser video tools', version: '1.0.0' },
   instructions:
     'Guides on editing video with an AI assistant, a blog, and the free video tools of life2film.com. Read-only: ' +
-    'search_guides, then get_guide for the text; list_tools describes the browser tools, which run in the visitor\'s browser and are not callable here. ' +
+    'search_guides, then get_guide for the text; list_tools lists every browser tool on life2film.com, superduperai.co and visayes.app, get_tool returns one as a SKILL.md; the tools run in the visitor\'s browser and are not callable here. ' +
     'Public content, may be quoted with a link back.',
   tools,
   docsUrl: 'https://life2film.com/llms.txt',
