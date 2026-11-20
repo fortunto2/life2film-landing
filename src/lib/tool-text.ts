@@ -202,4 +202,40 @@ export const TEXT_TOOLS: Tool[] = [
     facts: ['A semitone is a frequency ratio of 2^(1/12) ≈ 1.0595; twelve of them double the frequency.'],
     agentJob: 'Changing the key of a song, locally',
   },
+  {
+    // 20 Nov 2026: «добавить логотип на видео», «add watermark to video» — an image on every frame.
+    slug: 'add-logo-to-video',
+    group: 'everyday',
+    name: 'Add Logo to Video',
+    appName: 'Add Logo',
+    blurb: 'Put your logo or watermark in a corner of a video, at the size and opacity you pick.',
+
+    searchPhrase: 'Add Logo to Video Online',
+    title: 'Add Logo or Watermark to Video Online Free | no upload',
+    description: 'Add your logo or a watermark to a video online for free: pick a PNG (transparency kept), JPG or SVG, a corner, size and opacity, and get an MP4. Runs in your browser, nothing is uploaded, and we add no watermark of our own.',
+    heading: 'Add a logo to',
+    accent: 'video',
+    lede: 'Your logo in the corner of every frame. The video stays on your device.',
+    featureList: [
+      'PNG with transparency, JPG, WebP or SVG',
+      'Four corners or the centre, 4% from the edges',
+      'Size and opacity sliders',
+      'Sound copied untouched',
+      'Nothing uploaded, no watermark of ours',
+    ],
+    faq: [
+      {
+        q: 'Will the background of my logo show?',
+        a: 'Not if it is a PNG or SVG with transparency: transparent pixels stay transparent. A JPG has no transparency, so its background shows as a box.',
+      },
+      {
+        q: 'Is the video uploaded?',
+        a: 'No. Your browser draws the logo on each frame and encodes the result.',
+      },
+    ],
+
+    summary: 'Overlay a logo image on every frame of a video in the browser; sound copied.',
+    facts: ['A logo sized by the shorter side of the frame looks the same on vertical and horizontal video.'],
+    agentJob: 'Adding a logo to a video, locally',
+  },
 ];

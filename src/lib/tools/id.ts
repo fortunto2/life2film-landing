@@ -719,6 +719,32 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'add-logo-to-video': {
+    searchPhrase: 'Tambah logo ke video online',
+    title: 'Tambah Logo atau Watermark ke Video Online Gratis — tanpa unggah',
+    description:
+      'Tambahkan logo atau watermark ke video secara online dan gratis: pilih PNG (transparansi tetap), JPG atau SVG, sudut, ukuran dan opasitas, lalu dapatkan MP4. Di browser, tanpa unggah.',
+    heading: 'Tambah logo ke',
+    accent: 'video',
+    lede: 'Logo Anda di sudut setiap frame. Video tetap di perangkat Anda.',
+    blurb: 'Logo atau watermark Anda di sudut video.',
+    featureList: [
+      'PNG transparan, JPG, WebP atau SVG',
+      'Empat sudut atau tengah',
+      'Ukuran dan opasitas bisa diatur',
+      'Tanpa unggah, tanpa watermark kami',
+    ],
+    faq: [
+      {
+        q: 'Apakah latar logo terlihat?',
+        a: 'Tidak jika PNG atau SVG transparan. JPG tidak punya transparansi.',
+      },
+      {
+        q: 'Apakah video diunggah?',
+        a: 'Tidak. Browser menggambar logo di setiap frame.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',

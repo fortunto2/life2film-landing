@@ -723,6 +723,32 @@ export const pt: ToolTranslations = {
       },
     ],
   },
+  'add-logo-to-video': {
+    searchPhrase: 'Colocar logo em vídeo online',
+    title: 'Colocar logo ou marca d’água em vídeo online grátis — sem upload',
+    description:
+      'Coloque seu logo ou marca d’água num vídeo online e grátis: escolha PNG (com transparência), JPG ou SVG, um canto, tamanho e opacidade, e receba um MP4. No navegador, sem upload.',
+    heading: 'Colocar logo no',
+    accent: 'vídeo',
+    lede: 'Seu logo no canto de cada quadro. O vídeo fica no seu aparelho.',
+    blurb: 'Seu logo ou marca d’água num canto do vídeo.',
+    featureList: [
+      'PNG com transparência, JPG, WebP ou SVG',
+      'Quatro cantos ou o centro',
+      'Tamanho e opacidade ajustáveis',
+      'Sem upload nem marca d’água nossa',
+    ],
+    faq: [
+      {
+        q: 'O fundo do logo aparece?',
+        a: 'Não se for PNG ou SVG com transparência. JPG não tem transparência.',
+      },
+      {
+        q: 'O vídeo é enviado?',
+        a: 'Não. O navegador desenha o logo em cada quadro.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Conversor de vídeo online',
     title: 'Conversor de Vídeo Online Grátis — MP4, WebM, MOV sem enviar nada',

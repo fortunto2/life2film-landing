@@ -1,0 +1,112 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { logo: 'Choose the logo (PNG, JPG, SVG)', where: 'Where', tl: 'top left', tr: 'top right', bl: 'bottom left', br: 'bottom right', c: 'centre', size: 'Size', opacity: 'Opacity', run: 'Add the logo', need: 'Choose a video and a logo.', saved: 'Saved — {size}.', failed: 'Could not add the logo — {msg}' },
+  ru: { logo: 'Выбрать логотип (PNG, JPG, SVG)', where: 'Где', tl: 'слева вверху', tr: 'справа вверху', bl: 'слева внизу', br: 'справа внизу', c: 'по центру', size: 'Размер', opacity: 'Прозрачность', run: 'Добавить логотип', need: 'Выберите видео и логотип.', saved: 'Сохранено — {size}.', failed: 'Не удалось добавить логотип — {msg}' },
+  es: { logo: 'Elegir el logo (PNG, JPG, SVG)', where: 'Dónde', tl: 'arriba izquierda', tr: 'arriba derecha', bl: 'abajo izquierda', br: 'abajo derecha', c: 'centro', size: 'Tamaño', opacity: 'Opacidad', run: 'Añadir el logo', need: 'Elige un video y un logo.', saved: 'Guardado — {size}.', failed: 'No se pudo añadir el logo — {msg}' },
+  pt: { logo: 'Escolher o logo (PNG, JPG, SVG)', where: 'Onde', tl: 'em cima à esquerda', tr: 'em cima à direita', bl: 'embaixo à esquerda', br: 'embaixo à direita', c: 'centro', size: 'Tamanho', opacity: 'Opacidade', run: 'Adicionar o logo', need: 'Escolha um vídeo e um logo.', saved: 'Salvo — {size}.', failed: 'Não foi possível adicionar o logo — {msg}' },
+  id: { logo: 'Pilih logo (PNG, JPG, SVG)', where: 'Posisi', tl: 'kiri atas', tr: 'kanan atas', bl: 'kiri bawah', br: 'kanan bawah', c: 'tengah', size: 'Ukuran', opacity: 'Opasitas', run: 'Tambahkan logo', need: 'Pilih video dan logo.', saved: 'Tersimpan — {size}.', failed: 'Gagal menambah logo — {msg}' },
+  tr: { logo: 'Logo seç (PNG, JPG, SVG)', where: 'Konum', tl: 'sol üst', tr: 'sağ üst', bl: 'sol alt', br: 'sağ alt', c: 'orta', size: 'Boyut', opacity: 'Opaklık', run: 'Logoyu ekle', need: 'Bir video ve logo seçin.', saved: 'Kaydedildi — {size}.', failed: 'Logo eklenemedi — {msg}' },
+  ar: { logo: 'اختر الشعار (PNG وJPG وSVG)', where: 'الموضع', tl: 'أعلى اليسار', tr: 'أعلى اليمين', bl: 'أسفل اليسار', br: 'أسفل اليمين', c: 'الوسط', size: 'الحجم', opacity: 'العتامة', run: 'أضف الشعار', need: 'اختر فيديو وشعارًا.', saved: 'تم الحفظ — {size}.', failed: 'تعذّرت إضافة الشعار — {msg}' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="video/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP4, MOV, WebM</span>
+  </label>
+  <div class="controls">
+    <label class="ghost" for="logo">{words.logo}<input type="file" id="logo" accept="image/*" hidden /></label>
+    <img id="thumb" alt="" hidden />
+    <label class="control"><span class="muted">{words.where}</span>
+      <select id="corner"><option value="br" selected>{words.br}</option><option value="bl">{words.bl}</option><option value="tr">{words.tr}</option><option value="tl">{words.tl}</option><option value="c">{words.c}</option></select></label>
+    <label class="control"><span class="muted">{words.size}</span><input type="range" id="size" min="0.06" max="0.5" step="0.02" value="0.16" /></label>
+    <label class="control"><span class="muted">{words.opacity}</span><input type="range" id="opacity" min="0.2" max="1" step="0.05" value="0.85" /></label>
+    <span class="spacer"></span>
+    <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<style>
+  #thumb { height: 36px; max-width: 120px; object-fit: contain; background: repeating-conic-gradient(#555 0 25%, #333 0 50%) 50% / 12px 12px; border-radius: 4px; }
+</style>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { saveBlob, formatBytes } from '../../lib/encode';
+  import { addWatermark, type Corner } from '../../lib/watermark';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  let video: File | null = null;
+  let logo: File | null = null;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  function take(files: FileList | File[] | null | undefined, how: 'picker' | 'drop') {
+    for (const f of Array.from(files ?? [])) {
+      if (f.type.startsWith('image/')) {
+        logo = f;
+        const t = el<HTMLImageElement>('thumb');
+        t.src = URL.createObjectURL(f);
+        t.hidden = false;
+      } else { video = f; fileChosen(f, how); }
+    }
+    status([video?.name, logo?.name].filter(Boolean).join(' + '));
+  }
+
+  el('run').addEventListener('click', async () => {
+    if (busy) return;
+    if (!video || !logo) { status(w.need, 1, true); return; }
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    const corner = el<HTMLSelectElement>('corner').value as Corner;
+    try {
+      const blob = await addWatermark(video, logo, {
+        corner,
+        size: Number(el<HTMLInputElement>('size').value),
+        opacity: Number(el<HTMLInputElement>('opacity').value),
+        onProgress: (p) => status(`${Math.round(p * 100)}%`, p),
+      });
+      saveBlob(blob, `${video.name.replace(/\.[^.]+$/, '')}-logo.mp4`);
+      track('result_saved', { placement: 'result', corner }, { size_mb: Math.round(blob.size / 104_857.6) / 10 });
+      status(w.saved.replace('{size}', formatBytes(blob.size)), 1);
+    } catch (error) {
+      toolFailed('run', error, video);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  el<HTMLInputElement>('file').addEventListener('change', (e) => take((e.target as HTMLInputElement).files, 'picker'));
+  el<HTMLInputElement>('logo').addEventListener('change', (e) => take((e.target as HTMLInputElement).files, 'picker'));
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => take((e as DragEvent).dataTransfer?.files, 'drop'));
+</script>

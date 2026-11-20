@@ -719,6 +719,32 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'add-logo-to-video': {
+    searchPhrase: 'Videoya logo ekle online',
+    title: 'Videoya Logo veya Filigran Ekle Online Ücretsiz — yükleme yok',
+    description:
+      'Videoya online ve ücretsiz logonuzu veya filigranınızı ekleyin: PNG (şeffaflık korunur), JPG ya da SVG, köşe, boyut ve opaklık seçin, MP4 alın. Tarayıcıda, yükleme yok.',
+    heading: 'Videoya',
+    accent: 'logo ekle',
+    lede: 'Logonuz her karenin köşesinde. Video cihazınızda kalır.',
+    blurb: 'Logonuzu veya filigranınızı videonun köşesine koyun.',
+    featureList: [
+      'Şeffaf PNG, JPG, WebP veya SVG',
+      'Dört köşe veya orta',
+      'Boyut ve opaklık ayarı',
+      'Yükleme yok, bizim filigranımız yok',
+    ],
+    faq: [
+      {
+        q: 'Logonun arka planı görünür mü?',
+        a: 'Şeffaf PNG veya SVG ise görünmez. JPG’de şeffaflık yoktur.',
+      },
+      {
+        q: 'Video yükleniyor mu?',
+        a: 'Hayır. Tarayıcı logoyu her kareye çizer.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',
