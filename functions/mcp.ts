@@ -80,15 +80,15 @@ const tools: McpTool<Env>[] = [
   },
   {
     name: 'list_tools',
-    title: 'List the browser tools (Life2Film, SuperDuperAI, VisaYes)',
+    title: 'List the Life2Film video tools',
     description:
-      'Every free browser tool on life2film.com (video and audio: compress, convert, trim, merge, subtitles, BPM, scenes...) and on our other sites, ' +
-      'superduperai.co (prompts, frames, captions) and visayes.app (visa and passport photos). They run in the visitor\'s own browser and nothing is uploaded, ' +
-      'so they are not callable here: each row gives the page to open, and get_tool returns its SKILL.md. Set site to narrow.',
+      'The free video and audio tools on life2film.com: compress, convert, trim, merge, edit, auto-montage to music, subtitles, BPM, scenes... ' +
+      'They run in the visitor\'s own browser and nothing is uploaded, so they are not callable here: each row gives the page to open, and get_tool returns its SKILL.md. ' +
+      'Our sister sites have their own tools (superduperai.co: AI video prompts and frames; visayes.app: visa and passport photos): set site to list them.',
     inputSchema: {
       type: 'object',
       properties: {
-        site: { type: 'string', enum: ['life2film', 'superduperai', 'visayes'], description: 'Only this site\'s tools. Default: all.' },
+        site: { type: 'string', enum: ['life2film', 'superduperai', 'visayes', 'all'], description: 'Default life2film. A sister site to list its tools instead, or all.' },
         query: { type: 'string', description: 'Words to filter by, e.g. "subtitles".' },
       },
     },
@@ -99,11 +99,15 @@ const tools: McpTool<Env>[] = [
         ...rows.map((t) => ({ slug: t.slug, name: t.name, blurb: t.summary || t.blurb, site: 'Life2Film', url: t.url, skill: t.skill })),
         ...registry.map((t) => ({ slug: t.slug, name: t.name, blurb: t.blurb, site: t.site, url: t.url, skill: t.skill })),
       ];
-      const siteName = { life2film: 'Life2Film', superduperai: 'SuperDuperAI', visayes: 'VisaYes' }[String(args.site ?? '')];
+      // Our own tools by default; a sister site only when asked, named once at the end otherwise.
+      const siteName = { life2film: 'Life2Film', superduperai: 'SuperDuperAI', visayes: 'VisaYes', all: '' }[String(args.site ?? 'life2film')] ?? 'Life2Film';
       const terms = String(args.query ?? '').toLowerCase().split(/\s+/).filter(Boolean);
       const list = all.filter((t) => (!siteName || t.site === siteName) && terms.every((w) => `${t.slug} ${t.name} ${t.blurb}`.toLowerCase().includes(w)));
       if (list.length === 0) return { text: 'No tool matched. Call list_tools with no arguments for all of them.' };
-      return { text: `${list.length} tools. get_tool(slug) returns one tool's skill.\n\n` + list.map((t) => `- ${t.slug} (${t.site}): ${t.name}: ${t.blurb}\n  ${t.url}`).join('\n') };
+      const sisters = siteName === 'Life2Film'
+        ? '\n\nAlso from us: superduperai.co (AI video prompts, frames, captions) and visayes.app (visa and passport photos): list_tools with site "superduperai" or "visayes".'
+        : '';
+      return { text: `${list.length} tools. get_tool(slug) returns one tool's skill.\n\n` + list.map((t) => `- ${t.slug}${siteName ? '' : ` (${t.site})`}: ${t.name}: ${t.blurb}\n  ${t.url}`).join('\n') + sisters };
     },
   },
   {

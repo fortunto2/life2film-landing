@@ -12,10 +12,10 @@ interface Props { slug: string; name: string; lang?: Lang }
 const { slug, name, lang = 'en' } = Astro.props;
 const VERBS = /^(trim|compress|convert|remove|rotate|crop|add|merge|cut|reverse|loop|fade|resize|normalize|change|burn|blur|split|make|record|join|boost|find|detect|check|reduce|prepare)\b/i;
 const verb = VERBS.test(name);
-const n = ALL_TOOLS.length;
+const n = ALL_TOOLS.filter((t) => t.canonical_site === 'life2film').length;
 const L = {
-  en: { pitch: verb ? `Let your agent ${name.toLowerCase()}` : `Let your agent use the ${name}`, mcp: `connect Life2Film's MCP (all ${n} tools of Life2Film, SuperDuper, VisaYes)`, more: 'Prompt, skill', prompt: 'Paste to your agent:', skill: 'Skill file' },
-  ru: { pitch: `Пусть это сделает ваш агент: ${name}`, mcp: `подключите MCP Life2Film (все ${n} инструментов Life2Film, SuperDuper, VisaYes)`, more: 'Промпт, навык', prompt: 'Вставьте агенту:', skill: 'Файл навыка' },
+  en: { pitch: verb ? `Let your agent ${name.toLowerCase()}` : `Let your agent use the ${name}`, mcp: `connect Life2Film's MCP (${n} video tools, guides and skills)`, more: 'Prompt, skill', prompt: 'Paste to your agent:', skill: 'Skill file' },
+  ru: { pitch: `Пусть это сделает ваш агент: ${name}`, mcp: `подключите MCP Life2Film (${n} видеоинструментов, гайды и навыки)`, more: 'Промпт, навык', prompt: 'Вставьте агенту:', skill: 'Файл навыка' },
 };
 const t = L[lang as 'ru'] ?? L.en;
 const setup = mcpSetup('life2film');
