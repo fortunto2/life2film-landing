@@ -56,6 +56,8 @@ export interface ToolChrome {
   /** The phone offer on the BPM page: its visitors come with a track, not a camera roll
    * (the RU page is the site's most-searched, 5,937 impressions in 28 days to 19 Nov 2026). */
   appAfterBeat: string;
+  /** After a slideshow: the app does the same from photos AND videos, choosing the moments itself. */
+  appAfterPhotos: string;
 }
 
 export const CHROME: Record<Lang, ToolChrome> = {
@@ -84,6 +86,7 @@ export const CHROME: Record<Lang, ToolChrome> = {
     studioAfter: "Saved. Life2Film Studio for Mac does the whole edit by itself: best moments, cut to music, on your desktop.",
     studioNote: "Apple Silicon · macOS 15+ · free in beta",
     appAfterBeat: 'Saved. Life2Film cuts your iPhone videos to the beat of a track like this one by itself: pick the song, it picks the moments.',
+    appAfterPhotos: 'Saved. Life2Film makes this from your iPhone\'s photos and videos together, by itself: you pick the song, it picks the moments and cuts on the beat.',
   },
   es: {
     allTools: '← Todas las herramientas',
@@ -110,6 +113,7 @@ export const CHROME: Record<Lang, ToolChrome> = {
     studioAfter: "Guardado. Life2Film Studio para Mac hace toda la edición solo: los mejores momentos, montados con música, en tu ordenador.",
     studioNote: "Apple Silicon · macOS 15+ · gratis en beta",
     appAfterBeat: 'Guardado. Life2Film monta solo los vídeos de tu iPhone al ritmo de una canción como esta: tú eliges la canción, él elige los momentos.',
+    appAfterPhotos: 'Guardado. Life2Film hace esto solo con las fotos y los vídeos de tu iPhone juntos: tú eliges la canción, él elige los momentos y corta al ritmo.',
   },
   pt: {
     allTools: '← Todas as ferramentas',
@@ -136,6 +140,7 @@ export const CHROME: Record<Lang, ToolChrome> = {
     studioAfter: "Salvo. O Life2Film Studio para Mac faz toda a edição sozinho: os melhores momentos, montados com música, no seu computador.",
     studioNote: "Apple Silicon · macOS 15+ · grátis no beta",
     appAfterBeat: 'Salvo. O Life2Film monta sozinho os vídeos do seu iPhone no ritmo de uma música como esta: você escolhe a música, ele escolhe os momentos.',
+    appAfterPhotos: 'Salvo. O Life2Film faz isso sozinho com as fotos e os vídeos do seu iPhone juntos: você escolhe a música, ele escolhe os momentos e corta no ritmo.',
   },
   id: {
     allTools: '← Semua alat',
@@ -162,6 +167,7 @@ export const CHROME: Record<Lang, ToolChrome> = {
     studioAfter: "Tersimpan. Life2Film Studio untuk Mac mengerjakan seluruh editan sendiri: momen terbaik, dipotong sesuai musik, di komputer Anda.",
     studioNote: "Apple Silicon · macOS 15+ · gratis selama beta",
     appAfterBeat: 'Tersimpan. Life2Film memotong video iPhone Anda sendiri mengikuti ketukan lagu seperti ini: Anda pilih lagunya, ia pilih momennya.',
+    appAfterPhotos: 'Tersimpan. Life2Film membuat ini sendiri dari foto dan video iPhone Anda sekaligus: Anda pilih lagunya, ia pilih momen dan memotong mengikuti ketukan.',
   },
   ar: {
     allTools: '← كل الأدوات',
@@ -188,6 +194,7 @@ export const CHROME: Record<Lang, ToolChrome> = {
     studioAfter: "تم الحفظ. يتولى Life2Film Studio لأجهزة Mac المونتاج كاملًا بنفسه: أفضل اللحظات، مقطّعة على الموسيقى، على حاسوبك.",
     studioNote: "Apple Silicon · macOS 15 أو أحدث · مجاني خلال النسخة التجريبية",
     appAfterBeat: 'تم الحفظ. يقطّع Life2Film مقاطع الآيفون بنفسه على إيقاع أغنية مثل هذه: أنت تختار الأغنية، وهو يختار اللحظات.',
+    appAfterPhotos: 'تم الحفظ. يصنع Life2Film هذا بنفسه من صور الآيفون ومقاطعه معًا: أنت تختار الأغنية، وهو يختار اللحظات ويقطع على الإيقاع.',
   },
   ru: {
     allTools: '← Все инструменты',
@@ -214,6 +221,7 @@ export const CHROME: Record<Lang, ToolChrome> = {
     studioAfter: "Сохранено. Life2Film Studio для Mac делает весь монтаж сам: лучшие моменты, нарезанные под музыку, прямо на компьютере.",
     studioNote: "Apple Silicon · macOS 15+ · бесплатно на время беты",
     appAfterBeat: 'Сохранено. Life2Film сам режет видео с iPhone в бит такого трека: вы выбираете песню, он выбирает моменты.',
+    appAfterPhotos: 'Сохранено. Life2Film делает такое сам — из фото и видео с iPhone вместе: вы выбираете песню, он выбирает моменты и режет в бит.',
   },
   tr: {
     allTools: '← Tüm araçlar',
@@ -240,6 +248,7 @@ export const CHROME: Record<Lang, ToolChrome> = {
     studioAfter: "Kaydedildi. Mac için Life2Film Studio tüm kurguyu kendisi yapar: en iyi anlar, müziğe göre kesilmiş, bilgisayarınızda.",
     studioNote: "Apple Silicon · macOS 15+ · beta süresince ücretsiz",
     appAfterBeat: 'Kaydedildi. Life2Film iPhone videolarınızı böyle bir şarkının ritmine göre kendisi keser: şarkıyı siz seçersiniz, anları o seçer.',
+    appAfterPhotos: 'Kaydedildi. Life2Film bunu iPhone’unuzdaki fotoğraf ve videolardan birlikte kendisi yapar: şarkıyı siz seçersiniz, anları o seçer ve ritme göre keser.',
   },
 };
 

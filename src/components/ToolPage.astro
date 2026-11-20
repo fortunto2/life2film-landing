@@ -30,7 +30,9 @@ const base = TOOL[slug];
 const tool = lang === 'en' ? asTranslation(base) : TRANSLATIONS[lang]?.[slug] ?? asTranslation(base);
 const chrome = CHROME[lang];
 // A song is on the table on both pages: the offer that names cutting to a track's beat fits there.
-const phoneAfter = ['bpm-detector', 'add-music-to-video', 'key-finder'].includes(slug) ? chrome.appAfterBeat : chrome.appAfter;
+const phoneAfter = slug === 'photos-to-video'
+  ? chrome.appAfterPhotos
+  : ['bpm-detector', 'add-music-to-video', 'key-finder'].includes(slug) ? chrome.appAfterBeat : chrome.appAfter;
 const path = localePath(lang, `/tools/${slug}/`);
 
 /** Only the locales that actually have this page — never claim a translation that does not exist. */
