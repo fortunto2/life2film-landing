@@ -858,4 +858,44 @@ Reference implementation: https://life2film.com/tools/audio-cutter/`,
     facts: ['An equal-power crossfade (cos/sin curves) avoids the loudness dip a linear crossfade leaves in the middle.'],
     agentJob: 'Joining audio files, locally',
   },
+  {
+    // 20 Nov 2026: «add subtitles to video», «вшить субтитры в видео» — burn an SRT/VTT in.
+    slug: 'burn-subtitles',
+    group: 'everyday',
+    name: 'Add Subtitles to Video',
+    appName: 'Burn Subtitles',
+    blurb: 'Burn an SRT or VTT file into a video, so the captions show everywhere it plays.',
+
+    searchPhrase: 'Add Subtitles to Video Online',
+    title: 'Add Subtitles to Video Online Free | burn SRT into MP4, no upload',
+    description: 'Burn subtitles into a video online for free: drop an MP4 and an SRT or VTT file, pick the size and position, get an MP4 with the captions in the picture. Works for Instagram, TikTok and WhatsApp. In your browser: nothing is uploaded.',
+    heading: 'Add subtitles to',
+    accent: 'video',
+    lede: 'Put an SRT or VTT file into the picture itself. The video and the text stay on your device.',
+    featureList: [
+      'SRT and WebVTT, with their timing',
+      'White text with a dark outline, wrapped to the width',
+      'Three sizes, bottom or top',
+      'Sound copied untouched',
+      'Runs fully client-side: no upload, no watermark',
+    ],
+    faq: [
+      {
+        q: 'Why burn subtitles instead of attaching them?',
+        a: 'Instagram, TikTok, WhatsApp and most messengers ignore a separate subtitle track. Burned-in captions are part of the picture, so they show everywhere — at the price of not being switchable off.',
+      },
+      {
+        q: 'Where do I get an SRT file?',
+        a: 'Any captioning tool exports one (YouTube Studio, CapCut, Descript, Whisper). It is plain text: a number, a time range like 00:00:01,000 --> 00:00:03,000, and the line.',
+      },
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. Your browser draws every frame and encodes the result.',
+      },
+    ],
+
+    summary: 'Burn SRT/WebVTT subtitles into a video in the browser: frames drawn to a canvas with the active cue on top, sound copied.',
+    facts: ['Messaging apps and social feeds drop soft subtitle tracks; only burned-in captions survive sharing.'],
+    agentJob: 'Burning subtitles into a video, locally',
+  },
 ];

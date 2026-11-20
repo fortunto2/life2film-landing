@@ -545,6 +545,32 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'burn-subtitles': {
+    searchPhrase: 'Tambah subtitle ke video online',
+    title: 'Tambah Subtitle ke Video Online Gratis — SRT ke MP4, tanpa unggah',
+    description:
+      'Tanamkan subtitle ke video secara online dan gratis: jatuhkan MP4 dan file SRT atau VTT, pilih ukuran dan posisi, dapatkan MP4 dengan teks di gambar. Untuk Instagram, TikTok dan WhatsApp. Di browser, tanpa unggah.',
+    heading: 'Tambah subtitle ke',
+    accent: 'video',
+    lede: 'Masukkan SRT atau VTT ke dalam gambar. Video dan teks tetap di perangkat Anda.',
+    blurb: 'Tanamkan SRT atau VTT ke video agar subtitle tampil di mana saja.',
+    featureList: [
+      'SRT dan WebVTT dengan waktunya',
+      'Teks putih bergaris tepi gelap, dibungkus sesuai lebar',
+      'Tiga ukuran, bawah atau atas',
+      'Semua di browser: tanpa unggah',
+    ],
+    faq: [
+      {
+        q: 'Kenapa ditanam, bukan dilampirkan?',
+        a: 'Instagram, TikTok dan WhatsApp mengabaikan trek subtitle terpisah; yang ditanam jadi bagian gambar dan selalu tampil.',
+      },
+      {
+        q: 'Apakah video saya diunggah?',
+        a: 'Tidak. Browser menggambar setiap frame dan meng-encode hasilnya.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',

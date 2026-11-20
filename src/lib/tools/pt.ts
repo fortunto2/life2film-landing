@@ -549,6 +549,32 @@ export const pt: ToolTranslations = {
       },
     ],
   },
+  'burn-subtitles': {
+    searchPhrase: 'Colocar legenda em vídeo online',
+    title: 'Colocar legenda em vídeo online grátis — SRT para MP4, sem upload',
+    description:
+      'Embuta legendas num vídeo online e grátis: solte um MP4 e um SRT ou VTT, escolha tamanho e posição e receba um MP4 com o texto na imagem. Para Instagram, TikTok e WhatsApp. No navegador, sem upload.',
+    heading: 'Colocar legenda no',
+    accent: 'vídeo',
+    lede: 'Coloque um SRT ou VTT dentro da imagem. O vídeo e o texto ficam no seu aparelho.',
+    blurb: 'Embuta um SRT ou VTT num vídeo para a legenda aparecer em qualquer lugar.',
+    featureList: [
+      'SRT e WebVTT com o tempo deles',
+      'Texto branco com contorno escuro, quebrado na largura',
+      'Três tamanhos, embaixo ou em cima',
+      'Tudo no navegador: sem upload',
+    ],
+    faq: [
+      {
+        q: 'Por que embutir a legenda?',
+        a: 'Instagram, TikTok e WhatsApp ignoram uma faixa de legenda separada; embutida, ela faz parte da imagem e aparece sempre.',
+      },
+      {
+        q: 'Meu vídeo é enviado?',
+        a: 'Não. O navegador desenha cada quadro e codifica o resultado.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Conversor de vídeo online',
     title: 'Conversor de Vídeo Online Grátis — MP4, WebM, MOV sem enviar nada',

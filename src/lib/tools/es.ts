@@ -548,6 +548,32 @@ export const es: ToolTranslations = {
       },
     ],
   },
+  'burn-subtitles': {
+    searchPhrase: 'Añadir subtítulos a un video online',
+    title: 'Añadir subtítulos a un video online gratis — SRT a MP4, sin subir',
+    description:
+      'Incrusta subtítulos en un video online gratis: suelta un MP4 y un SRT o VTT, elige tamaño y posición y obtén un MP4 con el texto en la imagen. Para Instagram, TikTok y WhatsApp. En tu navegador, sin subir nada.',
+    heading: 'Añadir subtítulos al',
+    accent: 'video',
+    lede: 'Pon un SRT o VTT dentro de la imagen. El video y el texto se quedan en tu dispositivo.',
+    blurb: 'Incrusta un SRT o VTT en un video para que los subtítulos se vean en todas partes.',
+    featureList: [
+      'SRT y WebVTT con sus tiempos',
+      'Texto blanco con borde oscuro, ajustado al ancho',
+      'Tres tamaños, abajo o arriba',
+      'Todo en el navegador: sin subidas',
+    ],
+    faq: [
+      {
+        q: '¿Por qué incrustarlos?',
+        a: 'Instagram, TikTok y WhatsApp ignoran una pista de subtítulos aparte; incrustados forman parte de la imagen y se ven siempre.',
+      },
+      {
+        q: '¿Se sube mi video?',
+        a: 'No. Tu navegador dibuja cada fotograma y codifica el resultado.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Convertidor de vídeo online',
     title: 'Convertidor de Vídeo Online Gratis — MP4, WebM, MOV sin subir nada',

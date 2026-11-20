@@ -545,6 +545,32 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'burn-subtitles': {
+    searchPhrase: 'Videoya altyazı ekleme online',
+    title: 'Videoya Altyazı Ekle Online Ücretsiz — SRT’yi MP4’e göm, yükleme yok',
+    description:
+      'Altyazıyı videoya online ve ücretsiz gömün: bir MP4 ile SRT veya VTT dosyası bırakın, boyutu ve konumu seçin, metni görüntünün içinde olan bir MP4 alın. Instagram, TikTok ve WhatsApp için. Tarayıcıda, yükleme yok.',
+    heading: 'Videoya',
+    accent: 'altyazı ekle',
+    lede: 'SRT veya VTT’yi görüntünün içine koyun. Video ve metin cihazınızda kalır.',
+    blurb: 'SRT veya VTT’yi videoya gömün, altyazı her yerde görünsün.',
+    featureList: [
+      'Zamanlamasıyla SRT ve WebVTT',
+      'Koyu kenarlı beyaz metin, genişliğe göre kaydırılır',
+      'Üç boyut, alt veya üst',
+      'Her şey tarayıcıda: yükleme yok',
+    ],
+    faq: [
+      {
+        q: 'Neden gömülü altyazı?',
+        a: 'Instagram, TikTok ve WhatsApp ayrı altyazı parçasını yok sayar; gömülü altyazı görüntünün parçasıdır ve her yerde görünür.',
+      },
+      {
+        q: 'Videom yükleniyor mu?',
+        a: 'Hayır. Tarayıcınız her kareyi çizer ve sonucu kodlar.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',
