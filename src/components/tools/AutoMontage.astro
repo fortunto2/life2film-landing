@@ -1,6 +1,7 @@
 ---
 import { CHROME, STATUS } from '../../lib/tools-i18n';
 import type { Lang } from '../../i18n';
+import { localePath } from '../../i18n';
 
 interface Props { lang?: Lang }
 const { lang = 'en' } = Astro.props;
@@ -8,8 +9,8 @@ const chrome = CHROME[lang];
 const status = STATUS[lang];
 
 const WORDS: Partial<Record<Lang, Record<string, string>>> = {
-  en: { clips: 'Your clips (up to 10)', song: 'The song', songHint: 'MP3, M4A or WAV — the cuts land on its beats', length: 'Length', shape: 'Shape', auto: 'Like the clips', run: 'Make the montage', engine: 'Loading the montage engine (1.3 MB, once)…', analyze: 'Watching the clips… {n}%', music: 'Finding the beats…', render: 'Cutting to the beat… {n}%', saved: 'Saved — {shots} cuts from {clips} clips at {bpm} BPM, {len}, {size}.', needSong: 'Add a song first.', failed: 'Could not make it — {msg}', app: 'Want it in 4K, with titles and your photos? The Life2Film app does the same montage on your iPhone.' },
-  ru: { clips: 'Ваши клипы (до 10)', song: 'Песня', songHint: 'MP3, M4A или WAV — склейки встанут на её доли', length: 'Длина', shape: 'Формат', auto: 'Как у клипов', run: 'Смонтировать', engine: 'Загружаем движок монтажа (1,3 МБ, один раз)…', analyze: 'Смотрим клипы… {n}%', music: 'Ищем доли в песне…', render: 'Режем под бит… {n}%', saved: 'Сохранено — {shots} склеек из {clips} клипов, {bpm} BPM, {len}, {size}.', needSong: 'Сначала добавьте песню.', failed: 'Не получилось — {msg}', app: 'Нужно в 4K, с титрами и фото? Приложение Life2Film делает тот же монтаж на iPhone.' },
+  en: { clips: 'Your clips (up to 10)', song: 'The song', songHint: 'MP3, M4A or WAV — the cuts land on its beats', length: 'Length', shape: 'Shape', auto: 'Like the clips', run: 'Make the montage', engine: 'Loading the montage engine (1.3 MB, once)…', analyze: 'Watching the clips… {n}%', music: 'Finding the beats…', render: 'Cutting to the beat… {n}%', saved: 'Saved — {shots} cuts from {clips} clips at {bpm} BPM, {len}, {size}.', needSong: 'Add a song first.', failed: 'Could not make it — {msg}', app: 'Want it in 4K, with titles and your photos? The Life2Film app does the same montage on your iPhone.', editor: 'Rather put the shots in order yourself? Open the video editor' },
+  ru: { clips: 'Ваши клипы (до 10)', song: 'Песня', songHint: 'MP3, M4A или WAV — склейки встанут на её доли', length: 'Длина', shape: 'Формат', auto: 'Как у клипов', run: 'Смонтировать', engine: 'Загружаем движок монтажа (1,3 МБ, один раз)…', analyze: 'Смотрим клипы… {n}%', music: 'Ищем доли в песне…', render: 'Режем под бит… {n}%', saved: 'Сохранено — {shots} склеек из {clips} клипов, {bpm} BPM, {len}, {size}.', needSong: 'Сначала добавьте песню.', failed: 'Не получилось — {msg}', app: 'Нужно в 4K, с титрами и фото? Приложение Life2Film делает тот же монтаж на iPhone.', editor: 'Хотите расставить куски сами? Откройте видеоредактор' },
 };
 const words = WORDS[lang] ?? WORDS.en!;
 ---
@@ -40,6 +41,7 @@ const words = WORDS[lang] ?? WORDS.en!;
     <div class="statustext" id="statusText"></div>
   </div>
   <p class="muted small">{words.app}</p>
+  <p class="muted small"><a href={localePath(lang, '/tools/video-editor/')}>{words.editor} →</a></p>
 </div>
 
 <style>

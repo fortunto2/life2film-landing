@@ -1,0 +1,326 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+import { localePath } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+// One line per language that has this tool translated (see src/lib/tools/<lang>-text.ts).
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { clips: 'Add clips (up to 10)', song: 'Music (optional)', songHint: 'MP3, M4A or WAV, laid under the whole film', play: 'Play', pause: 'Pause', split: 'Split at playhead', del: 'Delete shot', keep: 'Keep the clips’ sound', shape: 'Shape', auto: 'Like the clips', run: 'Export MP4', empty: 'Add clips: each becomes a block. Drag to reorder, drag an edge to trim.', hint: 'Drag a block to move it, its edges to trim. Click the ruler to move the playhead.', render: 'Rendering… {n}%', saved: 'Saved — {shots} shots from {clips} clips, {len}, {size}.', tooMany: 'Up to 10 clips; the rest were left out.', failed: 'Could not export — {msg}', auto2: 'Rather not cut by hand? Let it cut automatically to the beat', none: 'No sound' },
+  ru: { clips: 'Добавьте клипы (до 10)', song: 'Музыка (необязательно)', songHint: 'MP3, M4A или WAV — ляжет под весь фильм', play: 'Играть', pause: 'Пауза', split: 'Разрезать по курсору', del: 'Удалить кусок', keep: 'Оставить звук клипов', shape: 'Формат', auto: 'Как у клипов', run: 'Сохранить MP4', empty: 'Добавьте клипы — каждый станет блоком. Тяните блок, чтобы переставить, край — чтобы обрезать.', hint: 'Тяните блок, чтобы переставить, края — чтобы обрезать. Клик по линейке двигает курсор.', render: 'Собираем… {n}%', saved: 'Сохранено — {shots} кусков из {clips} клипов, {len}, {size}.', tooMany: 'Не больше 10 клипов, остальные не добавлены.', failed: 'Не получилось — {msg}', auto2: 'Не хочется резать руками? Пусть смонтирует само под бит', none: 'Без звука' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="video/*" multiple hidden />
+    <strong>{words.clips}</strong>
+    <span class="muted">{chrome.dragHint} — MP4, MOV, WebM</span>
+  </label>
+
+  <div class="stage" id="stage"><span class="muted" id="emptyNote">{words.empty}</span></div>
+  <div class="transport">
+    <button id="play" type="button" class="ghost" disabled>{words.play}</button>
+    <span class="clock" id="clock">0:00.0 / 0:00.0</span>
+    <span class="spacer"></span>
+    <button id="split" type="button" class="ghost" disabled>{words.split}</button>
+    <button id="del" type="button" class="ghost" disabled>{words.del}</button>
+  </div>
+  <div class="timeline" id="timeline">
+    <div class="ruler" id="ruler"></div>
+    <div class="track" id="track"></div>
+    <div class="playhead" id="playhead"></div>
+  </div>
+  <p class="muted small">{words.hint}</p>
+
+  <label class="drop song" for="song">
+    <input type="file" id="song" accept="audio/*,.mp3,.m4a,.wav" hidden />
+    <strong>{words.song}</strong>
+    <span class="muted" id="songName">{words.songHint}</span>
+  </label>
+  <div class="controls">
+    <label class="control check"><input type="checkbox" id="keep" checked /> <span>{words.keep}</span></label>
+    <label class="control"><span class="muted">{words.shape}</span>
+      <select id="shape"><option value="auto" selected>{words.auto}</option><option value="9:16">9:16</option><option value="16:9">16:9</option></select></label>
+    <span class="spacer"></span>
+    <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+  <p class="muted small"><a href={localePath(lang, '/tools/auto-montage/')}>{words.auto2} →</a></p>
+</div>
+
+<style>
+  .stage { position: relative; margin-top: 14px; aspect-ratio: 16 / 9; max-height: 420px; width: 100%; background: #000; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: grid; place-items: center; }
+  .stage :global(video) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; visibility: hidden; }
+  .stage :global(video.on) { visibility: visible; }
+  #emptyNote { padding: 16px; text-align: center; }
+  .transport { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .clock { font-variant-numeric: tabular-nums; font-size: 0.9rem; }
+  .spacer { flex: 1; }
+  .timeline { position: relative; margin-top: 10px; user-select: none; touch-action: none; }
+  .ruler { height: 22px; border-radius: 6px; background: var(--panel); border: 1px solid var(--line); cursor: pointer; position: relative; }
+  .ruler :global(i) { position: absolute; top: 2px; font-style: normal; font-size: 0.7rem; color: var(--muted); transform: translateX(2px); pointer-events: none; }
+  .track { position: relative; height: 64px; margin-top: 6px; display: flex; gap: 2px; }
+  .track :global(.blk) { position: relative; flex: none; height: 100%; border-radius: 8px; background: #222 center / cover no-repeat; border: 2px solid transparent; cursor: grab; overflow: hidden; min-width: 12px; }
+  .track :global(.blk.sel) { border-color: var(--cyan); }
+  .track :global(.blk.drag) { opacity: 0.6; cursor: grabbing; }
+  .track :global(.blk b) { position: absolute; left: 10px; bottom: 3px; font-size: 0.7rem; font-weight: 600; text-shadow: 0 1px 2px #000; pointer-events: none; white-space: nowrap; }
+  .track :global(.h) { position: absolute; top: 0; bottom: 0; width: 9px; background: rgba(0, 242, 224, 0.75); cursor: ew-resize; }
+  .track :global(.h.l) { left: 0; border-radius: 6px 0 0 6px; }
+  .track :global(.h.r) { right: 0; border-radius: 0 6px 6px 0; }
+  .playhead { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--pink); pointer-events: none; left: 0; }
+  .song { margin-top: 14px; padding: 14px; }
+  .check { flex-direction: row; align-items: center; gap: 6px; }
+  .small { font-size: 0.85rem; }
+</style>
+
+<script>
+  import { mountTool, messageOf } from 'superduper-tools/shell';
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { saveBlob, formatBytes, preciseClock } from '../../lib/encode';
+  import { MIN_SHOT, addClips, locate, move, offsets, remove, split, totalLength, trim, type TimelineShot } from '../../lib/timeline';
+  import { exportFilm, type EditorShape } from '../../lib/video-editor';
+
+  const MAX_CLIPS = 10;
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const stage = el('stage'), trackEl = el('track'), ruler = el('ruler'), head = el('playhead');
+  const playBtn = el<HTMLButtonElement>('play'), splitBtn = el<HTMLButtonElement>('split'), delBtn = el<HTMLButtonElement>('del');
+  const keep = el<HTMLInputElement>('keep');
+
+  interface Clip { file: File; url: string; duration: number; thumb: string; video: HTMLVideoElement }
+  const clips: Clip[] = [];
+  let shots: TimelineShot[] = [];
+  let selected = -1;
+  let now = 0;
+  let playing = false;
+  let song: File | null = null;
+  let songEl: HTMLAudioElement | null = null;
+  let pps = 1; // pixels per second, frozen while dragging
+
+  const fmt = (t: number) => `${Math.floor(t / 60)}:${(t % 60).toFixed(1).padStart(4, '0')}`;
+
+  /** Duration and a thumbnail from the clip's own <video>, which then serves the preview. */
+  function loadClip(file: File): Promise<Clip | null> {
+    return new Promise((resolve) => {
+      const url = URL.createObjectURL(file);
+      const video = document.createElement('video');
+      video.preload = 'auto'; video.playsInline = true; video.src = url;
+      video.onerror = () => resolve(null);
+      video.onloadedmetadata = () => { video.currentTime = Math.min(0.5, video.duration / 2); };
+      video.onseeked = () => {
+        video.onseeked = null;
+        const c = document.createElement('canvas');
+        c.height = 64; c.width = Math.max(1, Math.round((64 * video.videoWidth) / Math.max(1, video.videoHeight)));
+        c.getContext('2d')?.drawImage(video, 0, 0, c.width, c.height);
+        stage.appendChild(video);
+        resolve({ file, url, duration: video.duration, thumb: c.toDataURL('image/jpeg', 0.7), video });
+      };
+    });
+  }
+
+  function layout() {
+    const total = totalLength(shots);
+    const width = trackEl.clientWidth - 2 * Math.max(0, shots.length - 1);
+    pps = total > 0 ? width / total : 1;
+  }
+
+  function draw() {
+    if (!dragging) layout();
+    trackEl.replaceChildren(...shots.map((s, i) => {
+      const b = document.createElement('div');
+      b.className = 'blk' + (i === selected ? ' sel' : '');
+      b.style.width = `${(s.end - s.start) * pps}px`;
+      b.style.backgroundImage = `url(${clips[s.clip].thumb})`;
+      b.dataset.i = String(i);
+      b.innerHTML = `<span class="h l" data-edge="start"></span><b>${(s.end - s.start).toFixed(1)}s</b><span class="h r" data-edge="end"></span>`;
+      return b;
+    }));
+    const total = totalLength(shots);
+    const step = total > 60 ? 10 : total > 20 ? 5 : 1;
+    const ticks: HTMLElement[] = [];
+    for (let t = 0; t < total; t += step) { const i = document.createElement('i'); i.style.left = `${t * pps}px`; i.textContent = fmt(t).replace(/\.\d$/, ''); ticks.push(i); }
+    ruler.replaceChildren(...ticks);
+    el('emptyNote').hidden = shots.length > 0;
+    playBtn.disabled = !shots.length;
+    delBtn.disabled = !shots.length;
+    splitBtn.disabled = !shots.length;
+    seek(Math.min(now, total));
+  }
+
+  /** Show the frame at film time `t` in the preview (not frame-exact; the export is). */
+  function seek(t: number) {
+    now = Math.max(0, t);
+    const hit = locate(shots, now);
+    head.style.left = `${now * pps}px`;
+    el('clock').textContent = `${fmt(now)} / ${fmt(totalLength(shots))}`;
+    for (const c of clips) c.video.classList.remove('on');
+    if (!hit) return;
+    const v = clips[shots[hit.index].clip].video;
+    v.classList.add('on');
+    if (!playing && Math.abs(v.currentTime - hit.clipTime) > 0.04) v.currentTime = hit.clipTime;
+  }
+
+  let current = -1;
+  function tick() {
+    if (!playing) return;
+    const at = offsets(shots);
+    const s = shots[current];
+    const v = s && clips[s.clip].video;
+    if (!s || !v) { stop(); return; }
+    if (v.currentTime >= s.end - 0.02 || v.ended) {
+      v.pause();
+      if (current + 1 >= shots.length) { stop(); seek(0); return; }
+      startShot(current + 1, shots[current + 1].start);
+    } else seek(at[current] + Math.max(0, v.currentTime - s.start));
+    requestAnimationFrame(tick);
+  }
+  function startShot(i: number, clipTime: number) {
+    current = i;
+    const v = clips[shots[i].clip].video;
+    for (const c of clips) if (c.video !== v) c.video.pause();
+    v.muted = !keep.checked;
+    v.currentTime = clipTime;
+    void v.play().catch(() => stop());
+    seek(offsets(shots)[i] + clipTime - shots[i].start);
+  }
+  function play() {
+    if (!shots.length) return;
+    if (now >= totalLength(shots) - 0.05) now = 0;
+    const hit = locate(shots, now)!;
+    playing = true;
+    playBtn.textContent = w.pause;
+    if (songEl) { songEl.volume = keep.checked ? 0.25 : 1; songEl.currentTime = now; void songEl.play().catch(() => {}); }
+    startShot(hit.index, hit.clipTime);
+    requestAnimationFrame(tick);
+  }
+  function stop() {
+    playing = false;
+    playBtn.textContent = w.play;
+    for (const c of clips) c.video.pause();
+    songEl?.pause();
+  }
+  playBtn.addEventListener('click', () => (playing ? stop() : play()));
+
+  // Playhead: click or drag on the ruler.
+  const fromX = (x: number) => Math.max(0, Math.min(totalLength(shots), (x - ruler.getBoundingClientRect().left) / pps));
+  ruler.addEventListener('pointerdown', (e) => {
+    stop();
+    ruler.setPointerCapture(e.pointerId);
+    seek(fromX(e.clientX));
+    const mv = (ev: PointerEvent) => seek(fromX(ev.clientX));
+    ruler.addEventListener('pointermove', mv);
+    ruler.addEventListener('pointerup', () => ruler.removeEventListener('pointermove', mv), { once: true });
+  });
+
+  // Blocks: drag to reorder, drag an edge to trim, click to select.
+  let dragging = false;
+  trackEl.addEventListener('pointerdown', (e) => {
+    const t = e.target as HTMLElement;
+    const blk = t.closest<HTMLElement>('.blk');
+    if (!blk) return;
+    stop();
+    const i = Number(blk.dataset.i);
+    const edge = t.dataset.edge as 'start' | 'end' | undefined;
+    const x0 = e.clientX, base = shots[i], dur = clips[base.clip].duration;
+    let moved = false;
+    dragging = true;
+    selected = i;
+    trackEl.setPointerCapture(e.pointerId);
+    blk.classList.add('sel');
+    const onMove = (ev: PointerEvent) => {
+      const dx = ev.clientX - x0;
+      if (Math.abs(dx) > 4) moved = true;
+      if (!moved) return;
+      if (edge) {
+        const before = shots;
+        shots = trim(shots.map((s, k) => (k === i ? base : s)), i, edge, (edge === 'start' ? base.start : base.end) + dx / pps, dur);
+        if (shots !== before) draw();
+      } else {
+        blk.classList.add('drag');
+        blk.style.transform = `translateX(${dx}px)`;
+      }
+    };
+    const onUp = (ev: PointerEvent) => {
+      trackEl.removeEventListener('pointermove', onMove);
+      dragging = false;
+      if (moved && !edge) {
+        // Drop where the block's centre lands among the others' centres.
+        const centre = blk.getBoundingClientRect().left + blk.offsetWidth / 2;
+        const others = [...trackEl.querySelectorAll<HTMLElement>('.blk')].filter((b) => b !== blk);
+        const to = others.filter((b) => b.getBoundingClientRect().left + b.offsetWidth / 2 < centre).length;
+        shots = move(shots, i, to);
+        selected = to;
+      } else if (!moved) {
+        seek(offsets(shots)[i] + Math.max(0, Math.min(shots[i].end - shots[i].start, (ev.clientX - blk.getBoundingClientRect().left) / pps)));
+      }
+      draw();
+    };
+    trackEl.addEventListener('pointermove', onMove);
+    trackEl.addEventListener('pointerup', onUp, { once: true });
+  });
+
+  splitBtn.addEventListener('click', () => {
+    stop();
+    const before = shots.length;
+    shots = split(shots, now);
+    if (shots.length > before) selected = locate(shots, now)?.index ?? selected;
+    draw();
+  });
+  delBtn.addEventListener('click', () => {
+    stop();
+    const i = selected >= 0 && selected < shots.length ? selected : locate(shots, now)?.index ?? -1;
+    shots = remove(shots, i);
+    selected = -1;
+    draw();
+  });
+  window.addEventListener('resize', draw);
+
+  el<HTMLInputElement>('song').addEventListener('change', (e) => {
+    song = (e.target as HTMLInputElement).files?.[0] ?? null;
+    songEl?.pause();
+    songEl = song ? new Audio(URL.createObjectURL(song)) : null;
+    el('songName').textContent = song ? song.name : w.songHint;
+    if (song) fileChosen(song, 'picker');
+  });
+
+  const tool = mountTool({
+    multiple: true,
+    onFiles: (fs, via, status) => {
+      fs.slice(0, 1).forEach((f) => fileChosen(f, via));
+      const room = MAX_CLIPS - clips.length;
+      void (async () => {
+        const loaded: Clip[] = [];
+        for (const f of fs.slice(0, Math.max(0, room))) { const c = await loadClip(f); if (c && c.duration >= MIN_SHOT) loaded.push(c); }
+        shots = addClips(shots, loaded.map((c) => c.duration), clips.length);
+        clips.push(...loaded);
+        draw();
+        status(fs.length > room ? w.tooMany : clips.map((c) => c.file.name).join(', '));
+      })();
+    },
+    onError: (error, [f]) => { toolFailed('run', error, f); return w.failed.replace('{msg}', messageOf(error)); },
+    run: async ({ status }) => {
+      stop();
+      const shape = el<HTMLSelectElement>('shape').value as EditorShape;
+      const r = await exportFilm(clips.map((c) => c.file), shots, {
+        shape, song, keepClipSound: keep.checked,
+        onProgress: (f) => status(w.render.replace('{n}', String(Math.round(f * 100))), f * 0.97),
+      });
+      saveBlob(r.blob, 'life2film-edit.mp4');
+      track('result_saved', { placement: 'result', shape }, { clips: clips.length, clips_used: r.clipsUsed, shots: r.shots, seconds: Math.round(r.duration), song: song ? 1 : 0, clip_sound: keep.checked ? 1 : 0 });
+      status(w.saved.replace('{shots}', String(r.shots)).replace('{clips}', String(r.clipsUsed)).replace('{len}', preciseClock(r.duration)).replace('{size}', formatBytes(r.blob.size)), 1);
+    },
+  });
+  void tool;
+  draw();
+</script>

@@ -9,12 +9,12 @@
  * shot decoded from its clip at 30 fps onto one canvas, cover-fit → the song under it, faded out.
  */
 import { loadMediabunny } from './encode';
-import { pushStereo, trackStereo } from './audio-io';
-import { FPS, canvasMp4, openVideo, type OpenedVideo } from './canvas-out';
-import { cover } from './blur-fill';
+import { openVideo, type OpenedVideo } from './canvas-out';
+import { frameSchedule, renderShots, type Shot } from './render-shots';
+
+export { frameSchedule, type Shot };
 
 export interface Segment { segment_id: number; source_id: number; source_file: string; start: number; end: number; score: number; is_garbage: boolean; best_frame_ts: number }
-export interface Shot { trim_start: number; trim_end: number; output_start: number; speed: number; segment_id: number; source_id: number }
 
 interface Planner {
   default: (o: { module_or_path: string }) => Promise<unknown>;
@@ -52,17 +52,6 @@ export function toSegments(frames: { t: number; score: number }[], duration: num
     const score = inside.reduce((s, f) => s + f.score, 0) / inside.length;
     const best = inside.reduce((a, b) => (b.score > a.score ? b : a));
     out.push({ segment_id: firstId + k, source_id: clip + 1, source_file: `clip-${clip + 1}`, start, end, score, is_garbage: score < 0.25, best_frame_ts: best.t });
-  }
-  return out;
-}
-
-/** Output frame times of a planned film: for each frame, which clip (0-based) and which moment in it. */
-export function frameSchedule(shots: Shot[], fps = FPS): { source: number; t: number }[] {
-  const out: { source: number; t: number }[] = [];
-  for (const s of shots) {
-    const len = (s.trim_end - s.trim_start) / (s.speed || 1);
-    const n = Math.max(1, Math.round(len * fps));
-    for (let i = 0; i < n; i++) out.push({ source: s.source_id - 1, t: s.trim_start + (i / fps) * (s.speed || 1) });
   }
   return out;
 }
@@ -128,40 +117,7 @@ export async function autoMontage(
   // Output shape: the majority of the clips, ties portrait (the app's rule).
   const portrait = shape === '9:16' || (shape === 'auto' && opened.filter((c) => c.height > c.width).length * 2 >= opened.length);
   const [W, H] = portrait ? [720, 1280] : [1280, 720];
-  const out = await canvasMp4(W, H, true);
-  const { ctx, vsource, asource } = out;
-  const { CanvasSink } = await loadMediabunny();
-  const schedule = frameSchedule(shots);
-  // One decoder per clip, fed only that clip's times, in output order.
-  const iters = opened.map((c, i) => {
-    const ts = schedule.filter((f) => f.source === i).map((f) => Math.min(c.duration - 1e-3, f.t));
-    return ts.length ? new CanvasSink(c.video, { poolSize: 2 }).canvasesAtTimestamps(ts)[Symbol.asyncIterator]() : null;
-  });
-  for (const [k, f] of schedule.entries()) {
-    const next = await iters[f.source]!.next();
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, W, H);
-    const c = next.value?.canvas as OffscreenCanvas | undefined;
-    if (c) { const r = cover(c.width, c.height, W, H); ctx.drawImage(c, r.x, r.y, r.w, r.h); }
-    await vsource.add(k / FPS, 1 / FPS);
-    if (k % 15 === 0) onStage('render', k / schedule.length);
-  }
-  vsource.close();
-  if (asource) {
-    const { Input, BlobSource, ALL_FORMATS } = await loadMediabunny();
-    const track = await new Input({ source: new BlobSource(song), formats: ALL_FORMATS }).getPrimaryAudioTrack();
-    const len = schedule.length / FPS;
-    const pcm = await trackStereo(track, len, (off) => {
-      const g = off.createGain();
-      g.gain.setValueAtTime(1, Math.max(0, len - 1.5));
-      g.gain.linearRampToValueAtTime(0, len);
-      g.connect(off.destination);
-      return g;
-    });
-    if (pcm) await pushStereo(asource, pcm[0], pcm[1]);
-    else asource.close();
-  }
-  const blob = await out.finish();
+  const { blob } = await renderShots(opened, shots, { W, H, song, onProgress: (f) => onStage('render', f) });
   return { blob, duration, shots: shots.length, clipsUsed: new Set(shots.map((s) => s.source_id)).size, bpm: music.bpm };
 }
 

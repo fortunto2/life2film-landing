@@ -8,24 +8,38 @@ import { loadMediabunny } from './encode';
 export const RATE = 48_000;
 
 /**
- * A track's sound from 0 to `duration`, resampled to 48 kHz stereo, through an optional node chain
+ * Where a decoded buffer that starts at `timestamp` (seconds of the track) goes when the render
+ * starts at `from`: `when` into the render, skipping `offset` of the buffer's own head.
+ */
+export function placeBuffer(timestamp: number, from: number): { when: number; offset: number } {
+  return timestamp >= from ? { when: timestamp - from, offset: 0 } : { when: 0, offset: from - timestamp };
+}
+
+/**
+ * A track's sound from `from` (default 0) for `duration`, resampled to 48 kHz stereo, through an optional node chain
  * (`chain` gets the context and returns the node the sources connect to). Null when it cannot decode.
  */
 export async function trackStereo(
   track: InputAudioTrack | null,
   duration: number,
   chain?: (ctx: OfflineAudioContext) => AudioNode,
+  from = 0,
 ): Promise<[Float32Array, Float32Array] | null> {
   if (!track || !(await track.canDecode().catch(() => false))) return null;
   const { AudioBufferSink } = await loadMediabunny();
   const off = new OfflineAudioContext(2, Math.max(1, Math.round(duration * RATE)), RATE);
   const into = chain ? chain(off) : off.destination;
   let at = 0, any = false;
-  for await (const { buffer } of new AudioBufferSink(track).buffers(0, duration)) {
+  for await (const { buffer, timestamp } of new AudioBufferSink(track).buffers(from, from + duration)) {
     const s = off.createBufferSource();
     s.buffer = buffer;
     s.connect(into);
-    s.start(at);
+    // From 0, buffers are laid end to end (as every renderer here always did); from a later point,
+    // by their timestamps, since the first one decoded usually starts before `from`.
+    if (from > 0) {
+      const p = placeBuffer(timestamp, from);
+      if (p.offset < buffer.duration) s.start(p.when, p.offset);
+    } else s.start(at);
     at += buffer.duration;
     any = true;
   }

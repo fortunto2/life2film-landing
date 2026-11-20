@@ -930,4 +930,35 @@ export const TEXT_TOOLS: Tool[] = [
     facts: ['Output long side up to 1280 px, up to 120 s, 30 fps; the mask keeps 40% of the previous frame and has a soft edge between 0.3 and 0.7 confidence.'],
     agentJob: 'Removing or replacing the background of a video, locally',
   },
+  {
+    slug: 'video-editor',
+    group: 'create',
+    name: 'Online Video Editor',
+    appName: 'Life2Film Online Video Editor',
+    blurb: 'Clips on a timeline: reorder, trim, split, add music, export MP4. In your browser, nothing uploaded.',
+
+    searchPhrase: 'Online Video Editor',
+    title: 'Online Video Editor — free, in your browser, nothing uploaded',
+    description: 'Online video editor, free: put up to 10 clips on a timeline, drag to reorder, trim and split them, lay a song under the film and export MP4. Runs in your browser; nothing is uploaded, no watermark.',
+    heading: 'Online video',
+    accent: 'editor',
+    lede: 'Drop your clips onto a timeline, put them in order, trim the ends and export one video. The files stay on your device.',
+    featureList: [
+      'Up to 10 clips on a timeline, each a block as long as the clip',
+      'Drag to reorder, drag an edge to trim, split at the playhead, delete',
+      'A song under the whole film with a 1.5 s fade out, or the clips’ own sound, or both',
+      '9:16 or 16:9 at 720p, MP4 out; no upload, no watermark, no account',
+    ],
+    faq: [
+      { q: 'Is my video uploaded?', a: 'No. Decoding, cutting and encoding run in this tab (WebCodecs); the clips and the song never leave your device.' },
+      { q: 'Can I mix clips shot vertically and horizontally?', a: 'Yes. Pick 9:16 or 16:9, or let it follow most of your clips; every shot is scaled to fill the frame and cropped at the edges.' },
+      { q: 'What happens to the sound?', a: 'Keep the clips’ own sound, add a song, or both: with both, the song plays 12 dB quieter under the clips. The song fades out over the last 1.5 seconds.' },
+      { q: 'Is the preview exact?', a: 'The preview jumps between your clips as they play, so a cut can land a few frames off there. The exported MP4 is cut frame by frame at 30 fps.' },
+      { q: 'I do not want to cut by hand. Can it edit for me?', a: 'Yes: the auto montage on this site picks the best moments of your clips and cuts them to the beat of a song. The Life2Film app for iPhone does it with your whole camera roll.' },
+    ],
+
+    summary: 'Browser video editor: up to 10 clips on a timeline (reorder, trim, split, delete), optional song with 1.5 s fade (-12 dB under kept clip sound), 720p 9:16 or 16:9 MP4 rendered frame by frame at 30 fps.',
+    facts: ['Shots are at least 0.3 s; export 720p at 30 fps, cover-fit; the song sits 12 dB under the clips when their sound is kept.'],
+    agentJob: 'Editing several clips into one video on a timeline, locally',
+  },
 ];
