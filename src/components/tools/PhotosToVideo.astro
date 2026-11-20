@@ -1,0 +1,140 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { hint: 'photos — JPG, PNG, WebP', add: 'Add photos', music: 'Add a song', run: 'Make the video', up: 'Move up', down: 'Move down', remove: 'Remove', shape: 'Shape', per: 'Each photo', sec: 's', song: 'Song: {name}', saved: 'Saved — {size}, {len}.', failed: 'Could not make the video — {msg}', two: 'Add at least one photo.' },
+  ru: { hint: 'фото — JPG, PNG, WebP', add: 'Добавить фото', music: 'Добавить песню', run: 'Сделать видео', up: 'Выше', down: 'Ниже', remove: 'Убрать', shape: 'Формат', per: 'Каждое фото', sec: 'с', song: 'Песня: {name}', saved: 'Сохранено — {size}, {len}.', failed: 'Не удалось сделать видео — {msg}', two: 'Добавьте хотя бы одно фото.' },
+  es: { hint: 'fotos — JPG, PNG, WebP', add: 'Añadir fotos', music: 'Añadir canción', run: 'Crear video', up: 'Subir', down: 'Bajar', remove: 'Quitar', shape: 'Formato', per: 'Cada foto', sec: 's', song: 'Canción: {name}', saved: 'Guardado — {size}, {len}.', failed: 'No se pudo crear el video — {msg}', two: 'Añade al menos una foto.' },
+  pt: { hint: 'fotos — JPG, PNG, WebP', add: 'Adicionar fotos', music: 'Adicionar música', run: 'Criar vídeo', up: 'Subir', down: 'Descer', remove: 'Remover', shape: 'Formato', per: 'Cada foto', sec: 's', song: 'Música: {name}', saved: 'Salvo — {size}, {len}.', failed: 'Não foi possível criar o vídeo — {msg}', two: 'Adicione pelo menos uma foto.' },
+  id: { hint: 'foto — JPG, PNG, WebP', add: 'Tambah foto', music: 'Tambah lagu', run: 'Buat video', up: 'Naik', down: 'Turun', remove: 'Hapus', shape: 'Bentuk', per: 'Tiap foto', sec: 'dtk', song: 'Lagu: {name}', saved: 'Tersimpan — {size}, {len}.', failed: 'Gagal membuat video — {msg}', two: 'Tambahkan minimal satu foto.' },
+  tr: { hint: 'fotoğraflar — JPG, PNG, WebP', add: 'Fotoğraf ekle', music: 'Şarkı ekle', run: 'Video yap', up: 'Yukarı', down: 'Aşağı', remove: 'Kaldır', shape: 'Biçim', per: 'Her fotoğraf', sec: 'sn', song: 'Şarkı: {name}', saved: 'Kaydedildi — {size}, {len}.', failed: 'Video yapılamadı — {msg}', two: 'En az bir fotoğraf ekleyin.' },
+  ar: { hint: 'صور — JPG وPNG وWebP', add: 'أضف صورًا', music: 'أضف أغنية', run: 'اصنع الفيديو', up: 'لأعلى', down: 'لأسفل', remove: 'إزالة', shape: 'الشكل', per: 'كل صورة', sec: 'ث', song: 'الأغنية: {name}', saved: 'تم الحفظ — {size}، {len}.', failed: 'تعذّر صنع الفيديو — {msg}', two: 'أضف صورة واحدة على الأقل.' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="image/*,audio/*" multiple hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — {words.hint}</span>
+  </label>
+  <div id="editor" hidden>
+    <ol class="clips" id="clips"></ol>
+    <p class="muted" id="songName" hidden></p>
+    <div class="controls">
+      <label class="ghost" for="more">{words.add}<input type="file" id="more" accept="image/*" multiple hidden /></label>
+      <label class="ghost" for="song">{words.music}<input type="file" id="song" accept="audio/*" hidden /></label>
+      <label class="control"><span class="muted">{words.shape}</span>
+        <select id="shape"><option value="9:16" selected>9:16</option><option value="16:9">16:9</option><option value="1:1">1:1</option></select></label>
+      <label class="control"><span class="muted">{words.per}</span>
+        <select id="per"><option value="2">2 {words.sec}</option><option value="3" selected>3 {words.sec}</option><option value="5">5 {words.sec}</option></select></label>
+      <span class="spacer"></span>
+      <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+    </div>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<style>
+  .clips { margin: 0 0 16px; padding-left: 22px; }
+  .clips :global(li) { display: flex; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .clips :global(li span) { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .clips :global(button) { background: none; border: 1px solid rgba(255,255,255,.15); color: inherit; border-radius: 6px; padding: 2px 8px; cursor: pointer; }
+  label.ghost { cursor: pointer; }
+</style>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { toolStrings, fill } from '../../lib/strings';
+  import { saveBlob, formatBytes, preciseClock } from '../../lib/encode';
+  import { makeSlideshow, type Shape } from '../../lib/slideshow';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const say = toolStrings();
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  let files: File[] = [];
+  let music: File | null = null;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  function render() {
+    const list = el('clips');
+    list.replaceChildren(...files.map((f, i) => {
+      const li = document.createElement('li');
+      const name = document.createElement('span');
+      name.textContent = `${f.name} · ${formatBytes(f.size)}`;
+      const mk = (label: string, text: string, act: () => void, off = false) => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.textContent = text; b.title = label; b.setAttribute('aria-label', label); b.disabled = off;
+        b.addEventListener('click', () => { act(); render(); });
+        return b;
+      };
+      li.append(name,
+        mk(w.up, '↑', () => { [files[i - 1], files[i]] = [files[i], files[i - 1]]; }, i === 0),
+        mk(w.down, '↓', () => { [files[i + 1], files[i]] = [files[i], files[i + 1]]; }, i === files.length - 1),
+        mk(w.remove, '×', () => { files.splice(i, 1); }));
+      return li;
+    }));
+    el('editor').hidden = files.length === 0;
+  }
+
+  function addFiles(list: FileList | null | undefined, how: 'picker' | 'drop') {
+    const all = [...(list ?? [])];
+    const song = all.find((f) => f.type.startsWith('audio/') || /\.(mp3|m4a|wav|ogg|flac|aac)$/i.test(f.name));
+    if (song) { music = song; el('songName').textContent = w.song.replace('{name}', song.name); el('songName').hidden = false; }
+    const chosen = all.filter((f) => f.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|avif|heic)$/i.test(f.name));
+    if (!chosen.length) { if (song) render(); return; }
+    fileChosen(chosen[0], how);
+    files.push(...chosen);
+    statusEl.hidden = true;
+    render();
+  }
+
+  el<HTMLButtonElement>('run').addEventListener('click', async () => {
+    if (busy) return;
+    if (files.length < 1) { status(w.two, 1); return; }
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    try {
+      status(fill(say.working, { n: 0 }), 0);
+      const shape = el<HTMLSelectElement>('shape').value as Shape;
+      const result = await makeSlideshow(files, { shape, perPhoto: Number(el<HTMLSelectElement>('per').value) || 3, music, onProgress: (p) => status(fill(say.working, { n: Math.round(p * 100) }), p) });
+      saveBlob(result.blob, `photos-${files.length}.mp4`);
+      track('result_saved', { placement: 'result', format: 'mp4', shape: shape.replace(':', 'x'), music: String(!!music), clips: String(Math.min(files.length, 50)) }, { size_mb: Math.round(result.blob.size / 104_857.6) / 10 });
+      status(w.saved.replace('{size}', formatBytes(result.blob.size)).replace('{len}', preciseClock(result.duration)), 1);
+    } catch (error) {
+      toolFailed('run', error, files[0]);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  el<HTMLInputElement>('file').addEventListener('change', (e) => addFiles((e.target as HTMLInputElement).files, 'picker'));
+  el<HTMLInputElement>('more').addEventListener('change', (e) => addFiles((e.target as HTMLInputElement).files, 'picker'));
+  el<HTMLInputElement>('song').addEventListener('change', (e) => addFiles((e.target as HTMLInputElement).files, 'picker'));
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => addFiles((e as DragEvent).dataTransfer?.files, 'drop'));
+</script>

@@ -574,6 +574,32 @@ export const es: ToolTranslations = {
       },
     ],
   },
+  'photos-to-video': {
+    searchPhrase: 'Hacer un video con fotos y música online',
+    title: 'Video con fotos y música online gratis — creador de slideshow, sin subir',
+    description:
+      'Haz un video con fotos y música online gratis: orden, 2, 3 o 5 s por foto, zoom suave y fundidos, 9:16 para Reels e historias, 16:9 o cuadrado. La canción se recorta y se desvanece. En tu navegador, sin subir nada.',
+    heading: 'Video con',
+    accent: 'fotos',
+    lede: 'Ordena las fotos, añade una canción y obtén un MP4. Nada sale de tu dispositivo.',
+    blurb: 'Fotos y una canción en un video para Reels, historias o YouTube, con zoom suave.',
+    featureList: [
+      '9:16 para Reels y TikTok; 16:9 para YouTube; 1:1',
+      '2, 3 o 5 s por foto, zoom suave, fundidos de medio segundo',
+      'Canción opcional, recortada y con fundido',
+      'Todo en el navegador: sin subidas ni marca de agua',
+    ],
+    faq: [
+      {
+        q: '¿Cuánto durará el video?',
+        a: 'Fotos × segundos por foto: 20 fotos a 3 s son un minuto.',
+      },
+      {
+        q: '¿Se sube algo?',
+        a: 'No. Tu navegador dibuja y codifica el video.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Convertidor de vídeo online',
     title: 'Convertidor de Vídeo Online Gratis — MP4, WebM, MOV sin subir nada',

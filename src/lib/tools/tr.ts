@@ -571,6 +571,32 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'photos-to-video': {
+    searchPhrase: 'Fotoğraflardan müzikli video yapma online',
+    title: 'Fotoğraftan Müzikli Video Online Ücretsiz — slayt gösterisi, yükleme yok',
+    description:
+      'Fotoğraflardan müzikli video yapın, online ve ücretsiz: sıra, fotoğraf başına 2, 3 veya 5 sn, yavaş yakınlaştırma ve yumuşak geçişler, Reels ve hikâyeler için 9:16, 16:9 ya da kare. Şarkı kesilir ve sonda kısılır. Tarayıcıda, yükleme yok.',
+    heading: 'Fotoğraftan',
+    accent: 'video',
+    lede: 'Fotoğrafları sıralayın, şarkı ekleyin, MP4 alın. Cihazınızdan hiçbir şey çıkmaz.',
+    blurb: 'Fotoğraflar ve bir şarkı Reels, hikâye ya da YouTube için videoya, yavaş yakınlaştırmayla.',
+    featureList: [
+      'Reels ve TikTok için 9:16; YouTube için 16:9; 1:1',
+      'Fotoğraf başına 2, 3 veya 5 sn, yavaş yakınlaştırma, yarım saniyelik geçişler',
+      'İsteğe bağlı şarkı, kesilir ve kısılır',
+      'Her şey tarayıcıda: yükleme ve filigran yok',
+    ],
+    faq: [
+      {
+        q: 'Video ne kadar uzun olur?',
+        a: 'Fotoğraf × fotoğraf başına saniye: 3 saniyelik 20 fotoğraf bir dakika eder.',
+      },
+      {
+        q: 'Bir şey yükleniyor mu?',
+        a: 'Hayır. Tarayıcınız videoyu çizer ve kodlar.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',

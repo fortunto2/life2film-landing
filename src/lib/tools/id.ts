@@ -571,6 +571,32 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'photos-to-video': {
+    searchPhrase: 'Buat video dari foto dengan musik online',
+    title: 'Video dari Foto dengan Musik Online Gratis — pembuat slideshow, tanpa unggah',
+    description:
+      'Buat video dari foto dengan musik secara online dan gratis: urutan, 2, 3 atau 5 detik per foto, zoom halus dan transisi lembut, 9:16 untuk Reels dan Story, 16:9 atau persegi. Lagu dipotong dan memudar di akhir. Di browser, tanpa unggah.',
+    heading: 'Video dari',
+    accent: 'foto',
+    lede: 'Urutkan foto, tambahkan lagu, dapatkan MP4. Tidak ada yang keluar dari perangkat.',
+    blurb: 'Foto dan lagu jadi video untuk Reels, Story atau YouTube, dengan zoom halus.',
+    featureList: [
+      '9:16 untuk Reels dan TikTok; 16:9 untuk YouTube; 1:1',
+      '2, 3 atau 5 detik per foto, zoom halus, transisi setengah detik',
+      'Lagu opsional, dipotong dan memudar',
+      'Semua di browser: tanpa unggah dan watermark',
+    ],
+    faq: [
+      {
+        q: 'Berapa panjang videonya?',
+        a: 'Foto × detik per foto: 20 foto 3 detik = satu menit.',
+      },
+      {
+        q: 'Apakah ada yang diunggah?',
+        a: 'Tidak. Browser menggambar dan meng-encode video.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',

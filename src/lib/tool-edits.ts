@@ -898,4 +898,45 @@ Reference implementation: https://life2film.com/tools/audio-cutter/`,
     facts: ['Messaging apps and social feeds drop soft subtitle tracks; only burned-in captions survive sharing.'],
     agentJob: 'Burning subtitles into a video, locally',
   },
+  {
+    // 20 Nov 2026: «сделать видео из фото с музыкой», «photos to video», «slideshow maker» — the
+    // nearest thing on the site to what the app does, so it is also the most natural door into it.
+    slug: 'photos-to-video',
+    group: 'everyday',
+    name: 'Photos to Video',
+    appName: 'Slideshow Maker',
+    blurb: 'Turn photos and a song into a video for Reels, Stories or YouTube, with a slow zoom and soft cuts.',
+
+    searchPhrase: 'Make a Video from Photos with Music',
+    title: 'Photos to Video with Music Online Free | slideshow maker, no upload',
+    description: 'Make a video from photos with music online for free: set the order, 2, 3 or 5 seconds per photo, a slow zoom and soft crossfades, 9:16 for Reels and Stories, 16:9 or square. The song is trimmed and faded out. In your browser: nothing is uploaded, no watermark.',
+    heading: 'Photos to',
+    accent: 'video',
+    lede: 'Put photos in order, add a song, get an MP4. Nothing leaves your device.',
+    featureList: [
+      '9:16 for Reels, TikTok and Stories; 16:9 for YouTube; 1:1 square',
+      '2, 3 or 5 seconds per photo, slow zoom, half-second crossfades',
+      'Optional song, trimmed to the video and faded out',
+      'Only two photos in memory at a time: a hundred phone photos are fine',
+      'Runs fully client-side: no upload, no watermark',
+    ],
+    faq: [
+      {
+        q: 'Can I use iPhone photos?',
+        a: 'Yes, when they are JPG — which is what iPhone sends when you share or AirDrop to a computer with «Most Compatible» on. HEIC opens only in Safari; elsewhere export as JPG first.',
+      },
+      {
+        q: 'How long will the video be?',
+        a: 'Photos × seconds per photo: 20 photos at 3 seconds make a minute. The song is cut to that length and faded out over the last two seconds.',
+      },
+      {
+        q: 'Is anything uploaded?',
+        a: 'No. Your browser draws and encodes the video.',
+      },
+    ],
+
+    summary: 'Make an MP4 slideshow from photos and an optional song in the browser, with slow zoom and crossfades.',
+    facts: ['Decoding photos two at a time and scaling each to the frame on arrival keeps memory flat, whatever the photo count.'],
+    agentJob: 'Making a video from photos, locally',
+  },
 ];
