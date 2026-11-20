@@ -1,0 +1,140 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { run: 'Make GIF', start: 'Start, s', length: 'Length, s', fps: 'Frames per second', width: 'Width', saved: 'Saved — {size} GIF, {n} frames.', failed: 'Could not make the GIF — {msg}', long: 'A GIF is at most 15 seconds here: past that the file gets too large to share.' },
+  ru: { run: 'Сделать GIF', start: 'Начало, с', length: 'Длина, с', fps: 'Кадров в секунду', width: 'Ширина', saved: 'Сохранено — GIF {size}, кадров: {n}.', failed: 'Не удалось сделать GIF — {msg}', long: 'GIF здесь не длиннее 15 секунд: дальше файл слишком тяжёлый, чтобы им делиться.' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="video/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP4, MOV, WebM</span>
+  </label>
+  <div id="editor" hidden>
+    <div class="facts" id="facts"></div>
+    <div class="controls">
+      <label class="control"><span class="muted">{words.start}</span><input type="number" id="start" min="0" step="0.1" value="0" /></label>
+      <label class="control"><span class="muted">{words.length}</span><input type="number" id="len" min="0.5" max="15" step="0.5" value="4" /></label>
+      <label class="control"><span class="muted">{words.fps}</span>
+        <select id="fps"><option value="10">10</option><option value="15" selected>15</option><option value="20">20</option></select></label>
+      <label class="control"><span class="muted">{words.width}</span>
+        <select id="width"><option value="320">320 px</option><option value="480" selected>480 px</option><option value="640">640 px</option></select></label>
+      <span class="spacer"></span>
+      <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+    </div>
+    <img id="out" alt="" hidden />
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<style>
+  #out { display: block; max-width: 100%; margin: 16px auto 0; border-radius: 8px; }
+  .control input[type=number] { width: 90px; }
+</style>
+
+<script>
+  import { GIFEncoder, quantize, applyPalette } from 'gifenc';
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { toolStrings, fill } from '../../lib/strings';
+  import { openVideo, type VideoSource } from '../../lib/frames';
+  import { saveBlob, formatBytes, preciseClock } from '../../lib/encode';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const say = toolStrings();
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  const fileInput = el<HTMLInputElement>('file');
+  let file: File | null = null;
+  let source: VideoSource | null = null;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  async function open(chosen: File) {
+    file = chosen;
+    source?.release();
+    try {
+      status(say.reading);
+      source = await openVideo(chosen);
+      el('editor').hidden = false;
+      statusEl.hidden = true;
+      el('facts').innerHTML = `<span>${source.width}×${source.height}</span><span>${preciseClock(source.duration)}</span>`;
+      el<HTMLInputElement>('len').value = String(Math.min(4, Math.max(0.5, Math.floor(source.duration * 2) / 2)));
+    } catch (error) {
+      toolFailed('open', error, chosen);
+      status(error instanceof Error ? error.message : 'Could not read that file.', 1, true);
+    }
+  }
+
+  el<HTMLButtonElement>('run').addEventListener('click', async () => {
+    if (!file || !source || busy) return;
+    const start = Math.max(0, Math.min(Number(el<HTMLInputElement>('start').value) || 0, source.duration - 0.1));
+    let len = Number(el<HTMLInputElement>('len').value) || 4;
+    if (len > 15) { len = 15; el<HTMLInputElement>('len').value = '15'; }
+    len = Math.min(len, source.duration - start);
+    const fps = Number(el<HTMLSelectElement>('fps').value);
+    const width = Math.min(Number(el<HTMLSelectElement>('width').value), source.width);
+    // frameAt scales the LONG edge; for a portrait clip that is the height.
+    const longEdge = source.height > source.width ? Math.round((width * source.height) / source.width) : width;
+    const count = Math.max(1, Math.round(len * fps));
+    const delay = Math.round(1000 / fps);
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    try {
+      const gif = GIFEncoder();
+      for (let i = 0; i < count; i++) {
+        const frame = await source.frameAt(start + i / fps, longEdge);
+        const rgba = new Uint8Array(frame.width * frame.height * 4);
+        for (let p = 0, q = 0; p < frame.rgb24.length; p += 3, q += 4) {
+          rgba[q] = frame.rgb24[p];
+          rgba[q + 1] = frame.rgb24[p + 1];
+          rgba[q + 2] = frame.rgb24[p + 2];
+          rgba[q + 3] = 255;
+        }
+        const palette = quantize(rgba, 256);
+        gif.writeFrame(applyPalette(rgba, palette), frame.width, frame.height, { palette, delay });
+        status(fill(say.working, { n: Math.round(((i + 1) / count) * 100) }), (i + 1) / count);
+      }
+      gif.finish();
+      const blob = new Blob([gif.bytes() as BlobPart], { type: 'image/gif' });
+      const out = el<HTMLImageElement>('out');
+      out.src = URL.createObjectURL(blob);
+      out.hidden = false;
+      saveBlob(blob, `${file.name.replace(/\.[^.]+$/, '') || 'video'}.gif`);
+      track('result_saved', { placement: 'result', format: 'gif', fps: String(fps) }, { size_mb: Math.round(blob.size / 104_857.6) / 10 });
+      status(w.saved.replace('{size}', formatBytes(blob.size)).replace('{n}', String(count)), 1);
+    } catch (error) {
+      toolFailed('run', error, file);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  fileInput.addEventListener('change', () => { const f = fileInput.files?.[0]; if (f) { fileChosen(f, 'picker'); void open(f); } });
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => { const f = (e as DragEvent).dataTransfer?.files?.[0]; if (f) { fileChosen(f, 'drop'); void open(f); } });
+</script>

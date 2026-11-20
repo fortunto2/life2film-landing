@@ -248,4 +248,64 @@ Requirements:
 Reference implementation: https://life2film.com/tools/crop-video/`,
     agentJob: 'Cropping a video to a shape, locally',
   },
+  {
+    // 20 Nov 2026: «video to gif» — one of the most searched single jobs, and gifenc is 9 KB.
+    slug: 'video-to-gif',
+    group: 'everyday',
+    name: 'Video to GIF',
+    appName: 'Video to GIF Converter',
+    blurb: 'Turn a few seconds of a video into a GIF: pick the start, length, frame rate and width.',
+
+    searchPhrase: 'Video to GIF Online',
+    title: 'Video to GIF Online Free | MP4 to GIF, no upload, no watermark',
+    description: 'Convert a video to a GIF online and free: choose the start, length, frames per second and width. MP4, MOV and WebM. Made in your browser, so nothing is uploaded and there is no watermark.',
+    heading: 'Video',
+    accent: 'to GIF',
+    lede: 'Pick a moment and make it a GIF. The video stays on your device.',
+    featureList: [
+      'MP4, MOV and WebM to GIF',
+      'Start, length up to 15 s, 10–20 fps, 320–640 px wide',
+      'A palette per frame, so colour holds up',
+      'Runs fully client-side: no upload, no watermark',
+    ],
+    faq: [
+      {
+        q: 'How do I make a GIF smaller?',
+        a: 'Shorter, narrower and fewer frames per second, in that order. A 4-second GIF at 480 px and 15 fps is usually 2–6 MB; at 320 px and 10 fps it is a third of that. GIF has no real compression for video, so a long GIF is always large.',
+      },
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. Your browser reads the frames and writes the GIF itself; nothing leaves your device.',
+      },
+      {
+        q: 'Why is the GIF limited to 15 seconds?',
+        a: 'Because past that the file stops being shareable: most chats and sites cap GIFs at 10–25 MB. For anything longer, a short MP4 plays everywhere a GIF does and is ten times smaller.',
+      },
+    ],
+
+    summary: 'Convert part of a video to an animated GIF in the browser, with start, length, fps and width.',
+    facts: [
+      'GIF is 256 colours per frame; quantizing each frame separately keeps colour far better than one palette for the clip.',
+      'GIF size grows with width × height × fps × seconds; halving the width cuts it by about four.',
+    ],
+    code: `import { GIFEncoder, quantize, applyPalette } from 'gifenc';
+
+const gif = GIFEncoder();
+for (const rgba of frames) { // Uint8Array RGBA, one per frame
+  const palette = quantize(rgba, 256);
+  gif.writeFrame(applyPalette(rgba, palette), width, height, { palette, delay: 66 });
+}
+gif.finish();
+const blob = new Blob([gif.bytes()], { type: 'image/gif' });`,
+    prompt: `Add "video to GIF" to my project, running entirely in the browser.
+
+Requirements:
+- Read frames at the chosen fps from a <video> or WebCodecs, scaled to the chosen width.
+- Encode with "gifenc": quantize each frame to its own 256-colour palette.
+- Cap the length (15 s) and say why: GIFs past ~20 MB cannot be shared.
+- Show the GIF on the page and save it.
+
+Reference implementation: https://life2film.com/tools/video-to-gif/`,
+    agentJob: 'Making a GIF from a video, locally',
+  },
 ];
