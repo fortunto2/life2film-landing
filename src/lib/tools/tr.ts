@@ -771,6 +771,32 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'remove-background-noise': {
+    searchPhrase: 'Sesten arka plan gürültüsünü kaldır online',
+    title: 'Ses ve Videodan Arka Plan Gürültüsünü Kaldır Online Ücretsiz — yükleme yok',
+    description:
+      'Bir ses kaydından veya videodan arka plan gürültüsünü online ve ücretsiz kaldırın: fan, uğultu, rüzgâr ve trafik, tarayıcıda çalışan ses için bir sinir ağı olan RNNoise ile konuşmadan temizlenir. Video görüntüsü korunur; hiçbir şey yüklenmez.',
+    heading: 'Arka plan',
+    accent: 'gürültüsünü kaldır',
+    lede: 'Konuşmadaki gürültüyü temizleyin. Dosya cihazınızda kalır.',
+    blurb: 'Konuşmadan fan uğultusunu, rüzgârı ve oda gürültüsünü kaldırın.',
+    featureList: [
+      'RNNoise (Xiph), ses için sinirsel gürültü bastırıcı',
+      'Video ve kayıtlarla çalışır',
+      'Güç ayarı',
+      'Hiçbir şey yüklenmez',
+    ],
+    faq: [
+      {
+        q: 'Hangi gürültüyü kaldırır?',
+        a: 'Sesin etrafındaki sabit gürültü: fan, klima, uğultu, rüzgâr, trafik. Müzik için değildir.',
+      },
+      {
+        q: 'Dosyam yükleniyor mu?',
+        a: 'Hayır. Ağ tarayıcıda WebAssembly ile çalışır.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',

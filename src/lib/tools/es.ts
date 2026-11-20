@@ -774,6 +774,32 @@ export const es: ToolTranslations = {
       },
     ],
   },
+  'remove-background-noise': {
+    searchPhrase: 'Quitar ruido de fondo del audio online',
+    title: 'Quitar ruido de fondo de audio y video online gratis — sin subir',
+    description:
+      'Quita el ruido de fondo de una grabación de voz o un video online y gratis: ventilador, zumbido, viento y tráfico se limpian de la voz con RNNoise, una red neuronal para voz que funciona en tu navegador. El video conserva la imagen; nada se sube.',
+    heading: 'Quitar el ruido',
+    accent: 'de fondo',
+    lede: 'Limpia el ruido de la voz. El archivo se queda en tu dispositivo.',
+    blurb: 'Quita zumbidos, viento y ruido de sala de la voz.',
+    featureList: [
+      'RNNoise (Xiph), supresor de ruido neuronal para voz',
+      'Funciona con videos y grabaciones',
+      'Control de intensidad',
+      'Nada se sube',
+    ],
+    faq: [
+      {
+        q: '¿Qué ruido quita?',
+        a: 'Ruido constante alrededor de la voz: ventiladores, aire acondicionado, zumbido, viento, tráfico. No es para música.',
+      },
+      {
+        q: '¿Se sube mi archivo?',
+        a: 'No. La red funciona en tu navegador con WebAssembly.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Convertidor de vídeo online',
     title: 'Convertidor de Vídeo Online Gratis — MP4, WebM, MOV sin subir nada',

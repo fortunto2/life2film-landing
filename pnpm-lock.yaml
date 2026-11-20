@@ -23,6 +23,9 @@ importers:
       '@rive-app/canvas-lite':
         specifier: 2.45.0
         version: 2.45.0
+      '@shiguredo/rnnoise-wasm':
+        specifier: 2025.1.5
+        version: 2025.1.5
       astro:
         specifier: ^6.4.8
         version: 6.4.8(@types/node@24.13.3)(rollup@4.62.3)(yaml@2.9.0)
@@ -933,6 +936,10 @@ packages:
     resolution: {integrity: sha512-MOG/3gTOn4Fwf574RVOaY61I5o6P90legkFADiTyn1hyjNydT+cerU2rLUwPdZkKKyJ+iT+K9p7WXK4LM1Ka6g==}
     cpu: [x64]
     os: [win32]
+
+  '@shiguredo/rnnoise-wasm@2025.1.5':
+    resolution: {integrity: sha512-9YJxzzHftlW936E5z9aEKK2CrPfUgc3HgZ2keyQ5e2Pb5bx+6tykYQ2Gyudvxd7Sxmlnar7SemDMFfx0OuVuGA==}
+    engines: {node: '>=20', pnpm: '>=10'}
 
   '@shikijs/core@4.6.0':
     resolution: {integrity: sha512-bfd4OKgvoyXYiYmMRuleA656P4V7M/Du9lcTl38Ngm6KszMj7bq4J1IGZwSYR4c95Tv5UQALtYNWUwaI9UT3xw==}
@@ -3084,6 +3091,8 @@ snapshots:
 
   '@rollup/rollup-win32-x64-msvc@4.62.3':
     optional: true
+
+  '@shiguredo/rnnoise-wasm@2025.1.5': {}
 
   '@shikijs/core@4.6.0':
     dependencies:

@@ -278,4 +278,44 @@ export const TEXT_TOOLS: Tool[] = [
     facts: ['A sped up edit at 1.25× raises the pitch by 12·log2(1.25) ≈ 3.9 semitones.'],
     agentJob: 'Making sped up or slowed versions of a song, locally',
   },
+  {
+    // 20 Nov 2026: «убрать шум из аудио онлайн», «remove background noise from audio» — RNNoise in WASM.
+    slug: 'remove-background-noise',
+    group: 'audio',
+    name: 'Remove Background Noise',
+    appName: 'Remove Noise',
+    blurb: 'Clean fan hum, wind and room noise out of speech, in a video or a recording.',
+
+    searchPhrase: 'Remove Background Noise from Audio Online',
+    title: 'Remove Background Noise from Audio & Video Online Free | no upload',
+    description: 'Remove background noise from a voice recording or a video online for free: fan, hum, wind, traffic and room tone are cleaned out of speech by RNNoise, a neural network for voice, running in your browser. Video keeps its picture; nothing is uploaded.',
+    heading: 'Remove background',
+    accent: 'noise',
+    lede: 'Clean the noise out of speech. The file stays on your device.',
+    featureList: [
+      'RNNoise (Xiph), a neural noise suppressor built for voice',
+      'Works on videos (picture copied, sound replaced) and recordings',
+      'Strength slider to keep a little room sound',
+      'Before / after players for audio',
+      'Nothing is uploaded',
+    ],
+    faq: [
+      {
+        q: 'What noise does it remove?',
+        a: 'Steady and semi-steady noise around a voice: fans, air conditioning, hum, wind, traffic, keyboard, room tone. It is not a vocal remover and not for music: on a song it thins the instruments.',
+      },
+      {
+        q: 'Will my voice sound different?',
+        a: 'At full strength a little drier, because the room around it goes too. Lower the strength to 60–80% to keep some of it.',
+      },
+      {
+        q: 'Is my file uploaded?',
+        a: 'No. The network runs in your browser through WebAssembly; the file never leaves your device.',
+      },
+    ],
+
+    summary: 'Denoise speech in audio or video with RNNoise (WASM) in the browser; video picture copied.',
+    facts: ['RNNoise answers two 480-sample frames late at 48 kHz (20 ms); mixing dry and clean without compensating comb-filters the voice.'],
+    agentJob: 'Removing background noise from speech, locally',
+  },
 ];

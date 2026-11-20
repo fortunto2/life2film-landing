@@ -771,6 +771,32 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'remove-background-noise': {
+    searchPhrase: 'Hapus bising latar dari audio online',
+    title: 'Hapus Bising Latar dari Audio & Video Online Gratis — tanpa unggah',
+    description:
+      'Hapus bising latar dari rekaman suara atau video secara online dan gratis: kipas, dengung, angin dan lalu lintas dibersihkan dari ucapan oleh RNNoise, jaringan saraf untuk suara yang berjalan di browser. Gambar video tetap; tidak ada yang diunggah.',
+    heading: 'Hapus bising',
+    accent: 'latar',
+    lede: 'Bersihkan bising dari ucapan. File tetap di perangkat Anda.',
+    blurb: 'Hapus dengung kipas, angin dan bising ruangan dari ucapan.',
+    featureList: [
+      'RNNoise (Xiph), peredam bising neural untuk suara',
+      'Untuk video dan rekaman',
+      'Pengatur kekuatan',
+      'Tidak ada yang diunggah',
+    ],
+    faq: [
+      {
+        q: 'Bising apa yang dihapus?',
+        a: 'Bising tetap di sekitar suara: kipas, AC, dengung, angin, lalu lintas. Bukan untuk musik.',
+      },
+      {
+        q: 'Apakah file saya diunggah?',
+        a: 'Tidak. Jaringan berjalan di browser lewat WebAssembly.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',

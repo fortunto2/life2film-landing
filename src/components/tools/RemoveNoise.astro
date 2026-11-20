@@ -1,0 +1,107 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { strength: 'Strength', format: 'Audio saved as', run: 'Remove noise', working: 'Cleaning…', saved: 'Saved — {size}, {len}.', novoice: 'Saved — {size}. Very little speech was heard: RNNoise is made for voices, music may come out thin.', failed: 'Could not clean — {msg}', before: 'Before', after: 'After' },
+  ru: { strength: 'Сила', format: 'Звук сохранить как', run: 'Убрать шум', working: 'Очищаем…', saved: 'Сохранено — {size}, {len}.', novoice: 'Сохранено — {size}. Речи почти не слышно: RNNoise сделан для голоса, музыка может стать тоньше.', failed: 'Не удалось очистить — {msg}', before: 'До', after: 'После' },
+  es: { strength: 'Intensidad', format: 'Audio como', run: 'Quitar ruido', working: 'Limpiando…', saved: 'Guardado — {size}, {len}.', novoice: 'Guardado — {size}. Se oyó muy poca voz: RNNoise está hecho para voces, la música puede quedar débil.', failed: 'No se pudo limpiar — {msg}', before: 'Antes', after: 'Después' },
+  pt: { strength: 'Intensidade', format: 'Áudio como', run: 'Remover ruído', working: 'Limpando…', saved: 'Salvo — {size}, {len}.', novoice: 'Salvo — {size}. Pouca fala foi ouvida: o RNNoise é feito para vozes, música pode ficar fraca.', failed: 'Não foi possível limpar — {msg}', before: 'Antes', after: 'Depois' },
+  id: { strength: 'Kekuatan', format: 'Audio sebagai', run: 'Hapus bising', working: 'Membersihkan…', saved: 'Tersimpan — {size}, {len}.', novoice: 'Tersimpan — {size}. Hampir tidak ada ucapan: RNNoise dibuat untuk suara, musik bisa menipis.', failed: 'Gagal membersihkan — {msg}', before: 'Sebelum', after: 'Sesudah' },
+  tr: { strength: 'Güç', format: 'Ses biçimi', run: 'Gürültüyü temizle', working: 'Temizleniyor…', saved: 'Kaydedildi — {size}, {len}.', novoice: 'Kaydedildi — {size}. Çok az konuşma duyuldu: RNNoise ses için yapıldı, müzik incelebilir.', failed: 'Temizlenemedi — {msg}', before: 'Önce', after: 'Sonra' },
+  ar: { strength: 'القوة', format: 'احفظ الصوت بصيغة', run: 'أزل الضوضاء', working: 'جارٍ التنظيف…', saved: 'تم الحفظ — {size}، {len}.', novoice: 'تم الحفظ — {size}. سُمع كلام قليل جدًا: صُمّم RNNoise للأصوات، وقد تضعف الموسيقى.', failed: 'تعذّر التنظيف — {msg}', before: 'قبل', after: 'بعد' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="audio/*,video/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP4, MOV, MP3, M4A, WAV</span>
+  </label>
+  <div class="controls">
+    <label class="control grow"><span class="muted">{words.strength}: <b id="sv">100%</b></span>
+      <input type="range" id="strength" min="0.3" max="1" step="0.05" value="1" /></label>
+    <label class="control"><span class="muted">{words.format}</span>
+      <select id="format"><option value="mp3" selected>MP3</option><option value="wav">WAV</option></select></label>
+    <span class="spacer"></span>
+    <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+  </div>
+  <div id="compare" class="compare" hidden>
+    <label><span class="muted">{words.before}</span><audio id="before" controls></audio></label>
+    <label><span class="muted">{words.after}</span><audio id="after" controls></audio></label>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<style>
+  .grow { flex: 1 1 240px; }
+  .grow input { width: 100%; }
+  .compare { display: grid; gap: 8px; margin-top: 8px; }
+  .compare label { display: grid; gap: 4px; }
+  .compare audio { width: 100%; }
+</style>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { saveBlob, formatBytes, preciseClock } from '../../lib/encode';
+  import { denoise } from '../../lib/denoise';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  const strength = el<HTMLInputElement>('strength');
+  let file: File | null = null;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+  strength.addEventListener('input', () => { el('sv').textContent = `${Math.round(Number(strength.value) * 100)}%`; });
+
+  el('run').addEventListener('click', async () => {
+    if (!file || busy) return;
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    status(w.working, 0.02);
+    try {
+      const r = await denoise(file, { strength: Number(strength.value), format: el<HTMLSelectElement>('format').value as 'mp3' | 'wav', onProgress: (f) => status(w.working, f) });
+      if (!r.extension.startsWith('mp4') && !r.extension.startsWith('webm')) {
+        el<HTMLAudioElement>('before').src = URL.createObjectURL(file);
+        el<HTMLAudioElement>('after').src = URL.createObjectURL(r.blob);
+        el('compare').hidden = false;
+      }
+      saveBlob(r.blob, `${file.name.replace(/\.[^.]+$/, '')}-clean.${r.extension}`);
+      track('result_saved', { placement: 'result', format: r.extension }, { seconds: Math.round(r.duration), voice: Math.round(r.voice * 100) / 100 });
+      const msg = r.voice < 0.15 ? w.novoice : w.saved;
+      status(msg.replace('{size}', formatBytes(r.blob.size)).replace('{len}', preciseClock(r.duration)), 1);
+    } catch (error) {
+      toolFailed('run', error, file);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  const take = (f: File | undefined, how: 'picker' | 'drop') => { if (!f) return; file = f; fileChosen(f, how); status(f.name); };
+  el<HTMLInputElement>('file').addEventListener('change', (e) => take((e.target as HTMLInputElement).files?.[0], 'picker'));
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => take((e as DragEvent).dataTransfer?.files?.[0], 'drop'));
+</script>
