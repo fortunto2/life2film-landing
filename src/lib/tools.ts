@@ -300,6 +300,12 @@ Reference implementation: https://life2film.com/tools/video-compressor/`,
     'Runs fully client-side: no upload, no watermark',
   ],
     faq: [
+      {
+        // 20 Nov 2026: Bing shows this page for «تحويل فيديو يوتيوب الى mp3» (YouTube to MP3, the top
+        // queries); say plainly what it does with a link before people bounce.
+        q: 'Can I convert a YouTube video to MP3 here?',
+        a: "Not from a link: this tool takes the video file itself, because everything runs in your browser with no upload. If the video is yours, download it from YouTube Studio (Content → Download) and drop the file here. Downloading other people's videos is against YouTube's terms.",
+      },
   {
     q: 'Is my video uploaded?',
     a: 'No. The browser decodes the file and encodes the audio locally, so nothing is sent anywhere. That matters more here than for most conversions: the reason to pull audio out of a video is often that the video is personal (a lecture, an interview, a recording of your own) and it has no business on someone else\'s server to answer a question your laptop can answer.',
