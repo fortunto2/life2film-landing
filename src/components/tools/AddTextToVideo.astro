@@ -1,0 +1,122 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { video: 'Video', text: 'Text', ph: 'Your caption', size: 'Text size', s: 'small', m: 'medium', l: 'large', pos: 'Position', bottom: 'bottom', top: 'top', run: 'Add text', saved: 'Saved — {size}.', failed: 'Could not add the text — {msg}', need: 'Choose a video and type the text.' },
+  ru: { video: 'Видео', text: 'Текст', ph: 'Ваша надпись', size: 'Размер текста', s: 'мелкий', m: 'средний', l: 'крупный', pos: 'Где', bottom: 'внизу', top: 'вверху', run: 'Добавить текст', saved: 'Сохранено — {size}.', failed: 'Не удалось добавить текст — {msg}', need: 'Выберите видео и введите текст.' },
+  es: { video: 'Video', text: 'Texto', ph: 'Tu texto', size: 'Tamaño', s: 'pequeño', m: 'mediano', l: 'grande', pos: 'Posición', bottom: 'abajo', top: 'arriba', run: 'Añadir texto', saved: 'Guardado — {size}.', failed: 'No se pudo añadir el texto — {msg}', need: 'Elige un video y escribe el texto.' },
+  pt: { video: 'Vídeo', text: 'Texto', ph: 'Seu texto', size: 'Tamanho', s: 'pequeno', m: 'médio', l: 'grande', pos: 'Posição', bottom: 'embaixo', top: 'em cima', run: 'Adicionar texto', saved: 'Salvo — {size}.', failed: 'Não foi possível adicionar o texto — {msg}', need: 'Escolha um vídeo e digite o texto.' },
+  id: { video: 'Video', text: 'Teks', ph: 'Teks Anda', size: 'Ukuran teks', s: 'kecil', m: 'sedang', l: 'besar', pos: 'Posisi', bottom: 'bawah', top: 'atas', run: 'Tambah teks', saved: 'Tersimpan — {size}.', failed: 'Gagal menambah teks — {msg}', need: 'Pilih video dan ketik teksnya.' },
+  tr: { video: 'Video', text: 'Metin', ph: 'Yazınız', size: 'Yazı boyutu', s: 'küçük', m: 'orta', l: 'büyük', pos: 'Konum', bottom: 'alt', top: 'üst', run: 'Metin ekle', saved: 'Kaydedildi — {size}.', failed: 'Metin eklenemedi — {msg}', need: 'Bir video seçin ve metni yazın.' },
+  ar: { video: 'الفيديو', text: 'النص', ph: 'نصك', size: 'حجم النص', s: 'صغير', m: 'متوسط', l: 'كبير', pos: 'الموضع', bottom: 'أسفل', top: 'أعلى', run: 'أضف النص', saved: 'تم الحفظ — {size}.', failed: 'تعذّر إضافة النص — {msg}', need: 'اختر فيديو واكتب النص.' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="video/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP4, MOV, WebM</span>
+  </label>
+  <div class="facts" id="facts"></div>
+  <div class="controls">
+    <label class="control grow"><span class="muted">{words.text}</span><input type="text" id="caption" placeholder={words.ph} maxlength="200" /></label>
+    <label class="control"><span class="muted">{words.size}</span>
+      <select id="size"><option value="s">{words.s}</option><option value="m" selected>{words.m}</option><option value="l">{words.l}</option></select></label>
+    <label class="control"><span class="muted">{words.pos}</span>
+      <select id="pos"><option value="bottom" selected>{words.bottom}</option><option value="top">{words.top}</option></select></label>
+    <span class="spacer"></span>
+    <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<style>
+  label.ghost { cursor: pointer; }
+  .grow { flex: 1 1 260px; }
+  .grow input { width: 100%; }
+  .facts { display: flex; gap: 16px; flex-wrap: wrap; margin: 10px 0; }
+</style>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { toolStrings, fill } from '../../lib/strings';
+  import { saveBlob, formatBytes } from '../../lib/encode';
+  import { burnSubtitles } from '../../lib/subtitles';
+  import { probe } from '../../lib/encode';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const say = toolStrings();
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  let video: File | null = null;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  function facts() {
+    const parts: string[] = [];
+    if (video) parts.push(`${w.video}: ${video.name}`);
+    el('facts').replaceChildren(...parts.map((t) => { const s = document.createElement('span'); s.textContent = t; return s; }));
+  }
+
+  async function take(list: FileList | null | undefined, how: 'picker' | 'drop') {
+    for (const f of [...(list ?? [])]) {
+      if (f.type.startsWith('video/') || /\.(mp4|mov|webm|mkv|m4v)$/i.test(f.name)) {
+        video = f;
+        fileChosen(f, how);
+      }
+    }
+    statusEl.hidden = true;
+    facts();
+  }
+
+  el<HTMLButtonElement>('run').addEventListener('click', async () => {
+    if (busy) return;
+    const text = el<HTMLInputElement>('caption').value.trim();
+    if (!video || !text) { status(w.need, 1, true); return; }
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    try {
+      status(fill(say.working, { n: 0 }), 0);
+      const { duration } = await probe(video);
+      const result = await burnSubtitles(video, [{ start: 0, end: duration + 1, text }], {
+        size: el<HTMLSelectElement>('size').value as 's' | 'm' | 'l',
+        position: el<HTMLSelectElement>('pos').value as 'bottom' | 'top',
+        onProgress: (p) => status(fill(say.working, { n: Math.round(p * 100) }), p),
+      });
+      saveBlob(result.blob, `${video.name.replace(/\.[^.]+$/, '') || 'video'}-text.mp4`);
+      track('result_saved', { placement: 'result', format: 'mp4' }, { size_mb: Math.round(result.blob.size / 104_857.6) / 10 });
+      status(w.saved.replace('{size}', formatBytes(result.blob.size)), 1);
+    } catch (error) {
+      toolFailed('run', error, video);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  el<HTMLInputElement>('file').addEventListener('change', (e) => void take((e.target as HTMLInputElement).files, 'picker'));
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => void take((e as DragEvent).dataTransfer?.files, 'drop'));
+</script>

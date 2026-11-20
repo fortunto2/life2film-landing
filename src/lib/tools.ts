@@ -11,6 +11,7 @@
  */
 
 import { EDIT_TOOLS } from './tool-edits';
+import { TEXT_TOOLS } from './tool-text';
 
 export interface FaqEntry {
   q: string;
@@ -455,6 +456,7 @@ Reference implementation: https://life2film.com/tools/video-converter/`,
     agentJob: 'Converting video between formats in the browser',
   },
   ...EDIT_TOOLS,
+  ...TEXT_TOOLS,
   {
     slug: 'video-to-frames',
     group: 'everyday',

@@ -627,6 +627,28 @@ export const pt: ToolTranslations = {
       },
     ],
   },
+  'add-text-to-video': {
+    searchPhrase: 'Colocar texto em vídeo online',
+    title: 'Colocar texto em vídeo online grátis — legenda fixa, sem upload',
+    description:
+      'Coloque texto num vídeo online e grátis: escreva a frase, escolha tamanho e em cima ou embaixo, e receba um MP4 com o texto na imagem, branco com contorno escuro. No navegador, sem upload.',
+    heading: 'Colocar texto no',
+    accent: 'vídeo',
+    lede: 'Escreva uma frase e ela aparece na imagem. O vídeo fica no seu aparelho.',
+    blurb: 'Uma frase no vídeo, em cima ou embaixo, legível em qualquer fundo.',
+    featureList: [
+      'Uma frase para o vídeo todo, até 200 caracteres',
+      'Branco com contorno escuro, legível em qualquer fundo',
+      'Três tamanhos, em cima ou embaixo',
+      'Tudo no navegador: sem upload',
+    ],
+    faq: [
+      {
+        q: 'Meu vídeo é enviado?',
+        a: 'Não. O navegador desenha cada quadro e codifica o resultado.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Conversor de vídeo online',
     title: 'Conversor de Vídeo Online Grátis — MP4, WebM, MOV sem enviar nada',

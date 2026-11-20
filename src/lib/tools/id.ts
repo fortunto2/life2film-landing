@@ -623,6 +623,28 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'add-text-to-video': {
+    searchPhrase: 'Tambah teks ke video online',
+    title: 'Tambah Teks ke Video Online Gratis — tulisan di video, tanpa unggah',
+    description:
+      'Tambahkan teks ke video secara online dan gratis: ketik tulisan, pilih ukuran dan atas atau bawah, dapatkan MP4 dengan teks di gambar, putih bergaris tepi gelap. Di browser, tanpa unggah.',
+    heading: 'Tambah teks ke',
+    accent: 'video',
+    lede: 'Ketik tulisan dan ia muncul di gambar. Video tetap di perangkat Anda.',
+    blurb: 'Tulisan di video, atas atau bawah, terbaca di latar apa pun.',
+    featureList: [
+      'Satu tulisan untuk seluruh video, hingga 200 karakter',
+      'Putih bergaris tepi gelap, terbaca di latar apa pun',
+      'Tiga ukuran, atas atau bawah',
+      'Semua di browser: tanpa unggah',
+    ],
+    faq: [
+      {
+        q: 'Apakah video saya diunggah?',
+        a: 'Tidak. Browser menggambar setiap frame dan meng-encode hasilnya.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',

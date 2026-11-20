@@ -626,6 +626,28 @@ export const es: ToolTranslations = {
       },
     ],
   },
+  'add-text-to-video': {
+    searchPhrase: 'Añadir texto a un video online',
+    title: 'Añadir texto a un video online gratis — rótulo, sin subir',
+    description:
+      'Añade texto a un video online gratis: escribe el rótulo, elige tamaño y arriba o abajo, y obtén un MP4 con el texto en la imagen, blanco con borde oscuro. En tu navegador, sin subir nada.',
+    heading: 'Añadir texto al',
+    accent: 'video',
+    lede: 'Escribe un rótulo y aparecerá en la imagen. El video se queda en tu dispositivo.',
+    blurb: 'Un rótulo en el video, arriba o abajo, legible sobre cualquier fondo.',
+    featureList: [
+      'Un rótulo para todo el video, hasta 200 caracteres',
+      'Blanco con borde oscuro, legible en cualquier fondo',
+      'Tres tamaños, arriba o abajo',
+      'Todo en el navegador: sin subidas',
+    ],
+    faq: [
+      {
+        q: '¿Se sube mi video?',
+        a: 'No. Tu navegador dibuja cada fotograma y codifica el resultado.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Convertidor de vídeo online',
     title: 'Convertidor de Vídeo Online Gratis — MP4, WebM, MOV sin subir nada',

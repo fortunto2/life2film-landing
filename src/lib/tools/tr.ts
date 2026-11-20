@@ -623,6 +623,28 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'add-text-to-video': {
+    searchPhrase: 'Videoya yazı ekleme online',
+    title: 'Videoya Yazı Ekle Online Ücretsiz — yükleme yok',
+    description:
+      'Videoya online ve ücretsiz yazı ekleyin: metni yazın, boyutu ve üst ya da alt konumu seçin, metni görüntüde olan bir MP4 alın; koyu kenarlı beyaz. Tarayıcıda, yükleme yok.',
+    heading: 'Videoya',
+    accent: 'yazı ekle',
+    lede: 'Bir yazı girin, görüntüde belirsin. Video cihazınızda kalır.',
+    blurb: 'Videoya üstte ya da altta, her zeminde okunan bir yazı.',
+    featureList: [
+      'Tüm video için tek yazı, 200 karaktere kadar',
+      'Koyu kenarlı beyaz, her zeminde okunur',
+      'Üç boyut, üst veya alt',
+      'Her şey tarayıcıda: yükleme yok',
+    ],
+    faq: [
+      {
+        q: 'Videom yükleniyor mu?',
+        a: 'Hayır. Tarayıcınız her kareyi çizer ve sonucu kodlar.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',
