@@ -358,4 +358,40 @@ export const TEXT_TOOLS: Tool[] = [
     facts: ['YouTube accepts only video uploads; a still image with the sound is the usual way to post audio there.'],
     agentJob: 'Turning audio into a video for YouTube, locally',
   },
+  {
+    // 20 Nov 2026: «make video vertical without cropping», «вертикальное видео с размытым фоном».
+    slug: 'blur-background-video',
+    group: 'everyday',
+    name: 'Blurred Background Video',
+    appName: 'Blur Fill',
+    blurb: 'Make a horizontal video vertical (or square) without cutting it: blurred background fills the rest.',
+
+    searchPhrase: 'Make Video Vertical with Blurred Background',
+    title: 'Make a Video Vertical with Blurred Background Online Free | 9:16, no crop',
+    description: 'Turn a horizontal video into 9:16 for Reels, TikTok and Shorts (or 4:5, 1:1) without cropping: the whole frame stays in the middle and a blurred copy of it fills the bands. Online, free, in your browser; nothing is uploaded, no watermark.',
+    heading: 'Vertical video with',
+    accent: 'blurred background',
+    lede: 'Nothing cut off, no black bars. The video stays on your device.',
+    featureList: [
+      '9:16, 4:5, 1:1 or 16:9 output',
+      'The whole frame kept, centred',
+      'Bands filled with a blurred, darkened copy of the same frame',
+      'Sound copied untouched',
+      'Nothing uploaded, no watermark',
+    ],
+    faq: [
+      {
+        q: 'How is this different from cropping?',
+        a: 'Cropping cuts the sides off to fill the frame (Crop Video does that). This keeps everything and fills the empty space with a blur, so nobody at the edge of the shot disappears.',
+      },
+      {
+        q: 'Is the video uploaded?',
+        a: 'No. Your browser draws every frame and encodes the result.',
+      },
+    ],
+
+    summary: 'Fit a video into 9:16/4:5/1:1/16:9 with a blurred copy filling the bands, in the browser.',
+    facts: ['Blurring a 1/8-size copy and scaling it up looks the same as blurring full size and costs about 64x less.'],
+    agentJob: 'Making a video vertical with a blurred background, locally',
+  },
 ];

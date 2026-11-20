@@ -1,0 +1,85 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { shape: 'Make it', run: 'Convert', working: 'Converting… {n}%', saved: 'Saved — {size}.', failed: 'Could not convert — {msg}' },
+  ru: { shape: 'Сделать', run: 'Преобразовать', working: 'Преобразуем… {n}%', saved: 'Сохранено — {size}.', failed: 'Не удалось преобразовать — {msg}' },
+  es: { shape: 'Formato', run: 'Convertir', working: 'Convirtiendo… {n}%', saved: 'Guardado — {size}.', failed: 'No se pudo convertir — {msg}' },
+  pt: { shape: 'Formato', run: 'Converter', working: 'Convertendo… {n}%', saved: 'Salvo — {size}.', failed: 'Não foi possível converter — {msg}' },
+  id: { shape: 'Format', run: 'Ubah', working: 'Mengubah… {n}%', saved: 'Tersimpan — {size}.', failed: 'Gagal mengubah — {msg}' },
+  tr: { shape: 'Biçim', run: 'Dönüştür', working: 'Dönüştürülüyor… %{n}', saved: 'Kaydedildi — {size}.', failed: 'Dönüştürülemedi — {msg}' },
+  ar: { shape: 'الشكل', run: 'حوّل', working: 'جارٍ التحويل… {n}%', saved: 'تم الحفظ — {size}.', failed: 'تعذّر التحويل — {msg}' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="video/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP4, MOV, WebM</span>
+  </label>
+  <div class="controls">
+    <label class="control"><span class="muted">{words.shape}</span>
+      <select id="shape"><option value="9:16" selected>9:16 — Reels, TikTok, Shorts</option><option value="4:5">4:5 — Instagram</option><option value="1:1">1:1</option><option value="16:9">16:9 — YouTube</option></select></label>
+    <span class="spacer"></span>
+    <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { saveBlob, formatBytes } from '../../lib/encode';
+  import { blurFill, type Shape } from '../../lib/blur-fill';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  let file: File | null = null;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  el('run').addEventListener('click', async () => {
+    if (!file || busy) return;
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    const shape = el<HTMLSelectElement>('shape').value as Shape;
+    try {
+      const blob = await blurFill(file, shape, (f) => status(w.working.replace('{n}', String(Math.round(f * 100))), f));
+      saveBlob(blob, `${file.name.replace(/\.[^.]+$/, '')}-${shape.replace(':', 'x')}.mp4`);
+      track('result_saved', { placement: 'result', shape }, { size_mb: Math.round(blob.size / 104_857.6) / 10 });
+      status(w.saved.replace('{size}', formatBytes(blob.size)), 1);
+    } catch (error) {
+      toolFailed('run', error, file);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  const take = (f: File | undefined, how: 'picker' | 'drop') => { if (!f) return; file = f; fileChosen(f, how); status(f.name); };
+  el<HTMLInputElement>('file').addEventListener('change', (e) => take((e.target as HTMLInputElement).files?.[0], 'picker'));
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => take((e as DragEvent).dataTransfer?.files?.[0], 'drop'));
+</script>
