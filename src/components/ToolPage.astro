@@ -189,14 +189,17 @@ const jsonLd = {
         <script is:inline>
           (() => {
             // A computer: no touch and no phone in the user agent. It gets the QR for the iPhone
-            // instead of a button that opens the App Store on the desktop; a Mac also gets Studio.
+            // instead of a button that opens the App Store on the desktop.
             const ua = navigator.userAgent;
             const touch = navigator.maxTouchPoints > 0 || /iPhone|iPad|iPod|Android|Mobile/i.test(ua);
             if (touch) return;
             const mac = /Macintosh/.test(ua);
             for (const n of document.querySelectorAll('[data-offer]')) {
               const o = n.dataset.offer;
-              n.hidden = !(o === 'qr' || (o === 'mac' && mac) || (o === 'phone' && !n.closest('#appAfter')));
+              // One offer per card: after the result the QR alone; the card at the bottom is Studio on a Mac,
+              // the iPhone app elsewhere. Two offers stacked in one card read as a pile.
+              const after = !!n.closest('#appAfter');
+              n.hidden = after ? o !== 'qr' : o !== (mac ? 'mac' : 'phone');
             }
           })();
         </script>
