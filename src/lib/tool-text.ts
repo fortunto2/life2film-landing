@@ -122,4 +122,44 @@ export const TEXT_TOOLS: Tool[] = [
     facts: ['MediaRecorder gives WebM/Opus or MP4/AAC depending on the browser; re-encoding to MP3 makes the file open everywhere.'],
     agentJob: 'Recording a voice memo, locally',
   },
+  {
+    // 20 Nov 2026: «записать видео с веб-камеры онлайн», «webcam recorder» — camera + mic to a file.
+    slug: 'webcam-recorder',
+    group: 'everyday',
+    name: 'Webcam Recorder',
+    appName: 'Webcam Recorder',
+    blurb: 'Record yourself from the webcam with sound and save the video.',
+
+    searchPhrase: 'Online Webcam Recorder',
+    title: 'Online Webcam Recorder Free | record video from your camera, no upload',
+    description: 'Record video from your webcam online for free: turn on the camera, press record, stop, and the browser saves the video with sound (MP4 where the browser can, WebM otherwise). No sign-up, no watermark, no time limit, nothing uploaded.',
+    heading: 'Webcam',
+    accent: 'recorder',
+    lede: 'See yourself, press record, keep the file. Nothing leaves your computer.',
+    featureList: [
+      'Camera and microphone together, 480p, 720p or 1080p',
+      'MP4 in Safari and recent Chrome, WebM elsewhere',
+      'Mirrored preview like a selfie camera; the file is saved unmirrored',
+      'No sign-up, no watermark, no time limit',
+      'Nothing is uploaded',
+    ],
+    faq: [
+      {
+        q: 'Is the video uploaded?',
+        a: 'No. The browser records the camera into memory and saves the file to your downloads.',
+      },
+      {
+        q: 'Why is the text in my video backwards?',
+        a: 'It is not: only the preview is mirrored, like a phone\'s selfie camera. Untick «Mirror the preview» to see what the file looks like.',
+      },
+      {
+        q: 'I got a WebM file. How do I make it MP4?',
+        a: 'Open it in the Video Converter (/tools/video-converter/); it converts in the browser too.',
+      },
+    ],
+
+    summary: 'Record webcam + microphone in the browser and save MP4/WebM, no upload.',
+    facts: ['A mirrored preview is a CSS transform; MediaRecorder records the camera as it is.'],
+    agentJob: 'Recording a webcam video, locally',
+  },
 ];

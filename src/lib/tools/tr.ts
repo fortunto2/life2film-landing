@@ -671,6 +671,28 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'webcam-recorder': {
+    searchPhrase: 'Online webcam kaydedici',
+    title: 'Online Webcam Video Kaydı Ücretsiz — yükleme ve filigran yok',
+    description:
+      'Webcam’den online ve ücretsiz video kaydedin: kamerayı açın, kayda basın, durdurun; tarayıcı videoyu sesle kaydeder (MP4 veya WebM). Kayıt, filigran ve süre sınırı yok; hiçbir şey yüklenmez.',
+    heading: 'Online webcam',
+    accent: 'kaydedici',
+    lede: 'Kendinizi görün, kayda basın, dosyayı alın. Hiçbir şey bilgisayardan çıkmaz.',
+    blurb: 'Webcam’den kendinizi sesli kaydedin ve videoyu saklayın.',
+    featureList: [
+      'Kamera ve mikrofon, 480p, 720p veya 1080p',
+      'Safari ve yeni Chrome’da MP4, diğerlerinde WebM',
+      'Aynalı önizleme; dosya aynasız kaydedilir',
+      'Kayıt yok, filigran yok, yükleme yok',
+    ],
+    faq: [
+      {
+        q: 'Video yükleniyor mu?',
+        a: 'Hayır. Tarayıcı kamerayı belleğe kaydeder ve dosyayı indirilenlere kaydeder.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',

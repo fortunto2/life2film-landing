@@ -674,6 +674,28 @@ export const es: ToolTranslations = {
       },
     ],
   },
+  'webcam-recorder': {
+    searchPhrase: 'Grabar con la webcam online',
+    title: 'Grabar video con la webcam online gratis — sin subir ni marca de agua',
+    description:
+      'Graba video con tu webcam online gratis: enciende la cámara, pulsa grabar, detén y el navegador guarda el video con sonido (MP4 o WebM). Sin registro, marca de agua ni límite; nada se sube.',
+    heading: 'Grabar con la',
+    accent: 'webcam',
+    lede: 'Te ves, pulsas grabar y guardas el archivo. Nada sale de tu equipo.',
+    blurb: 'Grábate con la webcam y guarda el video con sonido.',
+    featureList: [
+      'Cámara y micrófono, 480p, 720p o 1080p',
+      'MP4 en Safari y Chrome reciente, WebM en otros',
+      'Vista previa en espejo; el archivo se guarda sin espejo',
+      'Sin registro, sin marca de agua, sin subidas',
+    ],
+    faq: [
+      {
+        q: '¿Se sube el video?',
+        a: 'No. El navegador graba la cámara en memoria y guarda el archivo en tus descargas.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Convertidor de vídeo online',
     title: 'Convertidor de Vídeo Online Gratis — MP4, WebM, MOV sin subir nada',

@@ -671,6 +671,28 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'webcam-recorder': {
+    searchPhrase: 'Rekam webcam online',
+    title: 'Rekam Video Webcam Online Gratis — tanpa unggah dan watermark',
+    description:
+      'Rekam video dari webcam secara online dan gratis: nyalakan kamera, tekan rekam, berhenti, dan browser menyimpan video bersuara (MP4 atau WebM). Tanpa daftar, watermark, atau batas; tidak ada yang diunggah.',
+    heading: 'Rekam',
+    accent: 'webcam',
+    lede: 'Lihat diri Anda, tekan rekam, simpan filenya. Tidak ada yang keluar dari komputer.',
+    blurb: 'Rekam diri Anda dari webcam dengan suara dan simpan videonya.',
+    featureList: [
+      'Kamera dan mikrofon, 480p, 720p atau 1080p',
+      'MP4 di Safari dan Chrome terbaru, WebM di lainnya',
+      'Pratinjau dicerminkan; file disimpan tanpa cermin',
+      'Tanpa daftar, tanpa watermark, tanpa unggah',
+    ],
+    faq: [
+      {
+        q: 'Apakah video diunggah?',
+        a: 'Tidak. Browser merekam kamera ke memori dan menyimpan file ke unduhan.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',

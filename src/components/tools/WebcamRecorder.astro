@@ -1,0 +1,124 @@
+---
+import { STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { on: 'Turn on the camera', start: 'Start recording', stop: 'Stop and save', mirror: 'Mirror the preview', quality: 'Quality', rec: 'Recording… {t}', saved: 'Saved {t} — {size}.', denied: 'The browser did not get the camera. Allow camera and microphone in the address bar and try again.', unsupported: 'This browser cannot record video. Chrome, Edge, Firefox and Safari can.', failed: 'Could not record — {msg}' },
+  ru: { on: 'Включить камеру', start: 'Начать запись', stop: 'Остановить и сохранить', mirror: 'Зеркалить превью', quality: 'Качество', rec: 'Идёт запись… {t}', saved: 'Сохранено {t} — {size}.', denied: 'Браузер не получил камеру. Разрешите камеру и микрофон в адресной строке и попробуйте ещё раз.', unsupported: 'Этот браузер не умеет записывать видео. Chrome, Edge, Firefox и Safari умеют.', failed: 'Не удалось записать — {msg}' },
+  es: { on: 'Encender la cámara', start: 'Empezar a grabar', stop: 'Detener y guardar', mirror: 'Vista en espejo', quality: 'Calidad', rec: 'Grabando… {t}', saved: 'Guardado {t} — {size}.', denied: 'El navegador no obtuvo la cámara. Permite cámara y micrófono en la barra de direcciones.', unsupported: 'Este navegador no puede grabar video. Chrome, Edge, Firefox y Safari sí.', failed: 'No se pudo grabar — {msg}' },
+  pt: { on: 'Ligar a câmera', start: 'Começar a gravar', stop: 'Parar e salvar', mirror: 'Espelhar a prévia', quality: 'Qualidade', rec: 'Gravando… {t}', saved: 'Salvo {t} — {size}.', denied: 'O navegador não obteve a câmera. Permita câmera e microfone na barra de endereço.', unsupported: 'Este navegador não grava vídeo. Chrome, Edge, Firefox e Safari gravam.', failed: 'Não foi possível gravar — {msg}' },
+  id: { on: 'Nyalakan kamera', start: 'Mulai merekam', stop: 'Berhenti dan simpan', mirror: 'Cerminkan pratinjau', quality: 'Kualitas', rec: 'Merekam… {t}', saved: 'Tersimpan {t} — {size}.', denied: 'Browser tidak mendapat kamera. Izinkan kamera dan mikrofon di bilah alamat.', unsupported: 'Browser ini tidak bisa merekam video. Chrome, Edge, Firefox dan Safari bisa.', failed: 'Gagal merekam — {msg}' },
+  tr: { on: 'Kamerayı aç', start: 'Kaydı başlat', stop: 'Durdur ve kaydet', mirror: 'Önizlemeyi aynala', quality: 'Kalite', rec: 'Kaydediliyor… {t}', saved: 'Kaydedildi {t} — {size}.', denied: 'Tarayıcı kameraya erişemedi. Adres çubuğundan kamera ve mikrofona izin verin.', unsupported: 'Bu tarayıcı video kaydedemiyor. Chrome, Edge, Firefox ve Safari kaydedebilir.', failed: 'Kaydedilemedi — {msg}' },
+  ar: { on: 'شغّل الكاميرا', start: 'ابدأ التسجيل', stop: 'أوقف واحفظ', mirror: 'اعكس المعاينة', quality: 'الجودة', rec: 'جارٍ التسجيل… {t}', saved: 'تم الحفظ {t} — {size}.', denied: 'لم يحصل المتصفح على الكاميرا. اسمح بالكاميرا والميكروفون من شريط العنوان.', unsupported: 'هذا المتصفح لا يسجل الفيديو. Chrome وEdge وFirefox وSafari تسجّل.', failed: 'تعذّر التسجيل — {msg}' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <video id="live" muted playsinline autoplay class="mirrored" hidden></video>
+  <div class="controls">
+    <button id="on" type="button" class="ghost primary">{words.on}</button>
+    <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls" hidden>● {words.start}</button>
+    <button id="stop" type="button" class="ghost" hidden>■ {words.stop}</button>
+    <span class="spacer"></span>
+    <label class="control"><span class="muted">{words.quality}</span>
+      <select id="quality"><option value="720" selected>720p</option><option value="1080">1080p</option><option value="480">480p</option></select></label>
+    <label class="control"><input type="checkbox" id="mirror" checked /> <span class="muted">{words.mirror}</span></label>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<style>
+  #live { width: 100%; max-height: 60vh; background: #000; border-radius: 10px; }
+  #live.mirrored { transform: scaleX(-1); }
+</style>
+
+<script>
+  import { toolFailed, track } from '../../lib/track';
+  import { saveBlob, preciseClock, formatBytes } from '../../lib/encode';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const live = el<HTMLVideoElement>('live');
+  let stream: MediaStream | null = null;
+  let recorder: MediaRecorder | null = null;
+  let started = 0;
+  let timer = 0;
+
+  function status(message: string, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+  }
+
+  function pickType(): { mime: string; ext: 'mp4' | 'webm' } {
+    for (const mime of ['video/mp4;codecs=avc1,mp4a.40.2', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm']) {
+      if (MediaRecorder.isTypeSupported(mime)) return { mime, ext: mime.startsWith('video/mp4') ? 'mp4' : 'webm' };
+    }
+    return { mime: '', ext: 'webm' };
+  }
+
+  async function turnOn() {
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') { status(w.unsupported, true); return; }
+    stream?.getTracks().forEach((t) => t.stop());
+    const h = Number(el<HTMLSelectElement>('quality').value);
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: { height: { ideal: h }, width: { ideal: Math.round((h * 16) / 9) } }, audio: true });
+    } catch {
+      status(w.denied, true);
+      return;
+    }
+    live.srcObject = stream;
+    live.hidden = false;
+    el('on').hidden = true;
+    el('run').hidden = false;
+    statusEl.hidden = true;
+  }
+
+  el('on').addEventListener('click', () => void turnOn());
+  el('quality').addEventListener('change', () => { if (stream && !recorder) void turnOn(); });
+  el<HTMLInputElement>('mirror').addEventListener('change', (e) => live.classList.toggle('mirrored', (e.target as HTMLInputElement).checked));
+
+  el('run').addEventListener('click', () => {
+    if (!stream) return;
+    const { mime, ext } = pickType();
+    const chunks: Blob[] = [];
+    try {
+      recorder = new MediaRecorder(stream, mime ? { mimeType: mime, videoBitsPerSecond: 5_000_000 } : undefined);
+    } catch (error) {
+      toolFailed('run', error);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), true);
+      return;
+    }
+    recorder.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    recorder.onstop = () => {
+      clearInterval(timer);
+      recorder = null;
+      el('run').hidden = false;
+      el('stop').hidden = true;
+      const seconds = (Date.now() - started) / 1000;
+      const blob = new Blob(chunks, { type: mime || 'video/webm' });
+      if (!blob.size) { status(w.failed.replace('{msg}', 'nothing was recorded'), true); return; }
+      const now = new Date();
+      const pad = (n: number) => String(n).padStart(2, '0');
+      saveBlob(blob, `webcam-${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}-${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}.${ext}`);
+      track('result_saved', { placement: 'result', format: ext }, { seconds: Math.round(seconds), size_mb: Math.round(blob.size / 104_857.6) / 10 });
+      status(w.saved.replace('{t}', preciseClock(seconds)).replace('{size}', formatBytes(blob.size)));
+    };
+    started = Date.now();
+    recorder.start(1000);
+    el('run').hidden = true;
+    el('stop').hidden = false;
+    timer = window.setInterval(() => status(w.rec.replace('{t}', preciseClock((Date.now() - started) / 1000))), 250);
+  });
+  el('stop').addEventListener('click', () => recorder?.stop());
+</script>
