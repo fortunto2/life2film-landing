@@ -3,6 +3,7 @@
  * cut to the video's length from a chosen offset, faded out at the end, and encoded to AAC (or
  * whatever audio codec the browser can encode for the container). The video's own sound is dropped.
  */
+import { PieceSink } from './sink';
 import { loadMediabunny } from './encode';
 
 export interface AddMusicOptions {
@@ -24,7 +25,7 @@ export interface AddMusicResult {
 export async function addMusic(video: File, music: File, options: AddMusicOptions): Promise<AddMusicResult> {
   const mb = await loadMediabunny();
   const {
-    Input, BlobSource, ALL_FORMATS, Output, BufferTarget, Mp4OutputFormat, WebMOutputFormat,
+    Input, BlobSource, ALL_FORMATS, Output, StreamTarget, Mp4OutputFormat, WebMOutputFormat,
     EncodedPacketSink, EncodedVideoPacketSource, AudioBufferSink, AudioBufferSource, getFirstEncodableAudioCodec,
   } = mb;
 
@@ -41,7 +42,7 @@ export async function addMusic(video: File, music: File, options: AddMusicOption
   if (!vcodec) throw new Error('The video codec is not one this tool can copy.');
   // VP8 only lives in WebM; everything else goes into MP4, which plays everywhere.
   const webm = vcodec === 'vp8';
-  const format = webm ? new WebMOutputFormat() : new Mp4OutputFormat({ fastStart: 'in-memory' });
+  const format = webm ? new WebMOutputFormat() : new Mp4OutputFormat();
   const acodec = await getFirstEncodableAudioCodec(format.getSupportedAudioCodecs(), {
     numberOfChannels: Math.min(2, atrack.numberOfChannels),
     sampleRate: atrack.sampleRate,
@@ -49,7 +50,9 @@ export async function addMusic(video: File, music: File, options: AddMusicOption
   });
   if (!acodec) throw new Error('This browser cannot encode audio for this file. Chrome or Edge usually can.');
 
-  const output = new Output({ format, target: new BufferTarget() });
+  // Written in pieces, not one ArrayBuffer: Chrome refuses a single buffer past ~2 GB (see sink.ts).
+  const sink = new PieceSink();
+  const output = new Output({ format, target: new StreamTarget(sink.stream(), { chunked: true }) });
   const vsource = new EncodedVideoPacketSource(vcodec);
   output.addVideoTrack(vsource, { rotation: vtrack.rotation });
   const asource = new AudioBufferSource({ codec: acodec, bitrate: 192_000 });
@@ -97,10 +100,9 @@ export async function addMusic(video: File, music: File, options: AddMusicOption
   asource.close();
   await output.finalize();
 
-  const bytes = (output.target as InstanceType<typeof BufferTarget>).buffer;
-  if (!bytes) throw new Error('Nothing was written.');
+  if (!sink.size) throw new Error('Nothing was written.');
   return {
-    blob: new Blob([bytes], { type: webm ? 'video/webm' : 'video/mp4' }),
+    blob: sink.blob(webm ? 'video/webm' : 'video/mp4'),
     extension: webm ? 'webm' : 'mp4',
     covered,
     duration,

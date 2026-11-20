@@ -6,6 +6,7 @@
  * shape differs) and encoded once. Sound is carried at the first clip's sample rate in stereo; a clip
  * without sound contributes silence of its own length, so picture and sound stay together.
  */
+import { PieceSink } from './sink';
 import { loadMediabunny, encodableCodec } from './encode';
 
 export interface MergeResult {
@@ -20,7 +21,7 @@ const even = (n: number) => Math.max(2, Math.round(n / 2) * 2);
 export async function mergeVideos(files: File[], onProgress?: (fraction: number) => void): Promise<MergeResult> {
   const mb = await loadMediabunny();
   const {
-    Input, BlobSource, ALL_FORMATS, Output, BufferTarget, Mp4OutputFormat, CanvasSink, CanvasSource,
+    Input, BlobSource, ALL_FORMATS, Output, StreamTarget, Mp4OutputFormat, CanvasSink, CanvasSource,
     AudioBufferSink, AudioBufferSource, getFirstEncodableAudioCodec, QUALITY_HIGH,
   } = mb;
 
@@ -43,7 +44,7 @@ export async function mergeVideos(files: File[], onProgress?: (fraction: number)
   const width = even(first.displayWidth * scale);
   const height = even(first.displayHeight * scale);
 
-  const format = new Mp4OutputFormat({ fastStart: 'in-memory' });
+  const format = new Mp4OutputFormat();
   const vcodec = await encodableCodec('mp4', { width, height });
   if (!vcodec) throw new Error('This browser cannot encode MP4 video. Chrome or Edge usually can.');
   const rate = clips.find((c) => c.audio)?.audio?.sampleRate ?? 48_000;
@@ -54,7 +55,9 @@ export async function mergeVideos(files: File[], onProgress?: (fraction: number)
   const canvas = new OffscreenCanvas(width, height);
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Canvas is unavailable in this browser.');
-  const output = new Output({ format, target: new BufferTarget() });
+  // Written in pieces, not one ArrayBuffer: Chrome refuses a single buffer past ~2 GB (see sink.ts).
+  const sink = new PieceSink();
+  const output = new Output({ format, target: new StreamTarget(sink.stream(), { chunked: true }) });
   const vsource = new CanvasSource(canvas, { codec: vcodec, bitrate: QUALITY_HIGH, keyFrameInterval: 2 });
   output.addVideoTrack(vsource);
   const asource = acodec ? new AudioBufferSource({ codec: acodec, bitrate: 192_000 }) : null;
@@ -75,8 +78,8 @@ export async function mergeVideos(files: File[], onProgress?: (fraction: number)
   let offset = 0;
   for (const clip of clips) {
     // Picture.
-    const sink = new CanvasSink(clip.video, { width, height, fit: 'contain', poolSize: 2 });
-    for await (const { canvas: frame, timestamp, duration } of sink.canvases(0, clip.duration)) {
+    const frames = new CanvasSink(clip.video, { width, height, fit: 'contain', poolSize: 2 });
+    for await (const { canvas: frame, timestamp, duration } of frames.canvases(0, clip.duration)) {
       ctx.fillStyle = '#000';
       ctx.fillRect(0, 0, width, height);
       ctx.drawImage(frame as CanvasImageSource, 0, 0);
@@ -115,7 +118,6 @@ export async function mergeVideos(files: File[], onProgress?: (fraction: number)
   await output.finalize();
   onProgress?.(1);
 
-  const bytes = (output.target as InstanceType<typeof BufferTarget>).buffer;
-  if (!bytes) throw new Error('Nothing was written.');
-  return { blob: new Blob([bytes], { type: 'video/mp4' }), width, height, duration: total };
+  if (!sink.size) throw new Error('Nothing was written.');
+  return { blob: sink.blob('video/mp4'), width, height, duration: total };
 }

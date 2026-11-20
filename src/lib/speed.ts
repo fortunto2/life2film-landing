@@ -3,6 +3,7 @@
  * nothing is invented or blended; slow motion shows each frame longer. Sound is either dropped or
  * resampled with the picture (pitch moves with speed, like a tape), through OfflineAudioContext.
  */
+import { PieceSink } from './sink';
 import { loadMediabunny, encodableCodec } from './encode';
 
 export interface SpeedResult {
@@ -19,7 +20,7 @@ export async function changeSpeed(
   onProgress?: (fraction: number) => void,
 ): Promise<SpeedResult> {
   const {
-    Input, BlobSource, ALL_FORMATS, Output, BufferTarget, Mp4OutputFormat, CanvasSink, CanvasSource,
+    Input, BlobSource, ALL_FORMATS, Output, StreamTarget, Mp4OutputFormat, CanvasSink, CanvasSource,
     AudioBufferSink, AudioBufferSource, getFirstEncodableAudioCodec, QUALITY_HIGH,
   } = await loadMediabunny();
 
@@ -34,7 +35,7 @@ export async function changeSpeed(
   const scale = Math.min(1, 1920 / Math.max(video.displayWidth, video.displayHeight));
   const width = even(video.displayWidth * scale);
   const height = even(video.displayHeight * scale);
-  const format = new Mp4OutputFormat({ fastStart: 'in-memory' });
+  const format = new Mp4OutputFormat();
   const vcodec = await encodableCodec('mp4', { width, height });
   if (!vcodec) throw new Error('This browser cannot encode MP4 video. Chrome or Edge usually can.');
 
@@ -46,7 +47,9 @@ export async function changeSpeed(
   const canvas = new OffscreenCanvas(width, height);
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Canvas is unavailable in this browser.');
-  const output = new Output({ format, target: new BufferTarget() });
+  // Written in pieces, not one ArrayBuffer: Chrome refuses a single buffer past ~2 GB (see sink.ts).
+  const sink = new PieceSink();
+  const output = new Output({ format, target: new StreamTarget(sink.stream(), { chunked: true }) });
   const vsource = new CanvasSource(canvas, { codec: vcodec, bitrate: QUALITY_HIGH, keyFrameInterval: 2 });
   output.addVideoTrack(vsource);
   const asource = acodec ? new AudioBufferSource({ codec: acodec, bitrate: 192_000 }) : null;
@@ -81,7 +84,6 @@ export async function changeSpeed(
   await output.finalize();
   onProgress?.(1);
 
-  const bytes = (output.target as InstanceType<typeof BufferTarget>).buffer;
-  if (!bytes) throw new Error('Nothing was written.');
-  return { blob: new Blob([bytes], { type: 'video/mp4' }), duration: out };
+  if (!sink.size) throw new Error('Nothing was written.');
+  return { blob: sink.blob('video/mp4'), duration: out };
 }
