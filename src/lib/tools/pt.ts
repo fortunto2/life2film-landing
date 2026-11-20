@@ -213,6 +213,36 @@ export const pt: ToolTranslations = {
       },
     ],
   },
+  'crop-video': {
+    searchPhrase: 'Recortar vídeo online',
+    title: 'Recortar vídeo online grátis — 9:16 para Reels e TikTok, 1:1, 4:5',
+    description:
+      'Recorte um vídeo para 9:16 para Reels, TikTok e Shorts, ou para 1:1, 4:5 ou 16:9, online e grátis. Deslize o quadro para manter o que importa. No navegador, sem upload nem marca d’água.',
+    heading: 'Recortar',
+    accent: 'vídeo',
+    lede: 'Transforme um vídeo horizontal em vertical ou quadrado e escolha qual parte fica. Nada é enviado.',
+    blurb: 'Recorte um vídeo horizontal para 9:16 para Reels, TikTok e Shorts, ou quadrado.',
+    featureList: [
+      'Formatos 9:16, 1:1, 4:5 e 16:9',
+      'Deslize o quadro para manter o assunto em cena',
+      'Mantém a resolução original da área recortada',
+      'Tudo no navegador: sem upload nem marca d’água',
+    ],
+    faq: [
+      {
+        q: 'Como deixar um vídeo horizontal na vertical para Reels ou TikTok?',
+        a: 'Escolha 9:16, deslize o quadro sobre a parte que quer manter e recorte. Você recebe a maior área 9:16 do vídeo no tamanho dela; o Instagram e o TikTok a ampliam para tela cheia.',
+      },
+      {
+        q: 'Perde qualidade?',
+        a: 'Os pixels mantidos não são ampliados, mas recortar sempre recodifica a imagem, o que custa um pouco de qualidade uma vez.',
+      },
+      {
+        q: 'Meu vídeo é enviado?',
+        a: 'Não. O navegador decodifica, recorta e codifica o vídeo com WebCodecs; nada sai do seu aparelho.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Conversor de vídeo online',
     title: 'Conversor de Vídeo Online Grátis — MP4, WebM, MOV sem enviar nada',

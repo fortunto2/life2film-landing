@@ -209,6 +209,36 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'crop-video': {
+    searchPhrase: 'Crop video online',
+    title: 'Crop Video Online Gratis — 9:16 untuk Reels dan TikTok, 1:1, 4:5',
+    description:
+      'Crop video ke 9:16 untuk Reels, TikTok dan Shorts, atau ke 1:1, 4:5 atau 16:9, online dan gratis. Geser bingkai untuk menyimpan bagian penting. Di browser, tanpa unggah dan tanpa watermark.',
+    heading: 'Crop',
+    accent: 'video',
+    lede: 'Ubah klip horizontal menjadi vertikal atau persegi dan pilih bagian yang tersisa. Tidak ada yang diunggah.',
+    blurb: 'Crop video horizontal ke 9:16 untuk Reels, TikTok dan Shorts, atau persegi.',
+    featureList: [
+      'Format 9:16, 1:1, 4:5 dan 16:9',
+      'Geser bingkai agar subjek tetap di dalam',
+      'Resolusi asli area yang di-crop tetap terjaga',
+      'Semua di browser: tanpa unggah dan watermark',
+    ],
+    faq: [
+      {
+        q: 'Bagaimana membuat video horizontal jadi vertikal untuk Reels atau TikTok?',
+        a: 'Pilih 9:16, geser bingkai ke bagian yang ingin disimpan, lalu crop. Hasilnya area 9:16 tertinggi dari video dalam ukurannya sendiri; Instagram dan TikTok memperbesarnya ke layar penuh.',
+      },
+      {
+        q: 'Apakah kualitas turun?',
+        a: 'Piksel yang tersisa tidak diperbesar, tetapi crop selalu meng-encode ulang gambar, yang sedikit mengurangi kualitas sekali.',
+      },
+      {
+        q: 'Apakah video saya diunggah?',
+        a: 'Tidak. Browser mendekode, meng-crop dan meng-encode video lewat WebCodecs; tidak ada yang keluar dari perangkat.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',

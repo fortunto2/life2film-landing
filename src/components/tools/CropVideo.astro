@@ -10,6 +10,11 @@ const status = STATUS[lang];
 const WORDS: Partial<Record<Lang, Record<string, string>>> = {
   en: { run: 'Crop', shape: 'Shape', vertical: '9:16 — Reels, TikTok, Shorts', square: '1:1 — square', portrait: '4:5 — Instagram feed', wide: '16:9 — YouTube', position: 'Position', saved: 'Saved — {size}, {w}×{h}.', failed: 'Could not crop — {msg}', same: 'The video is already this shape.' },
   ru: { run: 'Обрезать', shape: 'Формат', vertical: '9:16 — Reels, TikTok, Shorts', square: '1:1 — квадрат', portrait: '4:5 — лента Instagram', wide: '16:9 — YouTube', position: 'Положение', saved: 'Сохранено — {size}, {w}×{h}.', failed: 'Не удалось обрезать — {msg}', same: 'Видео уже в этом формате.' },
+  es: { run: 'Recortar', shape: 'Formato', vertical: '9:16 — Reels, TikTok, Shorts', square: '1:1 — cuadrado', portrait: '4:5 — feed de Instagram', wide: '16:9 — YouTube', position: 'Posición', saved: 'Guardado — {size}, {w}×{h}.', failed: 'No se pudo recortar — {msg}', same: 'El video ya tiene este formato.' },
+  pt: { run: 'Recortar', shape: 'Formato', vertical: '9:16 — Reels, TikTok, Shorts', square: '1:1 — quadrado', portrait: '4:5 — feed do Instagram', wide: '16:9 — YouTube', position: 'Posição', saved: 'Salvo — {size}, {w}×{h}.', failed: 'Não foi possível recortar — {msg}', same: 'O vídeo já está neste formato.' },
+  id: { run: 'Crop', shape: 'Format', vertical: '9:16 — Reels, TikTok, Shorts', square: '1:1 — persegi', portrait: '4:5 — feed Instagram', wide: '16:9 — YouTube', position: 'Posisi', saved: 'Tersimpan — {size}, {w}×{h}.', failed: 'Gagal crop — {msg}', same: 'Video sudah dalam format ini.' },
+  tr: { run: 'Kırp', shape: 'Biçim', vertical: '9:16 — Reels, TikTok, Shorts', square: '1:1 — kare', portrait: '4:5 — Instagram akışı', wide: '16:9 — YouTube', position: 'Konum', saved: 'Kaydedildi — {size}, {w}×{h}.', failed: 'Kırpılamadı — {msg}', same: 'Video zaten bu biçimde.' },
+  ar: { run: 'قص', shape: 'الصيغة', vertical: '9:16 — ريلز، تيك توك، شورتس', square: '1:1 — مربع', portrait: '4:5 — موجز إنستغرام', wide: '16:9 — يوتيوب', position: 'الموضع', saved: 'تم الحفظ — {size}، {w}×{h}.', failed: 'تعذّر القص — {msg}', same: 'الفيديو بهذه الصيغة بالفعل.' },
 };
 const words = WORDS[lang] ?? WORDS.en!;
 ---

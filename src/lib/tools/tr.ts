@@ -209,6 +209,36 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'crop-video': {
+    searchPhrase: 'Video kırpma online',
+    title: 'Video Kırp Online Ücretsiz — Reels ve TikTok için 9:16, 1:1, 4:5',
+    description:
+      'Videoyu Reels, TikTok ve Shorts için 9:16’ya ya da 1:1, 4:5 veya 16:9’a online ve ücretsiz kırpın. Önemli kısmı tutmak için çerçeveyi kaydırın. Tarayıcıda, yükleme ve filigran yok.',
+    heading: 'Kırp',
+    accent: 'video',
+    lede: 'Yatay bir klibi dikey ya da kare yapın ve hangi kısmın kalacağını seçin. Hiçbir şey yüklenmez.',
+    blurb: 'Yatay videoyu Reels, TikTok ve Shorts için 9:16’ya ya da kareye kırpın.',
+    featureList: [
+      '9:16, 1:1, 4:5 ve 16:9 biçimleri',
+      'Konuyu kadrajda tutmak için çerçeveyi kaydırın',
+      'Kırpılan alanın özgün çözünürlüğü korunur',
+      'Her şey tarayıcıda: yükleme ve filigran yok',
+    ],
+    faq: [
+      {
+        q: 'Yatay videoyu Reels veya TikTok için nasıl dikey yaparım?',
+        a: '9:16’yı seçin, çerçeveyi tutmak istediğiniz kısma kaydırın ve kırpın. Videonuzun en yüksek 9:16 alanını kendi boyutunda alırsınız; Instagram ve TikTok onu tam ekrana büyütür.',
+      },
+      {
+        q: 'Kalite düşer mi?',
+        a: 'Kalan pikseller büyütülmez, ama kırpma her zaman görüntüyü yeniden kodlar; bu bir kez biraz kaliteye mal olur.',
+      },
+      {
+        q: 'Videom yükleniyor mu?',
+        a: 'Hayır. Tarayıcınız videoyu WebCodecs ile çözer, kırpar ve kodlar; cihazınızdan hiçbir şey çıkmaz.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',
