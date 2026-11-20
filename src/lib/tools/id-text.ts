@@ -254,4 +254,30 @@ export const idText: ToolTranslations = {
       },
     ],
   },
+  'video-filters': {
+    searchPhrase: 'Filter video online',
+    title: 'Filter Video Online Gratis — terangkan video gelap, hitam putih, tanpa unggah',
+    description:
+      'Terapkan filter ke video secara online dan gratis: terangkan video gelap, jadikan hitam putih, cerah, hangat, dingin atau vintage, atau atur kecerahan, kontras, saturasi dan kehangatan dengan pratinjau langsung. Di browser, tanpa unggah.',
+    heading: 'Filter',
+    accent: 'video',
+    lede: 'Lihat hasilnya di klip Anda sebelum menyimpan.',
+    blurb: 'Terangkan video gelap, hitam putih, lebih hangat atau cerah, dengan pratinjau.',
+    featureList: [
+      'Preset: terangkan, hitam putih, cerah, hangat, dingin, vintage',
+      'Kecerahan, kontras, saturasi, kehangatan',
+      'Pratinjau langsung',
+      'Tanpa unggah dan watermark',
+    ],
+    faq: [
+      {
+        q: 'Bagaimana menerangkan video yang terlalu gelap?',
+        a: 'Tekan «Terangkan» lalu naikkan kecerahan sampai wajah terlihat.',
+      },
+      {
+        q: 'Apakah video diunggah?',
+        a: 'Tidak. Browser Anda yang menerapkan filter.',
+      },
+    ],
+  },
 };

@@ -254,4 +254,30 @@ export const trText: ToolTranslations = {
       },
     ],
   },
+  'video-filters': {
+    searchPhrase: 'Video filtreleri online',
+    title: 'Video Filtreleri Online Ücretsiz — karanlık videoyu aydınlat, siyah beyaz, yükleme yok',
+    description:
+      'Bir videoya online ve ücretsiz filtre uygulayın: karanlık videoyu aydınlatın, siyah beyaz, canlı, sıcak, soğuk veya vintage yapın ya da canlı önizlemeyle parlaklık, kontrast, doygunluk ve sıcaklığı ayarlayın. Tarayıcıda, yükleme yok.',
+    heading: 'Video',
+    accent: 'filtreleri',
+    lede: 'Kaydetmeden önce sonucu kendi klibinizde görün.',
+    blurb: 'Karanlık videoyu aydınlatın, siyah beyaz, daha sıcak veya canlı yapın.',
+    featureList: [
+      'Ön ayarlar: aydınlat, siyah beyaz, canlı, sıcak, soğuk, vintage',
+      'Parlaklık, kontrast, doygunluk, sıcaklık',
+      'Canlı önizleme',
+      'Yükleme ve filigran yok',
+    ],
+    faq: [
+      {
+        q: 'Çok karanlık bir videoyu nasıl aydınlatırım?',
+        a: '«Aydınlat»a basın, yüzler görünene kadar parlaklığı artırın.',
+      },
+      {
+        q: 'Video yükleniyor mu?',
+        a: 'Hayır. Filtreyi tarayıcınız uygular.',
+      },
+    ],
+  },
 };

@@ -1,0 +1,118 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { none: 'Original', brighten: 'Brighten', bw: 'Black & white', vivid: 'Vivid', warm: 'Warm', cool: 'Cool', vintage: 'Vintage', brightness: 'Brightness', contrast: 'Contrast', saturation: 'Saturation', warmth: 'Warmth', run: 'Apply and save', working: 'Applying… {n}%', saved: 'Saved — {size}.', failed: 'Could not apply — {msg}' },
+  ru: { none: 'Оригинал', brighten: 'Осветлить', bw: 'Чёрно-белое', vivid: 'Сочнее', warm: 'Теплее', cool: 'Холоднее', vintage: 'Винтаж', brightness: 'Яркость', contrast: 'Контраст', saturation: 'Насыщенность', warmth: 'Тепло', run: 'Применить и сохранить', working: 'Применяем… {n}%', saved: 'Сохранено — {size}.', failed: 'Не удалось применить — {msg}' },
+  es: { none: 'Original', brighten: 'Aclarar', bw: 'Blanco y negro', vivid: 'Vivo', warm: 'Cálido', cool: 'Frío', vintage: 'Vintage', brightness: 'Brillo', contrast: 'Contraste', saturation: 'Saturación', warmth: 'Calidez', run: 'Aplicar y guardar', working: 'Aplicando… {n}%', saved: 'Guardado — {size}.', failed: 'No se pudo aplicar — {msg}' },
+  pt: { none: 'Original', brighten: 'Clarear', bw: 'Preto e branco', vivid: 'Vívido', warm: 'Quente', cool: 'Frio', vintage: 'Vintage', brightness: 'Brilho', contrast: 'Contraste', saturation: 'Saturação', warmth: 'Calor', run: 'Aplicar e salvar', working: 'Aplicando… {n}%', saved: 'Salvo — {size}.', failed: 'Não foi possível aplicar — {msg}' },
+  id: { none: 'Asli', brighten: 'Terangkan', bw: 'Hitam putih', vivid: 'Cerah', warm: 'Hangat', cool: 'Dingin', vintage: 'Vintage', brightness: 'Kecerahan', contrast: 'Kontras', saturation: 'Saturasi', warmth: 'Kehangatan', run: 'Terapkan dan simpan', working: 'Menerapkan… {n}%', saved: 'Tersimpan — {size}.', failed: 'Gagal menerapkan — {msg}' },
+  tr: { none: 'Orijinal', brighten: 'Aydınlat', bw: 'Siyah beyaz', vivid: 'Canlı', warm: 'Sıcak', cool: 'Soğuk', vintage: 'Vintage', brightness: 'Parlaklık', contrast: 'Kontrast', saturation: 'Doygunluk', warmth: 'Sıcaklık', run: 'Uygula ve kaydet', working: 'Uygulanıyor… %{n}', saved: 'Kaydedildi — {size}.', failed: 'Uygulanamadı — {msg}' },
+  ar: { none: 'الأصلي', brighten: 'تفتيح', bw: 'أبيض وأسود', vivid: 'زاهٍ', warm: 'دافئ', cool: 'بارد', vintage: 'عتيق', brightness: 'السطوع', contrast: 'التباين', saturation: 'التشبع', warmth: 'الدفء', run: 'طبّق واحفظ', working: 'جارٍ التطبيق… {n}%', saved: 'تم الحفظ — {size}.', failed: 'تعذّر التطبيق — {msg}' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+const presets = ['none', 'brighten', 'bw', 'vivid', 'warm', 'cool', 'vintage'];
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="video/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP4, MOV, WebM</span>
+  </label>
+  <video id="preview" muted playsinline loop controls hidden></video>
+  <div class="controls">{presets.map((p) => <button type="button" class="ghost preset" data-preset={p}>{words[p]}</button>)}</div>
+  <div class="controls">
+    <label class="control grow"><span class="muted">{words.brightness}</span><input type="range" id="brightness" min="0.5" max="2" step="0.05" value="1" /></label>
+    <label class="control grow"><span class="muted">{words.contrast}</span><input type="range" id="contrast" min="0.5" max="2" step="0.05" value="1" /></label>
+    <label class="control grow"><span class="muted">{words.saturation}</span><input type="range" id="saturation" min="0" max="2" step="0.05" value="1" /></label>
+    <label class="control grow"><span class="muted">{words.warmth}</span><input type="range" id="warmth" min="-1" max="1" step="0.05" value="0" /></label>
+  </div>
+  <div class="controls">
+    <span class="spacer"></span>
+    <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<style>
+  .grow { flex: 1 1 160px; }
+  .grow input { width: 100%; }
+  #preview { width: 100%; max-height: 50vh; background: #000; border-radius: 10px; margin-top: 8px; }
+</style>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { saveBlob, formatBytes } from '../../lib/encode';
+  import { filterVideo, filterOf, PRESETS, type Look } from '../../lib/video-filter';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  const preview = el<HTMLVideoElement>('preview');
+  const keys = ['brightness', 'contrast', 'saturation', 'warmth'] as const;
+  let file: File | null = null;
+  let busy = false;
+  let preset = 'none';
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+  const look = (): Look => Object.fromEntries(keys.map((k) => [k, Number(el<HTMLInputElement>(k).value)])) as unknown as Look;
+  const show = () => { preview.style.filter = filterOf(look()); };
+  for (const k of keys) el(k).addEventListener('input', () => { preset = 'custom'; show(); });
+  document.querySelectorAll<HTMLButtonElement>('.preset').forEach((b) => b.addEventListener('click', () => {
+    preset = b.dataset.preset!;
+    const l = PRESETS[preset];
+    for (const k of keys) el<HTMLInputElement>(k).value = String(l[k]);
+    show();
+  }));
+
+  el('run').addEventListener('click', async () => {
+    if (!file || busy) return;
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    try {
+      const blob = await filterVideo(file, look(), (f) => status(w.working.replace('{n}', String(Math.round(f * 100))), f));
+      saveBlob(blob, `${file.name.replace(/\.[^.]+$/, '')}-${preset}.mp4`);
+      track('result_saved', { placement: 'result', preset }, { size_mb: Math.round(blob.size / 104_857.6) / 10 });
+      status(w.saved.replace('{size}', formatBytes(blob.size)), 1);
+    } catch (error) {
+      toolFailed('run', error, file);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  const take = (f: File | undefined, how: 'picker' | 'drop') => {
+    if (!f) return;
+    file = f;
+    fileChosen(f, how);
+    preview.src = URL.createObjectURL(f);
+    preview.hidden = false;
+    void preview.play().catch(() => {});
+    show();
+    status(f.name);
+  };
+  el<HTMLInputElement>('file').addEventListener('change', (e) => take((e.target as HTMLInputElement).files?.[0], 'picker'));
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => take((e as DragEvent).dataTransfer?.files?.[0], 'drop'));
+</script>

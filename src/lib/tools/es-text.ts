@@ -254,4 +254,30 @@ export const esText: ToolTranslations = {
       },
     ],
   },
+  'video-filters': {
+    searchPhrase: 'Filtros de video online',
+    title: 'Filtros de video online gratis — aclarar un video oscuro, blanco y negro, sin subir',
+    description:
+      'Aplica filtros a un video online y gratis: aclara un video oscuro, pásalo a blanco y negro, vivo, cálido, frío o vintage, o ajusta brillo, contraste, saturación y calidez con vista previa en vivo. En tu navegador, sin subir nada.',
+    heading: 'Filtros de',
+    accent: 'video',
+    lede: 'Mira el resultado en tu clip antes de guardar.',
+    blurb: 'Aclarar un video oscuro, blanco y negro, más cálido o vivo, con vista previa.',
+    featureList: [
+      'Presets: aclarar, blanco y negro, vivo, cálido, frío, vintage',
+      'Brillo, contraste, saturación y calidez',
+      'Vista previa en vivo',
+      'Sin subidas ni marca de agua',
+    ],
+    faq: [
+      {
+        q: '¿Cómo aclaro un video muy oscuro?',
+        a: 'Pulsa «Aclarar» y sube el brillo hasta que se vean las caras.',
+      },
+      {
+        q: '¿Se sube el video?',
+        a: 'No. Tu navegador aplica el filtro.',
+      },
+    ],
+  },
 };

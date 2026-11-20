@@ -394,4 +394,40 @@ export const TEXT_TOOLS: Tool[] = [
     facts: ['Blurring a 1/8-size copy and scaling it up looks the same as blurring full size and costs about 64x less.'],
     agentJob: 'Making a video vertical with a blurred background, locally',
   },
+  {
+    // 20 Nov 2026: «осветлить тёмное видео», «сделать видео чёрно-белым», «video filters online».
+    slug: 'video-filters',
+    group: 'everyday',
+    name: 'Video Filters',
+    appName: 'Video Filters',
+    blurb: 'Brighten a dark video, make it black and white, warmer or more vivid, with a live preview.',
+
+    searchPhrase: 'Video Filters Online',
+    title: 'Video Filters Online Free | brighten a dark video, black and white, no upload',
+    description: 'Apply filters to a video online for free: brighten a dark video, make it black and white, vivid, warm, cool or vintage, or set brightness, contrast, saturation and warmth yourself with a live preview. Runs in your browser; nothing is uploaded, no watermark.',
+    heading: 'Video',
+    accent: 'filters',
+    lede: 'See the look on your own clip before you save it. The video stays on your device.',
+    featureList: [
+      'Presets: brighten, black & white, vivid, warm, cool, vintage',
+      'Brightness, contrast, saturation and warmth sliders',
+      'Live preview on your clip, exactly what gets saved',
+      'Sound copied untouched',
+      'Nothing uploaded, no watermark',
+    ],
+    faq: [
+      {
+        q: 'How do I brighten a video that is too dark?',
+        a: 'Press «Brighten», then raise Brightness until faces read; add a little Contrast if it looks washed out. The preview shows the result before you save.',
+      },
+      {
+        q: 'Is the video uploaded?',
+        a: 'No. Your browser applies the filter to every frame and encodes the result.',
+      },
+    ],
+
+    summary: 'Brightness/contrast/saturation/warmth and B&W filters on a video, live preview, in the browser.',
+    facts: ['The same CSS filter string drives the preview element and the canvas that encodes, so the preview is the result.'],
+    agentJob: 'Applying a colour filter to a video, locally',
+  },
 ];

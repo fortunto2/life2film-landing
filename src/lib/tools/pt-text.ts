@@ -254,4 +254,30 @@ export const ptText: ToolTranslations = {
       },
     ],
   },
+  'video-filters': {
+    searchPhrase: 'Filtros de vídeo online',
+    title: 'Filtros de vídeo online grátis — clarear vídeo escuro, preto e branco, sem upload',
+    description:
+      'Aplique filtros num vídeo online e grátis: clareie um vídeo escuro, deixe preto e branco, vívido, quente, frio ou vintage, ou ajuste brilho, contraste, saturação e calor com prévia ao vivo. No navegador, sem upload.',
+    heading: 'Filtros de',
+    accent: 'vídeo',
+    lede: 'Veja o resultado no seu clipe antes de salvar.',
+    blurb: 'Clarear vídeo escuro, preto e branco, mais quente ou vívido, com prévia.',
+    featureList: [
+      'Presets: clarear, preto e branco, vívido, quente, frio, vintage',
+      'Brilho, contraste, saturação e calor',
+      'Prévia ao vivo',
+      'Sem upload nem marca d’água',
+    ],
+    faq: [
+      {
+        q: 'Como clareio um vídeo muito escuro?',
+        a: 'Clique em «Clarear» e aumente o brilho até os rostos aparecerem.',
+      },
+      {
+        q: 'O vídeo é enviado?',
+        a: 'Não. O navegador aplica o filtro.',
+      },
+    ],
+  },
 };
