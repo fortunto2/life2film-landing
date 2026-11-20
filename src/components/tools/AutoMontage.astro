@@ -41,12 +41,14 @@ const words = WORDS[lang] ?? WORDS.en!;
     <div class="statustext" id="statusText"></div>
   </div>
   <p class="muted small">{words.app}</p>
-  <p class="muted small"><a href={localePath(lang, '/tools/video-editor/')}>{words.editor} →</a></p>
+  <p class="muted small"><a class="link" href={localePath(lang, '/tools/video-editor/')}>{words.editor} →</a></p>
 </div>
 
 <style>
   .song { margin-top: 10px; padding: 14px; }
   .small { font-size: 0.85rem; }
+  .link { color: var(--cyan); text-decoration: none; font-weight: 500; }
+  .link:hover { text-decoration: underline; }
 </style>
 
 <script>

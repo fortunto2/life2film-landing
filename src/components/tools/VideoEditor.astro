@@ -56,7 +56,7 @@ const words = WORDS[lang] ?? WORDS.en!;
     <div class="bar"><span id="fill"></span></div>
     <div class="statustext" id="statusText"></div>
   </div>
-  <p class="muted small"><a href={localePath(lang, '/tools/auto-montage/')}>{words.auto2} →</a></p>
+  <p class="muted small"><a class="link" href={localePath(lang, '/tools/auto-montage/')}>{words.auto2} →</a></p>
 </div>
 
 <style>
@@ -70,14 +70,28 @@ const words = WORDS[lang] ?? WORDS.en!;
   .timeline { position: relative; margin-top: 10px; user-select: none; touch-action: none; }
   .ruler { height: 22px; border-radius: 6px; background: var(--panel); border: 1px solid var(--line); cursor: pointer; position: relative; }
   .ruler :global(i) { position: absolute; top: 2px; font-style: normal; font-size: 0.7rem; color: var(--muted); transform: translateX(2px); pointer-events: none; }
-  .track { position: relative; height: 64px; margin-top: 6px; display: flex; gap: 2px; }
-  .track :global(.blk) { position: relative; flex: none; height: 100%; border-radius: 8px; background: #222 center / cover no-repeat; border: 2px solid transparent; cursor: grab; overflow: hidden; min-width: 12px; }
-  .track :global(.blk.sel) { border-color: var(--cyan); }
-  .track :global(.blk.drag) { opacity: 0.6; cursor: grabbing; }
-  .track :global(.blk b) { position: absolute; left: 10px; bottom: 3px; font-size: 0.7rem; font-weight: 600; text-shadow: 0 1px 2px #000; pointer-events: none; white-space: nowrap; }
-  .track :global(.h) { position: absolute; top: 0; bottom: 0; width: 9px; background: rgba(0, 242, 224, 0.75); cursor: ew-resize; }
-  .track :global(.h.l) { left: 0; border-radius: 6px 0 0 6px; }
-  .track :global(.h.r) { right: 0; border-radius: 0 6px 6px 0; }
+  .track { position: relative; height: 64px; margin-top: 6px; display: flex; gap: 4px; }
+  .track :global(.blk) { position: relative; flex: none; height: 100%; border-radius: 6px; background: #17171c; outline: 2px solid transparent; outline-offset: -2px; cursor: grab; overflow: hidden; min-width: 12px; transition: transform 120ms var(--ease); }
+  .track :global(.blk:hover) { outline-color: rgba(255, 255, 255, 0.35); }
+  .track :global(.blk.sel) { outline-color: var(--cyan); }
+  .track :global(.strip) { position: absolute; inset: 0; display: flex; pointer-events: none; }
+  .track :global(.strip img) { flex: none; height: 100%; object-fit: cover; display: block; }
+  .track :global(.blk b) { position: absolute; left: 6px; top: 5px; padding: 1px 6px; border-radius: 999px; background: rgba(0, 0, 0, 0.72); font-size: 0.7rem; font-weight: 600; font-variant-numeric: tabular-nums; pointer-events: none; white-space: nowrap; }
+  .track :global(.h) { position: absolute; top: 0; bottom: 0; width: 10px; cursor: ew-resize; opacity: 0; transition: opacity 120ms; z-index: 1; }
+  .track :global(.h::after) { content: ''; position: absolute; top: 50%; width: 4px; height: 26px; margin-top: -13px; border-radius: 2px; background: var(--cyan); box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5); }
+  .track :global(.h.l) { left: 0; }
+  .track :global(.h.l::after) { left: 2px; }
+  .track :global(.h.r) { right: 0; }
+  .track :global(.h.r::after) { right: 2px; }
+  .track :global(.blk:hover .h), .track :global(.blk.sel .h) { opacity: 1; }
+  .track :global(.ins) { position: absolute; top: -4px; bottom: -4px; width: 3px; margin-left: -1.5px; border-radius: 2px; background: var(--cyan); box-shadow: 0 0 10px var(--cyan); pointer-events: none; z-index: 2; }
+  :global(.ve-ghost) { position: fixed; z-index: 50; pointer-events: none; opacity: 0.75; border-radius: 6px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); outline: 2px solid var(--cyan); outline-offset: -2px; transform: scale(1.04); }
+  :global(.ve-ghost .strip) { position: absolute; inset: 0; display: flex; }
+  :global(.ve-ghost .strip img) { flex: none; height: 100%; object-fit: cover; }
+  :global(.ve-ghost b) { position: absolute; left: 6px; top: 5px; padding: 1px 6px; border-radius: 999px; background: rgba(0, 0, 0, 0.72); font-size: 0.7rem; }
+  :global(.ve-ghost .h) { display: none; }
+  .link { color: var(--cyan); text-decoration: none; font-weight: 500; }
+  .link:hover { text-decoration: underline; }
   .playhead { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--pink); pointer-events: none; left: 0; }
   .song { margin-top: 14px; padding: 14px; }
   .check { flex-direction: row; align-items: center; gap: 6px; }
@@ -98,7 +112,36 @@ const words = WORDS[lang] ?? WORDS.en!;
   const playBtn = el<HTMLButtonElement>('play'), splitBtn = el<HTMLButtonElement>('split'), delBtn = el<HTMLButtonElement>('del');
   const keep = el<HTMLInputElement>('keep');
 
-  interface Clip { file: File; url: string; duration: number; thumb: string; video: HTMLVideoElement }
+  interface Still { t: number; url: string }
+  interface Clip { file: File; url: string; duration: number; aspect: number; stills: Still[]; video: HTMLVideoElement }
+  const LANE = 64;
+  /** Stills per clip for the filmstrip: decoded once, reused by every shot cut from that clip. */
+  const STILLS = 8;
+  const STILL_H = LANE * Math.max(2, Math.ceil(window.devicePixelRatio || 1));
+
+  function grab(video: HTMLVideoElement, aspect: number): string {
+    const c = document.createElement('canvas');
+    c.height = STILL_H; c.width = Math.max(1, Math.round(STILL_H * aspect));
+    c.getContext('2d')?.drawImage(video, 0, 0, c.width, c.height);
+    return c.toDataURL('image/jpeg', 0.8);
+  }
+  const seekTo = (v: HTMLVideoElement, t: number) => new Promise<void>((r) => { v.onseeked = () => { v.onseeked = null; r(); }; v.currentTime = t; });
+
+  /** The rest of a clip's stills, from a second hidden <video> so the preview is not disturbed. */
+  async function fillStrip(c: Clip) {
+    const v = document.createElement('video');
+    v.muted = true; v.preload = 'auto'; v.src = c.url;
+    await new Promise((r) => { v.onloadeddata = r; v.onerror = r; });
+    for (let k = 0; k < STILLS; k++) {
+      const t = ((k + 0.5) * c.duration) / STILLS;
+      await seekTo(v, t);
+      c.stills.push({ t, url: grab(v, c.aspect) });
+    }
+    c.stills.sort((a, b) => a.t - b.t);
+    v.removeAttribute('src'); v.load();
+    if (!dragging) draw();
+  }
+  const nearest = (c: Clip, t: number) => c.stills.reduce((a, b) => (Math.abs(b.t - t) < Math.abs(a.t - t) ? b : a)).url;
   const clips: Clip[] = [];
   let shots: TimelineShot[] = [];
   let selected = -1;
@@ -120,18 +163,18 @@ const words = WORDS[lang] ?? WORDS.en!;
       video.onloadedmetadata = () => { video.currentTime = Math.min(0.5, video.duration / 2); };
       video.onseeked = () => {
         video.onseeked = null;
-        const c = document.createElement('canvas');
-        c.height = 64; c.width = Math.max(1, Math.round((64 * video.videoWidth) / Math.max(1, video.videoHeight)));
-        c.getContext('2d')?.drawImage(video, 0, 0, c.width, c.height);
+        const aspect = video.videoWidth / Math.max(1, video.videoHeight) || 16 / 9;
         stage.appendChild(video);
-        resolve({ file, url, duration: video.duration, thumb: c.toDataURL('image/jpeg', 0.7), video });
+        const clip: Clip = { file, url, duration: video.duration, aspect, stills: [{ t: video.currentTime, url: grab(video, aspect) }], video };
+        void fillStrip(clip);
+        resolve(clip);
       };
     });
   }
 
   function layout() {
     const total = totalLength(shots);
-    const width = trackEl.clientWidth - 2 * Math.max(0, shots.length - 1);
+    const width = trackEl.clientWidth - 4 * Math.max(0, shots.length - 1);
     pps = total > 0 ? width / total : 1;
   }
 
@@ -141,9 +184,18 @@ const words = WORDS[lang] ?? WORDS.en!;
       const b = document.createElement('div');
       b.className = 'blk' + (i === selected ? ' sel' : '');
       b.style.width = `${(s.end - s.start) * pps}px`;
-      b.style.backgroundImage = `url(${clips[s.clip].thumb})`;
       b.dataset.i = String(i);
+      const c = clips[s.clip], bw = (s.end - s.start) * pps, tw = LANE * c.aspect;
+      const strip = document.createElement('div');
+      strip.className = 'strip';
+      for (let k = 0, n = Math.min(40, Math.ceil(bw / tw)); k < n; k++) {
+        const img = document.createElement('img');
+        img.alt = ''; img.width = Math.round(tw); img.style.width = `${tw}px`;
+        img.src = nearest(c, Math.min(s.end, s.start + (k * tw + tw / 2) / pps));
+        strip.appendChild(img);
+      }
       b.innerHTML = `<span class="h l" data-edge="start"></span><b>${(s.end - s.start).toFixed(1)}s</b><span class="h r" data-edge="end"></span>`;
+      b.prepend(strip);
       return b;
     }));
     const total = totalLength(shots);
@@ -228,46 +280,86 @@ const words = WORDS[lang] ?? WORDS.en!;
   trackEl.addEventListener('pointerdown', (e) => {
     const t = e.target as HTMLElement;
     const blk = t.closest<HTMLElement>('.blk');
-    if (!blk) return;
+    if (!blk || e.button !== 0) return;
     stop();
     const i = Number(blk.dataset.i);
     const edge = t.dataset.edge as 'start' | 'end' | undefined;
     const x0 = e.clientX, base = shots[i], dur = clips[base.clip].duration;
-    let moved = false;
+    const r0 = blk.getBoundingClientRect(), grabDx = x0 - r0.left, grabDy = e.clientY - r0.top;
+    let moved = false, to = i, cancelled = false;
+    let ghost: HTMLElement | null = null, bar: HTMLElement | null = null;
+    let others: HTMLElement[] = [], lefts: number[] = [];
     dragging = true;
     selected = i;
     trackEl.setPointerCapture(e.pointerId);
     blk.classList.add('sel');
+
+    const lift = () => {
+      // Take the block out of the row; the others close up, and that closed-up row is the drop map.
+      ghost = blk.cloneNode(true) as HTMLElement;
+      ghost.className = 'blk ve-ghost';
+      ghost.style.width = `${r0.width}px`; ghost.style.height = `${r0.height}px`;
+      document.body.appendChild(ghost);
+      blk.style.display = 'none';
+      others = [...trackEl.querySelectorAll<HTMLElement>('.blk')].filter((b) => b !== blk);
+      const tl = trackEl.getBoundingClientRect().left;
+      lefts = others.map((b) => b.getBoundingClientRect().left - tl);
+      for (const b of others) b.style.transition = 'transform 120ms var(--ease)';
+      bar = document.createElement('div');
+      bar.className = 'ins';
+      trackEl.appendChild(bar);
+    };
+    const place = (ev: PointerEvent) => {
+      if (!ghost || !bar) return;
+      ghost.style.left = `${ev.clientX - grabDx}px`; ghost.style.top = `${ev.clientY - grabDy}px`;
+      const tl = trackEl.getBoundingClientRect().left;
+      const centre = ev.clientX - grabDx + r0.width / 2 - tl;
+      to = others.filter((b, k) => lefts[k] + b.offsetWidth / 2 < centre).length;
+      others.forEach((b, k) => { b.style.transform = k >= to ? `translateX(${r0.width + 4}px)` : ''; });
+      const slot = to < others.length ? lefts[to] : others.length ? lefts[others.length - 1] + others[others.length - 1].offsetWidth + 4 : 0;
+      bar.style.left = `${slot - 2}px`;
+    };
     const onMove = (ev: PointerEvent) => {
       const dx = ev.clientX - x0;
-      if (Math.abs(dx) > 4) moved = true;
-      if (!moved) return;
+      if (!moved && Math.abs(dx) <= 4 && Math.abs(ev.clientY - e.clientY) <= 4) return;
+      moved = true;
       if (edge) {
         const before = shots;
         shots = trim(shots.map((s, k) => (k === i ? base : s)), i, edge, (edge === 'start' ? base.start : base.end) + dx / pps, dur);
         if (shots !== before) draw();
-      } else {
-        blk.classList.add('drag');
-        blk.style.transform = `translateX(${dx}px)`;
+        return;
       }
+      if (!ghost) lift();
+      place(ev);
+    };
+    const end = () => {
+      trackEl.removeEventListener('pointermove', onMove);
+      trackEl.removeEventListener('pointerup', onUp);
+      window.removeEventListener('keydown', onKey);
+      (ghost as HTMLElement | null)?.remove();
+      dragging = false;
+    };
+    const onKey = (ev: KeyboardEvent) => {
+      if (ev.key !== 'Escape') return;
+      cancelled = true;
+      if (edge) shots = shots.map((s, k) => (k === i ? base : s));
+      end();
+      draw();
     };
     const onUp = (ev: PointerEvent) => {
-      trackEl.removeEventListener('pointermove', onMove);
-      dragging = false;
+      end();
+      if (cancelled) return;
       if (moved && !edge) {
-        // Drop where the block's centre lands among the others' centres.
-        const centre = blk.getBoundingClientRect().left + blk.offsetWidth / 2;
-        const others = [...trackEl.querySelectorAll<HTMLElement>('.blk')].filter((b) => b !== blk);
-        const to = others.filter((b) => b.getBoundingClientRect().left + b.offsetWidth / 2 < centre).length;
         shots = move(shots, i, to);
         selected = to;
       } else if (!moved) {
-        seek(offsets(shots)[i] + Math.max(0, Math.min(shots[i].end - shots[i].start, (ev.clientX - blk.getBoundingClientRect().left) / pps)));
+        seek(offsets(shots)[i] + Math.max(0, Math.min(shots[i].end - shots[i].start, (ev.clientX - r0.left) / pps)));
       }
       draw();
     };
     trackEl.addEventListener('pointermove', onMove);
-    trackEl.addEventListener('pointerup', onUp, { once: true });
+    trackEl.addEventListener('pointerup', onUp);
+    window.addEventListener('keydown', onKey);
   });
 
   splitBtn.addEventListener('click', () => {
