@@ -745,6 +745,32 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'sped-up-slowed-reverb': {
+    searchPhrase: 'Lagu sped up dan slowed + reverb online',
+    title: 'Sped Up & Slowed + Reverb Online Gratis — percepat atau perlambat lagu tanpa unggah',
+    description:
+      'Buat versi sped up atau slowed + reverb dari lagu secara online dan gratis: preset sekali klik, kecepatan 0,5× hingga 2×, reverb dan opsi pertahankan nada. MP3 atau WAV. Di browser, tanpa unggah.',
+    heading: 'Sped up &',
+    accent: 'slowed + reverb',
+    lede: 'Versi TikTok dari sebuah lagu, dibuat di perangkat Anda.',
+    blurb: 'Versi sped up atau slowed + reverb dari lagu.',
+    featureList: [
+      'Preset: sped up 1,25×, slowed 0,8× dengan reverb',
+      'Kecepatan apa pun 0,5× hingga 2×',
+      'Seperti piringan hitam atau pertahankan nada',
+      'MP3 atau WAV, tanpa unggah',
+    ],
+    faq: [
+      {
+        q: 'Kenapa versi sped up terdengar lebih tinggi?',
+        a: 'Itulah suara sped up: nada naik bersama tempo. Centang «Pertahankan nada» untuk hanya mengubah tempo.',
+      },
+      {
+        q: 'Apakah lagu diunggah?',
+        a: 'Tidak. Browser Anda yang memprosesnya.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',

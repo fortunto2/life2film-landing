@@ -238,4 +238,44 @@ export const TEXT_TOOLS: Tool[] = [
     facts: ['A logo sized by the shorter side of the frame looks the same on vertical and horizontal video.'],
     agentJob: 'Adding a logo to a video, locally',
   },
+  {
+    // 20 Nov 2026: «sped up song maker», «slowed and reverb», «ускорить песню онлайн» — the TikTok edits.
+    slug: 'sped-up-slowed-reverb',
+    group: 'audio',
+    name: 'Sped Up & Slowed + Reverb',
+    appName: 'Sped Up / Slowed',
+    blurb: 'Make the sped up or slowed + reverb version of a song, or any speed in between.',
+
+    searchPhrase: 'Sped Up & Slowed + Reverb Maker',
+    title: 'Sped Up & Slowed + Reverb Song Maker Online Free | no upload',
+    description: 'Make a sped up or slowed + reverb version of any song online for free: one-click presets, a speed slider from 0.5× to 2×, reverb, and an option to keep the pitch. Save MP3 or WAV. Runs in your browser; the song is not uploaded.',
+    heading: 'Sped up &',
+    accent: 'slowed + reverb',
+    lede: 'The TikTok versions of a song, made on your own device.',
+    featureList: [
+      'Presets: sped up 1.25×, slowed 0.8× with reverb',
+      'Any speed from 0.5× to 2×',
+      'Turntable-style (pitch moves with speed) or keep the pitch',
+      'Reverb from dry to 60% wet',
+      'MP3 or WAV, nothing uploaded',
+    ],
+    faq: [
+      {
+        q: 'Why does the sped up version sound higher?',
+        a: 'That is the sped up sound: like a record played faster, pitch rises with tempo. Tick «Keep the pitch» to change only the tempo.',
+      },
+      {
+        q: 'Can I post the result?',
+        a: 'The tool changes the sound; the rights stay with whoever owns the song. Use your own music or music you are allowed to edit.',
+      },
+      {
+        q: 'Is the song uploaded?',
+        a: 'No. Your browser decodes, changes and encodes it.',
+      },
+    ],
+
+    summary: 'Sped up / slowed + reverb versions of a song (resample or WSOLA, convolution reverb) in the browser.',
+    facts: ['A sped up edit at 1.25× raises the pitch by 12·log2(1.25) ≈ 3.9 semitones.'],
+    agentJob: 'Making sped up or slowed versions of a song, locally',
+  },
 ];

@@ -1,0 +1,121 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { up: 'Sped up', slowed: 'Slowed + reverb', speed: 'Speed', keep: 'Keep the pitch (time-stretch)', reverb: 'Reverb', format: 'Save as', run: 'Make it', working: 'Working…', saved: 'Saved — {size}, {len}.', failed: 'Could not process — {msg}' },
+  ru: { up: 'Ускорить (sped up)', slowed: 'Замедлить + реверб', speed: 'Скорость', keep: 'Сохранить высоту тона', reverb: 'Реверб', format: 'Сохранить как', run: 'Сделать', working: 'Обрабатываем…', saved: 'Сохранено — {size}, {len}.', failed: 'Не удалось обработать — {msg}' },
+  es: { up: 'Sped up', slowed: 'Slowed + reverb', speed: 'Velocidad', keep: 'Mantener el tono', reverb: 'Reverb', format: 'Guardar como', run: 'Crear', working: 'Procesando…', saved: 'Guardado — {size}, {len}.', failed: 'No se pudo procesar — {msg}' },
+  pt: { up: 'Sped up', slowed: 'Slowed + reverb', speed: 'Velocidade', keep: 'Manter o tom', reverb: 'Reverb', format: 'Salvar como', run: 'Criar', working: 'Processando…', saved: 'Salvo — {size}, {len}.', failed: 'Não foi possível processar — {msg}' },
+  id: { up: 'Sped up', slowed: 'Slowed + reverb', speed: 'Kecepatan', keep: 'Pertahankan nada', reverb: 'Reverb', format: 'Simpan sebagai', run: 'Buat', working: 'Memproses…', saved: 'Tersimpan — {size}, {len}.', failed: 'Gagal memproses — {msg}' },
+  tr: { up: 'Sped up', slowed: 'Slowed + reverb', speed: 'Hız', keep: 'Ses perdesini koru', reverb: 'Yankı', format: 'Biçim', run: 'Oluştur', working: 'İşleniyor…', saved: 'Kaydedildi — {size}, {len}.', failed: 'İşlenemedi — {msg}' },
+  ar: { up: 'تسريع (sped up)', slowed: 'إبطاء + صدى', speed: 'السرعة', keep: 'حافظ على طبقة الصوت', reverb: 'الصدى', format: 'احفظ بصيغة', run: 'أنشئ', working: 'جارٍ المعالجة…', saved: 'تم الحفظ — {size}، {len}.', failed: 'تعذّرت المعالجة — {msg}' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="audio/*,video/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP3, M4A, WAV, MP4</span>
+  </label>
+  <div class="controls">
+    <button type="button" class="ghost" id="presetUp">⏩ {words.up}</button>
+    <button type="button" class="ghost" id="presetSlow">🌙 {words.slowed}</button>
+  </div>
+  <div class="controls">
+    <label class="control grow"><span class="muted">{words.speed}: <b id="spv">1.25×</b></span>
+      <input type="range" id="speed" min="0.5" max="2" step="0.05" value="1.25" /></label>
+    <label class="control grow"><span class="muted">{words.reverb}: <b id="rvv">0%</b></span>
+      <input type="range" id="reverb" min="0" max="0.6" step="0.05" value="0" /></label>
+  </div>
+  <div class="controls">
+    <label class="control"><input type="checkbox" id="keep" /> <span class="muted">{words.keep}</span></label>
+    <label class="control"><span class="muted">{words.format}</span>
+      <select id="format"><option value="mp3" selected>MP3</option><option value="wav">WAV</option></select></label>
+    <span class="spacer"></span>
+    <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+  </div>
+  <audio id="play" controls hidden></audio>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<style>
+  .grow { flex: 1 1 220px; }
+  .grow input { width: 100%; }
+  #play { width: 100%; margin-top: 8px; }
+</style>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { saveBlob, formatBytes, preciseClock } from '../../lib/encode';
+  import { songSpeed } from '../../lib/song-speed';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  const speed = el<HTMLInputElement>('speed');
+  const reverb = el<HTMLInputElement>('reverb');
+  let file: File | null = null;
+  let busy = false;
+  let preset = 'custom';
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+  const show = () => {
+    el('spv').textContent = `${Number(speed.value).toFixed(2)}×`;
+    el('rvv').textContent = `${Math.round(Number(reverb.value) * 100)}%`;
+  };
+  speed.addEventListener('input', () => { preset = 'custom'; show(); });
+  reverb.addEventListener('input', () => { preset = 'custom'; show(); });
+  el('presetUp').addEventListener('click', () => { speed.value = '1.25'; reverb.value = '0'; el<HTMLInputElement>('keep').checked = false; preset = 'sped-up'; show(); });
+  el('presetSlow').addEventListener('click', () => { speed.value = '0.8'; reverb.value = '0.35'; el<HTMLInputElement>('keep').checked = false; preset = 'slowed-reverb'; show(); });
+
+  el('run').addEventListener('click', async () => {
+    if (!file || busy) return;
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    const sp = Number(speed.value);
+    const format = el<HTMLSelectElement>('format').value as 'mp3' | 'wav';
+    const keep = el<HTMLInputElement>('keep').checked;
+    status(w.working, 0.02);
+    try {
+      const { blob, duration } = await songSpeed(file, { speed: sp, mode: keep ? 'keep-pitch' : 'turntable', reverb: Number(reverb.value), format, onProgress: (f) => status(w.working, f) });
+      const play = el<HTMLAudioElement>('play');
+      play.src = URL.createObjectURL(blob);
+      play.hidden = false;
+      const tag = preset === 'sped-up' ? 'sped up' : preset === 'slowed-reverb' ? 'slowed + reverb' : `${sp.toFixed(2)}x`;
+      saveBlob(blob, `${file.name.replace(/\.[^.]+$/, '')} (${tag}).${format}`);
+      track('result_saved', { placement: 'result', format, preset, mode: keep ? 'keep-pitch' : 'turntable' }, { speed: sp, seconds: Math.round(duration) });
+      status(w.saved.replace('{size}', formatBytes(blob.size)).replace('{len}', preciseClock(duration)), 1);
+    } catch (error) {
+      toolFailed('run', error, file);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  const take = (f: File | undefined, how: 'picker' | 'drop') => { if (!f) return; file = f; fileChosen(f, how); status(f.name); };
+  el<HTMLInputElement>('file').addEventListener('change', (e) => take((e.target as HTMLInputElement).files?.[0], 'picker'));
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => take((e as DragEvent).dataTransfer?.files?.[0], 'drop'));
+</script>

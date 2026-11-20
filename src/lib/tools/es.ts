@@ -748,6 +748,32 @@ export const es: ToolTranslations = {
       },
     ],
   },
+  'sped-up-slowed-reverb': {
+    searchPhrase: 'Canción sped up y slowed + reverb online',
+    title: 'Sped up y slowed + reverb online gratis — acelerar o ralentizar canciones sin subir',
+    description:
+      'Crea la versión sped up o slowed + reverb de una canción online y gratis: presets de un clic, velocidad de 0,5× a 2×, reverb y opción de mantener el tono. MP3 o WAV. En tu navegador, sin subir la canción.',
+    heading: 'Sped up y',
+    accent: 'slowed + reverb',
+    lede: 'Las versiones de TikTok de una canción, hechas en tu dispositivo.',
+    blurb: 'Versión sped up o slowed + reverb de una canción.',
+    featureList: [
+      'Presets: sped up 1,25×, slowed 0,8× con reverb',
+      'Cualquier velocidad de 0,5× a 2×',
+      'Como un tocadiscos o manteniendo el tono',
+      'MP3 o WAV, sin subidas',
+    ],
+    faq: [
+      {
+        q: '¿Por qué suena más agudo?',
+        a: 'Así suena el sped up: el tono sube con el tempo. Marca «Mantener el tono» para cambiar solo el tempo.',
+      },
+      {
+        q: '¿Se sube la canción?',
+        a: 'No. Tu navegador la procesa.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Convertidor de vídeo online',
     title: 'Convertidor de Vídeo Online Gratis — MP4, WebM, MOV sin subir nada',

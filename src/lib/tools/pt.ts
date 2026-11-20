@@ -749,6 +749,32 @@ export const pt: ToolTranslations = {
       },
     ],
   },
+  'sped-up-slowed-reverb': {
+    searchPhrase: 'Música sped up e slowed + reverb online',
+    title: 'Sped up e slowed + reverb online grátis — acelerar ou desacelerar músicas sem upload',
+    description:
+      'Crie a versão sped up ou slowed + reverb de uma música online e grátis: presets de um clique, velocidade de 0,5× a 2×, reverb e opção de manter o tom. MP3 ou WAV. No navegador, sem upload.',
+    heading: 'Sped up e',
+    accent: 'slowed + reverb',
+    lede: 'As versões de TikTok de uma música, feitas no seu aparelho.',
+    blurb: 'Versão sped up ou slowed + reverb de uma música.',
+    featureList: [
+      'Presets: sped up 1,25×, slowed 0,8× com reverb',
+      'Qualquer velocidade de 0,5× a 2×',
+      'Como um toca-discos ou mantendo o tom',
+      'MP3 ou WAV, sem upload',
+    ],
+    faq: [
+      {
+        q: 'Por que fica mais agudo?',
+        a: 'É o som do sped up: o tom sobe com o andamento. Marque «Manter o tom» para mudar só o andamento.',
+      },
+      {
+        q: 'A música é enviada?',
+        a: 'Não. O navegador a processa.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Conversor de vídeo online',
     title: 'Conversor de Vídeo Online Grátis — MP4, WebM, MOV sem enviar nada',

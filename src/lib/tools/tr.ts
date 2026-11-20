@@ -745,6 +745,32 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'sped-up-slowed-reverb': {
+    searchPhrase: 'Sped up ve slowed + reverb şarkı online',
+    title: 'Sped Up ve Slowed + Reverb Online Ücretsiz — şarkıyı hızlandır veya yavaşlat, yükleme yok',
+    description:
+      'Bir şarkının sped up veya slowed + reverb versiyonunu online ve ücretsiz yapın: tek tık ön ayarlar, 0,5×–2× hız, yankı ve ses perdesini koruma seçeneği. MP3 veya WAV. Tarayıcıda, yükleme yok.',
+    heading: 'Sped up ve',
+    accent: 'slowed + reverb',
+    lede: 'Bir şarkının TikTok versiyonları, kendi cihazınızda.',
+    blurb: 'Bir şarkının sped up veya slowed + reverb versiyonu.',
+    featureList: [
+      'Ön ayarlar: sped up 1,25×, yankılı slowed 0,8×',
+      '0,5× ile 2× arası her hız',
+      'Plak gibi ya da perdeyi koruyarak',
+      'MP3 veya WAV, yükleme yok',
+    ],
+    faq: [
+      {
+        q: 'Hızlı versiyon neden daha ince?',
+        a: 'Sped up sesi budur: perde tempoyla yükselir. Yalnızca tempoyu değiştirmek için «Ses perdesini koru»yu işaretleyin.',
+      },
+      {
+        q: 'Şarkı yükleniyor mu?',
+        a: 'Hayır. Tarayıcınız işler.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',
