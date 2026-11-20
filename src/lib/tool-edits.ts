@@ -886,7 +886,7 @@ Reference implementation: https://life2film.com/tools/audio-cutter/`,
       },
       {
         q: 'Where do I get an SRT file?',
-        a: 'Any captioning tool exports one (YouTube Studio, CapCut, Descript, Whisper). It is plain text: a number, a time range like 00:00:01,000 --> 00:00:03,000, and the line.',
+        a: 'Make one here from the video\'s speech with Auto Subtitles (/tools/auto-subtitles/), also without uploading. Any captioning tool exports one too (YouTube Studio, CapCut, Descript). It is plain text: a number, a time range like 00:00:01,000 --> 00:00:03,000, and the line.',
       },
       {
         q: 'Is my video uploaded?',
