@@ -332,4 +332,29 @@ export const ptText: ToolTranslations = {
       },
     ],
   },
+  'fade-video': {
+    searchPhrase: 'Fade in e fade out em vídeo online',
+    title: 'Fade em vídeo online grátis — entrada e saída do preto, sem upload',
+    description:
+      'Adicione fade in do preto e fade out para o preto a um vídeo online e grátis, com o som acompanhando. De 0,5 a 3 s em cada ponta. No navegador, sem upload.',
+    heading: 'Fade in e fade out',
+    accent: 'em vídeo',
+    lede: 'Um começo suave e um final limpo.',
+    blurb: 'Fade do preto e para o preto, com o som.',
+    featureList: [
+      'Fade de 0,5 a 3 s em cada ponta',
+      'O som acompanha a imagem',
+      'Sem upload nem marca d’água',
+    ],
+    faq: [
+      {
+        q: 'O som também?',
+        a: 'Sim, nos mesmos segundos.',
+      },
+      {
+        q: 'O vídeo é enviado?',
+        a: 'Não. O navegador o processa.',
+      },
+    ],
+  },
 };

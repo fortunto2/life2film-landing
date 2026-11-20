@@ -332,4 +332,29 @@ export const esText: ToolTranslations = {
       },
     ],
   },
+  'fade-video': {
+    searchPhrase: 'Fundido de entrada y salida online',
+    title: 'Fundido de video online gratis — aparecer y desvanecer a negro, sin subir',
+    description:
+      'Añade un fundido desde negro y a negro a un video online y gratis, con el sonido. De 0,5 a 3 s en cada extremo. En tu navegador, sin subir.',
+    heading: 'Fundido de entrada y salida',
+    accent: 'de video',
+    lede: 'Un inicio suave y un final limpio.',
+    blurb: 'Fundido desde negro y a negro, con el sonido.',
+    featureList: [
+      'Fundido de 0,5 a 3 s en cada extremo',
+      'El sonido se desvanece con la imagen',
+      'Sin subidas ni marca de agua',
+    ],
+    faq: [
+      {
+        q: '¿El sonido también?',
+        a: 'Sí, en los mismos segundos.',
+      },
+      {
+        q: '¿Se sube el video?',
+        a: 'No. Tu navegador lo procesa.',
+      },
+    ],
+  },
 };

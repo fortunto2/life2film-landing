@@ -332,4 +332,29 @@ export const idText: ToolTranslations = {
       },
     ],
   },
+  'fade-video': {
+    searchPhrase: 'Fade in dan fade out video online',
+    title: 'Fade Video Online Gratis — muncul dan hilang ke hitam, tanpa unggah',
+    description:
+      'Tambahkan fade in dari hitam dan fade out ke hitam pada video secara online dan gratis, suaranya ikut memudar. 0,5 sampai 3 detik tiap ujung. Di browser, tanpa unggah.',
+    heading: 'Fade in, fade out',
+    accent: 'video',
+    lede: 'Awal yang lembut dan akhir yang bersih.',
+    blurb: 'Fade dari hitam dan ke hitam, suara ikut memudar.',
+    featureList: [
+      'Fade 0,5–3 detik tiap ujung',
+      'Suara memudar bersama gambar',
+      'Tanpa unggah dan watermark',
+    ],
+    faq: [
+      {
+        q: 'Apakah suara ikut memudar?',
+        a: 'Ya, dalam detik yang sama.',
+      },
+      {
+        q: 'Apakah video diunggah?',
+        a: 'Tidak. Browser Anda yang memprosesnya.',
+      },
+    ],
+  },
 };

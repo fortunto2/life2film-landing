@@ -332,4 +332,29 @@ export const trText: ToolTranslations = {
       },
     ],
   },
+  'fade-video': {
+    searchPhrase: 'Videoya belirme ve kararma online',
+    title: 'Video Kararma Online Ücretsiz — siyahtan belirme ve siyaha kararma, yükleme yok',
+    description:
+      'Bir videoya siyahtan belirme ve siyaha kararma geçişini online ve ücretsiz ekleyin, ses de birlikte azalır. Her uç için 0,5–3 saniye. Tarayıcıda, yükleme yok.',
+    heading: 'Belirme ve kararma',
+    accent: 'video',
+    lede: 'Yumuşak bir başlangıç, temiz bir son.',
+    blurb: 'Siyahtan belirme ve siyaha kararma, sesle birlikte.',
+    featureList: [
+      'Her uçta 0,5–3 s geçiş',
+      'Ses görüntüyle birlikte azalır',
+      'Yükleme ve filigran yok',
+    ],
+    faq: [
+      {
+        q: 'Ses de azalıyor mu?',
+        a: 'Evet, aynı saniyelerde.',
+      },
+      {
+        q: 'Video yükleniyor mu?',
+        a: 'Hayır. Tarayıcınız işler.',
+      },
+    ],
+  },
 };

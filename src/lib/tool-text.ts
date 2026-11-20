@@ -506,4 +506,39 @@ export const TEXT_TOOLS: Tool[] = [
     facts: ['Short captions read best broken at sentence ends and pauses, not at a fixed word count alone.'],
     agentJob: 'Adding TikTok-style captions to a video, locally',
   },
+  {
+    // 20 Nov 2026: «fade in video online», «fade out video», «затемнение в начале видео».
+    slug: 'fade-video',
+    group: 'everyday',
+    name: 'Fade In / Fade Out Video',
+    appName: 'Fade Video',
+    blurb: 'Fade a video in from black and out to black, the sound fading with it.',
+
+    searchPhrase: 'Fade In Fade Out Video Online',
+    title: 'Fade In / Fade Out Video Online Free | fade to black, no upload',
+    description: 'Add a fade in from black and a fade out to black to a video online for free, with the sound fading along. Pick 0.5 to 3 seconds for each end. Runs in your browser; nothing is uploaded, no watermark.',
+    heading: 'Fade in, fade out',
+    accent: 'video',
+    lede: 'A soft start and a clean ending. The video stays on your device.',
+    featureList: [
+      'Fade in from black and out to black, 0.5 to 3 s each',
+      'The sound fades with the picture',
+      'Original size kept, MP4 out',
+      'Nothing uploaded, no watermark',
+    ],
+    faq: [
+      {
+        q: 'Does the sound fade too?',
+        a: 'Yes, over the same seconds as the picture, so the end does not cut off mid-word.',
+      },
+      {
+        q: 'Is the video uploaded?',
+        a: 'No. Your browser decodes it, darkens the frames and encodes the result.',
+      },
+    ],
+
+    summary: 'Fade in from black and out to black, with the sound, in the browser.',
+    facts: ['A one- or two-second fade out is the usual way to end a clip without an abrupt cut.'],
+    agentJob: 'Fading a video in and out, locally',
+  },
 ];
