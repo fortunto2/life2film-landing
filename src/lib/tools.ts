@@ -17,7 +17,7 @@ export interface FaqEntry {
   a: string;
 }
 
-export type ToolGroup = 'everyday' | 'engine';
+export type ToolGroup = 'everyday' | 'audio' | 'engine';
 
 export interface Tool {
   slug: string;
@@ -776,6 +776,7 @@ export const TOOL = Object.fromEntries(TOOLS.map((tool) => [tool.slug, tool])) a
 
 export const GROUPS: { id: ToolGroup; name: string; note: string }[] = [
   { id: 'everyday', name: 'Everyday', note: 'The things footage usually needs before anything else.' },
+  { id: 'audio', name: 'Sound and music', note: 'For the track under the picture, or a song on its own.' },
   {
     id: 'engine',
     name: 'Made with the engine',

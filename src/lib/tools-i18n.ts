@@ -263,7 +263,7 @@ export interface HubWords {
   heading: string;
   lede: string;
   open: string;
-  groups: Record<'everyday' | 'engine', { name: string; note: string }>;
+  groups: Record<'everyday' | 'audio' | 'engine', { name: string; note: string }>;
   whyTitle: string;
   whyBody: string;
   engineTitle: string;
@@ -282,6 +282,7 @@ export const HUB: Record<Lang, HubWords> = {
     open: 'Open →',
     groups: {
       everyday: { name: 'Everyday', note: 'The things footage usually needs before anything else.' },
+      audio: { name: 'Sound and music', note: 'For the track under the picture, or a song on its own.' },
       engine: {
         name: 'Made with the engine',
         note: 'These read what is in the video, which is the part other tools skip.',
@@ -307,6 +308,7 @@ export const HUB: Record<Lang, HubWords> = {
     open: 'Abrir →',
     groups: {
       everyday: { name: 'Cada día', note: 'Lo que el material suele necesitar antes que nada.' },
+      audio: { name: 'Sonido y música', note: 'Para la pista bajo la imagen o una canción por sí sola.' },
       engine: {
         name: 'Hechas con el motor',
         note: 'Estas leen lo que hay dentro del vídeo, que es la parte que otras herramientas se saltan.',
@@ -332,6 +334,7 @@ export const HUB: Record<Lang, HubWords> = {
     open: 'Abrir →',
     groups: {
       everyday: { name: 'Do dia a dia', note: 'O que o material costuma precisar antes de tudo o resto.' },
+      audio: { name: 'Som e música', note: 'Para a faixa sob a imagem ou uma música sozinha.' },
       engine: {
         name: 'Feitas com o motor',
         note: 'Estas leem o que está dentro do vídeo, que é a parte que as outras ferramentas saltam.',
@@ -357,6 +360,7 @@ export const HUB: Record<Lang, HubWords> = {
     open: 'Buka →',
     groups: {
       everyday: { name: 'Sehari-hari', note: 'Hal yang biasanya dibutuhkan rekaman sebelum apa pun.' },
+      audio: { name: 'Suara dan musik', note: 'Untuk trek di bawah gambar, atau lagu itu sendiri.' },
       engine: {
         name: 'Dibuat dengan mesin analisis',
         note: 'Yang ini membaca isi videonya — bagian yang dilewati alat lain.',
@@ -382,6 +386,7 @@ export const HUB: Record<Lang, HubWords> = {
     open: 'افتح →',
     groups: {
       everyday: { name: 'كل يوم', note: 'ما تحتاجه اللقطات عادةً قبل أي شيء آخر.' },
+      audio: { name: 'الصوت والموسيقى', note: 'للمسار تحت الصورة، أو لأغنية وحدها.' },
       engine: {
         name: 'مبنية على المحرّك',
         note: 'هذه تقرأ ما داخل الفيديو، وهو الجزء الذي تتجاوزه الأدوات الأخرى.',
@@ -407,6 +412,7 @@ export const HUB: Record<Lang, HubWords> = {
     open: 'Открыть →',
     groups: {
       everyday: { name: 'Каждый день', note: 'То, что материалу обычно нужно раньше всего остального.' },
+      audio: { name: 'Звук и музыка', note: 'Для дорожки под картинкой или для песни самой по себе.' },
       engine: {
         name: 'Сделано на движке',
         note: 'Эти читают, что внутри видео, — ту часть, которую другие инструменты пропускают.',
@@ -432,6 +438,7 @@ export const HUB: Record<Lang, HubWords> = {
     open: 'Aç →',
     groups: {
       everyday: { name: 'Her gün', note: 'Çekimlerin genellikle her şeyden önce ihtiyaç duyduğu işler.' },
+      audio: { name: 'Ses ve müzik', note: 'Görüntünün altındaki parça ya da tek başına bir şarkı için.' },
       engine: {
         name: 'Motorla yapıldı',
         note: 'Bunlar videonun içindekini okur — diğer araçların atladığı kısım.',

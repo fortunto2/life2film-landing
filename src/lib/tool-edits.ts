@@ -574,7 +574,7 @@ Reference implementation: https://life2film.com/tools/screen-recorder/`,
   {
     // 20 Nov 2026: «mp3 cutter» / «обрезать песню онлайн» — the audio twin of the trimmer.
     slug: 'audio-cutter',
-    group: 'everyday',
+    group: 'audio',
     name: 'Audio Cutter',
     appName: 'MP3 Cutter',
     blurb: 'Cut a piece out of a song for a ringtone, a reel or an edit, with a soft fade.',
@@ -627,7 +627,7 @@ Reference implementation: https://life2film.com/tools/audio-cutter/`,
     // 20 Nov 2026: «audio converter», «m4a to mp3», «конвертер аудио» — the video-to-mp3 engine,
     // which already takes audio files, under the name people search for.
     slug: 'audio-converter',
-    group: 'everyday',
+    group: 'audio',
     name: 'Audio Converter',
     appName: 'Audio Converter',
     blurb: 'M4A, WAV, FLAC, OGG and more to MP3, WAV or OGG, with the bitrate you choose.',
@@ -782,7 +782,7 @@ Reference implementation: https://life2film.com/tools/audio-cutter/`,
     // 20 Nov 2026: the BPM page's readers (its RU queries are 2,756 impressions in 28 days) are the
     // people who also ask «тональность песни», «song key finder», «camelot key».
     slug: 'key-finder',
-    group: 'everyday',
+    group: 'audio',
     name: 'Song Key Finder',
     appName: 'Key Finder',
     blurb: 'Find a song\'s key and its Camelot code for harmonic mixing, with a second guess when it is close.',
@@ -825,7 +825,7 @@ Reference implementation: https://life2film.com/tools/audio-cutter/`,
   {
     // 20 Nov 2026: «объединить mp3», «join mp3», «merge audio» — the audio twin of merge-videos.
     slug: 'audio-joiner',
-    group: 'everyday',
+    group: 'audio',
     name: 'Audio Joiner',
     appName: 'MP3 Joiner',
     blurb: 'Join songs or recordings into one MP3 or WAV, in your order, with a crossfade if you want one.',
