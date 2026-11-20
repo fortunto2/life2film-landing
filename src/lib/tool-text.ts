@@ -16,14 +16,14 @@ export const TEXT_TOOLS: Tool[] = [
 
     searchPhrase: 'Auto Subtitle Generator Online',
     title: 'Auto Subtitle Generator Online Free | video to SRT with Whisper, no upload',
-    description: 'Make subtitles from a video automatically, online and free: Whisper runs in your browser and writes SRT or VTT with timing, in 99 languages. The video is not uploaded; the speech model downloads once and is cached.',
+    description: 'Make subtitles from a video automatically, online and free: Whisper runs in your browser and writes SRT or VTT with timing, or a plain transcript (.txt), in 99 languages. The video is not uploaded; the speech model downloads once and is cached.',
     heading: 'Auto',
     accent: 'subtitles',
     lede: 'Turn speech into timed subtitles without sending the video anywhere.',
     featureList: [
       'Whisper base (fast) or small (more accurate), running in the tab',
       'Language detected, or chosen from the list',
-      'SRT and WebVTT with timing, lines split to a readable length',
+      'SRT and WebVTT with timing, lines split to a readable length; or a plain-text transcript',
       'GPU through WebGPU where the browser has it, CPU otherwise',
       'The video is not uploaded; the model downloads once',
     ],
