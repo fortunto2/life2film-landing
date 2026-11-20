@@ -4,6 +4,7 @@
  * site reads the other sites' tools from it. `registry.test.ts` fails when the package is stale;
  * `REGISTRY_WRITE=1 npx vitest run src/lib/registry.test.ts` rewrites this site's rows in place.
  */
+import { ENGINE_CLI } from './engine-cli';
 import type { ToolCategory, ToolEntry } from 'superduper-tools/registry';
 import { TOOLS, type ToolGroup } from './tools';
 import { TRANSLATIONS, localesFor, toolName } from './tools/index';
@@ -35,6 +36,7 @@ export function registryRows(previous: readonly ToolEntry[] = []): ToolEntry[] {
     if (Object.keys(l10n).length) row.l10n = l10n;
     if (old?.core) row.core = old.core;
     if (old?.related?.length) row.related = old.related;
+    if (ENGINE_CLI[t.slug]) row.cli = ENGINE_CLI[t.slug];
     return row;
   });
 }
