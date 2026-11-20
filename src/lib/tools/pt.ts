@@ -125,6 +125,35 @@ export const pt: ToolTranslations = {
     ],
   },
 
+  'remove-audio-from-video': {
+    searchPhrase: 'Remover áudio de vídeo online',
+    title: 'Remover o áudio de um vídeo online grátis — sem recodificar',
+    description:
+      'Tire o som de um vídeo online e grátis: a faixa de áudio é removida e a imagem é copiada sem recodificar, com a mesma qualidade. Tudo no navegador, sem upload nem marca d’água.',
+    heading: 'Remover áudio',
+    accent: 'do vídeo',
+    lede: 'Tire a faixa de som e deixe a imagem intacta. Nada é enviado nem recodificado.',
+    blurb: 'Vídeo sem som: a faixa sai e a imagem é copiada sem perder qualidade.',
+    featureList: [
+      'Remove o áudio de MP4, MOV e WebM',
+      'Copia a imagem sem recodificar: mesma qualidade, em segundos',
+      'Tudo no navegador: sem upload, sem marca d’água, sem limite de tamanho',
+    ],
+    faq: [
+      {
+        q: 'O vídeo perde qualidade?',
+        a: 'Não. A imagem vai para o novo arquivo quadro a quadro; só a faixa de som fica de fora. Se o navegador não conseguir copiar esse codec no contêiner, a ferramenta recodifica a imagem e avisa.',
+      },
+      {
+        q: 'Meu vídeo é enviado para algum lugar?',
+        a: 'Não. O navegador lê e grava o arquivo com WebCodecs; nada sai do seu aparelho. Por isso não há limite de tamanho além da memória do navegador.',
+      },
+      {
+        q: 'Posso guardar o áudio separado?',
+        a: 'Sim, com a ferramenta de vídeo para MP3 deste site: ela faz o contrário, mantém o som e tira a imagem.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Conversor de vídeo online',
     title: 'Conversor de Vídeo Online Grátis — MP4, WebM, MOV sem enviar nada',

@@ -14,6 +14,11 @@ const status = STATUS[lang];
 const WORDS: Partial<Record<Lang, Record<string, string>>> = {
   en: { run: 'Remove audio', silent: 'This video has no sound track: it is already silent.', copied: 'Saved — {size}, the picture copied as it was.', reencoded: 'Saved — {size}. The picture had to be re-encoded for this browser.', failed: 'Could not remove the audio — {msg}' },
   ru: { run: 'Убрать звук', silent: 'В этом видео нет звуковой дорожки: оно уже без звука.', copied: 'Сохранено — {size}, картинка скопирована как есть.', reencoded: 'Сохранено — {size}. Картинку пришлось перекодировать для этого браузера.', failed: 'Не удалось убрать звук — {msg}' },
+  es: { run: 'Quitar audio', silent: 'Este video no tiene pista de sonido: ya está en silencio.', copied: 'Guardado — {size}, la imagen copiada tal cual.', reencoded: 'Guardado — {size}. La imagen tuvo que recodificarse para este navegador.', failed: 'No se pudo quitar el audio — {msg}' },
+  pt: { run: 'Remover áudio', silent: 'Este vídeo não tem faixa de som: já está sem som.', copied: 'Salvo — {size}, a imagem copiada como estava.', reencoded: 'Salvo — {size}. A imagem precisou ser recodificada para este navegador.', failed: 'Não foi possível remover o áudio — {msg}' },
+  id: { run: 'Hapus audio', silent: 'Video ini tidak punya trek suara: sudah tanpa suara.', copied: 'Tersimpan — {size}, gambar disalin apa adanya.', reencoded: 'Tersimpan — {size}. Gambar harus di-encode ulang untuk browser ini.', failed: 'Gagal menghapus audio — {msg}' },
+  tr: { run: 'Sesi kaldır', silent: 'Bu videoda ses parçası yok: zaten sessiz.', copied: 'Kaydedildi — {size}, görüntü olduğu gibi kopyalandı.', reencoded: 'Kaydedildi — {size}. Görüntünün bu tarayıcı için yeniden kodlanması gerekti.', failed: 'Ses kaldırılamadı — {msg}' },
+  ar: { run: 'إزالة الصوت', silent: 'لا يحتوي هذا الفيديو على مسار صوت: إنه صامت بالفعل.', copied: 'تم الحفظ — {size}، ونُسخت الصورة كما هي.', reencoded: 'تم الحفظ — {size}. اضطررنا لإعادة ترميز الصورة لهذا المتصفح.', failed: 'تعذّرت إزالة الصوت — {msg}' },
 };
 const words = WORDS[lang] ?? WORDS.en!;
 ---

@@ -125,6 +125,35 @@ export const tr: ToolTranslations = {
     ],
   },
 
+  'remove-audio-from-video': {
+    searchPhrase: 'Videodan ses silme online',
+    title: 'Videodan Sesi Kaldır Online Ücretsiz — yeniden kodlama yok',
+    description:
+      'Videonun sesini online ve ücretsiz kaldırın: ses parçası çıkarılır, görüntü yeniden kodlanmadan kopyalanır, kalite aynı kalır. Her şey tarayıcıda, yükleme ve filigran yok.',
+    heading: 'Sesi kaldır',
+    accent: 'videodan',
+    lede: 'Ses parçasını çıkarın, görüntüye dokunmayın. Hiçbir şey yüklenmez, yeniden kodlanmaz.',
+    blurb: 'Sessiz video: ses parçası çıkarılır, görüntü kalite kaybı olmadan kopyalanır.',
+    featureList: [
+      'MP4, MOV ve WebM dosyalarından sesi kaldırır',
+      'Görüntüyü yeniden kodlamadan kopyalar: aynı kalite, saniyeler içinde',
+      'Her şey tarayıcıda: yükleme yok, filigran yok, boyut sınırı yok',
+    ],
+    faq: [
+      {
+        q: 'Video kalitesi düşer mi?',
+        a: 'Hayır. Görüntü yeni dosyaya kare kare aktarılır; yalnızca ses parçası dışarıda kalır. Tarayıcı bu codec’i kapsayıcıya kopyalayamazsa araç görüntüyü yeniden kodlar ve bunu söyler.',
+      },
+      {
+        q: 'Videom bir yere yükleniyor mu?',
+        a: 'Hayır. Dosyayı tarayıcınız WebCodecs ile okur ve yazar; cihazınızdan hiçbir şey çıkmaz. Bu yüzden tarayıcı belleği dışında boyut sınırı yoktur.',
+      },
+      {
+        q: 'Sesi ayrı bir dosya olarak saklayabilir miyim?',
+        a: 'Evet, bu sitedeki videodan MP3 aracıyla: tersini yapar, sesi tutar ve görüntüyü atar.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',

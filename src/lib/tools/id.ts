@@ -125,6 +125,35 @@ export const id: ToolTranslations = {
     ],
   },
 
+  'remove-audio-from-video': {
+    searchPhrase: 'Hapus audio dari video online',
+    title: 'Hapus Audio dari Video Online Gratis — tanpa encode ulang',
+    description:
+      'Hapus suara dari video secara online dan gratis: trek audio dibuang dan gambar disalin tanpa encode ulang, kualitas tetap sama. Semua di browser, tanpa unggah dan tanpa watermark.',
+    heading: 'Hapus audio',
+    accent: 'dari video',
+    lede: 'Buang trek suara dan biarkan gambar apa adanya. Tidak ada yang diunggah atau di-encode ulang.',
+    blurb: 'Video tanpa suara: trek dibuang, gambar disalin tanpa kehilangan kualitas.',
+    featureList: [
+      'Menghapus audio dari MP4, MOV, dan WebM',
+      'Menyalin gambar tanpa encode ulang: kualitas sama, dalam hitungan detik',
+      'Semua di browser: tanpa unggah, tanpa watermark, tanpa batas ukuran',
+    ],
+    faq: [
+      {
+        q: 'Apakah kualitas video turun?',
+        a: 'Tidak. Gambar dipindahkan ke file baru bingkai demi bingkai; hanya trek suaranya yang ditinggalkan. Jika browser tidak bisa menyalin codec itu ke kontainer, alat ini meng-encode ulang gambar dan memberi tahu Anda.',
+      },
+      {
+        q: 'Apakah video saya diunggah?',
+        a: 'Tidak. Browser Anda membaca dan menulis file lewat WebCodecs; tidak ada yang keluar dari perangkat. Karena itu tidak ada batas ukuran selain memori browser.',
+      },
+      {
+        q: 'Bisakah audionya disimpan terpisah?',
+        a: 'Bisa, dengan alat video ke MP3 di situs ini: kebalikannya, menyimpan suara dan membuang gambar.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',
