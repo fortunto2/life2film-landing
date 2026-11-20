@@ -54,6 +54,14 @@ export interface EncodeOptions {
    * keyframe. Forcing the transcode is what buys a frame-accurate in-point.
    */
   forceTranscode?: boolean;
+  /**
+   * Turn the picture clockwise and/or mirror it. Without `bakeTransform` this is written as the
+   * file's rotation/flip metadata and the frames are copied untouched; with it the turn is drawn into
+   * the frames (a re-encode), for the players and uploaders that ignore that metadata.
+   */
+  rotate?: 0 | 90 | 180 | 270;
+  flip?: boolean;
+  bakeTransform?: boolean;
   /** Drop the picture — used by "extract the audio". */
   discardVideo?: boolean;
   /** Drop the sound — used to make a file smaller when nobody will hear it. */
@@ -446,7 +454,7 @@ export async function encodeDetailed(file: File, options: EncodeOptions): Promis
   // does not imply a transcode gets added.
   const transcode =
     !dropVideo &&
-    Boolean(options.width || options.height || options.fit || videoBitrate || options.forceTranscode);
+    Boolean(options.width || options.height || options.fit || videoBitrate || options.forceTranscode || options.bakeTransform);
 
   const sourceTrack = dropVideo ? null : await input.getPrimaryVideoTrack();
   // A source codec the container should not carry (VP9 into MP4) forces a transcode even when
@@ -487,6 +495,11 @@ export async function encodeDetailed(file: File, options: EncodeOptions): Promis
       })
       .catch(() => false));
 
+  const turn = {
+    ...(options.rotate && { rotate: options.rotate }),
+    ...(options.flip && { flip: true }),
+    ...(options.bakeTransform && { allowTransformationMetadata: false }),
+  };
   const videoFor = (attempt: Attempt) =>
     dropVideo
       ? { discard: true as const }
@@ -498,9 +511,10 @@ export async function encodeDetailed(file: File, options: EncodeOptions): Promis
             ...(options.fit && { fit: options.fit }),
             ...(videoBitrate && { bitrate: videoBitrate }),
             ...(options.forceTranscode && { forceTranscode: true }),
+            ...turn,
             hardwareAcceleration: attempt.acceleration,
           }
-        : {};
+        : turn;
 
   // WAV is uncompressed: sample rate × bit depth × channels, with no bitrate to choose. Every other
   // container here has one. Testing `isAudioOnly` instead used to lump MP3 and OGG in with WAV, and

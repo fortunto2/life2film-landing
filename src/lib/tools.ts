@@ -517,6 +517,67 @@ Reference implementation: https://life2film.com/tools/remove-audio-from-video/`,
     agentJob: 'Muting a video, locally',
   },
   {
+    // 20 Nov 2026: «rotate video», «flip video» — a job searched by name. Done as rotation metadata
+    // by default (lossless, instant), with an opt-in to draw the turn into the frames.
+    slug: 'rotate-video',
+    group: 'everyday',
+    name: 'Rotate Video',
+    appName: 'Rotate Video',
+    blurb: 'Turn a sideways video upright or mirror it, without re-encoding.',
+
+    searchPhrase: 'Rotate Video Online',
+    title: 'Rotate Video Online Free | turn 90° or flip, no re-encoding',
+    description: 'Rotate a video 90°, 180° or 270°, or flip it, online and free. The turn is written into the file without re-encoding, so quality stays the same; or draw it into the frames for players that ignore rotation. In your browser, no upload.',
+    heading: 'Rotate',
+    accent: 'video',
+    lede: 'Fix a sideways video in seconds. Nothing is uploaded, and by default nothing is re-encoded.',
+    featureList: [
+      'Rotate 90° right, 90° left or 180°, and mirror horizontally',
+      'Lossless by default: the turn is stored in the file, the frames are copied',
+      'Optional: draw the turn into the frames for players that ignore rotation',
+      'Runs fully client-side: no upload, no watermark',
+    ],
+    faq: [
+      {
+        q: 'Does rotating lose quality?',
+        a: 'Not by default. Video files carry a rotation flag that players read, so the tool sets that flag and copies the frames untouched: same quality, done in seconds. If you tick «draw the turn into the frames», the picture is re-encoded, which costs a little quality once.',
+      },
+      {
+        q: 'Why is my rotated video still sideways in some apps?',
+        a: 'A few players and upload forms ignore the rotation flag and show the frames as they are stored. For those, rotate again with «draw the turn into the frames» ticked: the turn then is part of the picture and every player shows it upright.',
+      },
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. Your browser reads and writes the file through WebCodecs; nothing leaves your device.',
+      },
+    ],
+
+    summary: 'Rotate or mirror a video in the browser, losslessly through rotation metadata or by redrawing the frames.',
+    facts: [
+      'MP4 and MOV store a rotation matrix; setting it turns the video for every player that reads it, with the frames copied untouched.',
+      'Some players and uploaders ignore that matrix; baking the turn into the frames needs a re-encode.',
+    ],
+    code: `import { Input, Output, Conversion, BlobSource, BufferTarget, Mp4OutputFormat, ALL_FORMATS } from 'mediabunny';
+
+const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
+const output = new Output({ format: new Mp4OutputFormat(), target: new BufferTarget() });
+// Metadata when possible (lossless); allowTransformationMetadata: false draws it into the frames.
+const conversion = await Conversion.init({ input, output, video: { rotate: 90 } });
+await conversion.execute();`,
+    prompt: `Add "rotate or flip a video" to my project, running entirely in the browser.
+
+Requirements:
+- Use "mediabunny" (WebCodecs). Offer 90° right, 90° left, 180° and a horizontal mirror.
+- Default to rotation metadata so the frames are copied untouched; offer an explicit option to
+  draw the turn into the frames (allowTransformationMetadata: false) for players that ignore it,
+  and say that this re-encodes.
+- Keep the source container (MP4 stays MP4, MOV stays MOV).
+- Write results in pieces (StreamTarget), not one ArrayBuffer: Chrome refuses buffers over ~2 GB.
+
+Reference implementation: https://life2film.com/tools/rotate-video/`,
+    agentJob: 'Rotating a video, locally',
+  },
+  {
     slug: 'video-to-frames',
     group: 'everyday',
     name: 'Video to Frames',

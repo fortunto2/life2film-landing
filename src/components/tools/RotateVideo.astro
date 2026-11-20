@@ -1,0 +1,147 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+/** The words this tool says itself; the page around it comes from the registry. */
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { run: 'Rotate', turn: 'Turn', none: 'Keep', cw: '90° right', half: '180°', ccw: '90° left', flip: 'Mirror (flip horizontally)', bake: 'Draw the turn into the frames (for players that ignore rotation; re-encodes)', copied: 'Saved — {size}. Rotated without re-encoding: the frames are untouched.', reencoded: 'Saved — {size}. The turn is drawn into the frames.', failed: 'Could not rotate — {msg}', nothing: 'Pick a turn or a mirror first.' },
+  ru: { run: 'Повернуть', turn: 'Поворот', none: 'Без поворота', cw: '90° вправо', half: '180°', ccw: '90° влево', flip: 'Отразить по горизонтали', bake: 'Вписать поворот в кадры (для плееров, которые не читают поворот; перекодирует)', copied: 'Сохранено — {size}. Повёрнуто без перекодирования: кадры не тронуты.', reencoded: 'Сохранено — {size}. Поворот вписан в кадры.', failed: 'Не удалось повернуть — {msg}', nothing: 'Сначала выберите поворот или отражение.' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="video/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP4, MOV, WebM</span>
+  </label>
+
+  <div id="editor" hidden>
+    <div class="facts" id="facts"></div>
+    <div class="controls">
+      <label class="control">
+        <span class="muted">{words.turn}</span>
+        <select id="rotate">
+          <option value="0">{words.none}</option>
+          <option value="90" selected>{words.cw}</option>
+          <option value="180">{words.half}</option>
+          <option value="270">{words.ccw}</option>
+        </select>
+      </label>
+      <label class="control check"><input type="checkbox" id="flip" /> <span>{words.flip}</span></label>
+      <label class="control check"><input type="checkbox" id="bake" /> <span class="muted">{words.bake}</span></label>
+      <span class="spacer"></span>
+      <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+    </div>
+  </div>
+
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { toolStrings, fill } from '../../lib/strings';
+  import { probe, encodeDetailed, saveBlob, formatBytes, preciseClock, CONTAINER_EXTENSION, type Container, type Probe } from '../../lib/encode';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const say = toolStrings();
+  const words = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  const fileInput = el<HTMLInputElement>('file');
+  let file: File | null = null;
+  let info: Probe | null = null;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  /** Keep the source's container: MOV stays MOV, WebM stays WebM, anything else becomes MP4. */
+  function containerOf(f: File): Container {
+    const ext = f.name.split('.').pop()?.toLowerCase();
+    if (ext === 'mov' || f.type === 'video/quicktime') return 'mov';
+    if (ext === 'webm' || f.type === 'video/webm') return 'webm';
+    return 'mp4';
+  }
+
+  async function open(chosen: File) {
+    file = chosen;
+    try {
+      status(say.reading);
+      info = await probe(chosen);
+      el('editor').hidden = false;
+      el('facts').innerHTML =
+        `<span>Inside: <b>${info.videoCodec ?? 'no video'}${info.hasAudio ? ` + ${info.audioCodec}` : ''}</b></span>` +
+        `<span>Length: <b>${preciseClock(info.duration)}</b></span>` +
+        `<span>Size: <b>${formatBytes(info.size)}</b></span>`;
+      statusEl.hidden = true;
+    } catch (error) {
+      toolFailed('open', error, chosen);
+      status(error instanceof Error ? error.message : 'Could not read that file.', 1, true);
+    }
+  }
+
+  el<HTMLButtonElement>('run').addEventListener('click', async () => {
+    if (!file || busy || !info) return;
+    const rotate = Number(el<HTMLSelectElement>('rotate').value) as 0 | 90 | 180 | 270;
+    const flip = el<HTMLInputElement>('flip').checked;
+    const bake = el<HTMLInputElement>('bake').checked;
+    if (!rotate && !flip) { status(words.nothing, 1); return; }
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    const container = containerOf(file);
+    const name = file.name.replace(/\.[^.]+$/, '') || 'video';
+    try {
+      status(fill(say.working, { n: 0 }), 0);
+      const result = await encodeDetailed(file, {
+        container,
+        rotate,
+        flip,
+        bakeTransform: bake,
+        onProgress: (p) => status(fill(say.working, { n: Math.round(p * 100) }), p),
+      });
+      saveBlob(result.blob, `${name}-rotated.${CONTAINER_EXTENSION[container]}`);
+      track('result_saved', { placement: 'result', format: container, turn: String(rotate) + (flip ? 'f' : '') + (bake ? 'b' : ''), copied: result.copiedVideo ? 'yes' : 'no' }, { size_mb: Math.round(result.blob.size / 104_857.6) / 10 });
+      status((result.copiedVideo ? words.copied : words.reencoded).replace('{size}', formatBytes(result.blob.size)), 1);
+    } catch (error) {
+      toolFailed('run', error, file);
+      status(words.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  fileInput.addEventListener('change', () => {
+    const chosen = fileInput.files?.[0];
+    if (chosen) { fileChosen(chosen, 'picker'); void open(chosen); }
+  });
+  for (const type of ['dragenter', 'dragover']) drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const type of ['dragleave', 'drop']) drop.addEventListener(type, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => {
+    const chosen = (e as DragEvent).dataTransfer?.files?.[0];
+    if (chosen) { fileChosen(chosen, 'drop'); void open(chosen); }
+  });
+</script>
+
+<style>
+  .check { display: flex; gap: 8px; align-items: center; }
+</style>
