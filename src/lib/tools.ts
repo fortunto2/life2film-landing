@@ -606,7 +606,8 @@ Reference implementation: https://life2film.com/tools/video-splitter/`,
     blurb: 'Find a track’s tempo and the time of every beat, then send the grid to Resolve, Premiere, Final Cut or Audacity as markers.',
 
     searchPhrase: 'BPM Detector Online',
-    title: 'BPM Detector Online Free | find a song’s tempo and every beat',
+    // 20 Nov 2026: «video bpm finder», «bpm finder from video» at position 7: the tool reads video too.
+    title: 'BPM Detector Online Free | the tempo of a song or a video, every beat',
     description: 'Free online BPM finder: get a track’s tempo and the exact time of every beat, in your browser. Export the beat grid to DaVinci Resolve, Premiere, Final Cut or Audacity. Nothing is uploaded.',
     heading: 'BPM',
     accent: 'Detector',
@@ -702,6 +703,12 @@ Reference implementation: https://life2film.com/tools/bpm-detector/`,
         'Export to EDL, OTIO, FCPXML, Audacity labels, CSV and JSON',
       ],
     faq: [
+      {
+        // 20 Nov 2026: «find scene», «scene finder», «film detector» bring people at position 6–10
+        // who want to name a film from a clip. Say what this is before they bounce.
+        q: 'Can it tell me which movie a scene is from?',
+        a: 'No. This tool finds where the cuts are inside a video you have, and lists its shots. Naming a film from a clip is a different job, done by reverse image search: take a frame (the video to frames tool here saves one) and search it with Google Lens.',
+      },
   {
     q: 'Does the video get uploaded?',
     a: 'No. The browser decodes it locally, a canvas reads the pixels, and WebAssembly compares them. Nothing is sent anywhere, the page has no endpoint to send it to. That is also why there is no file-size limit and no queue.',
