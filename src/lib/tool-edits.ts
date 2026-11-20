@@ -507,7 +507,7 @@ Reference implementation: https://life2film.com/tools/video-speed/`,
   {
     // 20 Nov 2026: «screen recorder online» — a huge query, and the browser does it with no upload.
     slug: 'screen-recorder',
-    group: 'everyday',
+    group: 'create',
     name: 'Screen Recorder',
     appName: 'Online Screen Recorder',
     blurb: 'Record your screen, a window or a tab, with sound and microphone, straight to a file.',
@@ -865,7 +865,7 @@ Reference implementation: https://life2film.com/tools/audio-cutter/`,
   {
     // 20 Nov 2026: «add subtitles to video», «вшить субтитры в видео» — burn an SRT/VTT in.
     slug: 'burn-subtitles',
-    group: 'everyday',
+    group: 'create',
     name: 'Add Subtitles to Video',
     appName: 'Burn Subtitles',
     blurb: 'Burn an SRT or VTT file into a video, so the captions show everywhere it plays.',
@@ -906,7 +906,7 @@ Reference implementation: https://life2film.com/tools/audio-cutter/`,
     // 20 Nov 2026: «сделать видео из фото с музыкой», «photos to video», «slideshow maker» — the
     // nearest thing on the site to what the app does, so it is also the most natural door into it.
     slug: 'photos-to-video',
-    group: 'everyday',
+    group: 'create',
     name: 'Photos to Video',
     appName: 'Slideshow Maker',
     blurb: 'Turn photos and a song into a video for Reels, Stories or YouTube, with a slow zoom and soft cuts.',

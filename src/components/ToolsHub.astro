@@ -15,13 +15,15 @@ const words = HUB[lang];
 const note = homeNote(lang, true);
 
 /**
- * A card's blurb comes from the translation when there is one.
- *
- * `ToolTranslation` carries no `name`, so the name is always the English one — this used to be
- * written as a ternary whose branches were identical, which read like translation happening and
- * was not.
+ * A card's blurb comes from the translation when there is one, and so does its name: the page's own
+ * H1 (heading + accent), which is how that page names the job in that language. Until 20 Nov 2026
+ * every non-English hub showed English names («Trim Video») over translated blurbs.
  */
 const blurbFor = (slug: string, fallback: string) => TRANSLATIONS[lang]?.[slug]?.blurb ?? fallback;
+const nameFor = (slug: string, fallback: string) => {
+  const t = TRANSLATIONS[lang]?.[slug];
+  return t ? `${t.heading} ${t.accent}` : fallback;
+};
 
 /** Locales that have at least one tool translated — the hub exists wherever the tools do. */
 const locales = ['en', ...(Object.keys(TRANSLATIONS) as Lang[])] as Lang[];
@@ -65,7 +67,7 @@ const jsonLd = {
             <div class="grid cols-2 tools">
               {byGroup(group.id).map((tool) => (
                 <a class="card tool" href={toolPath(lang, tool.slug)}>
-                  <h3>{tool.name}</h3>
+                  <h3>{nameFor(tool.slug, tool.name)}</h3>
                   <p>{blurbFor(tool.slug, tool.blurb)}</p>
                   <span class="go">{words.open}</span>
                 </a>

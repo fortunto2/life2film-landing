@@ -1,5 +1,5 @@
 import type { Lang } from '../i18n';
-import type { FaqEntry, Tool } from './tools';
+import type { FaqEntry, Tool, ToolGroup } from './tools';
 
 /**
  * Tool pages in other languages.
@@ -272,7 +272,7 @@ export interface HubWords {
   heading: string;
   lede: string;
   open: string;
-  groups: Record<'everyday' | 'audio' | 'engine', { name: string; note: string }>;
+  groups: Record<ToolGroup, { name: string; note: string }>;
   whyTitle: string;
   whyBody: string;
   engineTitle: string;
@@ -291,6 +291,7 @@ export const HUB: Record<Lang, HubWords> = {
     open: 'Open →',
     groups: {
       everyday: { name: 'Everyday', note: 'The things footage usually needs before anything else.' },
+      create: { name: 'Make and style', note: 'Text, subtitles, a logo, a look, a new shape, or a video from scratch.' },
       audio: { name: 'Sound and music', note: 'For the track under the picture, or a song on its own.' },
       engine: {
         name: 'Made with the engine',
@@ -317,6 +318,7 @@ export const HUB: Record<Lang, HubWords> = {
     open: 'Abrir →',
     groups: {
       everyday: { name: 'Cada día', note: 'Lo que el material suele necesitar antes que nada.' },
+      create: { name: 'Crear y dar estilo', note: 'Texto, subtítulos, un logo, un look, otro formato o un video desde cero.' },
       audio: { name: 'Sonido y música', note: 'Para la pista bajo la imagen o una canción por sí sola.' },
       engine: {
         name: 'Hechas con el motor',
@@ -343,6 +345,7 @@ export const HUB: Record<Lang, HubWords> = {
     open: 'Abrir →',
     groups: {
       everyday: { name: 'Do dia a dia', note: 'O que o material costuma precisar antes de tudo o resto.' },
+      create: { name: 'Criar e estilizar', note: 'Texto, legendas, um logo, um visual, outro formato ou um vídeo do zero.' },
       audio: { name: 'Som e música', note: 'Para a faixa sob a imagem ou uma música sozinha.' },
       engine: {
         name: 'Feitas com o motor',
@@ -369,6 +372,7 @@ export const HUB: Record<Lang, HubWords> = {
     open: 'Buka →',
     groups: {
       everyday: { name: 'Sehari-hari', note: 'Hal yang biasanya dibutuhkan rekaman sebelum apa pun.' },
+      create: { name: 'Buat dan gaya', note: 'Teks, subtitle, logo, tampilan, bentuk baru, atau video dari nol.' },
       audio: { name: 'Suara dan musik', note: 'Untuk trek di bawah gambar, atau lagu itu sendiri.' },
       engine: {
         name: 'Dibuat dengan mesin analisis',
@@ -395,6 +399,7 @@ export const HUB: Record<Lang, HubWords> = {
     open: 'افتح →',
     groups: {
       everyday: { name: 'كل يوم', note: 'ما تحتاجه اللقطات عادةً قبل أي شيء آخر.' },
+      create: { name: 'الإنشاء والتنسيق', note: 'نص وترجمة وشعار ومظهر وشكل جديد، أو فيديو من الصفر.' },
       audio: { name: 'الصوت والموسيقى', note: 'للمسار تحت الصورة، أو لأغنية وحدها.' },
       engine: {
         name: 'مبنية على المحرّك',
@@ -421,6 +426,7 @@ export const HUB: Record<Lang, HubWords> = {
     open: 'Открыть →',
     groups: {
       everyday: { name: 'Каждый день', note: 'То, что материалу обычно нужно раньше всего остального.' },
+      create: { name: 'Создать и оформить', note: 'Текст, субтитры, логотип, цвет, новый формат или видео с нуля.' },
       audio: { name: 'Звук и музыка', note: 'Для дорожки под картинкой или для песни самой по себе.' },
       engine: {
         name: 'Сделано на движке',
@@ -447,6 +453,7 @@ export const HUB: Record<Lang, HubWords> = {
     open: 'Aç →',
     groups: {
       everyday: { name: 'Her gün', note: 'Çekimlerin genellikle her şeyden önce ihtiyaç duyduğu işler.' },
+      create: { name: 'Oluştur ve biçimlendir', note: 'Metin, altyazı, logo, görünüm, yeni biçim ya da sıfırdan video.' },
       audio: { name: 'Ses ve müzik', note: 'Görüntünün altındaki parça ya da tek başına bir şarkı için.' },
       engine: {
         name: 'Motorla yapıldı',

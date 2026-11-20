@@ -9,7 +9,7 @@ export const TEXT_TOOLS: Tool[] = [
     // 20 Nov 2026: «автоматические субтитры онлайн», «auto subtitle generator», «video to text» —
     // Whisper in the tab, SRT out, and burn-subtitles right after.
     slug: 'auto-subtitles',
-    group: 'everyday',
+    group: 'create',
     name: 'Auto Subtitles',
     appName: 'Auto Subtitles',
     blurb: 'Speech to SRT or VTT in your browser with Whisper, then burn them in with one more click.',
@@ -49,7 +49,7 @@ export const TEXT_TOOLS: Tool[] = [
   {
     // 20 Nov 2026: «add text to video», «добавить текст на видео» — one caption, the burner's drawing.
     slug: 'add-text-to-video',
-    group: 'everyday',
+    group: 'create',
     name: 'Add Text to Video',
     appName: 'Add Text',
     blurb: 'Put a caption on a video, top or bottom, readable on any background.',
@@ -125,7 +125,7 @@ export const TEXT_TOOLS: Tool[] = [
   {
     // 20 Nov 2026: «записать видео с веб-камеры онлайн», «webcam recorder» — camera + mic to a file.
     slug: 'webcam-recorder',
-    group: 'everyday',
+    group: 'create',
     name: 'Webcam Recorder',
     appName: 'Webcam Recorder',
     blurb: 'Record yourself from the webcam with sound and save the video.',
@@ -205,7 +205,7 @@ export const TEXT_TOOLS: Tool[] = [
   {
     // 20 Nov 2026: «добавить логотип на видео», «add watermark to video» — an image on every frame.
     slug: 'add-logo-to-video',
-    group: 'everyday',
+    group: 'create',
     name: 'Add Logo to Video',
     appName: 'Add Logo',
     blurb: 'Put your logo or watermark in a corner of a video, at the size and opacity you pick.',
@@ -361,7 +361,7 @@ export const TEXT_TOOLS: Tool[] = [
   {
     // 20 Nov 2026: «make video vertical without cropping», «вертикальное видео с размытым фоном».
     slug: 'blur-background-video',
-    group: 'everyday',
+    group: 'create',
     name: 'Blurred Background Video',
     appName: 'Blur Fill',
     blurb: 'Make a horizontal video vertical (or square) without cutting it: blurred background fills the rest.',
@@ -397,7 +397,7 @@ export const TEXT_TOOLS: Tool[] = [
   {
     // 20 Nov 2026: «осветлить тёмное видео», «сделать видео чёрно-белым», «video filters online».
     slug: 'video-filters',
-    group: 'everyday',
+    group: 'create',
     name: 'Video Filters',
     appName: 'Video Filters',
     blurb: 'Brighten a dark video, make it black and white, warmer or more vivid, with a live preview.',
@@ -433,7 +433,7 @@ export const TEXT_TOOLS: Tool[] = [
   {
     // 20 Nov 2026: «два видео в одном кадре», «side by side video maker», «split screen video».
     slug: 'split-screen-video',
-    group: 'everyday',
+    group: 'create',
     name: 'Split Screen Video',
     appName: 'Split Screen',
     blurb: 'Put two videos side by side or one above the other, playing together.',
