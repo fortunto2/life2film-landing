@@ -453,6 +453,70 @@ Reference implementation: https://life2film.com/tools/video-converter/`,
     agentJob: 'Converting video between formats in the browser',
   },
   {
+    // 20 Nov 2026: a job people search for by name («remove audio from video», «mute video
+    // online»), done here without re-encoding: the video track is copied, the sound is dropped.
+    slug: 'remove-audio-from-video',
+    group: 'everyday',
+    name: 'Remove Audio',
+    appName: 'Remove Audio from Video',
+    blurb: 'Mute a video by dropping its sound track. The picture is copied as it is, so nothing is lost.',
+
+    searchPhrase: 'Remove Audio from Video Online',
+    title: 'Remove Audio from Video Online Free | mute a video, no re-encoding',
+    description: 'Remove the sound from a video online for free: the audio track is dropped and the picture is copied without re-encoding, so quality stays exactly the same. Runs in your browser, no upload, no watermark.',
+    heading: 'Remove audio',
+    accent: 'from video',
+    lede: 'Drop the sound track and keep the picture untouched. Nothing is uploaded and nothing is re-encoded.',
+    featureList: [
+      'Removes the audio track from MP4, MOV and WebM',
+      'Copies the video without re-encoding: same quality, done in seconds',
+      'Runs fully client-side: no upload, no watermark, no size limit',
+    ],
+    faq: [
+      {
+        q: 'Does removing the audio lower the video quality?',
+        a: 'No. The picture is copied into the new file as it is, frame for frame; only the sound track is left out. If your browser cannot copy that codec into the chosen container, the tool re-encodes the picture instead and says so.',
+      },
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. The file is read and written by your browser through WebCodecs. Nothing leaves your device, which is also why there is no size limit beyond your browser\'s memory.',
+      },
+      {
+        q: 'Can I keep the audio as a separate file?',
+        a: 'Yes, with the video to MP3 tool on this site: it does the opposite job, keeping the sound and dropping the picture.',
+      },
+      {
+        q: 'Can I mute only part of a video?',
+        a: 'Not here: this tool removes the whole sound track. To silence a stretch, cut the video into parts with the splitter, mute the part you need, and join them in an editor.',
+      },
+    ],
+
+    summary: 'Remove the audio track from a video in the browser, copying the picture without re-encoding.',
+    facts: [
+      'Dropping a track is a remux, not a transcode: the video packets are copied, so quality and length are unchanged.',
+      'A copy needs the codec to be allowed in the output container (H.264 in MP4 and MOV, VP8/VP9 in WebM); otherwise the picture must be re-encoded.',
+    ],
+    code: `import { Input, Output, Conversion, BlobSource, BufferTarget, Mp4OutputFormat, ALL_FORMATS } from 'mediabunny';
+
+const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
+const output = new Output({ format: new Mp4OutputFormat(), target: new BufferTarget() });
+const conversion = await Conversion.init({ input, output, audio: { discard: true } });
+await conversion.execute(); // video is copied when the codec allows it
+const muted = new Blob([output.target.buffer!], { type: 'video/mp4' });`,
+    prompt: `Add "remove the audio from a video" to my project, running entirely in the browser.
+
+Requirements:
+- Use "mediabunny" (WebCodecs). Discard the audio track and let the video be copied, not
+  re-encoded, whenever the codec fits the output container; say when it had to re-encode.
+- Keep the source container when possible (MP4 stays MP4, MOV stays MOV, WebM stays WebM).
+- Results over ~2 GB must be written in pieces (StreamTarget), not one ArrayBuffer: Chrome refuses
+  a single buffer that large.
+- Fail clearly when the file has no audio to remove: say the file is already silent.
+
+Reference implementation: https://life2film.com/tools/remove-audio-from-video/`,
+    agentJob: 'Muting a video, locally',
+  },
+  {
     slug: 'video-to-frames',
     group: 'everyday',
     name: 'Video to Frames',
