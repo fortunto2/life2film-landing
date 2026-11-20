@@ -28,6 +28,8 @@ interface Copy {
   trim: string;
   cutPart: string;
   silence: string;
+  normalize: string;
+  denoise: string;
   hub: string;
   homeNote: (hub: string, frames: string, guides: string) => string;
   hubNote: (frames: string, guides: string) => string;
@@ -49,6 +51,8 @@ const COPY: Partial<Record<Lang, Copy>> = {
     trim: 'Keep one part and drop both ends (trim)',
     cutPart: 'Take one section out of the middle',
     silence: 'Cut every pause out of a talking video automatically',
+    normalize: 'Bring the recording to a standard loudness (normalize)',
+    denoise: 'Remove background noise from the recording',
     hub: 'All free video tools',
     homeNote: (hub, frames, guides) =>
       `Free in the browser: <a href="${hub}">video tools</a> such as <a href="${frames}">splitting a video into frames</a>, and <a href="${guides}">guides to editing video with an AI agent</a>.`,
@@ -70,6 +74,8 @@ const COPY: Partial<Record<Lang, Copy>> = {
     trim: 'Оставить одну часть и убрать оба конца (обрезка)',
     cutPart: 'Вырезать кусок из середины',
     silence: 'Автоматически вырезать все паузы из видео с речью',
+    normalize: 'Довести запись до стандартной громкости (нормализация)',
+    denoise: 'Убрать фоновый шум из записи',
     hub: 'Все бесплатные видеоинструменты',
     homeNote: (hub, frames, guides) =>
       `Бесплатно в браузере: <a href="${hub}">видеоинструменты</a>, например <a href="${frames}">разбить видео на кадры</a>, и <a href="${guides}">руководства по монтажу видео с ИИ-агентом</a>.`,
@@ -122,6 +128,13 @@ export function relatedForTool(slug: string, lang: Lang): { heading: string; lin
       { href: toolPath(lang, 'cut-part-of-video'), text: c.cutPart },
       { href: toolPath(lang, 'video-trimmer'), text: c.trim },
     ],
+    // 20 Nov 2026: a voice recording's usual path — record, clean, level.
+    'voice-recorder': [
+      { href: toolPath(lang, 'remove-background-noise'), text: c.denoise },
+      { href: toolPath(lang, 'normalize-audio'), text: c.normalize },
+    ],
+    'remove-background-noise': [{ href: toolPath(lang, 'normalize-audio'), text: c.normalize }],
+    'normalize-audio': [{ href: toolPath(lang, 'remove-background-noise'), text: c.denoise }],
     'video-splitter': [frames, guide],
     'video-to-frames': [splitter, guide],
     'scene-detector': [frames],
