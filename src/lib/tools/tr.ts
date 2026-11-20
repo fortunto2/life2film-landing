@@ -348,6 +348,36 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'screen-recorder': {
+    searchPhrase: 'Ekran kaydı online',
+    title: 'Online Ekran Kaydedici Ücretsiz — kurulum, filigran ve süre sınırı yok',
+    description:
+      'Ekranınızı online ve ücretsiz kaydedin: tüm ekran, bir pencere ya da bir tarayıcı sekmesi, sistem sesi ve mikrofonla. Kurulum, filigran ve süre sınırı yok, hiçbir şey yüklenmez: kayıt bilgisayarınıza MP4 veya WebM olarak kaydedilir.',
+    heading: 'Ekran',
+    accent: 'kaydı',
+    lede: 'Ekranınızı tarayıcıda kaydedin, dosya bilgisayarınıza gelsin. Hiçbir şey kurulmaz ya da yüklenmez.',
+    blurb: 'Ekranı, bir pencereyi ya da sekmeyi ses ve mikrofonla doğrudan dosyaya kaydedin.',
+    featureList: [
+      'Tüm ekran, bir pencere ya da sekme',
+      'Sekme veya sistem sesi ile mikrofon tek parçada',
+      'Tarayıcı destekliyorsa MP4 (Chrome, Edge, Safari), değilse WebM',
+      'Süre sınırı ve filigran yok',
+    ],
+    faq: [
+      {
+        q: 'Süre sınırı ya da filigran var mı?',
+        a: 'Hiçbiri yok. Kaydı tarayıcınız yapar ve bilgisayarınıza kaydeder.',
+      },
+      {
+        q: 'Bilgisayarın sesini kaydedebilir mi?',
+        a: 'Chrome ve Edge’de evet: bir sekmeyi «Sekme sesini paylaş» ile ya da Windows’ta tüm ekranı «Sistem sesini paylaş» ile paylaşın.',
+      },
+      {
+        q: 'Telefonda çalışır mı?',
+        a: 'Hayır. Mobil tarayıcılar ekranı paylaşamaz.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',

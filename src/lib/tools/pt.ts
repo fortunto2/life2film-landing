@@ -352,6 +352,36 @@ export const pt: ToolTranslations = {
       },
     ],
   },
+  'screen-recorder': {
+    searchPhrase: 'Gravar tela online',
+    title: 'Gravador de tela online grátis — sem instalar, sem marca d’água nem limite de tempo',
+    description:
+      'Grave sua tela online e grátis: a tela inteira, uma janela ou uma aba do navegador, com o som do sistema e seu microfone. Sem instalar, sem marca d’água, sem limite de tempo e sem upload: a gravação é salva no seu computador em MP4 ou WebM.',
+    heading: 'Gravar',
+    accent: 'tela',
+    lede: 'Grave a tela no navegador e receba o arquivo no seu computador. Nada é instalado nem enviado.',
+    blurb: 'Grave a tela, uma janela ou uma aba, com som e microfone, direto para um arquivo.',
+    featureList: [
+      'Tela inteira, uma janela ou uma aba',
+      'Som da aba ou do sistema e microfone numa faixa',
+      'MP4 onde o navegador consegue (Chrome, Edge, Safari), senão WebM',
+      'Sem limite de tempo nem marca d’água',
+    ],
+    faq: [
+      {
+        q: 'Tem limite de tempo ou marca d’água?',
+        a: 'Nenhum dos dois. A gravação é feita pelo navegador e salva no seu computador.',
+      },
+      {
+        q: 'Grava o som do computador?',
+        a: 'No Chrome e no Edge, sim: compartilhe uma aba com «Compartilhar áudio da guia» ou, no Windows, a tela inteira com «Compartilhar áudio do sistema».',
+      },
+      {
+        q: 'Funciona no celular?',
+        a: 'Não. Navegadores de celular não compartilham a tela.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Conversor de vídeo online',
     title: 'Conversor de Vídeo Online Grátis — MP4, WebM, MOV sem enviar nada',

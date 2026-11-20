@@ -1,0 +1,147 @@
+---
+import { STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { start: 'Start recording', stop: 'Stop', mic: 'Record the microphone too', recording: 'Recording… {t}', saved: 'Saved — {size}, {t}.', denied: 'Screen sharing was not allowed, so nothing is being recorded.', unsupported: 'This browser cannot record the screen. Chrome, Edge and Firefox on a computer can; phones cannot.', failed: 'Recording failed — {msg}', note: 'The browser asks which screen, window or tab to share. System sound can be shared from a Chrome tab or, on Windows, the whole screen.' },
+  ru: { start: 'Начать запись', stop: 'Стоп', mic: 'Записывать и микрофон', recording: 'Идёт запись… {t}', saved: 'Сохранено — {size}, {t}.', denied: 'Доступ к экрану не дан, поэтому ничего не записывается.', unsupported: 'Этот браузер не умеет записывать экран. На компьютере умеют Chrome, Edge и Firefox, на телефоне — нет.', failed: 'Запись не удалась — {msg}', note: 'Браузер спросит, какой экран, окно или вкладку показать. Системный звук можно записать со вкладки Chrome или, в Windows, со всего экрана.' },
+  es: { start: 'Empezar a grabar', stop: 'Detener', mic: 'Grabar también el micrófono', recording: 'Grabando… {t}', saved: 'Guardado — {size}, {t}.', denied: 'No se permitió compartir la pantalla, así que no se graba nada.', unsupported: 'Este navegador no puede grabar la pantalla. En un ordenador pueden Chrome, Edge y Firefox; en el móvil no.', failed: 'La grabación falló — {msg}', note: 'El navegador pregunta qué pantalla, ventana o pestaña compartir.' },
+  pt: { start: 'Começar a gravar', stop: 'Parar', mic: 'Gravar também o microfone', recording: 'Gravando… {t}', saved: 'Salvo — {size}, {t}.', denied: 'O compartilhamento de tela não foi permitido, então nada está sendo gravado.', unsupported: 'Este navegador não grava a tela. No computador, Chrome, Edge e Firefox gravam; no celular, não.', failed: 'A gravação falhou — {msg}', note: 'O navegador pergunta qual tela, janela ou aba compartilhar.' },
+  id: { start: 'Mulai merekam', stop: 'Berhenti', mic: 'Rekam juga mikrofon', recording: 'Merekam… {t}', saved: 'Tersimpan — {size}, {t}.', denied: 'Berbagi layar tidak diizinkan, jadi tidak ada yang direkam.', unsupported: 'Browser ini tidak bisa merekam layar. Di komputer, Chrome, Edge dan Firefox bisa; di ponsel tidak.', failed: 'Perekaman gagal — {msg}', note: 'Browser akan menanyakan layar, jendela atau tab mana yang dibagikan.' },
+  tr: { start: 'Kaydı başlat', stop: 'Durdur', mic: 'Mikrofonu da kaydet', recording: 'Kaydediliyor… {t}', saved: 'Kaydedildi — {size}, {t}.', denied: 'Ekran paylaşımına izin verilmedi, bu yüzden hiçbir şey kaydedilmiyor.', unsupported: 'Bu tarayıcı ekranı kaydedemez. Bilgisayarda Chrome, Edge ve Firefox kaydeder; telefonda kaydedemez.', failed: 'Kayıt başarısız — {msg}', note: 'Tarayıcı hangi ekranın, pencerenin ya da sekmenin paylaşılacağını sorar.' },
+  ar: { start: 'ابدأ التسجيل', stop: 'إيقاف', mic: 'سجّل الميكروفون أيضًا', recording: 'جارٍ التسجيل… {t}', saved: 'تم الحفظ — {size}، {t}.', denied: 'لم يُسمح بمشاركة الشاشة، لذلك لا يُسجَّل شيء.', unsupported: 'هذا المتصفح لا يستطيع تسجيل الشاشة. على الحاسوب يستطيع Chrome وEdge وFirefox، وعلى الهاتف لا.', failed: 'فشل التسجيل — {msg}', note: 'سيسألك المتصفح أي شاشة أو نافذة أو علامة تبويب تريد مشاركتها.' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <div class="rec">
+    <video id="live" muted playsinline hidden></video>
+    <p class="muted">{words.note}</p>
+    <div class="controls">
+      <label class="control check"><input type="checkbox" id="mic" /> <span>{words.mic}</span></label>
+      <span class="spacer"></span>
+      <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.start}</button>
+      <button id="stop" type="button" class="ghost" hidden>{words.stop}</button>
+    </div>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<style>
+  .rec video { display: block; width: 100%; max-height: 360px; border-radius: 8px; background: #000; margin-bottom: 12px; }
+  .check { display: flex; gap: 8px; align-items: center; }
+</style>
+
+<script>
+  import { toolFailed, track } from '../../lib/track';
+  import { saveBlob, formatBytes, preciseClock } from '../../lib/encode';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  let recorder: MediaRecorder | null = null;
+  let streams: MediaStream[] = [];
+  let started = 0;
+  let timer = 0;
+
+  function status(message: string, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+  }
+
+  /** MP4 where the browser records it (Chrome 126+, Safari), WebM otherwise. */
+  function pickType(): { mime: string; ext: 'mp4' | 'webm' } {
+    for (const mime of ['video/mp4;codecs=avc1,mp4a.40.2', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm']) {
+      if (MediaRecorder.isTypeSupported(mime)) return { mime, ext: mime.startsWith('video/mp4') ? 'mp4' : 'webm' };
+    }
+    return { mime: '', ext: 'webm' };
+  }
+
+  function cleanup() {
+    for (const s of streams) for (const t of s.getTracks()) t.stop();
+    streams = [];
+    clearInterval(timer);
+    el<HTMLVideoElement>('live').srcObject = null;
+    el('live').hidden = true;
+    el('run').hidden = false;
+    el('stop').hidden = true;
+  }
+
+  el('run').addEventListener('click', async () => {
+    if (!navigator.mediaDevices?.getDisplayMedia || typeof MediaRecorder === 'undefined') { status(w.unsupported, true); return; }
+    let screen: MediaStream;
+    try {
+      screen = await navigator.mediaDevices.getDisplayMedia({ video: { frameRate: 30 }, audio: true });
+    } catch {
+      status(w.denied, true);
+      return;
+    }
+    streams = [screen];
+    const tracks: MediaStreamTrack[] = [...screen.getVideoTracks()];
+    const sounds: MediaStreamTrack[] = [...screen.getAudioTracks()];
+    if (el<HTMLInputElement>('mic').checked) {
+      try {
+        const mic = await navigator.mediaDevices.getUserMedia({ audio: true });
+        streams.push(mic);
+        sounds.push(...mic.getAudioTracks());
+      } catch { /* no microphone: record without it */ }
+    }
+    // MediaRecorder takes one audio track: mix screen sound and microphone when there are both.
+    if (sounds.length > 1) {
+      const ctx = new AudioContext();
+      const dest = ctx.createMediaStreamDestination();
+      for (const s of sounds) ctx.createMediaStreamSource(new MediaStream([s])).connect(dest);
+      tracks.push(...dest.stream.getAudioTracks());
+    } else tracks.push(...sounds);
+
+    const { mime, ext } = pickType();
+    const chunks: Blob[] = [];
+    try {
+      recorder = new MediaRecorder(new MediaStream(tracks), mime ? { mimeType: mime, videoBitsPerSecond: 6_000_000 } : undefined);
+    } catch (error) {
+      cleanup();
+      toolFailed('run', error);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), true);
+      return;
+    }
+    recorder.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    recorder.onstop = () => {
+      const seconds = (Date.now() - started) / 1000;
+      cleanup();
+      const blob = new Blob(chunks, { type: mime || 'video/webm' });
+      if (!blob.size) { status(w.failed.replace('{msg}', 'nothing was recorded'), true); return; }
+      const now = new Date();
+      const pad = (n: number) => String(n).padStart(2, '0');
+      const stamp = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}-${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
+      saveBlob(blob, `screen-${stamp}.${ext}`);
+      track('result_shown', { placement: 'result', format: ext });
+      track('result_saved', { placement: 'result', format: ext }, { size_mb: Math.round(blob.size / 104_857.6) / 10, seconds: Math.round(seconds) });
+      status(w.saved.replace('{size}', formatBytes(blob.size)).replace('{t}', preciseClock(seconds)));
+    };
+    // The browser's own "Stop sharing" button ends the video track: finish the file then too.
+    screen.getVideoTracks()[0]?.addEventListener('ended', () => { if (recorder?.state === 'recording') recorder.stop(); });
+
+    const live = el<HTMLVideoElement>('live');
+    live.srcObject = screen;
+    live.hidden = false;
+    void live.play().catch(() => {});
+    recorder.start(1000);
+    started = Date.now();
+    el('run').hidden = true;
+    el('stop').hidden = false;
+    timer = window.setInterval(() => status(w.recording.replace('{t}', preciseClock((Date.now() - started) / 1000))), 500);
+  });
+
+  el('stop').addEventListener('click', () => { if (recorder?.state === 'recording') recorder.stop(); });
+</script>

@@ -351,6 +351,36 @@ export const es: ToolTranslations = {
       },
     ],
   },
+  'screen-recorder': {
+    searchPhrase: 'Grabar pantalla online',
+    title: 'Grabador de pantalla online gratis — sin instalar, sin marca de agua ni límite de tiempo',
+    description:
+      'Graba tu pantalla online gratis: toda la pantalla, una ventana o una pestaña del navegador, con el sonido del sistema y tu micrófono. Sin instalar, sin marca de agua, sin límite de tiempo y sin subir nada: la grabación se guarda en tu ordenador en MP4 o WebM.',
+    heading: 'Grabar',
+    accent: 'pantalla',
+    lede: 'Graba tu pantalla en el navegador y obtén el archivo en tu ordenador. No se instala ni se sube nada.',
+    blurb: 'Graba la pantalla, una ventana o una pestaña, con sonido y micrófono, directo a un archivo.',
+    featureList: [
+      'Toda la pantalla, una ventana o una pestaña',
+      'Sonido de la pestaña o del sistema y micrófono en una pista',
+      'MP4 donde el navegador puede (Chrome, Edge, Safari), si no WebM',
+      'Sin límite de tiempo ni marca de agua',
+    ],
+    faq: [
+      {
+        q: '¿Hay límite de tiempo o marca de agua?',
+        a: 'Ninguno de los dos. La grabación la hace tu navegador y se guarda en tu ordenador.',
+      },
+      {
+        q: '¿Puede grabar el sonido del ordenador?',
+        a: 'En Chrome y Edge sí: comparte una pestaña con «Compartir audio de la pestaña» o, en Windows, toda la pantalla con «Compartir audio del sistema».',
+      },
+      {
+        q: '¿Funciona en el móvil?',
+        a: 'No. Los navegadores móviles no pueden compartir la pantalla.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Convertidor de vídeo online',
     title: 'Convertidor de Vídeo Online Gratis — MP4, WebM, MOV sin subir nada',

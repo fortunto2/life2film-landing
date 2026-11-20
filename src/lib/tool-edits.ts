@@ -504,4 +504,71 @@ Requirements:
 Reference implementation: https://life2film.com/tools/video-speed/`,
     agentJob: 'Changing a video\'s speed, locally',
   },
+  {
+    // 20 Nov 2026: «screen recorder online» — a huge query, and the browser does it with no upload.
+    slug: 'screen-recorder',
+    group: 'everyday',
+    name: 'Screen Recorder',
+    appName: 'Online Screen Recorder',
+    blurb: 'Record your screen, a window or a tab, with sound and microphone, straight to a file.',
+
+    searchPhrase: 'Screen Recorder Online',
+    title: 'Screen Recorder Online Free | no download, no watermark, no time limit',
+    description: 'Record your screen online for free: the whole screen, one window or a browser tab, with system sound and your microphone. No install, no watermark, no time limit, nothing uploaded: the recording is saved straight to your computer as MP4 or WebM.',
+    heading: 'Screen',
+    accent: 'recorder',
+    lede: 'Record your screen in the browser and get the file on your computer. Nothing is installed or uploaded.',
+    featureList: [
+      'Whole screen, one window or a browser tab',
+      'System or tab sound, and your microphone, mixed into one track',
+      'MP4 where the browser can record it (Chrome, Edge, Safari), WebM otherwise',
+      'No time limit and no watermark',
+      'The recording never leaves your computer',
+    ],
+    faq: [
+      {
+        q: 'Is there a time limit or a watermark?',
+        a: 'Neither. The recording is made by your browser and saved to your computer; the only limit is free memory, since the file is kept in memory until you stop.',
+      },
+      {
+        q: 'Can it record the sound of my computer?',
+        a: 'In Chrome and Edge, yes: share a browser tab with «Share tab audio» ticked, or on Windows the whole screen with «Share system audio». macOS does not let browsers capture system sound from a whole screen; tab sound still works.',
+      },
+      {
+        q: 'Does it work on a phone?',
+        a: 'No. Mobile browsers cannot share the screen. On an iPhone use the Screen Recording button in Control Centre.',
+      },
+      {
+        q: 'Where does the video go?',
+        a: 'Straight to your Downloads folder. Nothing is uploaded: there is no server in between.',
+      },
+    ],
+
+    summary: 'Record the screen in the browser with getDisplayMedia and MediaRecorder, mixing tab/system sound and microphone, saved locally.',
+    facts: [
+      'MediaRecorder records MP4 (H.264 + AAC) in Chrome 126+ and Safari; check MediaRecorder.isTypeSupported and fall back to WebM.',
+      'MediaRecorder takes one audio track: mix screen sound and microphone through an AudioContext MediaStreamDestination.',
+      'The browser\'s own «Stop sharing» ends the video track; listen for "ended" and stop the recorder, or the file is never finished.',
+    ],
+    code: `const screen = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+const type = MediaRecorder.isTypeSupported('video/mp4') ? 'video/mp4' : 'video/webm';
+const rec = new MediaRecorder(screen, { mimeType: type });
+const chunks = [];
+rec.ondataavailable = (e) => chunks.push(e.data);
+rec.onstop = () => save(new Blob(chunks, { type }));
+screen.getVideoTracks()[0].onended = () => rec.stop();
+rec.start(1000);`,
+    prompt: `Add "record the screen" to my project, running entirely in the browser.
+
+Requirements:
+- getDisplayMedia({ video, audio: true }); optional microphone through getUserMedia.
+- Mix screen sound and microphone into one track (AudioContext + MediaStreamDestination):
+  MediaRecorder records only one audio track.
+- Prefer MP4 when MediaRecorder.isTypeSupported says so, WebM otherwise.
+- Stop and save when the user presses the browser's own "Stop sharing" (the video track's "ended").
+- Say plainly when the browser cannot record (phones) or permission was refused.
+
+Reference implementation: https://life2film.com/tools/screen-recorder/`,
+    agentJob: 'Recording the screen, locally',
+  },
 ];

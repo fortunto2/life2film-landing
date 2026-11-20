@@ -348,6 +348,36 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'screen-recorder': {
+    searchPhrase: 'Rekam layar online',
+    title: 'Perekam Layar Online Gratis — tanpa instal, tanpa watermark dan batas waktu',
+    description:
+      'Rekam layar Anda secara online dan gratis: seluruh layar, satu jendela atau tab browser, dengan suara sistem dan mikrofon. Tanpa instal, tanpa watermark, tanpa batas waktu dan tanpa unggah: rekaman disimpan di komputer Anda sebagai MP4 atau WebM.',
+    heading: 'Rekam',
+    accent: 'layar',
+    lede: 'Rekam layar di browser dan dapatkan filenya di komputer. Tidak ada yang diinstal atau diunggah.',
+    blurb: 'Rekam layar, jendela atau tab, dengan suara dan mikrofon, langsung ke file.',
+    featureList: [
+      'Seluruh layar, satu jendela atau tab',
+      'Suara tab atau sistem dan mikrofon dalam satu trek',
+      'MP4 bila browser mendukung (Chrome, Edge, Safari), selain itu WebM',
+      'Tanpa batas waktu dan watermark',
+    ],
+    faq: [
+      {
+        q: 'Apakah ada batas waktu atau watermark?',
+        a: 'Tidak ada. Rekaman dibuat browser dan disimpan di komputer Anda.',
+      },
+      {
+        q: 'Bisakah merekam suara komputer?',
+        a: 'Di Chrome dan Edge bisa: bagikan tab dengan «Bagikan audio tab» atau, di Windows, seluruh layar dengan «Bagikan audio sistem».',
+      },
+      {
+        q: 'Apakah bisa di ponsel?',
+        a: 'Tidak. Browser ponsel tidak bisa membagikan layar.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',
