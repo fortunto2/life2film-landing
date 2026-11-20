@@ -198,7 +198,7 @@ Reference implementation: https://life2film.com/tools/video-info/`,
     blurb: 'Crop a landscape video to 9:16 for Reels, TikTok and Shorts, or to a square.',
 
     searchPhrase: 'Crop Video Online',
-    title: 'Crop Video Online Free | 9:16 for Reels and TikTok, 1:1, 4:5',
+    title: 'Crop Video Online Free | video cropper for 9:16, 1:1, 4:5',
     description: 'Crop a video to 9:16 for Reels, TikTok and Shorts, to 1:1, 4:5 or 16:9, online and free. Slide the frame to keep what matters. Runs in your browser: no upload, no watermark.',
     heading: 'Crop',
     accent: 'video',

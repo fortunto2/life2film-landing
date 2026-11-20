@@ -1,4 +1,4 @@
-import { toolPath } from './tools/index';
+import { toolName, toolPath } from './tools/index';
 import { guidePath } from './guides';
 import { localePath, type Lang } from '../i18n';
 
@@ -116,6 +116,7 @@ export function relatedForTool(slug: string, lang: Lang): { heading: string; lin
     // naturally leads to; read their impressions on 4 Dec.
     'bpm-detector': [
       { href: toolPath(lang, 'key-finder'), text: c.key },
+      { href: toolPath(lang, 'tap-tempo'), text: toolName('tap-tempo', lang, 'Tap Tempo') },
       { href: toolPath(lang, 'change-key'), text: c.changeKey },
       { href: toolPath(lang, 'sped-up-slowed-reverb'), text: c.speed },
       { ...guide, text: c.guideMusic },

@@ -171,7 +171,7 @@ export const TEXT_TOOLS: Tool[] = [
     blurb: 'Move a song up or down by semitones without changing its tempo.',
 
     searchPhrase: 'Change Key of a Song Online',
-    title: 'Change Key of a Song Online Free | pitch shifter, same tempo',
+    title: 'Change Key of a Song Online Free | pitch changer, same tempo',
     description: 'Change the key of a song online for free: move it up or down by up to 12 semitones and keep the tempo, then save MP3 or WAV. For singing in your range or playing along. Runs in your browser; the file is not uploaded.',
     heading: 'Change the key of',
     accent: 'a song',
@@ -841,5 +841,33 @@ export const TEXT_TOOLS: Tool[] = [
     summary: 'A coloured border (2–9% of the short edge) around a video, picture kept whole, in the browser.',
     facts: ['A medium border is 5% of the short edge: 54 px on a 1080x1920 video.'],
     agentJob: 'Adding a border to a video, locally',
+  },
+  {
+    slug: 'tap-tempo',
+    group: 'audio',
+    name: 'Tap Tempo',
+    appName: 'Tap Tempo BPM Counter',
+    blurb: 'Tap along to any song and read its BPM, no file needed.',
+
+    searchPhrase: 'Tap Tempo Online',
+    title: 'Tap Tempo Online Free | tap BPM counter, no file needed',
+    description: 'Tap tempo online for free: tap the space bar or the button along to a song and read its BPM. The median of your taps, so one sloppy tap does not move it. Nothing to upload.',
+    heading: 'Tap',
+    accent: 'tempo',
+    lede: 'Tap along to the beat. The BPM settles after a few taps.',
+    featureList: [
+      'Space bar, Enter or the button',
+      'Median of the last 12 taps: one late tap does not move it',
+      'A two-second pause starts over',
+      'Works offline, nothing uploaded',
+    ],
+    faq: [
+      { q: 'How many taps do I need?', a: 'Three give a first number; eight to twelve make it steady.' },
+      { q: 'I have the audio file. Can it find the BPM itself?', a: 'Yes: the BPM finder on this site reads the file and marks every beat.' },
+    ],
+
+    summary: 'Tap tempo: BPM from the median gap of the last 12 taps; a pause over 2 s resets. In the browser.',
+    facts: ['Median of the last 12 tap gaps; one tap 150 ms late moves the result by less than 1 BPM at 100 BPM.'],
+    agentJob: 'Counting a song’s tempo by tapping',
   },
 ];

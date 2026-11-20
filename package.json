@@ -12,6 +12,7 @@
     "check": "astro check && vitest run",
     "check:links": "node scripts/check-links.mjs",
     "new-tool": "node scripts/new-tool.mjs",
+    "bump-tools": "sh scripts/bump-tools.sh",
     "wasm": "cp node_modules/life2film-engine/va_wasm.js node_modules/life2film-engine/va_wasm_bg.wasm public/wasm/"
   },
   "dependencies": {
@@ -25,7 +26,7 @@
     "gifenc": "1.0.3",
     "mediabunny": "^1.66.2",
     "superduper-site-kit": "git+file:///Users/rustam/startups/shared/superduper-site-kit",
-    "superduper-tools": "git+file:///Users/rustam/startups/shared/superduper-tools#d859cc3dc0f7dc5dad40c9878e2b2ecb2d6d6dce"
+    "superduper-tools": "git+file:///Users/rustam/startups/shared/superduper-tools#f8439543a42cc5ebd89f68fc568a6d1f4d8e8225"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",

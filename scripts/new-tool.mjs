@@ -6,7 +6,7 @@
 //   2. fill the TODOs in src/lib/tool-text.ts (title from Google Autocomplete phrasing, FAQ, facts);
 //   3. translations: add '<slug>' to src/lib/tools/<lang>-text.ts and words to the component;
 //   4. REGISTRY_WRITE=1 npx vitest run src/lib/registry.test.ts, commit superduper-tools, bump it here
-//      and on superduperai-site (the shared hubs list it from the registry).
+//      (`npm run bump-tools`) and on superduperai-site (the shared hubs list it from the registry).
 // src/lib/tool-structure.test.ts fails until every piece exists and no TODO is left.
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 

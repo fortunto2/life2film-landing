@@ -1,0 +1,59 @@
+---
+import type { Lang } from '../../i18n';
+import { toolPath } from '../../lib/tools/index';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { tap: 'Tap', hint: 'or press Space / Enter in time with the beat', reset: 'Start over', taps: 'taps: {n}', file: 'Have the file? Find the BPM automatically →' },
+  ru: { tap: 'Тап', hint: 'или нажимайте пробел / Enter в такт', reset: 'Заново', taps: 'ударов: {n}', file: 'Есть файл? Определить BPM автоматически →' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <div class="tap">
+    <div class="bpm"><span id="bpm">—</span> <small>BPM</small></div>
+    <div class="muted" id="count"></div>
+    <button id="tap" type="button" class="ghost primary big" data-sda-event="tool_run" data-sda-placement="controls">{words.tap}</button>
+    <p class="muted">{words.hint}</p>
+    <div class="controls"><button id="reset" type="button" class="ghost">{words.reset}</button><span class="spacer"></span><a href={toolPath(lang, 'bpm-detector')}>{words.file}</a></div>
+  </div>
+</div>
+
+<style>
+  .tap { text-align: center; }
+  .bpm { font-size: 64px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .bpm small { font-size: 20px; opacity: .7; }
+  .big { font-size: 22px; padding: 22px 64px; margin: 18px 0 8px; }
+</style>
+
+<script>
+  import { tapBpm } from '../../lib/tap-tempo';
+  import { track } from '../../lib/track';
+
+  const el = (id: string) => document.getElementById(id)!;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  let times: number[] = [];
+  let reported = false;
+
+  const show = () => {
+    const bpm = tapBpm(times);
+    el('bpm').textContent = bpm ? bpm.toFixed(1) : '—';
+    el('count').textContent = times.length ? w.taps.replace('{n}', String(times.length)) : '';
+    if (bpm && times.length >= 8 && !reported) { reported = true; track('result_shown', { placement: 'result' }, { bpm: Math.round(bpm) }); }
+  };
+  const tap = () => {
+    const now = performance.now() / 1000;
+    if (times.length && now - times[times.length - 1] > 2) { times = []; reported = false; }
+    times.push(now);
+    show();
+  };
+  el('tap').addEventListener('pointerdown', (e) => { e.preventDefault(); tap(); });
+  el('reset').addEventListener('click', () => { times = []; reported = false; show(); });
+  addEventListener('keydown', (e) => {
+    if ((e.code === 'Space' || e.code === 'Enter') && !(e.target instanceof HTMLInputElement) && !e.repeat) { e.preventDefault(); tap(); }
+  });
+</script>

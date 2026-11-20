@@ -612,7 +612,7 @@ Reference implementation: https://life2film.com/tools/video-splitter/`,
 
     searchPhrase: 'BPM Detector Online',
     // 20 Nov 2026: «video bpm finder», «bpm finder from video» at position 7: the tool reads video too.
-    title: 'BPM Detector Online Free | the tempo of a song or a video, every beat',
+    title: 'BPM Finder Online Free | find the tempo of a song or video, every beat',
     description: 'Free online BPM finder: get a track’s tempo and the exact time of every beat, in your browser. Export the beat grid to DaVinci Resolve, Premiere, Final Cut or Audacity. Nothing is uploaded.',
     heading: 'BPM',
     accent: 'Detector',
