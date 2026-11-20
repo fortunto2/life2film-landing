@@ -29,7 +29,8 @@ const base = TOOL[slug];
 // The words for this locale, or the English original when there is no translation yet.
 const tool = lang === 'en' ? asTranslation(base) : TRANSLATIONS[lang]?.[slug] ?? asTranslation(base);
 const chrome = CHROME[lang];
-const phoneAfter = slug === 'bpm-detector' ? chrome.appAfterBeat : chrome.appAfter;
+// A song is on the table on both pages: the offer that names cutting to a track's beat fits there.
+const phoneAfter = ['bpm-detector', 'add-music-to-video'].includes(slug) ? chrome.appAfterBeat : chrome.appAfter;
 const path = localePath(lang, `/tools/${slug}/`);
 
 /** Only the locales that actually have this page — never claim a translation that does not exist. */
