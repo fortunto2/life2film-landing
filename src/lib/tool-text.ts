@@ -15,7 +15,7 @@ export const TEXT_TOOLS: Tool[] = [
     blurb: 'Speech to SRT or VTT in your browser with Whisper, then burn them in with one more click.',
 
     searchPhrase: 'Auto Subtitle Generator Online',
-    title: 'Auto Subtitle Generator Online Free | video to SRT with Whisper, no upload',
+    title: 'Auto Subtitle Generator Online Free | video to SRT with Whisper',
     description: 'Make subtitles from a video automatically, online and free: Whisper runs in your browser and writes SRT or VTT with timing, or a plain transcript (.txt), in 99 languages. The video is not uploaded; the speech model downloads once and is cached.',
     heading: 'Auto',
     accent: 'subtitles',
@@ -171,7 +171,7 @@ export const TEXT_TOOLS: Tool[] = [
     blurb: 'Move a song up or down by semitones without changing its tempo.',
 
     searchPhrase: 'Change Key of a Song Online',
-    title: 'Change Key of a Song Online Free | pitch shifter, same tempo, no upload',
+    title: 'Change Key of a Song Online Free | pitch shifter, same tempo',
     description: 'Change the key of a song online for free: move it up or down by up to 12 semitones and keep the tempo, then save MP3 or WAV. For singing in your range or playing along. Runs in your browser; the file is not uploaded.',
     heading: 'Change the key of',
     accent: 'a song',
@@ -403,7 +403,7 @@ export const TEXT_TOOLS: Tool[] = [
     blurb: 'Brighten a dark video, make it black and white, warmer or more vivid, with a live preview.',
 
     searchPhrase: 'Video Filters Online',
-    title: 'Video Filters Online Free | brighten a dark video, black and white, no upload',
+    title: 'Video Filters Online Free | brighten a dark video, black and white',
     description: 'Apply filters to a video online for free: brighten a dark video, make it black and white, vivid, warm, cool or vintage, or set brightness, contrast, saturation and warmth yourself with a live preview. Runs in your browser; nothing is uploaded, no watermark.',
     heading: 'Video',
     accent: 'filters',
@@ -439,7 +439,7 @@ export const TEXT_TOOLS: Tool[] = [
     blurb: 'Put two videos side by side or one above the other, playing together.',
 
     searchPhrase: 'Split Screen Video Maker Online',
-    title: 'Split Screen Video Maker Online Free | two videos side by side, no upload',
+    title: 'Split Screen Video Maker Online Free | two videos side by side',
     description: 'Put two videos in one frame online for free: side by side (16:9) or one above the other (9:16 for Reels and TikTok), playing together, with the sound of either or both. Runs in your browser; nothing is uploaded, no watermark.',
     heading: 'Split screen',
     accent: 'video',
@@ -475,7 +475,7 @@ export const TEXT_TOOLS: Tool[] = [
     blurb: 'Big bold captions, a few words at a time in the middle of the frame, made from the speech.',
 
     searchPhrase: 'TikTok Captions Generator',
-    title: 'TikTok-style Auto Captions Online Free | big word-by-word captions, no upload',
+    title: 'TikTok-style Auto Captions Online Free | big word-by-word captions',
     description: 'Add TikTok and Reels style captions to a video automatically, online and free: Whisper hears the speech in your browser and burns big bold captions, 1 to 4 words at a time, in the middle of the frame. No upload, no watermark.',
     heading: 'TikTok-style',
     accent: 'captions',
@@ -550,7 +550,7 @@ export const TEXT_TOOLS: Tool[] = [
     blurb: 'Change a video’s resolution: 4K to 1080p, 1080p to 720p and so on, shape kept.',
 
     searchPhrase: 'Resize Video Online',
-    title: 'Resize Video Online Free | change resolution (4K, 1080p, 720p), no upload',
+    title: 'Resize Video Online Free | change resolution (4K, 1080p, 720p)',
     description: 'Change a video’s resolution online for free: 4K to 1080p, 1080p to 720p, 480p or 360p, vertical or horizontal, with its shape kept. Runs in your browser; nothing is uploaded, no watermark.',
     heading: 'Resize',
     accent: 'video',
@@ -670,7 +670,7 @@ export const TEXT_TOOLS: Tool[] = [
     blurb: 'A thin bar along the edge that fills as the video plays.',
 
     searchPhrase: 'Add Progress Bar to Video Online',
-    title: 'Add Progress Bar to Video Online Free | for Shorts, Reels, TikTok, no upload',
+    title: 'Add Progress Bar to Video Online Free | for Shorts, Reels, TikTok',
     description: 'Add a progress bar to a video online for free: a thin bar along the top or bottom edge that fills as it plays, in white, red, yellow, green or blue. Keeps viewers watching to the end. Runs in your browser; nothing is uploaded.',
     heading: 'Progress bar',
     accent: 'for video',
@@ -744,7 +744,7 @@ export const TEXT_TOOLS: Tool[] = [
     blurb: 'Two to four videos in one frame, in a grid, playing together.',
 
     searchPhrase: 'Video Collage Maker Online',
-    title: 'Video Collage Maker Online Free | 2 to 4 videos in one frame, no upload',
+    title: 'Video Collage Maker Online Free | 2 to 4 videos in one frame',
     description: 'Make a video collage online for free: two to four clips in one 16:9 frame, in a grid, playing together, with the sound of the first. Runs in your browser; nothing is uploaded, no watermark.',
     heading: 'Video collage',
     accent: 'maker',
@@ -780,7 +780,7 @@ export const TEXT_TOOLS: Tool[] = [
     blurb: 'Bring a recording to a standard loudness, or as loud as it goes without clipping.',
 
     searchPhrase: 'Normalize Audio Online',
-    title: 'Normalize Audio Online Free | louder without clipping, MP3 or WAV, no upload',
+    title: 'Normalize Audio Online Free | louder without clipping, MP3 or WAV',
     description: 'Normalize an audio file online for free: bring a voice note, podcast or song to a standard loudness (-16 dB) or to the loudest it can be without clipping, saved as MP3 or WAV. Runs in your browser; nothing is uploaded.',
     heading: 'Normalize',
     accent: 'audio',
