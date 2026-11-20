@@ -308,4 +308,74 @@ Requirements:
 Reference implementation: https://life2film.com/tools/video-to-gif/`,
     agentJob: 'Making a GIF from a video, locally',
   },
+  {
+    // 20 Nov 2026: «add music to video» — the job closest to the app (a film cut to music).
+    slug: 'add-music-to-video',
+    group: 'everyday',
+    name: 'Add Music to Video',
+    appName: 'Add Music to Video',
+    blurb: 'Put a song under a video, trimmed to its length and faded out, without re-encoding the picture.',
+
+    searchPhrase: 'Add Music to Video Online',
+    title: 'Add Music to Video Online Free | no watermark, no upload',
+    description: 'Add music to a video online and free: choose an MP3 or M4A, where the song starts, and a fade-out. The picture is copied without re-encoding, the song is cut to the video\'s length. In your browser, no upload, no watermark.',
+    heading: 'Add music',
+    accent: 'to video',
+    lede: 'Put your song under your clip, cut to fit and faded out at the end. Nothing is uploaded.',
+    featureList: [
+      'MP3, M4A, WAV, OGG or the sound of another video as the music',
+      'Choose where the song starts, fade-out of 0–4 s',
+      'The picture is copied untouched: same quality, quick',
+      'Runs fully client-side: no upload, no watermark',
+    ],
+    faq: [
+      {
+        q: 'Does it keep the original sound of the video?',
+        a: 'No: the music replaces it. To keep only the video\'s own sound, there is nothing to do; to remove it without adding music, use the remove-audio tool on this site.',
+      },
+      {
+        q: 'What if the song is shorter than the video?',
+        a: 'The music plays once and the rest of the video is silent; the tool tells you where it ran out. Start the song earlier, or pick a longer one.',
+      },
+      {
+        q: 'Can it cut the video to the beat of the song?',
+        a: 'Not this page: it lays the song under one clip as it is. Cutting several clips to the beat is what the Life2Film iPhone app does: it picks the best moments from your clips and places the cuts on the beats.',
+      },
+      {
+        q: 'Is anything uploaded?',
+        a: 'No. Your browser reads both files and writes the result itself; nothing leaves your device.',
+      },
+    ],
+
+    summary: 'Lay a music track under a video in the browser: video packets copied, music cut to length, faded and encoded to AAC.',
+    facts: [
+      'Replacing a soundtrack needs no video re-encode: copy the video packets and encode only the new audio.',
+      'Cut the music to the video length and fade the last seconds; an abrupt stop is the commonest tell of a home edit.',
+    ],
+    code: `import { Input, Output, BlobSource, BufferTarget, Mp4OutputFormat, ALL_FORMATS,
+  EncodedPacketSink, EncodedVideoPacketSource, AudioBufferSink, AudioBufferSource } from 'mediabunny';
+
+const v = await new Input({ source: new BlobSource(video), formats: ALL_FORMATS }).getPrimaryVideoTrack();
+const a = await new Input({ source: new BlobSource(music), formats: ALL_FORMATS }).getPrimaryAudioTrack();
+const out = new Output({ format: new Mp4OutputFormat(), target: new BufferTarget() });
+const vs = new EncodedVideoPacketSource(v.codec); out.addVideoTrack(vs);
+const as = new AudioBufferSource({ codec: 'aac', bitrate: 192e3 }); out.addAudioTrack(as);
+await out.start();
+let first = true;
+for await (const p of new EncodedPacketSink(v).packets()) { await vs.add(p, first ? { decoderConfig: await v.getDecoderConfig() } : undefined); first = false; }
+for await (const { buffer } of new AudioBufferSink(a).buffers(0, await v.computeDuration())) await as.add(buffer);
+vs.close(); as.close(); await out.finalize();`,
+    prompt: `Add "add music to a video" to my project, running entirely in the browser.
+
+Requirements:
+- Use "mediabunny". Copy the video packets as they are (EncodedPacketSink -> EncodedVideoPacketSource,
+  decoderConfig on the first packet); never re-encode the picture.
+- Decode the music with AudioBufferSink from a chosen offset, cut it at the video's length, apply a
+  linear fade-out over the last seconds, and encode with AudioBufferSource (AAC in MP4).
+- Pick the audio codec with getFirstEncodableAudioCodec for the container; say so when none exists.
+- When the music is shorter than the video, say where it ran out.
+
+Reference implementation: https://life2film.com/tools/add-music-to-video/`,
+    agentJob: 'Laying music under a video, locally',
+  },
 ];

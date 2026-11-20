@@ -1,0 +1,119 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { video: 'The video', music: 'The music (MP3, M4A, WAV…)', pickMusic: 'Choose music', start: 'Music starts at, s', fade: 'Fade out at the end', run: 'Add music', saved: 'Saved — {size}. The picture is copied untouched.', short: 'Saved — {size}. The music ran out at {at}; the rest is silent.', failed: 'Could not add the music — {msg}', needMusic: 'Choose the music first.' },
+  ru: { video: 'Видео', music: 'Музыка (MP3, M4A, WAV…)', pickMusic: 'Выбрать музыку', start: 'Музыка с секунды', fade: 'Затухание в конце', run: 'Добавить музыку', saved: 'Сохранено — {size}. Картинка скопирована без изменений.', short: 'Сохранено — {size}. Музыка закончилась на {at}, дальше тишина.', failed: 'Не удалось добавить музыку — {msg}', needMusic: 'Сначала выберите музыку.' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="video/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP4, MOV, WebM</span>
+  </label>
+  <div id="editor" hidden>
+    <div class="facts" id="facts"></div>
+    <div class="controls">
+      <label class="control">
+        <span class="muted">{words.music}</span>
+        <input type="file" id="music" accept="audio/*,video/*" />
+      </label>
+      <label class="control"><span class="muted">{words.start}</span><input type="number" id="mstart" min="0" step="0.5" value="0" /></label>
+      <label class="control"><span class="muted">{words.fade}</span>
+        <select id="fade"><option value="0">0 s</option><option value="1">1 s</option><option value="2" selected>2 s</option><option value="4">4 s</option></select></label>
+      <span class="spacer"></span>
+      <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+    </div>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<style>
+  .control input[type=number] { width: 90px; }
+  .control input[type=file] { max-width: 240px; }
+</style>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { toolStrings, fill } from '../../lib/strings';
+  import { probe, saveBlob, formatBytes, preciseClock } from '../../lib/encode';
+  import { addMusic } from '../../lib/add-music';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const say = toolStrings();
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  const fileInput = el<HTMLInputElement>('file');
+  let file: File | null = null;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  async function open(chosen: File) {
+    file = chosen;
+    try {
+      status(say.reading);
+      const info = await probe(chosen);
+      if (!info.width) throw new Error('That file has no video track.');
+      el('editor').hidden = false;
+      statusEl.hidden = true;
+      el('facts').innerHTML = `<span>${info.width}×${info.height}</span><span>${preciseClock(info.duration)}</span><span>${formatBytes(info.size)}</span>`;
+    } catch (error) {
+      toolFailed('open', error, chosen);
+      status(error instanceof Error ? error.message : 'Could not read that file.', 1, true);
+    }
+  }
+
+  el<HTMLButtonElement>('run').addEventListener('click', async () => {
+    const music = el<HTMLInputElement>('music').files?.[0];
+    if (!file || busy) return;
+    if (!music) { status(w.needMusic, 1); return; }
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    try {
+      status(fill(say.working, { n: 0 }), 0);
+      const result = await addMusic(file, music, {
+        musicStart: Number(el<HTMLInputElement>('mstart').value) || 0,
+        fadeOut: Number(el<HTMLSelectElement>('fade').value),
+        onProgress: (p) => status(fill(say.working, { n: Math.round(p * 100) }), p),
+      });
+      saveBlob(result.blob, `${file.name.replace(/\.[^.]+$/, '') || 'video'}-music.${result.extension}`);
+      track('result_saved', { placement: 'result', format: result.extension }, { size_mb: Math.round(result.blob.size / 104_857.6) / 10 });
+      const size = formatBytes(result.blob.size);
+      status(result.covered < result.duration - 0.5
+        ? w.short.replace('{size}', size).replace('{at}', preciseClock(result.covered))
+        : w.saved.replace('{size}', size), 1);
+    } catch (error) {
+      toolFailed('run', error, file);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  fileInput.addEventListener('change', () => { const f = fileInput.files?.[0]; if (f) { fileChosen(f, 'picker'); void open(f); } });
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => { const f = (e as DragEvent).dataTransfer?.files?.[0]; if (f) { fileChosen(f, 'drop'); void open(f); } });
+</script>
