@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "npm run -s vendor && astro dev",
-    "vendor": "mkdir -p public/mediapipe && cp node_modules/@mediapipe/tasks-vision/wasm/vision_wasm_internal.* node_modules/@mediapipe/tasks-vision/wasm/vision_wasm_nosimd_internal.* public/mediapipe/",
+    "vendor": "mkdir -p public/mediapipe && cp node_modules/@mediapipe/tasks-vision/wasm/vision_wasm_* public/mediapipe/",
     "build": "npm run -s vendor && astro check && astro build",
     "preview": "astro preview",
     "deploy": "GITHUB_TOKEN=${GITHUB_TOKEN:-$(gh auth token 2>/dev/null)} STUDIO_RELEASE_REQUIRED=1 npm run -s vendor && GITHUB_TOKEN=${GITHUB_TOKEN:-$(gh auth token 2>/dev/null)} STUDIO_RELEASE_REQUIRED=1 astro build && node scripts/check-links.mjs && wrangler pages deploy dist --project-name=life2film-site --branch=production",
@@ -21,7 +21,7 @@
     "@fontsource-variable/space-grotesk": "^5.3.0",
     "@huggingface/transformers": "4.3.2",
     "@mediabunny/mp3-encoder": "^1.66.2",
-    "@mediapipe/tasks-vision": "0.10.21",
+    "@mediapipe/tasks-vision": "1.0.1",
     "@rive-app/canvas-lite": "2.45.0",
     "@shiguredo/rnnoise-wasm": "2025.1.5",
     "astro": "^6.4.8",
