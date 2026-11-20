@@ -527,6 +527,28 @@ export const pt: ToolTranslations = {
       },
     ],
   },
+  'audio-joiner': {
+    searchPhrase: 'Juntar MP3 online',
+    title: 'Juntar arquivos MP3 online grátis — unir músicas em uma, sem upload',
+    description:
+      'Junte arquivos MP3, M4A, WAV, OGG ou FLAC numa faixa online e grátis: defina a ordem, adicione crossfade de 1-5 s e salve em MP3 ou WAV. No navegador, sem upload.',
+    heading: 'Juntar',
+    accent: 'áudio',
+    lede: 'Coloque músicas ou gravações em ordem e receba um só arquivo. Nada sai do seu aparelho.',
+    blurb: 'Junte músicas ou gravações num MP3 ou WAV, na sua ordem, com crossfade se quiser.',
+    featureList: [
+      'Dois ou mais arquivos na ordem que quiser',
+      'Crossfade opcional de 1, 3 ou 5 s',
+      'Formatos e taxas diferentes se alinham',
+      'Tudo no navegador: sem upload',
+    ],
+    faq: [
+      {
+        q: 'Meu áudio é enviado?',
+        a: 'Não. O navegador decodifica, junta e codifica.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Conversor de vídeo online',
     title: 'Conversor de Vídeo Online Grátis — MP4, WebM, MOV sem enviar nada',

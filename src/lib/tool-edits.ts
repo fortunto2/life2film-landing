@@ -822,4 +822,40 @@ Reference implementation: https://life2film.com/tools/audio-cutter/`,
     ],
     agentJob: 'Finding a song\'s key, locally',
   },
+  {
+    // 20 Nov 2026: «объединить mp3», «join mp3», «merge audio» — the audio twin of merge-videos.
+    slug: 'audio-joiner',
+    group: 'everyday',
+    name: 'Audio Joiner',
+    appName: 'MP3 Joiner',
+    blurb: 'Join songs or recordings into one MP3 or WAV, in your order, with a crossfade if you want one.',
+
+    searchPhrase: 'Join MP3 Online',
+    title: 'Join MP3 Files Online Free | merge songs into one, no upload',
+    description: 'Join MP3, M4A, WAV, OGG or FLAC files into one track online for free: set the order, add a 1-5 s crossfade, save as MP3 or WAV. Mixed sample rates line up. In your browser: nothing is uploaded.',
+    heading: 'Join',
+    accent: 'audio',
+    lede: 'Put songs or recordings in order and get one file. Nothing leaves your device.',
+    featureList: [
+      'Two or more files, in the order you set',
+      'Optional equal-power crossfade of 1, 3 or 5 seconds',
+      'Mixed formats and sample rates line up',
+      'Save as MP3 (192 kbps) or WAV',
+      'Runs fully client-side: no upload',
+    ],
+    faq: [
+      {
+        q: 'Can I join files with different formats?',
+        a: 'Yes. Every file is decoded and brought to the first file\'s sample rate in stereo before joining, so an M4A voice memo and an MP3 song join cleanly.',
+      },
+      {
+        q: 'Is my audio uploaded?',
+        a: 'No. Your browser decodes, joins and encodes it.',
+      },
+    ],
+
+    summary: 'Join audio files into one MP3 or WAV in the browser, with an optional equal-power crossfade.',
+    facts: ['An equal-power crossfade (cos/sin curves) avoids the loudness dip a linear crossfade leaves in the middle.'],
+    agentJob: 'Joining audio files, locally',
+  },
 ];

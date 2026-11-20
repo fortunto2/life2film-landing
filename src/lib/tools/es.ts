@@ -526,6 +526,28 @@ export const es: ToolTranslations = {
       },
     ],
   },
+  'audio-joiner': {
+    searchPhrase: 'Unir MP3 online',
+    title: 'Unir archivos MP3 online gratis — juntar canciones en una, sin subir',
+    description:
+      'Une archivos MP3, M4A, WAV, OGG o FLAC en una pista online gratis: elige el orden, añade un fundido de 1-5 s y guarda en MP3 o WAV. En tu navegador, sin subir nada.',
+    heading: 'Unir',
+    accent: 'audio',
+    lede: 'Ordena canciones o grabaciones y obtén un solo archivo. Nada sale de tu dispositivo.',
+    blurb: 'Une canciones o grabaciones en un MP3 o WAV, en tu orden, con fundido si quieres.',
+    featureList: [
+      'Dos o más archivos en el orden que elijas',
+      'Fundido cruzado opcional de 1, 3 o 5 s',
+      'Formatos y frecuencias distintas se alinean',
+      'Todo en el navegador: sin subidas',
+    ],
+    faq: [
+      {
+        q: '¿Se sube mi audio?',
+        a: 'No. Tu navegador lo decodifica, une y codifica.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Convertidor de vídeo online',
     title: 'Convertidor de Vídeo Online Gratis — MP4, WebM, MOV sin subir nada',

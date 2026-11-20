@@ -523,6 +523,28 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'audio-joiner': {
+    searchPhrase: 'Gabung MP3 online',
+    title: 'Gabung File MP3 Online Gratis — satukan lagu, tanpa unggah',
+    description:
+      'Gabungkan file MP3, M4A, WAV, OGG atau FLAC menjadi satu trek secara online dan gratis: atur urutan, tambahkan crossfade 1-5 detik, simpan sebagai MP3 atau WAV. Di browser, tanpa unggah.',
+    heading: 'Gabung',
+    accent: 'audio',
+    lede: 'Urutkan lagu atau rekaman dan dapatkan satu file. Tidak ada yang keluar dari perangkat.',
+    blurb: 'Gabungkan lagu atau rekaman ke satu MP3 atau WAV, sesuai urutan, dengan crossfade bila mau.',
+    featureList: [
+      'Dua file atau lebih sesuai urutan Anda',
+      'Crossfade opsional 1, 3 atau 5 detik',
+      'Format dan sample rate berbeda diselaraskan',
+      'Semua di browser: tanpa unggah',
+    ],
+    faq: [
+      {
+        q: 'Apakah audio saya diunggah?',
+        a: 'Tidak. Browser mendekode, menggabung dan meng-encode sendiri.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',

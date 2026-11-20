@@ -523,6 +523,28 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'audio-joiner': {
+    searchPhrase: 'MP3 birleştirme online',
+    title: 'MP3 Birleştir Online Ücretsiz — şarkıları tek dosyada topla, yükleme yok',
+    description:
+      'MP3, M4A, WAV, OGG veya FLAC dosyalarını online ve ücretsiz tek parçada birleştirin: sırayı belirleyin, 1-5 sn geçiş ekleyin, MP3 veya WAV olarak kaydedin. Tarayıcıda, yükleme yok.',
+    heading: 'Ses',
+    accent: 'birleştir',
+    lede: 'Şarkıları ya da kayıtları sıraya koyun, tek dosya alın. Cihazınızdan hiçbir şey çıkmaz.',
+    blurb: 'Şarkıları ya da kayıtları sırayla tek MP3 veya WAV’da birleştirin, isterseniz geçişle.',
+    featureList: [
+      'Sıraladığınız iki veya daha fazla dosya',
+      'İsteğe bağlı 1, 3 veya 5 sn geçiş',
+      'Farklı biçim ve örnekleme hızları uyumlanır',
+      'Her şey tarayıcıda: yükleme yok',
+    ],
+    faq: [
+      {
+        q: 'Sesim yükleniyor mu?',
+        a: 'Hayır. Tarayıcınız çözer, birleştirir ve kodlar.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',
