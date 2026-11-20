@@ -383,4 +383,30 @@ export const esText: ToolTranslations = {
       },
     ],
   },
+  'remove-silence-from-video': {
+    searchPhrase: 'Quitar silencios de un video online',
+    title: 'Quitar silencios de video online gratis — jump cuts automáticos, sin subir',
+    description:
+      'Corta las pausas de un video hablado automáticamente, online y gratis: elige qué es silencio y qué pausa cortar, y obtén un MP4 más ágil. En tu navegador, sin subir.',
+    heading: 'Quitar silencios',
+    accent: 'del video',
+    lede: 'Jump cuts automáticos para videos hablados.',
+    blurb: 'Corta las pausas de un video hablado (jump cut).',
+    featureList: [
+      'Umbral de -50 a -30 dB',
+      'Corta pausas de más de 0,3–1,2 s',
+      'Uniones sin clics',
+      'Sin subidas ni marca de agua',
+    ],
+    faq: [
+      {
+        q: 'Corta mis palabras.',
+        a: 'Baja el umbral a -45 o -50 dB.',
+      },
+      {
+        q: '¿Se sube el video?',
+        a: 'No. Todo ocurre en tu navegador.',
+      },
+    ],
+  },
 };

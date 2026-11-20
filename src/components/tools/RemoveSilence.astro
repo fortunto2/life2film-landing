@@ -1,0 +1,88 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { threshold: 'Silence is quieter than', pause: 'Cut pauses longer than', run: 'Remove silence', working: 'Cutting… {n}%', saved: 'Saved — {before} → {after}, {cuts} cuts, {size}.', failed: 'Could not cut — {msg}' },
+  ru: { threshold: 'Тишина тише, чем', pause: 'Вырезать паузы длиннее', run: 'Убрать паузы', working: 'Режем… {n}%', saved: 'Сохранено — {before} → {after}, склеек: {cuts}, {size}.', failed: 'Не удалось — {msg}' },
+  es: { threshold: 'Silencio por debajo de', pause: 'Cortar pausas de más de', run: 'Quitar silencios', working: 'Cortando… {n}%', saved: 'Guardado — {before} → {after}, {cuts} cortes, {size}.', failed: 'No se pudo — {msg}' },
+  pt: { threshold: 'Silêncio abaixo de', pause: 'Cortar pausas maiores que', run: 'Remover silêncios', working: 'Cortando… {n}%', saved: 'Salvo — {before} → {after}, {cuts} cortes, {size}.', failed: 'Não foi possível — {msg}' },
+  id: { threshold: 'Hening jika di bawah', pause: 'Potong jeda lebih dari', run: 'Hapus jeda', working: 'Memotong… {n}%', saved: 'Tersimpan — {before} → {after}, {cuts} potongan, {size}.', failed: 'Gagal — {msg}' },
+  tr: { threshold: 'Sessizlik eşiği', pause: 'Şundan uzun duraklamaları kes', run: 'Sessizliği kaldır', working: 'Kesiliyor… %{n}', saved: 'Kaydedildi — {before} → {after}, {cuts} kesim, {size}.', failed: 'Yapılamadı — {msg}' },
+  ar: { threshold: 'الصمت أهدأ من', pause: 'اقطع الوقفات الأطول من', run: 'أزل الصمت', working: 'جارٍ القص… {n}%', saved: 'تم الحفظ — {before} ← {after}، {cuts} قطعًا، {size}.', failed: 'تعذّر — {msg}' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="video/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP4, MOV, WebM</span>
+  </label>
+  <div class="controls">
+    <label class="control"><span class="muted">{words.threshold}</span>
+      <select id="db">{[-50, -45, -40, -35, -30].map((d) => <option value={d} selected={d === -40}>{d} dB</option>)}</select></label>
+    <label class="control"><span class="muted">{words.pause}</span>
+      <select id="pause">{[0.3, 0.5, 0.8, 1.2].map((s) => <option value={s} selected={s === 0.5}>{s} s</option>)}</select></label>
+    <span class="spacer"></span>
+    <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { saveBlob, formatBytes, preciseClock } from '../../lib/encode';
+  import { removeSilence } from '../../lib/silence';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  let file: File | null = null;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  el('run').addEventListener('click', async () => {
+    if (!file || busy) return;
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    const db = Number(el<HTMLSelectElement>('db').value);
+    const pause = Number(el<HTMLSelectElement>('pause').value);
+    try {
+      const r = await removeSilence(file, db, pause, (f) => status(w.working.replace('{n}', String(Math.round(f * 100))), f));
+      saveBlob(r.blob, `${file.name.replace(/\.[^.]+$/, '')}-cut.mp4`);
+      track('result_saved', { placement: 'result' }, { before_s: Math.round(r.before), after_s: Math.round(r.after), cuts: r.cuts, db, pause });
+      status(w.saved.replace('{before}', preciseClock(r.before)).replace('{after}', preciseClock(r.after)).replace('{cuts}', String(r.cuts)).replace('{size}', formatBytes(r.blob.size)), 1);
+    } catch (error) {
+      toolFailed('run', error, file);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  const take = (f: File | undefined, how: 'picker' | 'drop') => { if (!f) return; file = f; fileChosen(f, how); status(f.name); };
+  el<HTMLInputElement>('file').addEventListener('change', (e) => take((e.target as HTMLInputElement).files?.[0], 'picker'));
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => take((e as DragEvent).dataTransfer?.files?.[0], 'drop'));
+</script>

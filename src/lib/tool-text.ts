@@ -581,4 +581,44 @@ export const TEXT_TOOLS: Tool[] = [
     facts: ['A 1080p phone clip at 720p has about 44% of the pixels.'],
     agentJob: 'Changing a video’s resolution, locally',
   },
+  {
+    // 20 Nov 2026: «remove silence from video», «jump cut», «вырезать паузы из видео».
+    slug: 'remove-silence-from-video',
+    group: 'everyday',
+    name: 'Remove Silence from Video',
+    appName: 'Remove Silence',
+    blurb: 'Cut the pauses out of a talking video (jump cut), picture and sound together.',
+
+    searchPhrase: 'Remove Silence from Video Online',
+    title: 'Remove Silence from Video Online Free | automatic jump cuts, no upload',
+    description: 'Cut the pauses out of a talking video automatically, online and free: choose how quiet counts as silence and how long a pause may be, get a tighter MP4 with picture and sound cut together. Runs in your browser; nothing is uploaded.',
+    heading: 'Remove silence',
+    accent: 'from video',
+    lede: 'Automatic jump cuts for talking videos. The video stays on your device.',
+    featureList: [
+      'Silence threshold from -50 to -30 dB',
+      'Pauses longer than 0.3 to 1.2 s are cut',
+      'A little air kept around every word; 5 ms ramps so joins do not click',
+      'Shows how much shorter the result is',
+      'Nothing uploaded, no watermark',
+    ],
+    faq: [
+      {
+        q: 'It cut into my words.',
+        a: 'Lower the threshold (for example to -45 or -50 dB) so quieter speech counts as sound, or raise the pause length.',
+      },
+      {
+        q: 'It cut nothing.',
+        a: 'Background noise is louder than the threshold. Raise it to -35 or -30 dB, or clean the sound first with Remove Background Noise.',
+      },
+      {
+        q: 'Is the video uploaded?',
+        a: 'No. The sound is measured and the cut is rendered in your browser.',
+      },
+    ],
+
+    summary: 'Automatic jump cuts: pauses below a dB threshold removed from a talking video, in the browser.',
+    facts: ['Quiet runs are measured in 20 ms windows; speech keeps 0.12 s of padding on each side.'],
+    agentJob: 'Cutting the pauses out of a talking video, locally',
+  },
 ];

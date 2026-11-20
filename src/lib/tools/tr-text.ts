@@ -383,4 +383,30 @@ export const trText: ToolTranslations = {
       },
     ],
   },
+  'remove-silence-from-video': {
+    searchPhrase: 'Videodaki sessizlikleri online kes',
+    title: 'Videodan Sessizliği Kaldır Online Ücretsiz — otomatik jump cut, yükleme yok',
+    description:
+      'Konuşmalı bir videodaki duraklamaları otomatik, online ve ücretsiz kesin: neyin sessizlik sayılacağını ve duraklama uzunluğunu seçin, daha akıcı bir MP4 alın. Tarayıcıda, yükleme yok.',
+    heading: 'Sessizliği kaldır',
+    accent: 'videodan',
+    lede: 'Konuşmalı videolar için otomatik jump cut.',
+    blurb: 'Konuşmalı videodaki duraklamaları kesin (jump cut).',
+    featureList: [
+      '-50 ile -30 dB arası eşik',
+      '0,3–1,2 sn’den uzun duraklamalar kesilir',
+      'Tıkırtısız birleşimler',
+      'Yükleme ve filigran yok',
+    ],
+    faq: [
+      {
+        q: 'Kelimelerimi kesiyor.',
+        a: 'Eşiği -45 veya -50 dB’ye düşürün.',
+      },
+      {
+        q: 'Video yükleniyor mu?',
+        a: 'Hayır. Her şey tarayıcıda.',
+      },
+    ],
+  },
 };

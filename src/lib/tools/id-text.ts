@@ -383,4 +383,30 @@ export const idText: ToolTranslations = {
       },
     ],
   },
+  'remove-silence-from-video': {
+    searchPhrase: 'Hapus jeda dari video online',
+    title: 'Hapus Hening dari Video Online Gratis — jump cut otomatis, tanpa unggah',
+    description:
+      'Potong jeda dari video bicara secara otomatis, online dan gratis: pilih ambang hening dan panjang jeda, dapatkan MP4 yang lebih padat. Di browser, tanpa unggah.',
+    heading: 'Hapus jeda',
+    accent: 'dari video',
+    lede: 'Jump cut otomatis untuk video bicara.',
+    blurb: 'Potong jeda dari video bicara (jump cut).',
+    featureList: [
+      'Ambang -50 sampai -30 dB',
+      'Memotong jeda lebih dari 0,3–1,2 detik',
+      'Sambungan tanpa bunyi klik',
+      'Tanpa unggah dan watermark',
+    ],
+    faq: [
+      {
+        q: 'Kata-kata saya terpotong.',
+        a: 'Turunkan ambang ke -45 atau -50 dB.',
+      },
+      {
+        q: 'Apakah video diunggah?',
+        a: 'Tidak. Semuanya di browser.',
+      },
+    ],
+  },
 };
