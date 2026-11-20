@@ -298,6 +298,33 @@ export const es: ToolTranslations = {
       },
     ],
   },
+  'merge-videos': {
+    searchPhrase: 'Unir videos online',
+    title: 'Unir videos online gratis — juntar clips MP4 y MOV sin subir ni marca de agua',
+    description:
+      'Une videos online y gratis: junta dos o más clips MP4, MOV o WebM en un solo archivo en el orden que elijas. Los tamaños distintos se encajan en un solo cuadro. En tu navegador, sin subir nada ni marca de agua.',
+    heading: 'Unir',
+    accent: 'videos',
+    lede: 'Pon los clips uno tras otro y obtén un solo video. Nada sale de tu dispositivo.',
+    blurb: 'Junta dos o más videos en un archivo, en el orden que quieras.',
+    featureList: [
+      'Une cualquier número de clips MP4, MOV y WebM',
+      'Cambia el orden antes de unir',
+      'Los clips de otra forma se encajan con bandas',
+      'Los clips sin sonido aportan silencio: imagen y sonido no se desfasan',
+      'Todo en el navegador: sin subidas ni marca de agua',
+    ],
+    faq: [
+      {
+        q: '¿Puedo unir videos de distintos tamaños o teléfonos?',
+        a: 'Sí. Cada fotograma se encaja en el cuadro del primer clip (con bandas negras si la forma cambia) y la película se codifica una vez.',
+      },
+      {
+        q: '¿Puede elegir las mejores partes y montarlas con música?',
+        a: 'Esta página no: une los clips enteros. Elegir los mejores momentos y montarlos con una canción lo hace la app Life2Film para iPhone.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Convertidor de vídeo online',
     title: 'Convertidor de Vídeo Online Gratis — MP4, WebM, MOV sin subir nada',

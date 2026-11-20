@@ -295,6 +295,33 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'merge-videos': {
+    searchPhrase: 'Video birleştirme online',
+    title: 'Video Birleştir Online Ücretsiz — MP4 ve MOV klipleri yükleme ve filigran olmadan',
+    description:
+      'Videoları online ve ücretsiz birleştirin: iki veya daha fazla MP4, MOV ya da WebM klibi seçtiğiniz sırayla tek dosyada toplayın. Farklı boyutlar tek kadraja oturtulur. Tarayıcıda, yükleme ve filigran yok.',
+    heading: 'Videoları',
+    accent: 'birleştir',
+    lede: 'Klipleri art arda dizin ve tek bir video alın. Cihazınızdan hiçbir şey çıkmaz.',
+    blurb: 'İki veya daha fazla videoyu istediğiniz sırayla tek dosyada birleştirin.',
+    featureList: [
+      'Sınırsız sayıda MP4, MOV ve WebM klip',
+      'Birleştirmeden önce sırayı değiştirin',
+      'Farklı biçimdeki klipler siyah bantlarla oturtulur',
+      'Sessiz klipler sessizlik ekler: görüntü ve ses kaymaz',
+      'Her şey tarayıcıda: yükleme ve filigran yok',
+    ],
+    faq: [
+      {
+        q: 'Farklı boyutlarda veya telefonlardan videolar birleşir mi?',
+        a: 'Evet. Her kare ilk klibin kadrajına oturtulur (biçim farklıysa siyah bantlarla) ve film bir kez kodlanır.',
+      },
+      {
+        q: 'En iyi kısımları seçip müziğe göre kesebilir mi?',
+        a: 'Bu sayfa değil: klipleri bütün olarak birleştirir. En iyi anları seçip bir şarkıya göre kesmek Life2Film iPhone uygulamasının işidir.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',

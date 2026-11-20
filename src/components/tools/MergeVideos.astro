@@ -10,6 +10,11 @@ const status = STATUS[lang];
 const WORDS: Partial<Record<Lang, Record<string, string>>> = {
   en: { hint: 'two or more videos', add: 'Add more', run: 'Merge', up: 'Move up', down: 'Move down', remove: 'Remove', saved: 'Saved — {size}, {w}×{h}, {len}.', failed: 'Could not merge — {msg}', two: 'Add at least two videos.' },
   ru: { hint: 'два видео или больше', add: 'Добавить ещё', run: 'Объединить', up: 'Выше', down: 'Ниже', remove: 'Убрать', saved: 'Сохранено — {size}, {w}×{h}, {len}.', failed: 'Не удалось объединить — {msg}', two: 'Добавьте хотя бы два видео.' },
+  es: { hint: 'dos o más videos', add: 'Añadir más', run: 'Unir', up: 'Subir', down: 'Bajar', remove: 'Quitar', saved: 'Guardado — {size}, {w}×{h}, {len}.', failed: 'No se pudo unir — {msg}', two: 'Añade al menos dos videos.' },
+  pt: { hint: 'dois ou mais vídeos', add: 'Adicionar mais', run: 'Juntar', up: 'Subir', down: 'Descer', remove: 'Remover', saved: 'Salvo — {size}, {w}×{h}, {len}.', failed: 'Não foi possível juntar — {msg}', two: 'Adicione pelo menos dois vídeos.' },
+  id: { hint: 'dua video atau lebih', add: 'Tambah lagi', run: 'Gabung', up: 'Naik', down: 'Turun', remove: 'Hapus', saved: 'Tersimpan — {size}, {w}×{h}, {len}.', failed: 'Gagal menggabung — {msg}', two: 'Tambahkan minimal dua video.' },
+  tr: { hint: 'iki veya daha fazla video', add: 'Daha ekle', run: 'Birleştir', up: 'Yukarı', down: 'Aşağı', remove: 'Kaldır', saved: 'Kaydedildi — {size}, {w}×{h}, {len}.', failed: 'Birleştirilemedi — {msg}', two: 'En az iki video ekleyin.' },
+  ar: { hint: 'فيديوهان أو أكثر', add: 'أضف المزيد', run: 'دمج', up: 'لأعلى', down: 'لأسفل', remove: 'إزالة', saved: 'تم الحفظ — {size}، {w}×{h}، {len}.', failed: 'تعذّر الدمج — {msg}', two: 'أضف فيديوهين على الأقل.' },
 };
 const words = WORDS[lang] ?? WORDS.en!;
 ---

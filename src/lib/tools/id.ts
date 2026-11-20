@@ -295,6 +295,33 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'merge-videos': {
+    searchPhrase: 'Gabung video online',
+    title: 'Gabung Video Online Gratis — satukan klip MP4 dan MOV tanpa unggah dan watermark',
+    description:
+      'Gabungkan video secara online dan gratis: satukan dua klip MP4, MOV atau WebM atau lebih menjadi satu file sesuai urutan pilihan Anda. Ukuran berbeda dimasukkan ke satu bingkai. Di browser, tanpa unggah dan watermark.',
+    heading: 'Gabung',
+    accent: 'video',
+    lede: 'Taruh klip berurutan dan dapatkan satu video. Tidak ada yang keluar dari perangkat.',
+    blurb: 'Satukan dua video atau lebih menjadi satu file, sesuai urutan.',
+    featureList: [
+      'Menggabungkan klip MP4, MOV dan WebM berapa pun',
+      'Ubah urutan sebelum digabung',
+      'Klip berbentuk lain dimasukkan dengan bilah hitam',
+      'Klip tanpa suara diisi hening: gambar dan suara tetap sinkron',
+      'Semua di browser: tanpa unggah dan watermark',
+    ],
+    faq: [
+      {
+        q: 'Bisakah menggabungkan video berbeda ukuran atau dari ponsel berbeda?',
+        a: 'Bisa. Setiap frame dimasukkan ke bingkai klip pertama (dengan bilah hitam bila bentuknya beda), lalu film di-encode sekali.',
+      },
+      {
+        q: 'Bisakah memilih bagian terbaik dan memotongnya dengan musik?',
+        a: 'Tidak di halaman ini: halaman ini menggabungkan klip utuh. Memilih momen terbaik dan memotongnya dengan lagu dilakukan aplikasi Life2Film untuk iPhone.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',
