@@ -45,11 +45,14 @@ export function toCues(chunks: { timestamp: [number, number | null]; text: strin
     const end = c.timestamp[1] ?? chunks[i + 1]?.timestamp[0] ?? fallbackEnd;
     if (!(end > start)) return;
     const words = text.split(/\s+/);
+    // As many pieces as the length needs, each aimed at an equal share, so no word is left alone.
+    const parts = Math.max(1, Math.ceil(text.length / maxChars));
+    const aim = text.length / parts;
     const pieces: string[] = [];
     let line = '';
     for (const w of words) {
       const next = line ? `${line} ${w}` : w;
-      if (line && next.length > maxChars) { pieces.push(line); line = w; } else line = next;
+      if (line && pieces.length < parts - 1 && (next.length > maxChars || next.length > aim + w.length / 2)) { pieces.push(line); line = w; } else line = next;
     }
     if (line) pieces.push(line);
     const total = pieces.reduce((s, p) => s + p.length, 0);

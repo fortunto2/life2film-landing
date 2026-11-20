@@ -25,6 +25,15 @@ describe('toCues', () => {
   });
 });
 
+describe('toCues balance', () => {
+  it('does not leave the last word alone on its own cue', () => {
+    const text = 'The quick brown fox jumps over the lazy dog, then it runs into the forest and disappears.';
+    const cues = toCues([{ timestamp: [0, 5], text }], 5);
+    expect(cues.length).toBe(2);
+    expect(Math.min(...cues.map((c) => c.text.length))).toBeGreaterThan(30);
+  });
+});
+
 describe('toSrt / toVtt', () => {
   const cues = [{ start: 0.5, end: 2, text: 'Привет' }, { start: 3661.25, end: 3662, text: 'An hour in' }];
   it('round-trips through the subtitle parser the burner uses', () => {
