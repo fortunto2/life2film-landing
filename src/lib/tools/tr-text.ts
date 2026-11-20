@@ -457,4 +457,30 @@ export const trText: ToolTranslations = {
       },
     ],
   },
+  'cut-part-of-video': {
+    searchPhrase: 'Videonun bir kısmını online sil',
+    title: 'Videodan Bir Kısmı Sil Online Ücretsiz — ortasını kes, yükleme yok',
+    description:
+      'Bir videonun ortasından bir bölümü online ve ücretsiz kesin: izlerken başlangıç ve bitişi işaretleyin, öncesi ve sonrası birleşir. Tarayıcıda, yükleme yok.',
+    heading: 'Bir kısmı sil',
+    accent: 'videodan',
+    lede: 'Fazlasını işaretleyin; gerisi birleşir.',
+    blurb: 'Videonun ortasından bir bölümü çıkarın.',
+    featureList: [
+      'İzlerken başlangıç ve bitişi işaretleyin',
+      'Kare hassasiyetinde birleşim',
+      'Ses görüntüyle birlikte kesilir',
+      'Yükleme ve filigran yok',
+    ],
+    faq: [
+      {
+        q: 'Kırpmadan farkı ne?',
+        a: 'Kırpma bir parçayı tutar; bu bir parçayı atar, iki ucu tutar.',
+      },
+      {
+        q: 'Video yükleniyor mu?',
+        a: 'Hayır.',
+      },
+    ],
+  },
 };

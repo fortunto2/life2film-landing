@@ -457,4 +457,30 @@ export const ptText: ToolTranslations = {
       },
     ],
   },
+  'cut-part-of-video': {
+    searchPhrase: 'Remover parte de um vídeo online',
+    title: 'Remover parte de um vídeo online grátis — cortar o meio, sem upload',
+    description:
+      'Corte um trecho do meio de um vídeo online e grátis: marque início e fim enquanto assiste, e o antes e o depois se juntam. No navegador, sem upload.',
+    heading: 'Remover parte',
+    accent: 'do vídeo',
+    lede: 'Marque o que sobra; o resto se junta.',
+    blurb: 'Tire um trecho do meio de um vídeo.',
+    featureList: [
+      'Marque início e fim assistindo',
+      'Junção precisa ao quadro',
+      'Som cortado com a imagem',
+      'Sem upload nem marca d’água',
+    ],
+    faq: [
+      {
+        q: 'Diferença de cortar?',
+        a: 'Cortar mantém uma parte; isto remove uma parte e mantém as pontas.',
+      },
+      {
+        q: 'O vídeo é enviado?',
+        a: 'Não.',
+      },
+    ],
+  },
 };

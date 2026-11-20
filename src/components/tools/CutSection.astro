@@ -1,0 +1,112 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { from: 'Remove from', to: 'to', here: 'here', run: 'Remove this part', bad: 'Enter both times, e.g. 0:12 and 0:20.', working: 'Cutting… {n}%', saved: 'Saved — {before} → {after}, {size}.', failed: 'Could not cut — {msg}' },
+  ru: { from: 'Вырезать с', to: 'по', here: 'отсюда', run: 'Вырезать этот кусок', bad: 'Укажите оба времени, например 0:12 и 0:20.', working: 'Режем… {n}%', saved: 'Сохранено — {before} → {after}, {size}.', failed: 'Не удалось — {msg}' },
+  es: { from: 'Quitar desde', to: 'hasta', here: 'aquí', run: 'Quitar esta parte', bad: 'Escribe ambos tiempos, p. ej. 0:12 y 0:20.', working: 'Cortando… {n}%', saved: 'Guardado — {before} → {after}, {size}.', failed: 'No se pudo — {msg}' },
+  pt: { from: 'Remover de', to: 'até', here: 'aqui', run: 'Remover esta parte', bad: 'Digite os dois tempos, ex. 0:12 e 0:20.', working: 'Cortando… {n}%', saved: 'Salvo — {before} → {after}, {size}.', failed: 'Não foi possível — {msg}' },
+  id: { from: 'Hapus dari', to: 'sampai', here: 'di sini', run: 'Hapus bagian ini', bad: 'Isi kedua waktu, mis. 0:12 dan 0:20.', working: 'Memotong… {n}%', saved: 'Tersimpan — {before} → {after}, {size}.', failed: 'Gagal — {msg}' },
+  tr: { from: 'Şuradan sil', to: 'şuraya', here: 'burası', run: 'Bu kısmı sil', bad: 'İki zamanı da girin, örn. 0:12 ve 0:20.', working: 'Kesiliyor… %{n}', saved: 'Kaydedildi — {before} → {after}, {size}.', failed: 'Yapılamadı — {msg}' },
+  ar: { from: 'احذف من', to: 'إلى', here: 'هنا', run: 'احذف هذا الجزء', bad: 'أدخل الوقتين، مثل 0:12 و0:20.', working: 'جارٍ القص… {n}%', saved: 'تم الحفظ — {before} ← {after}، {size}.', failed: 'تعذّر — {msg}' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="video/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP4, MOV, WebM</span>
+  </label>
+  <video id="preview" controls playsinline hidden></video>
+  <div class="controls">
+    <label class="control"><span class="muted">{words.from}</span>
+      <input id="from" type="text" inputmode="decimal" placeholder="0:12" size="7" /></label>
+    <button id="fromHere" type="button" class="ghost">{words.here}</button>
+    <label class="control"><span class="muted">{words.to}</span>
+      <input id="to" type="text" inputmode="decimal" placeholder="0:20" size="7" /></label>
+    <button id="toHere" type="button" class="ghost">{words.here}</button>
+    <span class="spacer"></span>
+    <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<style>
+  #preview { width: 100%; max-height: 50vh; margin: 8px 0; border-radius: 8px; background: #000; }
+  input[type='text'] { font: inherit; background: rgba(255,255,255,.04); color: inherit; border: 1px solid rgba(255,255,255,.15); border-radius: 6px; padding: 4px 6px; }
+</style>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { saveBlob, formatBytes, preciseClock } from '../../lib/encode';
+  import { cutSection, parseClock } from '../../lib/cut-section';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  const preview = el<HTMLVideoElement>('preview');
+  let file: File | null = null;
+  let url = '';
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  const clock = (t: number) => `${Math.floor(t / 60)}:${(t % 60).toFixed(1).padStart(4, '0')}`;
+  el('fromHere').addEventListener('click', () => { el<HTMLInputElement>('from').value = clock(preview.currentTime); });
+  el('toHere').addEventListener('click', () => { el<HTMLInputElement>('to').value = clock(preview.currentTime); });
+
+  el('run').addEventListener('click', async () => {
+    if (!file || busy) return;
+    const from = parseClock(el<HTMLInputElement>('from').value);
+    const to = parseClock(el<HTMLInputElement>('to').value);
+    if (from === null || to === null || from === to) { status(w.bad, 1, true); return; }
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    try {
+      const r = await cutSection(file, from, to, preview.duration || Infinity, (f) => status(w.working.replace('{n}', String(Math.round(f * 100))), f));
+      saveBlob(r.blob, `${file.name.replace(/\.[^.]+$/, '')}-cut.mp4`);
+      track('result_saved', { placement: 'result' }, { before_s: Math.round(r.before), removed_s: Math.round(r.before - r.after) });
+      status(w.saved.replace('{before}', preciseClock(r.before)).replace('{after}', preciseClock(r.after)).replace('{size}', formatBytes(r.blob.size)), 1);
+    } catch (error) {
+      toolFailed('run', error, file);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  const take = (f: File | undefined, how: 'picker' | 'drop') => {
+    if (!f) return;
+    file = f;
+    fileChosen(f, how);
+    if (url) URL.revokeObjectURL(url);
+    url = URL.createObjectURL(f);
+    preview.src = url;
+    preview.hidden = false;
+    status(f.name);
+  };
+  el<HTMLInputElement>('file').addEventListener('change', (e) => take((e.target as HTMLInputElement).files?.[0], 'picker'));
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => take((e as DragEvent).dataTransfer?.files?.[0], 'drop'));
+</script>

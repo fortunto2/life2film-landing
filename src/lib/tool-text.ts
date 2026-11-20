@@ -696,4 +696,43 @@ export const TEXT_TOOLS: Tool[] = [
     facts: ['The bar is about 0.8% of the short edge: 9 px on a 1080x1920 video.'],
     agentJob: 'Adding a progress bar to a video, locally',
   },
+  {
+    // 20 Nov 2026: «remove part of video», «cut out middle of video», «вырезать кусок из видео».
+    slug: 'cut-part-of-video',
+    group: 'everyday',
+    name: 'Remove Part of a Video',
+    appName: 'Cut Out a Part',
+    blurb: 'Take a section out of the middle of a video; the rest joins up.',
+
+    searchPhrase: 'Remove Part of a Video Online',
+    title: 'Remove Part of a Video Online Free | cut out the middle, no upload',
+    description: 'Cut a section out of the middle of a video online for free: mark where it starts and ends while watching, and the parts before and after are joined, picture and sound together. Runs in your browser; nothing is uploaded.',
+    heading: 'Remove part',
+    accent: 'of a video',
+    lede: 'Mark the bit you do not want; the rest is joined. The video stays on your device.',
+    featureList: [
+      'Mark the start and end while watching, or type the times',
+      'The parts before and after are joined, frame-accurate',
+      'Sound cut with the picture, no click at the join',
+      'Nothing uploaded, no watermark',
+    ],
+    faq: [
+      {
+        q: 'How is this different from trimming?',
+        a: 'Video Trimmer keeps one part and drops both ends. This drops one part and keeps both ends.',
+      },
+      {
+        q: 'Can I remove several parts?',
+        a: 'Run it again on the saved file for each part, or let Remove Silence take out every pause at once.',
+      },
+      {
+        q: 'Is the video uploaded?',
+        a: 'No. Your browser decodes it and joins the two parts.',
+      },
+    ],
+
+    summary: 'Cut one section out of a video and join the rest, frame-accurate, in the browser.',
+    facts: ['Times can be typed as 75, 1:15 or 0:01:15.'],
+    agentJob: 'Cutting a section out of a video, locally',
+  },
 ];

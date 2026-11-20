@@ -54,10 +54,8 @@ export function keepRanges(rms: Float32Array, duration: number, threshold: numbe
 /** dBFS (e.g. -40) to linear RMS. */
 export const fromDb = (db: number) => 10 ** (db / 20);
 
-export async function removeSilence(file: File, thresholdDb: number, minSilence: number, onProgress?: (f: number) => void): Promise<{ blob: Blob; before: number; after: number; cuts: number }> {
-  const { Input, BlobSource, ALL_FORMATS, Output, StreamTarget, Mp4OutputFormat, CanvasSink, CanvasSource, AudioBufferSource, getFirstEncodableAudioCodec, QUALITY_HIGH } = await loadMediabunny();
-  const rate = 48_000;
-  // The whole sound, decoded once: measured for the cut and reused for the output.
+/** Decode the whole sound once to 48 kHz stereo. */
+async function decodeStereo(file: File, rate: number): Promise<[Float32Array, Float32Array]> {
   const ac = new AudioContext();
   let raw: AudioBuffer;
   try { raw = await ac.decodeAudioData(await file.arrayBuffer()); } catch { throw new Error('This browser cannot decode the sound of that file. MP4 and MOV usually work.'); } finally { void ac.close(); }
@@ -67,24 +65,42 @@ export async function removeSilence(file: File, thresholdDb: number, minSilence:
   node.connect(off.destination);
   node.start();
   const pcm = await off.startRendering();
-  const L = pcm.getChannelData(0), R = pcm.getChannelData(1);
+  return [pcm.getChannelData(0), pcm.getChannelData(1)];
+}
+
+export async function removeSilence(file: File, thresholdDb: number, minSilence: number, onProgress?: (f: number) => void): Promise<{ blob: Blob; before: number; after: number; cuts: number }> {
+  const [L, R] = await decodeStereo(file, 48_000);
   const mono = new Float32Array(L.length);
   for (let i = 0; i < L.length; i++) mono[i] = (L[i] + R[i]) / 2;
+  const before = L.length / 48_000;
+  const ranges = keepRanges(windowRms(mono, 48_000), before, fromDb(thresholdDb), minSilence);
+  if (!ranges.length) throw new Error('Nothing louder than the threshold was found. Try a lower threshold.');
+  const r = await renderRanges(file, ranges, onProgress, [L, R]);
+  return { blob: r.blob, before: r.before, after: r.after, cuts: Math.max(0, ranges.length - 1) };
+}
 
+/**
+ * Keep only `ranges` (seconds, ascending, non-overlapping) of a video, joined in order: picture and
+ * sound together, 5 ms ramps at every join. `pcm` skips decoding the sound again when the caller has it.
+ */
+export async function renderRanges(file: File, ranges: [number, number][], onProgress?: (f: number) => void, pcm?: [Float32Array, Float32Array]): Promise<{ blob: Blob; before: number; after: number }> {
+  const { Input, BlobSource, ALL_FORMATS, Output, StreamTarget, Mp4OutputFormat, CanvasSink, CanvasSource, AudioBufferSource, getFirstEncodableAudioCodec, QUALITY_HIGH } = await loadMediabunny();
+  const rate = 48_000;
   const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
   const video = await input.getPrimaryVideoTrack();
   if (!video) throw new Error('That file has no picture.');
   if (!(await video.canDecode())) throw new Error('This browser cannot decode that video. Chrome or Edge usually can.');
   const before = await input.computeDuration();
-  const ranges = keepRanges(windowRms(mono, rate), before, fromDb(thresholdDb), minSilence);
-  if (!ranges.length) throw new Error('Nothing louder than the threshold was found. Try a lower threshold.');
+  ranges = ranges.map(([a, b]) => [Math.max(0, a), Math.min(before, b)] as [number, number]).filter(([a, b]) => b - a > 1 / FPS);
+  if (!ranges.length) throw new Error('Nothing would be left.');
+  const audio = await input.getPrimaryAudioTrack();
+  const [L, R] = pcm ?? (audio ? await decodeStereo(file, rate) : [new Float32Array(0), new Float32Array(0)]);
   const after = ranges.reduce((s, [a, b]) => s + (b - a), 0);
-
   const width = video.displayWidth - (video.displayWidth % 2), height = video.displayHeight - (video.displayHeight % 2);
   const format = new Mp4OutputFormat();
   const vcodec = await encodableCodec('mp4', { width, height });
   if (!vcodec) throw new Error('This browser cannot encode MP4 video. Chrome or Edge usually can.');
-  const acodec = await getFirstEncodableAudioCodec(format.getSupportedAudioCodecs(), { numberOfChannels: 2, sampleRate: rate, bitrate: 192_000 });
+  const acodec = L.length === 0 ? null : await getFirstEncodableAudioCodec(format.getSupportedAudioCodecs(), { numberOfChannels: 2, sampleRate: rate, bitrate: 192_000 });
   const canvas = new OffscreenCanvas(width, height);
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Canvas is unavailable in this browser.');
@@ -141,5 +157,5 @@ export async function removeSilence(file: File, thresholdDb: number, minSilence:
   await output.finalize();
   onProgress?.(1);
   if (!sink.size) throw new Error('Nothing was written.');
-  return { blob: sink.blob('video/mp4'), before, after, cuts: Math.max(0, ranges.length - 1) };
+  return { blob: sink.blob('video/mp4'), before, after };
 }

@@ -457,4 +457,30 @@ export const esText: ToolTranslations = {
       },
     ],
   },
+  'cut-part-of-video': {
+    searchPhrase: 'Quitar una parte de un video online',
+    title: 'Quitar una parte de un video online gratis — cortar el medio, sin subir',
+    description:
+      'Corta una sección del medio de un video online y gratis: marca inicio y fin mientras lo ves, y lo de antes y después se une. En tu navegador, sin subir.',
+    heading: 'Quitar una parte',
+    accent: 'del video',
+    lede: 'Marca lo que sobra; el resto se une.',
+    blurb: 'Quita una sección del medio de un video.',
+    featureList: [
+      'Marca inicio y fin mientras miras',
+      'Unión precisa al fotograma',
+      'Sonido cortado con la imagen',
+      'Sin subidas ni marca de agua',
+    ],
+    faq: [
+      {
+        q: '¿Diferencia con recortar?',
+        a: 'Recortar conserva una parte; esto quita una parte y conserva los extremos.',
+      },
+      {
+        q: '¿Se sube el video?',
+        a: 'No.',
+      },
+    ],
+  },
 };

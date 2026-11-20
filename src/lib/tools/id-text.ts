@@ -457,4 +457,30 @@ export const idText: ToolTranslations = {
       },
     ],
   },
+  'cut-part-of-video': {
+    searchPhrase: 'Hapus bagian video online',
+    title: 'Hapus Bagian Video Online Gratis — potong bagian tengah, tanpa unggah',
+    description:
+      'Potong satu bagian dari tengah video secara online dan gratis: tandai awal dan akhir sambil menonton, sisanya disambung. Di browser, tanpa unggah.',
+    heading: 'Hapus bagian',
+    accent: 'dari video',
+    lede: 'Tandai yang tidak perlu; sisanya disambung.',
+    blurb: 'Hapus satu bagian dari tengah video.',
+    featureList: [
+      'Tandai awal dan akhir sambil menonton',
+      'Sambungan tepat per frame',
+      'Suara terpotong bersama gambar',
+      'Tanpa unggah dan watermark',
+    ],
+    faq: [
+      {
+        q: 'Apa bedanya dengan trim?',
+        a: 'Trim menyimpan satu bagian; ini membuang satu bagian dan menyimpan kedua ujung.',
+      },
+      {
+        q: 'Apakah video diunggah?',
+        a: 'Tidak.',
+      },
+    ],
+  },
 };
