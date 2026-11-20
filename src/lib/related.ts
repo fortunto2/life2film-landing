@@ -32,6 +32,10 @@ interface Copy {
   denoise: string;
   split: string;
   collage: string;
+  text: string;
+  logo: string;
+  border: string;
+  bar: string;
   hub: string;
   homeNote: (hub: string, frames: string, guides: string) => string;
   hubNote: (frames: string, guides: string) => string;
@@ -57,6 +61,10 @@ const COPY: Partial<Record<Lang, Copy>> = {
     denoise: 'Remove background noise from the recording',
     split: 'Two videos side by side, stacked or picture-in-picture',
     collage: 'Three or four videos in one frame (collage)',
+    text: 'Put a caption or title on the video',
+    logo: 'Add your logo or watermark',
+    border: 'Put a coloured border around the video',
+    bar: 'Add a progress bar that fills as it plays',
     hub: 'All free video tools',
     homeNote: (hub, frames, guides) =>
       `Free in the browser: <a href="${hub}">video tools</a> such as <a href="${frames}">splitting a video into frames</a>, and <a href="${guides}">guides to editing video with an AI agent</a>.`,
@@ -82,6 +90,10 @@ const COPY: Partial<Record<Lang, Copy>> = {
     denoise: 'Убрать фоновый шум из записи',
     split: 'Два видео рядом, друг над другом или картинка в картинке',
     collage: 'Три-четыре видео в одном кадре (коллаж)',
+    text: 'Наложить подпись или заголовок на видео',
+    logo: 'Добавить свой логотип или водяной знак',
+    border: 'Обвести видео цветной рамкой',
+    bar: 'Добавить полосу прогресса по ходу ролика',
     hub: 'Все бесплатные видеоинструменты',
     homeNote: (hub, frames, guides) =>
       `Бесплатно в браузере: <a href="${hub}">видеоинструменты</a>, например <a href="${frames}">разбить видео на кадры</a>, и <a href="${guides}">руководства по монтажу видео с ИИ-агентом</a>.`,
@@ -147,6 +159,16 @@ export function relatedForTool(slug: string, lang: Lang): { heading: string; lin
       { href: toolPath(lang, 'split-screen-video'), text: c.split },
       { href: toolPath(lang, 'video-collage'), text: c.collage },
     ],
+    'add-text-to-video': [
+      { href: toolPath(lang, 'add-logo-to-video'), text: c.logo },
+      { href: toolPath(lang, 'add-border-to-video'), text: c.border },
+    ],
+    'add-logo-to-video': [
+      { href: toolPath(lang, 'add-text-to-video'), text: c.text },
+      { href: toolPath(lang, 'video-progress-bar'), text: c.bar },
+    ],
+    'add-border-to-video': [{ href: toolPath(lang, 'add-text-to-video'), text: c.text }],
+    'video-progress-bar': [{ href: toolPath(lang, 'add-text-to-video'), text: c.text }],
     'video-splitter': [frames, guide],
     'video-to-frames': [splitter, guide],
     'scene-detector': [frames],
