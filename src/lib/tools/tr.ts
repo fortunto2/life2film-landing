@@ -645,6 +645,32 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'voice-recorder': {
+    searchPhrase: 'Online ses kaydedici',
+    title: 'Online Ses Kaydedici Ücretsiz — kayıt olmadan MP3 ses kaydı',
+    description:
+      'Sesinizi online ve ücretsiz kaydedin: kayda basın, konuşun, durdurun; tarayıcı MP3 veya WAV kaydeder. Kayıt ve süre sınırı yok; hiçbir şey yüklenmez.',
+    heading: 'Online ses',
+    accent: 'kaydedici',
+    lede: 'Kayda basın, konuşun ve MP3 alın. Ses bilgisayarınızdan çıkmaz.',
+    blurb: 'Mikrofondan sesinizi kaydedin, MP3 veya WAV olarak saklayın.',
+    featureList: [
+      'MP3 (192 kbps) veya WAV',
+      'Seviye göstergesi, kırpılınca kırmızı',
+      'Ham ses: gürültü bastırma veya otomatik kazanç yok',
+      'Kayıt yok, sınır yok, yükleme yok',
+    ],
+    faq: [
+      {
+        q: 'Kayıt bir yere yükleniyor mu?',
+        a: 'Hayır. Tarayıcı mikrofonu kaydeder ve MP3’ü kendisi kodlar; dosya doğrudan indirilenlere gider.',
+      },
+      {
+        q: 'Tarayıcı mikrofonu alamıyor.',
+        a: 'Adres çubuğundaki kilit simgesine tıklayın ve bu site için mikrofona izin verin.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',

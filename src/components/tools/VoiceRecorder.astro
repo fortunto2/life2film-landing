@@ -1,0 +1,131 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const status = STATUS[lang];
+void CHROME;
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { start: 'Start recording', stop: 'Stop and save', format: 'Save as', rec: 'Recording… {t}', saving: 'Saving…', saved: 'Saved {t} — {size}.', denied: 'The browser did not get the microphone. Allow it in the address bar and try again.', unsupported: 'This browser cannot record sound. Chrome, Edge, Firefox and Safari can.', failed: 'Could not save the recording — {msg}', again: 'Record another' },
+  ru: { start: 'Начать запись', stop: 'Остановить и сохранить', format: 'Сохранить как', rec: 'Идёт запись… {t}', saving: 'Сохраняем…', saved: 'Сохранено {t} — {size}.', denied: 'Браузер не получил микрофон. Разрешите его в адресной строке и попробуйте ещё раз.', unsupported: 'Этот браузер не умеет записывать звук. Chrome, Edge, Firefox и Safari умеют.', failed: 'Не удалось сохранить запись — {msg}', again: 'Записать ещё' },
+  es: { start: 'Empezar a grabar', stop: 'Detener y guardar', format: 'Guardar como', rec: 'Grabando… {t}', saving: 'Guardando…', saved: 'Guardado {t} — {size}.', denied: 'El navegador no obtuvo el micrófono. Permítelo en la barra de direcciones e inténtalo de nuevo.', unsupported: 'Este navegador no puede grabar sonido. Chrome, Edge, Firefox y Safari sí.', failed: 'No se pudo guardar — {msg}', again: 'Grabar otra' },
+  pt: { start: 'Começar a gravar', stop: 'Parar e salvar', format: 'Salvar como', rec: 'Gravando… {t}', saving: 'Salvando…', saved: 'Salvo {t} — {size}.', denied: 'O navegador não obteve o microfone. Permita na barra de endereço e tente de novo.', unsupported: 'Este navegador não grava som. Chrome, Edge, Firefox e Safari gravam.', failed: 'Não foi possível salvar — {msg}', again: 'Gravar outra' },
+  id: { start: 'Mulai merekam', stop: 'Berhenti dan simpan', format: 'Simpan sebagai', rec: 'Merekam… {t}', saving: 'Menyimpan…', saved: 'Tersimpan {t} — {size}.', denied: 'Browser tidak mendapat mikrofon. Izinkan di bilah alamat lalu coba lagi.', unsupported: 'Browser ini tidak bisa merekam suara. Chrome, Edge, Firefox dan Safari bisa.', failed: 'Gagal menyimpan — {msg}', again: 'Rekam lagi' },
+  tr: { start: 'Kaydı başlat', stop: 'Durdur ve kaydet', format: 'Biçim', rec: 'Kaydediliyor… {t}', saving: 'Kaydediliyor…', saved: 'Kaydedildi {t} — {size}.', denied: 'Tarayıcı mikrofona erişemedi. Adres çubuğundan izin verip tekrar deneyin.', unsupported: 'Bu tarayıcı ses kaydedemiyor. Chrome, Edge, Firefox ve Safari kaydedebilir.', failed: 'Kayıt saklanamadı — {msg}', again: 'Yeniden kaydet' },
+  ar: { start: 'ابدأ التسجيل', stop: 'أوقف واحفظ', format: 'احفظ بصيغة', rec: 'جارٍ التسجيل… {t}', saving: 'جارٍ الحفظ…', saved: 'تم الحفظ {t} — {size}.', denied: 'لم يحصل المتصفح على الميكروفون. اسمح به من شريط العنوان وحاول مجددًا.', unsupported: 'هذا المتصفح لا يسجل الصوت. Chrome وEdge وFirefox وSafari تسجّل.', failed: 'تعذّر حفظ التسجيل — {msg}', again: 'سجّل مرة أخرى' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <div class="controls">
+    <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">● {words.start}</button>
+    <button id="stop" type="button" class="ghost" hidden>■ {words.stop}</button>
+    <span class="spacer"></span>
+    <label class="control"><span class="muted">{words.format}</span>
+      <select id="format"><option value="mp3" selected>MP3</option><option value="wav">WAV</option></select></label>
+  </div>
+  <canvas id="level" width="600" height="48" hidden></canvas>
+  <audio id="play" controls hidden></audio>
+  <div id="status" class="status" hidden>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<style>
+  #level { width: 100%; height: 48px; margin-top: 8px; }
+  #play { width: 100%; margin-top: 8px; }
+</style>
+
+<script>
+  import { toolFailed, track } from '../../lib/track';
+  import { saveBlob, preciseClock, formatBytes } from '../../lib/encode';
+  import { cutAudio } from '../../lib/audio-cut';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  let recorder: MediaRecorder | null = null;
+  let stream: MediaStream | null = null;
+  let started = 0;
+  let tick = 0;
+
+  function status(message: string, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+  }
+
+  function meter(s: MediaStream) {
+    const ctx = new AudioContext();
+    const an = ctx.createAnalyser();
+    an.fftSize = 1024;
+    ctx.createMediaStreamSource(s).connect(an);
+    const buf = new Float32Array(an.fftSize);
+    const c = el<HTMLCanvasElement>('level');
+    c.hidden = false;
+    const g = c.getContext('2d')!;
+    const draw = () => {
+      if (!recorder) { void ctx.close(); return; }
+      an.getFloatTimeDomainData(buf);
+      let peak = 0;
+      for (const v of buf) peak = Math.max(peak, Math.abs(v));
+      g.clearRect(0, 0, c.width, c.height);
+      g.fillStyle = peak > 0.9 ? '#ff5a5a' : '#7ad48a';
+      g.fillRect(0, 12, c.width * Math.min(1, peak), 24);
+      status(w.rec.replace('{t}', preciseClock((Date.now() - started) / 1000)));
+      tick = requestAnimationFrame(draw);
+    };
+    draw();
+  }
+
+  el('run').addEventListener('click', async () => {
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') { status(w.unsupported, true); return; }
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+    } catch {
+      status(w.denied, true);
+      return;
+    }
+    const chunks: Blob[] = [];
+    recorder = new MediaRecorder(stream);
+    recorder.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    recorder.onstop = async () => {
+      cancelAnimationFrame(tick);
+      stream?.getTracks().forEach((t) => t.stop());
+      recorder = null;
+      el('run').hidden = false;
+      el('stop').hidden = true;
+      el('level').hidden = true;
+      const seconds = (Date.now() - started) / 1000;
+      const raw = new Blob(chunks, { type: chunks[0]?.type || 'audio/webm' });
+      const format = el<HTMLSelectElement>('format').value as 'mp3' | 'wav';
+      status(w.saving);
+      try {
+        const { blob } = await cutAudio(new File([raw], 'recording'), { start: 0, end: 1e9, fade: 0, format });
+        const now = new Date();
+        const pad = (n: number) => String(n).padStart(2, '0');
+        const stamp = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}-${pad(now.getHours())}-${pad(now.getMinutes())}`;
+        const play = el<HTMLAudioElement>('play');
+        play.src = URL.createObjectURL(blob);
+        play.hidden = false;
+        saveBlob(blob, `voice-${stamp}.${format}`);
+        track('result_saved', { placement: 'result', format }, { seconds: Math.round(seconds), size_kb: Math.round(blob.size / 1024) });
+        status(w.saved.replace('{t}', preciseClock(seconds)).replace('{size}', formatBytes(blob.size)));
+      } catch (error) {
+        toolFailed('run', error);
+        status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), true);
+      }
+    };
+    started = Date.now();
+    recorder.start(1000);
+    el('run').hidden = true;
+    el('stop').hidden = false;
+    meter(stream);
+  });
+  el('stop').addEventListener('click', () => recorder?.stop());
+</script>

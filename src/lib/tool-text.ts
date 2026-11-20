@@ -82,4 +82,44 @@ export const TEXT_TOOLS: Tool[] = [
     facts: ['A white fill with a dark stroke about 18% of the font size stays legible on both bright and dark frames.'],
     agentJob: 'Adding text to a video, locally',
   },
+  {
+    // 20 Nov 2026: «диктофон онлайн», «online voice recorder» — the microphone straight to MP3.
+    slug: 'voice-recorder',
+    group: 'audio',
+    name: 'Voice Recorder',
+    appName: 'Voice Recorder',
+    blurb: 'Record your voice from the microphone and save it as MP3 or WAV.',
+
+    searchPhrase: 'Online Voice Recorder',
+    title: 'Online Voice Recorder Free | record audio to MP3, no sign-up',
+    description: 'Record your voice online for free: press record, speak, stop, and the browser saves an MP3 or WAV. No sign-up, no time limit, nothing is uploaded: the recording stays on your device.',
+    heading: 'Online voice',
+    accent: 'recorder',
+    lede: 'Press record, speak, and get an MP3. The sound never leaves your computer.',
+    featureList: [
+      'MP3 (192 kbps) or WAV',
+      'Level meter while recording, red when it clips',
+      'Raw sound: no noise suppression or auto gain changing your voice',
+      'Play it back on the page right after',
+      'No sign-up, no limit, nothing uploaded',
+    ],
+    faq: [
+      {
+        q: 'Is the recording uploaded anywhere?',
+        a: 'No. The browser records the microphone and encodes the MP3 itself; the file goes straight to your downloads.',
+      },
+      {
+        q: 'The browser says it cannot get the microphone.',
+        a: 'Click the camera or lock icon in the address bar and allow the microphone for this site, then press record again. On a Mac, System Settings → Privacy → Microphone must also allow the browser.',
+      },
+      {
+        q: 'How long can I record?',
+        a: 'There is no limit on our side; an hour of MP3 is about 85 MB in memory before it is saved.',
+      },
+    ],
+
+    summary: 'Record the microphone in the browser and save MP3 or WAV, no upload.',
+    facts: ['MediaRecorder gives WebM/Opus or MP4/AAC depending on the browser; re-encoding to MP3 makes the file open everywhere.'],
+    agentJob: 'Recording a voice memo, locally',
+  },
 ];

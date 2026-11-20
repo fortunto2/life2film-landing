@@ -645,6 +645,32 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'voice-recorder': {
+    searchPhrase: 'Perekam suara online',
+    title: 'Perekam Suara Online Gratis — rekam audio ke MP3 tanpa daftar',
+    description:
+      'Rekam suara Anda secara online dan gratis: tekan rekam, bicara, berhenti, dan browser menyimpan MP3 atau WAV. Tanpa daftar dan tanpa batas waktu; tidak ada yang diunggah.',
+    heading: 'Perekam suara',
+    accent: 'online',
+    lede: 'Tekan rekam, bicara, dan dapatkan MP3. Suara tidak meninggalkan komputer Anda.',
+    blurb: 'Rekam suara dari mikrofon dan simpan sebagai MP3 atau WAV.',
+    featureList: [
+      'MP3 (192 kbps) atau WAV',
+      'Meter level, merah saat clipping',
+      'Suara mentah: tanpa peredam bising atau gain otomatis',
+      'Tanpa daftar, tanpa batas, tanpa unggah',
+    ],
+    faq: [
+      {
+        q: 'Apakah rekaman diunggah?',
+        a: 'Tidak. Browser merekam mikrofon dan meng-encode MP3; file langsung ke unduhan.',
+      },
+      {
+        q: 'Browser tidak mendapat mikrofon.',
+        a: 'Klik ikon gembok di bilah alamat dan izinkan mikrofon untuk situs ini.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',

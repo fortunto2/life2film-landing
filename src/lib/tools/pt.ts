@@ -649,6 +649,32 @@ export const pt: ToolTranslations = {
       },
     ],
   },
+  'voice-recorder': {
+    searchPhrase: 'Gravador de voz online',
+    title: 'Gravador de voz online grátis — grave áudio em MP3 sem cadastro',
+    description:
+      'Grave sua voz online e grátis: aperte gravar, fale, pare e o navegador salva um MP3 ou WAV. Sem cadastro nem limite de tempo; nada é enviado.',
+    heading: 'Gravador de voz',
+    accent: 'online',
+    lede: 'Aperte gravar, fale e receba um MP3. O som não sai do seu computador.',
+    blurb: 'Grave a voz do microfone e salve em MP3 ou WAV.',
+    featureList: [
+      'MP3 (192 kbps) ou WAV',
+      'Medidor de nível, vermelho quando satura',
+      'Som cru: sem supressão de ruído nem ganho automático',
+      'Sem cadastro, sem limite, sem upload',
+    ],
+    faq: [
+      {
+        q: 'A gravação é enviada?',
+        a: 'Não. O navegador grava o microfone e codifica o MP3; o arquivo vai direto para os downloads.',
+      },
+      {
+        q: 'O navegador não consegue o microfone.',
+        a: 'Clique no ícone de cadeado na barra de endereço e permita o microfone para este site.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Conversor de vídeo online',
     title: 'Conversor de Vídeo Online Grátis — MP4, WebM, MOV sem enviar nada',
