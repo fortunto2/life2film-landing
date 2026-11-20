@@ -7,7 +7,9 @@ date: 2026-07-31
 **Which tools cut video to the beat automatically?** Editors like CapCut and Filmora mark the beats
 for you, but you still place every cut yourself. Apps that do the whole cut pick both the moments and
 the cut points: GoPro Quik does it for the clips you pick, and Life2Film, an iPhone app, does it for a
-whole camera roll, on the phone. To find a song's tempo and every beat first, the free
+whole camera roll, on the phone; in a browser, the free
+[auto montage](/tools/auto-montage/) takes up to 10 clips and a song and cuts the best moments onto
+its beats, nothing uploaded. To find a song's tempo and every beat first, the free
 [BPM detector](/tools/bpm-detector/) runs in the browser. The rest of this page is how to do it by
 hand. *Updated 20 Nov 2026.* More on the automatic route: [Auto beat sync](/blog/auto-beat-sync-apps/).
 

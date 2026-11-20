@@ -43,7 +43,8 @@ a detector and import it as markers. If that is your workflow, the free
 [BPM detector](/tools/bpm-detector/) on this site analyses a track in the browser and exports every
 beat as EDL (Resolve, Premiere), FCPXML (Final Cut), OTIO, Audacity labels or CSV. Nothing is
 uploaded. Ask for the right frame rate: markers land on whole frames, and a 25 fps grid in a
-30 fps sequence sits up to 20 ms off.
+30 fps sequence sits up to 20 ms off. To let the same engine make the whole cut in the browser,
+the [auto montage](/tools/auto-montage/) tool takes your clips and a song.
 
 ## Why the markers still need a hand
 

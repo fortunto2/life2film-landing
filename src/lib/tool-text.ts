@@ -870,4 +870,34 @@ export const TEXT_TOOLS: Tool[] = [
     facts: ['Median of the last 12 tap gaps; one tap 150 ms late moves the result by less than 1 BPM at 100 BPM.'],
     agentJob: 'Counting a song’s tempo by tapping',
   },
+  {
+    slug: 'auto-montage',
+    group: 'create',
+    name: 'Auto Montage to the Beat',
+    appName: 'Life2Film Auto Montage',
+    blurb: 'Clips and a song in; the best moments cut to the beat out. The Life2Film engine, in your browser.',
+
+    searchPhrase: 'Auto Edit Video to the Beat Online',
+    title: 'Auto Edit Video to the Beat Online Free | clips + song, no upload',
+    description: 'Automatic video editor online, free: drop up to 10 clips and a song, get the best moments cut on the beats of the music. The same engine as the Life2Film app, running in your browser; nothing is uploaded.',
+    heading: 'Auto montage',
+    accent: 'to the beat',
+    lede: 'Your clips and a song. The engine watches every clip, finds the beats and cuts the best moments onto them.',
+    featureList: [
+      'Up to 10 clips and one song, 15 s, 30 s or 1 min',
+      'Every clip scored frame by frame: sharpness, exposure, colour, composition',
+      'Cuts land on the beats the engine finds in the song',
+      '9:16 or 16:9, picked from your clips; nothing uploaded, no watermark',
+    ],
+    faq: [
+      { q: 'How does it choose the moments?', a: 'It scores two frames a second of every clip (sharpness, exposure, colour, composition, noise), keeps the best two-second stretches and places them on the beats of your song, the same way the Life2Film app does on an iPhone.' },
+      { q: 'Is my video uploaded?', a: 'No. The engine is WebAssembly that runs in this tab; the clips and the song never leave your device.' },
+      { q: 'How is this different from adding music to a video?', a: 'Adding music lays a track under the footage you already cut. This makes the cut: it chooses which moments to keep and where each one starts, so the edit follows the music.' },
+      { q: 'Can I get a longer film or 4K?', a: 'The browser version makes up to a minute in 720p. The Life2Film app for iPhone and Mac makes full-length films in 4K, with titles and photos.' },
+    ],
+
+    summary: 'Automatic montage in the browser: up to 10 clips + a song -> best 2 s moments (frame scores at 2 fps) cut on the song’s beats by the Life2Film planner (music-video profile), 720p MP4.',
+    facts: ['Frames are scored at 2 fps on a 160 px picture; segments are 2 s; output 720p at 30 fps, the song faded over its last 1.5 s.'],
+    agentJob: 'Making a beat-synced montage from clips and a song, locally',
+  },
 ];
