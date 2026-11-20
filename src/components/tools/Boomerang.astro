@@ -1,0 +1,93 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { loops: 'Loops', speed: 'Speed', run: 'Make a boomerang', working: 'Making… {n}%', saved: 'Saved — {len}, {size}.', failed: 'Could not make it — {msg}', note: 'Uses the first 6 seconds; silent, like the original boomerangs.' },
+  ru: { loops: 'Повторов', speed: 'Скорость', run: 'Сделать бумеранг', working: 'Делаем… {n}%', saved: 'Сохранено — {len}, {size}.', failed: 'Не удалось — {msg}', note: 'Берутся первые 6 секунд; без звука, как настоящий бумеранг.' },
+  es: { loops: 'Repeticiones', speed: 'Velocidad', run: 'Crear boomerang', working: 'Creando… {n}%', saved: 'Guardado — {len}, {size}.', failed: 'No se pudo — {msg}', note: 'Usa los primeros 6 segundos; sin sonido.' },
+  pt: { loops: 'Repetições', speed: 'Velocidade', run: 'Criar boomerang', working: 'Criando… {n}%', saved: 'Salvo — {len}, {size}.', failed: 'Não foi possível — {msg}', note: 'Usa os primeiros 6 segundos; sem som.' },
+  id: { loops: 'Pengulangan', speed: 'Kecepatan', run: 'Buat boomerang', working: 'Membuat… {n}%', saved: 'Tersimpan — {len}, {size}.', failed: 'Gagal — {msg}', note: 'Memakai 6 detik pertama; tanpa suara.' },
+  tr: { loops: 'Tekrar', speed: 'Hız', run: 'Boomerang yap', working: 'Hazırlanıyor… %{n}', saved: 'Kaydedildi — {len}, {size}.', failed: 'Yapılamadı — {msg}', note: 'İlk 6 saniye kullanılır; sessiz.' },
+  ar: { loops: 'التكرار', speed: 'السرعة', run: 'اصنع بوميرانغ', working: 'جارٍ الإنشاء… {n}%', saved: 'تم الحفظ — {len}، {size}.', failed: 'تعذّر — {msg}', note: 'تُستخدم أول 6 ثوانٍ؛ بلا صوت.' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="video/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP4, MOV, WebM</span>
+  </label>
+  <div class="controls">
+    <label class="control"><span class="muted">{words.loops}</span>
+      <select id="loops">{[1, 2, 3, 4, 5].map((n) => <option value={n} selected={n === 3}>{n}</option>)}</select></label>
+    <label class="control"><span class="muted">{words.speed}</span>
+      <select id="speed">{[1, 1.5, 2].map((n) => <option value={n} selected={n === 1.5}>{n}x</option>)}</select></label>
+    <span class="spacer"></span>
+    <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+  </div>
+  <p class="muted small">{words.note}</p>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<style>
+  .small { font-size: 0.85rem; }
+</style>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { saveBlob, formatBytes, preciseClock } from '../../lib/encode';
+  import { boomerang } from '../../lib/boomerang';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  let file: File | null = null;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  el('run').addEventListener('click', async () => {
+    if (!file || busy) return;
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    const loops = Number(el<HTMLSelectElement>('loops').value);
+    const speed = Number(el<HTMLSelectElement>('speed').value);
+    try {
+      const { blob, duration } = await boomerang(file, loops, speed, (f) => status(w.working.replace('{n}', String(Math.round(f * 100))), f));
+      saveBlob(blob, `${file.name.replace(/\.[^.]+$/, '')}-boomerang.mp4`);
+      track('result_saved', { placement: 'result' }, { seconds: Math.round(duration), loops, speed });
+      status(w.saved.replace('{len}', preciseClock(duration)).replace('{size}', formatBytes(blob.size)), 1);
+    } catch (error) {
+      toolFailed('run', error, file);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  const take = (f: File | undefined, how: 'picker' | 'drop') => { if (!f) return; file = f; fileChosen(f, how); status(f.name); };
+  el<HTMLInputElement>('file').addEventListener('change', (e) => take((e.target as HTMLInputElement).files?.[0], 'picker'));
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => take((e as DragEvent).dataTransfer?.files?.[0], 'drop'));
+</script>

@@ -409,4 +409,30 @@ export const idText: ToolTranslations = {
       },
     ],
   },
+  'boomerang-video': {
+    searchPhrase: 'Boomerang dari video online',
+    title: 'Buat Boomerang Online Gratis — dari video apa pun, tanpa unggah',
+    description:
+      'Buat boomerang dari video apa pun secara online dan gratis: detik pertama maju lalu mundur, 1–5 kali, 1x–2x. Di browser, tanpa unggah.',
+    heading: 'Buat',
+    accent: 'boomerang',
+    lede: 'Maju, mundur, lagi.',
+    blurb: 'Ubah klip pendek jadi boomerang.',
+    featureList: [
+      'Maju dan mundur tanpa jeda',
+      '1–5 pengulangan, 1x–2x',
+      '6 detik pertama',
+      'Tanpa unggah dan watermark',
+    ],
+    faq: [
+      {
+        q: 'Kenapa tanpa suara?',
+        a: 'Suara terbalik hanya bising; boomerang memang tanpa suara.',
+      },
+      {
+        q: 'Apakah video diunggah?',
+        a: 'Tidak.',
+      },
+    ],
+  },
 };

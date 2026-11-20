@@ -621,4 +621,44 @@ export const TEXT_TOOLS: Tool[] = [
     facts: ['Quiet runs are measured in 20 ms windows; speech keeps 0.12 s of padding on each side.'],
     agentJob: 'Cutting the pauses out of a talking video, locally',
   },
+  {
+    // 20 Nov 2026: «boomerang video maker», «make a boomerang from a video», «бумеранг из видео».
+    slug: 'boomerang-video',
+    group: 'create',
+    name: 'Boomerang Video Maker',
+    appName: 'Boomerang',
+    blurb: 'Turn a short clip into a boomerang: forward, backward, again.',
+
+    searchPhrase: 'Boomerang Video Maker Online',
+    title: 'Boomerang Video Maker Online Free | from any video, no upload',
+    description: 'Make a boomerang from any video online for free: the first seconds play forward, then backward, looped 1 to 5 times at 1x to 2x speed. Runs in your browser; nothing is uploaded, no watermark.',
+    heading: 'Boomerang',
+    accent: 'video maker',
+    lede: 'Forward, back, again, from a clip you already have. The video stays on your device.',
+    featureList: [
+      'Forward then backward, with no stall at the turn',
+      '1 to 5 loops, 1x, 1.5x or 2x',
+      'Uses the first 6 seconds of the clip',
+      'Silent MP4, ready for Stories and Reels',
+      'Nothing uploaded, no watermark',
+    ],
+    faq: [
+      {
+        q: 'Which part of the clip is used?',
+        a: 'The first 6 seconds. To use another moment, cut it out first with Video Trimmer.',
+      },
+      {
+        q: 'Why is there no sound?',
+        a: 'Sound played backwards is noise; boomerangs are silent. Add a song afterwards with Add Music to Video.',
+      },
+      {
+        q: 'Is the video uploaded?',
+        a: 'No. Your browser decodes and encodes it.',
+      },
+    ],
+
+    summary: 'Forward-then-backward loop (boomerang) from the first 6 s of a clip, in the browser.',
+    facts: ['A seamless boomerang skips the two turnaround frames, so the motion never pauses.'],
+    agentJob: 'Making a boomerang from a video, locally',
+  },
 ];

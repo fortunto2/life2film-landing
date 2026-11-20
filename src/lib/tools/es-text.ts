@@ -409,4 +409,30 @@ export const esText: ToolTranslations = {
       },
     ],
   },
+  'boomerang-video': {
+    searchPhrase: 'Boomerang con un video online',
+    title: 'Crear boomerang online gratis — de cualquier video, sin subir',
+    description:
+      'Crea un boomerang de cualquier video online y gratis: los primeros segundos hacia adelante y atrás, de 1 a 5 veces, a 1x–2x. En tu navegador, sin subir.',
+    heading: 'Crear',
+    accent: 'boomerang',
+    lede: 'Adelante, atrás, otra vez.',
+    blurb: 'Convierte un clip corto en boomerang.',
+    featureList: [
+      'Adelante y atrás sin pausa',
+      '1 a 5 repeticiones, 1x a 2x',
+      'Primeros 6 segundos',
+      'Sin subidas ni marca de agua',
+    ],
+    faq: [
+      {
+        q: '¿Por qué sin sonido?',
+        a: 'El sonido al revés es ruido; los boomerangs son mudos.',
+      },
+      {
+        q: '¿Se sube el video?',
+        a: 'No.',
+      },
+    ],
+  },
 };

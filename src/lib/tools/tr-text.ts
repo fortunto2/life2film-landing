@@ -409,4 +409,30 @@ export const trText: ToolTranslations = {
       },
     ],
   },
+  'boomerang-video': {
+    searchPhrase: 'Videodan boomerang online',
+    title: 'Boomerang Yap Online Ücretsiz — her videodan, yükleme yok',
+    description:
+      'Herhangi bir videodan online ve ücretsiz boomerang yapın: ilk saniyeler ileri sonra geri, 1–5 kez, 1x–2x. Tarayıcıda, yükleme yok.',
+    heading: 'Boomerang',
+    accent: 'yap',
+    lede: 'İleri, geri, yeniden.',
+    blurb: 'Kısa bir klibi boomerang’a çevirin.',
+    featureList: [
+      'Duraksamadan ileri ve geri',
+      '1–5 tekrar, 1x–2x',
+      'İlk 6 saniye',
+      'Yükleme ve filigran yok',
+    ],
+    faq: [
+      {
+        q: 'Neden ses yok?',
+        a: 'Ters ses gürültüdür; boomerang sessizdir.',
+      },
+      {
+        q: 'Video yükleniyor mu?',
+        a: 'Hayır.',
+      },
+    ],
+  },
 };
