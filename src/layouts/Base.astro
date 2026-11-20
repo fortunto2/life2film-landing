@@ -53,7 +53,14 @@ const t = useTranslations(lang);
 // its brand node (life2film.com/#org, parentOrganization -> ORG_ID). Nodes sit in @graph, so the
 // per-node @context is dropped.
 const node = <T extends { '@context'?: string }>({ '@context': _c, ...rest }: T) => rest;
-const SITE_ORG = node(brandLd({ url: SITE, name: 'Life2Film' }));
+const APP_STORE = 'https://apps.apple.com/app/id6761656888';
+// One entity, one spelling: the brand node names its App Store page and logo, so answer engines tie
+// «Life2Film» to this site and that page (plan traffic_20261120, Track A «one entity»).
+const SITE_ORG = {
+  ...node(brandLd({ url: SITE, name: 'Life2Film' })),
+  logo: `${SITE}/img/app-icon.png`,
+  sameAs: [APP_STORE, 'https://github.com/fortunto2/life2film-landing'],
+};
 const PUBLISHER = { '@id': ORG_ID };
 
 const release = await studioRelease();
@@ -68,7 +75,7 @@ const jsonLd = {
       url: 'https://life2film.com',
       name: 'Life2Film',
       description,
-      inLanguage: ['en', 'ru', 'tr'],
+      inLanguage: Object.keys(languages),
       publisher: PUBLISHER,
     },
     {
@@ -80,6 +87,9 @@ const jsonLd = {
       applicationCategory: 'MultimediaApplication',
       operatingSystem: 'iOS 17+',
       url: 'https://life2film.com',
+      downloadUrl: APP_STORE,
+      sameAs: [APP_STORE],
+      image: `${SITE}/img/app-icon.png`,
       publisher: PUBLISHER,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       featureList: [
