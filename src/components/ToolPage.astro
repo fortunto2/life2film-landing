@@ -20,7 +20,7 @@ const savedSplit = (text: string): [string, string] => {
   const i = text.indexOf('. ');
   return i < 0 ? ['', text] : [text.slice(0, i + 1), text.slice(i + 2)];
 };
-const waitMode = ['video-splitter', 'scene-detector', 'bpm-detector'].includes(slug)
+const waitMode = ['video-splitter', 'scene-detector', 'bpm-detector', 'key-finder'].includes(slug)
   ? 'file'
   : slug === 'video-trimmer' ? 'none' : 'run';
 const STUDIO_DMG = 'https://github.com/fortunto2/life2film-landing/releases/latest/download/Life2FilmStudio.dmg';
@@ -30,7 +30,7 @@ const base = TOOL[slug];
 const tool = lang === 'en' ? asTranslation(base) : TRANSLATIONS[lang]?.[slug] ?? asTranslation(base);
 const chrome = CHROME[lang];
 // A song is on the table on both pages: the offer that names cutting to a track's beat fits there.
-const phoneAfter = ['bpm-detector', 'add-music-to-video'].includes(slug) ? chrome.appAfterBeat : chrome.appAfter;
+const phoneAfter = ['bpm-detector', 'add-music-to-video', 'key-finder'].includes(slug) ? chrome.appAfterBeat : chrome.appAfter;
 const path = localePath(lang, `/tools/${slug}/`);
 
 /** Only the locales that actually have this page — never claim a translation that does not exist. */

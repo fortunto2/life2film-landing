@@ -500,6 +500,32 @@ export const es: ToolTranslations = {
       },
     ],
   },
+  'key-finder': {
+    searchPhrase: 'Detectar tonalidad de una canción online',
+    title: 'Detector de tonalidad de canciones online gratis — tono y Camelot, sin subir',
+    description:
+      'Detecta la tonalidad de una canción online gratis: mayor o menor, el código Camelot de los DJ y una segunda opción si está reñido. MP3, M4A, WAV, FLAC. En tu navegador: no se sube nada.',
+    heading: 'Tonalidad de',
+    accent: 'canciones',
+    lede: 'Suelta un tema y obtén su tonalidad y código Camelot. Se analiza en tu equipo.',
+    blurb: 'Tonalidad y código Camelot de una canción para mezclar en armonía.',
+    featureList: [
+      'Mayor o menor con nombres de notas',
+      'Código Camelot (8A, 8B…) para mezcla armónica',
+      'Segunda opción y aviso claro si están cerca',
+      'Todo en el navegador: sin subidas',
+    ],
+    faq: [
+      {
+        q: '¿Qué tan preciso es?',
+        a: 'Comparado con el análisis de djay Pro en 120 temas: la misma tonalidad en 76 (63 %), y en 97 (81 %) la de djay era una de las dos mostradas aquí. Los fallos suelen ser a una quinta o la homónima mayor/menor.',
+      },
+      {
+        q: '¿Se sube mi canción?',
+        a: 'No. Tu navegador la decodifica y calcula.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Convertidor de vídeo online',
     title: 'Convertidor de Vídeo Online Gratis — MP4, WebM, MOV sin subir nada',

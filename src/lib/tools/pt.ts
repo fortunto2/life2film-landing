@@ -501,6 +501,32 @@ export const pt: ToolTranslations = {
       },
     ],
   },
+  'key-finder': {
+    searchPhrase: 'Descobrir tom de música online',
+    title: 'Descobrir o tom de uma música online grátis — tom e Camelot, sem upload',
+    description:
+      'Descubra o tom de uma música online e grátis: maior ou menor, o código Camelot dos DJs e uma segunda opção quando está apertado. MP3, M4A, WAV, FLAC. No navegador: nada é enviado.',
+    heading: 'Tom da',
+    accent: 'música',
+    lede: 'Solte uma faixa e receba o tom e o código Camelot. A análise é feita no seu computador.',
+    blurb: 'Tom e código Camelot de uma música para mixagem harmônica.',
+    featureList: [
+      'Maior ou menor com nomes de notas',
+      'Código Camelot (8A, 8B…) para mixagem harmônica',
+      'Segunda opção e aviso claro quando estão próximas',
+      'Tudo no navegador: sem upload',
+    ],
+    faq: [
+      {
+        q: 'É preciso?',
+        a: 'Comparado com a análise do djay Pro em 120 faixas: o mesmo tom em 76 (63%), e em 97 (81%) o tom do djay era um dos dois mostrados aqui. Os erros costumam ser uma quinta ou o homônimo maior/menor.',
+      },
+      {
+        q: 'Minha música é enviada?',
+        a: 'Não. O navegador decodifica e calcula.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Conversor de vídeo online',
     title: 'Conversor de Vídeo Online Grátis — MP4, WebM, MOV sem enviar nada',

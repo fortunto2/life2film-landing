@@ -778,4 +778,48 @@ Reference implementation: https://life2film.com/tools/audio-cutter/`,
     facts: ['Looping is concatenation of one clip with itself; packets are re-encoded once so the timestamps run on.'],
     agentJob: 'Looping a video, locally',
   },
+  {
+    // 20 Nov 2026: the BPM page's readers (its RU queries are 2,756 impressions in 28 days) are the
+    // people who also ask «тональность песни», «song key finder», «camelot key».
+    slug: 'key-finder',
+    group: 'everyday',
+    name: 'Song Key Finder',
+    appName: 'Key Finder',
+    blurb: 'Find a song\'s key and its Camelot code for harmonic mixing, with a second guess when it is close.',
+
+    searchPhrase: 'Song Key Finder Online',
+    title: 'Song Key Finder Online Free | key and Camelot code, no upload',
+    description: 'Find the key of a song online for free: major or minor, the Camelot code DJs mix by, and a second guess when the call is close. MP3, M4A, WAV, FLAC. In your browser: the track is not uploaded.',
+    heading: 'Song key',
+    accent: 'finder',
+    lede: 'Drop a track and get its key and Camelot code. The audio is analysed on your machine.',
+    featureList: [
+      'Major or minor key, with the note names musicians use',
+      'Camelot code (8A, 8B…) for harmonic mixing',
+      'A second guess, and a plain warning when the two are close',
+      'MP3, M4A, WAV, OGG, FLAC, or the sound of a video',
+      'Runs fully client-side: no upload',
+    ],
+    faq: [
+      {
+        q: 'How accurate is it?',
+        a: 'Measured against djay Pro\'s analysis on 120 tracks: the same key on 76 (63%), and on 97 (81%) djay\'s key was one of the two shown here. Misses are mostly a fifth away or the parallel major/minor. Modal tracks, heavy drums and songs that change key are the hardest.',
+      },
+      {
+        q: 'What is the Camelot code?',
+        a: 'A wheel that numbers the 24 keys so that neighbours mix smoothly: 8A goes with 7A, 9A and 8B. DJ software (rekordbox, Serato, Mixed In Key) shows keys this way.',
+      },
+      {
+        q: 'Is my song uploaded?',
+        a: 'No. Your browser decodes it and does the maths.',
+      },
+    ],
+
+    summary: 'Detect a song\'s musical key and Camelot code in the browser from a chromagram and Albrecht–Shanahan key profiles.',
+    facts: [
+      'Normalising each frame\'s chroma before summing stops loud choruses from outvoting the rest.',
+      'Camelot number for a major key with pitch class p is ((7p + 7) mod 12) + 1; a minor key takes its relative major\'s number.',
+    ],
+    agentJob: 'Finding a song\'s key, locally',
+  },
 ];

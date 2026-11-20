@@ -497,6 +497,32 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'key-finder': {
+    searchPhrase: 'Cari kunci nada lagu online',
+    title: 'Pencari Kunci Nada Lagu Online Gratis — kunci dan Camelot, tanpa unggah',
+    description:
+      'Temukan kunci nada lagu secara online dan gratis: mayor atau minor, kode Camelot untuk DJ, dan tebakan kedua bila hasilnya tipis. MP3, M4A, WAV, FLAC. Di browser: lagu tidak diunggah.',
+    heading: 'Kunci nada',
+    accent: 'lagu',
+    lede: 'Jatuhkan lagu dan dapatkan kunci nada serta kode Camelot. Dianalisis di komputer Anda.',
+    blurb: 'Kunci nada dan kode Camelot sebuah lagu untuk mixing harmonis.',
+    featureList: [
+      'Mayor atau minor dengan nama not',
+      'Kode Camelot (8A, 8B…) untuk mixing harmonis',
+      'Tebakan kedua dan peringatan jelas bila berdekatan',
+      'Semua di browser: tanpa unggah',
+    ],
+    faq: [
+      {
+        q: 'Seberapa akurat?',
+        a: 'Dibandingkan dengan analisis djay Pro pada 120 lagu: kunci yang sama pada 76 (63%), dan pada 97 (81%) kunci djay termasuk dua yang ditampilkan di sini. Kesalahan umumnya selisih kuint atau mayor/minor paralel.',
+      },
+      {
+        q: 'Apakah lagu saya diunggah?',
+        a: 'Tidak. Browser mendekode dan menghitung sendiri.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',

@@ -497,6 +497,32 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'key-finder': {
+    searchPhrase: 'Şarkının tonunu bulma online',
+    title: 'Şarkı Tonu Bulucu Online Ücretsiz — ton ve Camelot, yükleme yok',
+    description:
+      'Bir şarkının tonunu online ve ücretsiz bulun: majör ya da minör, DJ’lerin kullandığı Camelot kodu ve sonuç yakınsa ikinci tahmin. MP3, M4A, WAV, FLAC. Tarayıcıda: şarkı yüklenmez.',
+    heading: 'Şarkı',
+    accent: 'tonu',
+    lede: 'Bir parçayı bırakın, tonunu ve Camelot kodunu alın. Analiz bilgisayarınızda yapılır.',
+    blurb: 'Armonik miks için şarkının tonu ve Camelot kodu.',
+    featureList: [
+      'Nota adlarıyla majör ya da minör',
+      'Armonik miks için Camelot kodu (8A, 8B…)',
+      'İkinci tahmin ve yakın olduklarında açık uyarı',
+      'Her şey tarayıcıda: yükleme yok',
+    ],
+    faq: [
+      {
+        q: 'Ne kadar doğru?',
+        a: '120 parçada djay Pro’nun analiziyle karşılaştırıldı: 76’sında (%63) aynı ton, 97’sinde (%81) djay’in tonu burada gösterilen iki tondan biriydi. Hatalar çoğunlukla beşli uzaklık ya da aynı adlı majör/minör.',
+      },
+      {
+        q: 'Şarkım yükleniyor mu?',
+        a: 'Hayır. Tarayıcınız çözer ve hesaplar.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',

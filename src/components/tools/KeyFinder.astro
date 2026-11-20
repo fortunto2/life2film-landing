@@ -1,0 +1,114 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { key: 'Key', camelot: 'Camelot', or: 'Second guess', sure: 'clear', unsure: 'close call: listen to both', major: 'major', minor: 'minor', listening: 'Listening…', failed: 'Could not read the key — {msg}', bpm: 'Tempo and beats: BPM detector' },
+  ru: { notes: 'до,до♯,ре,ми♭,ми,фа,фа♯,соль,ля♭,ля,си♭,си', key: 'Тональность', camelot: 'Camelot', or: 'Второй вариант', sure: 'уверенно', unsure: 'почти поровну — проверьте оба на слух', major: 'мажор', minor: 'минор', listening: 'Слушаем…', failed: 'Не удалось определить тональность — {msg}', bpm: 'Темп и доли: определитель BPM' },
+  es: { notes: 'Do,Do♯,Re,Mi♭,Mi,Fa,Fa♯,Sol,La♭,La,Si♭,Si', key: 'Tonalidad', camelot: 'Camelot', or: 'Segunda opción', sure: 'clara', unsure: 'muy parejo: escucha ambas', major: 'mayor', minor: 'menor', listening: 'Escuchando…', failed: 'No se pudo detectar la tonalidad — {msg}', bpm: 'Tempo y pulsos: detector de BPM' },
+  pt: { notes: 'Dó,Dó♯,Ré,Mi♭,Mi,Fá,Fá♯,Sol,Lá♭,Lá,Si♭,Si', key: 'Tom', camelot: 'Camelot', or: 'Segunda opção', sure: 'claro', unsure: 'quase empate: ouça os dois', major: 'maior', minor: 'menor', listening: 'Ouvindo…', failed: 'Não foi possível detectar o tom — {msg}', bpm: 'Andamento e batidas: detector de BPM' },
+  id: { key: 'Kunci nada', camelot: 'Camelot', or: 'Tebakan kedua', sure: 'jelas', unsure: 'hampir seimbang: dengarkan keduanya', major: 'mayor', minor: 'minor', listening: 'Mendengarkan…', failed: 'Gagal mendeteksi kunci — {msg}', bpm: 'Tempo dan ketukan: detektor BPM' },
+  tr: { notes: 'Do,Do♯,Re,Mi♭,Mi,Fa,Fa♯,Sol,La♭,La,Si♭,Si', key: 'Ton', camelot: 'Camelot', or: 'İkinci tahmin', sure: 'net', unsure: 'çok yakın: ikisini de dinleyin', major: 'majör', minor: 'minör', listening: 'Dinleniyor…', failed: 'Ton bulunamadı — {msg}', bpm: 'Tempo ve vuruşlar: BPM bulucu' },
+  ar: { notes: 'دو,دو♯,ري,مي♭,مي,فا,فا♯,صول,لا♭,لا,سي♭,سي', key: 'المقام', camelot: 'Camelot', or: 'التخمين الثاني', sure: 'واضح', unsure: 'متقارب جدًا: استمع إلى الاثنين', major: 'كبير', minor: 'صغير', listening: 'جارٍ الاستماع…', failed: 'تعذّر تحديد المقام — {msg}', bpm: 'الإيقاع والنبضات: كاشف BPM' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+const bpmHref = lang === 'en' ? '/tools/bpm-detector/' : `/${lang}/tools/bpm-detector/`;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="audio/*,video/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP3, M4A, WAV, OGG, FLAC</span>
+  </label>
+  <div id="result" class="keyresult" hidden>
+    <div><span class="muted">{words.key}</span><strong id="kName"></strong></div>
+    <div><span class="muted">{words.camelot}</span><strong id="kCam"></strong></div>
+    <div><span class="muted">{words.or}</span><span id="kAlt"></span></div>
+    <p class="muted" id="kNote"></p>
+    <p><a href={bpmHref}>{words.bpm} →</a></p>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<style>
+  .keyresult { display: grid; gap: 10px; margin-top: 8px; }
+  .keyresult > div { display: flex; gap: 12px; align-items: baseline; }
+  .keyresult > div > span:first-child { min-width: 130px; }
+  .keyresult strong { font-size: 1.6rem; }
+</style>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { chromagram, detectKey, camelot, NOTE_NAMES, type KeyGuess } from '../../lib/key';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  const fileInput = el<HTMLInputElement>('file');
+  const RATE = 22050;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+    // Solfège where musicians speak it (ru, es, pt, tr, ar), with the chord symbol beside it.
+  const local = w.notes ? w.notes.split(',') : null;
+  const symbol = (k: KeyGuess) => `${NOTE_NAMES[k.tonic]}${k.mode === 'minor' ? 'm' : ''}`;
+  const name = (k: KeyGuess) => local ? `${local[k.tonic]} ${w[k.mode]} (${symbol(k)})` : `${NOTE_NAMES[k.tonic]} ${w[k.mode]}`;
+
+  async function run(file: File) {
+    if (busy) return;
+    busy = true;
+    el('result').hidden = true;
+    try {
+      status(w.listening, 0.1);
+      const ctx = new AudioContext();
+      const decoded = await ctx.decodeAudioData(await file.arrayBuffer());
+      void ctx.close();
+      // Mono at 22 050 Hz: enough for pitch classes up to 2 kHz, a quarter of the work.
+      const seconds = Math.min(decoded.duration, 15 * 60);
+      const off = new OfflineAudioContext(1, Math.max(1, Math.round(seconds * RATE)), RATE);
+      const node = off.createBufferSource();
+      node.buffer = decoded;
+      node.connect(off.destination);
+      node.start();
+      const mono = (await off.startRendering()).getChannelData(0);
+      status(w.listening, 0.5);
+      await new Promise((r) => setTimeout(r, 0));
+      const result = detectKey(chromagram(mono, RATE));
+      el('kName').textContent = name(result.best);
+      el('kCam').textContent = camelot(result.best);
+      el('kAlt').textContent = `${name(result.runnerUp)} · ${camelot(result.runnerUp)}`;
+      el('kNote').textContent = result.margin < 0.05 ? w.unsure : w.sure;
+      el('result').hidden = false;
+      statusEl.hidden = true;
+      track('result_shown', { placement: 'result', key: camelot(result.best), sure: String(result.margin >= 0.05) }, { seconds: Math.round(seconds) });
+    } catch (error) {
+      toolFailed('run', error, file);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+    }
+  }
+
+  fileInput.addEventListener('change', () => { const f = fileInput.files?.[0]; if (f) { fileChosen(f, 'picker'); void run(f); } });
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => { const f = (e as DragEvent).dataTransfer?.files?.[0]; if (f) { fileChosen(f, 'drop'); void run(f); } });
+</script>
