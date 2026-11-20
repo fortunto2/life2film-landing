@@ -110,10 +110,10 @@ const tools: McpTool<Env>[] = [
     name: 'get_tool',
     title: 'Get a tool\'s skill',
     description: 'One browser tool as an agent skill (SKILL.md): what it does, limits, how to use it for the person, the page URL. Any slug from list_tools, on any of our sites.',
-    inputSchema: { type: 'object', properties: { slug: { type: 'string', description: 'e.g. video-compressor, or a tool page URL.' } }, required: ['slug'] },
+    inputSchema: { type: 'object', properties: { slug: { type: 'string', description: 'e.g. video-compressor, or a tool page URL.' }, id: { type: 'string', description: 'Same as slug.' } } },
     annotations: READ_ONLY,
     async run(args, { env, origin }) {
-      const slug = String(args.slug ?? '').trim().replace(/\/+$/, '').split('/').pop()?.replace(/\.md$/, '') ?? '';
+      const slug = String(args.slug ?? args.id ?? '').trim().replace(/\/+$/, '').split('/').pop()?.replace(/\.md$/, '') ?? '';
       if (!/^[a-z0-9-]+$/.test(slug)) return { text: `Not a slug: ${String(args.slug)}. Use list_tools.`, isError: true };
       const { tools: rows, registry = [] } = await loadJson<Index>(env, origin, '/agent-index.json');
       const own = rows.find((t) => t.slug === slug);
