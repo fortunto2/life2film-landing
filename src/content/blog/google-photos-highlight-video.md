@@ -72,3 +72,17 @@ uploaded either.
 
 Other automatic options are compared in [GoPro Quik alternatives for iPhone](/blog/gopro-quik-alternative-iphone/),
 and [how to make your own Memories video on iPhone](/blog/make-your-own-memories-video-iphone/) covers the Apple version.
+
+## Questions
+
+### How do I create a highlight video from a Google Photos album?
+
+Open the album, tap **+** then **Highlight video** (on the web: Create → Highlight video), pick the
+people or things to feature and the length. If the button is missing, the album is shared from
+someone else's account or the app needs an update.
+
+### Can I make one without Google Photos?
+
+Yes. [The automatic montage tool](/tools/auto-montage/) takes up to ten clips and a song and cuts the
+best moments on the beat in your browser, with nothing uploaded. On iPhone, [Life2Film](/) does the
+same from the whole camera roll by itself.

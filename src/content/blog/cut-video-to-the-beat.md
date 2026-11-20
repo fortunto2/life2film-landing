@@ -101,3 +101,24 @@ un-hear a montage that ignores them.
 To skip the manual part, the guide to [editing video with an AI agent](/guides/edit-video-with-ai-agents/)
 asks for a beat-matched cut in plain words, and [how the automatic apps place cuts](/blog/auto-beat-sync-apps/)
 compares CapCut, Filmora and the rest.
+
+## Questions
+
+### Which tools cut video clips to the beat of music automatically?
+
+On a phone: CapCut (AutoCut and beat templates), GoPro Quik, Splice and [Life2Film](/), which picks the
+moments as well as the cut points. On a desktop: Premiere Pro's Remix and Beat Edit, DaVinci Resolve with
+markers from a beat script, Filmora's Beat Sync. In the browser with nothing uploaded:
+[the automatic montage tool](/tools/auto-montage/) here takes several clips and a song and cuts them on
+its beats. The comparison is in [how the automatic apps place cuts](/blog/auto-beat-sync-apps/).
+
+### How do I find the beats of a song first?
+
+The free [BPM and beat detector](/tools/bpm-detector/) reads the tempo and every beat from an audio
+file in the browser. Mark those times in your editor, or skip the marking and use the
+[automatic montage](/tools/auto-montage/).
+
+### Cut on the beat, or just before it?
+
+On it for picture changes; one or two frames early when the shot carries a motion that should hit
+the beat, because the eye registers the cut a little after it happens.
