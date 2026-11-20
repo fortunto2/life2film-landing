@@ -269,6 +269,36 @@ export const pt: ToolTranslations = {
       },
     ],
   },
+  'add-music-to-video': {
+    searchPhrase: 'Colocar música em vídeo online',
+    title: 'Colocar música em vídeo online grátis — sem marca d’água nem upload',
+    description:
+      'Adicione música a um vídeo online e grátis: escolha um MP3 ou M4A, em que segundo a música começa e um fade no final. A imagem é copiada sem recodificar e a música é cortada no tamanho do vídeo. No navegador.',
+    heading: 'Colocar música',
+    accent: 'no vídeo',
+    lede: 'Coloque sua música sob o vídeo, cortada no tamanho e com fade no final. Nada é enviado.',
+    blurb: 'Uma música sob o vídeo, no tamanho certo e com fade, sem recodificar a imagem.',
+    featureList: [
+      'Música de MP3, M4A, WAV, OGG ou o som de outro vídeo',
+      'Escolha onde a música começa; fade de 0–4 s',
+      'A imagem é copiada intacta: mesma qualidade, rápido',
+      'Tudo no navegador: sem upload nem marca d’água',
+    ],
+    faq: [
+      {
+        q: 'O som original do vídeo continua?',
+        a: 'Não: a música o substitui.',
+      },
+      {
+        q: 'E se a música for mais curta que o vídeo?',
+        a: 'A música toca uma vez e o resto fica em silêncio; a ferramenta mostra onde ela acabou.',
+      },
+      {
+        q: 'Dá para editar o vídeo no ritmo da música?',
+        a: 'Não nesta página: ela coloca a música sob um clipe como está. Editar vários clipes no ritmo é o que o app Life2Film para iPhone faz.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Conversor de vídeo online',
     title: 'Conversor de Vídeo Online Grátis — MP4, WebM, MOV sem enviar nada',

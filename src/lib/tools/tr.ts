@@ -265,6 +265,36 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'add-music-to-video': {
+    searchPhrase: 'Videoya müzik ekleme online',
+    title: 'Videoya Müzik Ekle Online Ücretsiz — filigran ve yükleme yok',
+    description:
+      'Videoya online ve ücretsiz müzik ekleyin: bir MP3 veya M4A seçin, şarkının başlayacağı saniyeyi ve sondaki kısılmayı belirleyin. Görüntü yeniden kodlanmadan kopyalanır, şarkı video süresine kesilir. Tarayıcıda.',
+    heading: 'Videoya',
+    accent: 'müzik ekle',
+    lede: 'Şarkınızı klibin altına koyun: süreye göre kesilmiş ve sonda kısılan. Hiçbir şey yüklenmez.',
+    blurb: 'Videonun altına şarkı: süresine göre, sonda kısılarak, görüntü yeniden kodlanmadan.',
+    featureList: [
+      'MP3, M4A, WAV, OGG ya da başka bir videonun sesi',
+      'Şarkının başlangıcını seçin; 0–4 sn kısılma',
+      'Görüntü olduğu gibi kopyalanır: aynı kalite, hızlı',
+      'Her şey tarayıcıda: yükleme ve filigran yok',
+    ],
+    faq: [
+      {
+        q: 'Videonun orijinal sesi kalır mı?',
+        a: 'Hayır: müzik onun yerini alır.',
+      },
+      {
+        q: 'Şarkı videodan kısaysa?',
+        a: 'Müzik bir kez çalar, videonun kalanı sessiz olur; araç müziğin nerede bittiğini söyler.',
+      },
+      {
+        q: 'Videoyu şarkının ritmine göre kesebilir mi?',
+        a: 'Bu sayfa değil: şarkıyı tek bir klibin altına olduğu gibi koyar. Birden çok klibi ritme göre kesmek Life2Film iPhone uygulamasının işidir.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',

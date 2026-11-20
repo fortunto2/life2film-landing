@@ -268,6 +268,36 @@ export const es: ToolTranslations = {
       },
     ],
   },
+  'add-music-to-video': {
+    searchPhrase: 'Poner música a un video online',
+    title: 'Poner música a un video online gratis — sin marca de agua ni subidas',
+    description:
+      'Añade música a un video online y gratis: elige un MP3 o M4A, desde qué segundo empieza la canción y un fundido final. La imagen se copia sin recodificar y la canción se corta a la duración del video. En tu navegador.',
+    heading: 'Poner música',
+    accent: 'a un video',
+    lede: 'Pon tu canción bajo tu clip, cortada a medida y con fundido al final. No se sube nada.',
+    blurb: 'Una canción bajo un video, a su duración y con fundido, sin recodificar la imagen.',
+    featureList: [
+      'Música desde MP3, M4A, WAV, OGG o el sonido de otro video',
+      'Elige dónde empieza la canción; fundido de 0–4 s',
+      'La imagen se copia intacta: misma calidad, rápido',
+      'Todo en el navegador: sin subidas ni marca de agua',
+    ],
+    faq: [
+      {
+        q: '¿Se conserva el sonido original?',
+        a: 'No: la música lo sustituye.',
+      },
+      {
+        q: '¿Y si la canción es más corta que el video?',
+        a: 'La música suena una vez y el resto queda en silencio; la herramienta te dice dónde se acabó.',
+      },
+      {
+        q: '¿Puede montar el video al ritmo de la canción?',
+        a: 'Esta página no: pone la canción bajo un clip tal cual. Montar varios clips al ritmo lo hace la app Life2Film para iPhone.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Convertidor de vídeo online',
     title: 'Convertidor de Vídeo Online Gratis — MP4, WebM, MOV sin subir nada',

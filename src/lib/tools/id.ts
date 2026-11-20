@@ -265,6 +265,36 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'add-music-to-video': {
+    searchPhrase: 'Tambah musik ke video online',
+    title: 'Tambah Musik ke Video Online Gratis — tanpa watermark dan unggah',
+    description:
+      'Tambahkan musik ke video secara online dan gratis: pilih MP3 atau M4A, detik mulai lagu, dan fade-out. Gambar disalin tanpa encode ulang, lagu dipotong sesuai durasi video. Di browser.',
+    heading: 'Tambah musik',
+    accent: 'ke video',
+    lede: 'Taruh lagu Anda di bawah klip, dipotong pas dan memudar di akhir. Tidak ada yang diunggah.',
+    blurb: 'Lagu di bawah video, sesuai durasi dan memudar, tanpa encode ulang gambar.',
+    featureList: [
+      'Musik dari MP3, M4A, WAV, OGG atau suara video lain',
+      'Pilih detik mulai lagu; fade-out 0–4 dtk',
+      'Gambar disalin utuh: kualitas sama, cepat',
+      'Semua di browser: tanpa unggah dan watermark',
+    ],
+    faq: [
+      {
+        q: 'Apakah suara asli video tetap ada?',
+        a: 'Tidak: musik menggantikannya.',
+      },
+      {
+        q: 'Bagaimana jika lagu lebih pendek dari video?',
+        a: 'Musik diputar sekali dan sisanya hening; alat ini memberi tahu kapan musik habis.',
+      },
+      {
+        q: 'Bisakah memotong video sesuai ketukan lagu?',
+        a: 'Tidak di halaman ini: lagu dipasang di bawah satu klip apa adanya. Memotong beberapa klip sesuai ketukan dilakukan aplikasi Life2Film untuk iPhone.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',
