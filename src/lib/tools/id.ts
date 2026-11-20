@@ -693,6 +693,32 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'change-key': {
+    searchPhrase: 'Ubah nada dasar lagu online',
+    title: 'Ubah Nada Dasar Lagu Online Gratis — tempo tetap, tanpa unggah',
+    description:
+      'Ubah nada dasar lagu secara online dan gratis: naikkan atau turunkan hingga 12 semitone dengan tempo tetap, lalu simpan MP3 atau WAV. Untuk bernyanyi di jangkauan Anda. Di browser, tanpa unggah.',
+    heading: 'Ubah nada dasar',
+    accent: 'lagu',
+    lede: 'Naik atau turun per semitone, tempo sama. Lagu tetap di perangkat Anda.',
+    blurb: 'Naikkan atau turunkan lagu per semitone tanpa mengubah tempo.',
+    featureList: [
+      '−12 hingga +12 semitone',
+      'Tempo dan durasi tetap',
+      'MP3 atau WAV, dengarkan di halaman',
+      'Tidak ada yang diunggah',
+    ],
+    faq: [
+      {
+        q: 'Berapa semitone yang saya perlukan?',
+        a: 'Satu semitone per langkah: C ke D adalah +2. Cari nada sekarang dengan Pendeteksi nada dasar (/id/tools/key-finder/).',
+      },
+      {
+        q: 'Apakah file diunggah?',
+        a: 'Tidak. Browser Anda yang mendekode, menggeser dan meng-encode lagu.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',

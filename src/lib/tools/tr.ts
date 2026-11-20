@@ -693,6 +693,32 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'change-key': {
+    searchPhrase: 'Şarkının tonunu değiştir online',
+    title: 'Şarkının Tonunu Değiştir Online Ücretsiz — tempo aynı kalır',
+    description:
+      'Bir şarkının tonunu online ve ücretsiz değiştirin: tempoyu koruyarak 12 yarım sese kadar yükseltin veya alçaltın, MP3 ya da WAV kaydedin. Kendi aralığınızda söylemek için. Tarayıcıda, yükleme yok.',
+    heading: 'Şarkının tonunu',
+    accent: 'değiştir',
+    lede: 'Yarım seslerle yukarı veya aşağı, tempo aynı. Şarkı cihazınızda kalır.',
+    blurb: 'Bir şarkıyı tempoyu değiştirmeden yarım seslerle kaydırın.',
+    featureList: [
+      '−12 ile +12 yarım ses arası',
+      'Tempo ve süre değişmez',
+      'MP3 veya WAV, sayfada dinleyin',
+      'Hiçbir şey yüklenmez',
+    ],
+    faq: [
+      {
+        q: 'Kaç yarım ses gerekir?',
+        a: 'Her adım bir yarım ses: Do’dan Re’ye +2. Mevcut tonu Ton bulucu ile öğrenin (/tr/tools/key-finder/).',
+      },
+      {
+        q: 'Dosya yükleniyor mu?',
+        a: 'Hayır. Tarayıcınız şarkıyı kendisi çözer, kaydırır ve kodlar.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',

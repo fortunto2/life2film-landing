@@ -697,6 +697,32 @@ export const pt: ToolTranslations = {
       },
     ],
   },
+  'change-key': {
+    searchPhrase: 'Mudar o tom de uma música online',
+    title: 'Mudar o tom de uma música online grátis — sem mudar o andamento',
+    description:
+      'Mude o tom de uma música online e grátis: suba ou desça até 12 semitons mantendo o andamento e salve MP3 ou WAV. Para cantar na sua extensão ou tocar junto. No navegador, sem upload.',
+    heading: 'Mudar o tom de',
+    accent: 'uma música',
+    lede: 'Para cima ou para baixo em semitons, mesmo andamento. A música fica no seu aparelho.',
+    blurb: 'Suba ou desça uma música em semitons sem mudar o andamento.',
+    featureList: [
+      'De −12 a +12 semitons',
+      'Andamento e duração iguais',
+      'MP3 ou WAV, ouça na página',
+      'Nada é enviado',
+    ],
+    faq: [
+      {
+        q: 'Quantos semitons eu preciso?',
+        a: 'Um semitom por passo: de Dó para Ré é +2. Descubra o tom atual com o Detector de tom (/pt/tools/key-finder/).',
+      },
+      {
+        q: 'O arquivo é enviado?',
+        a: 'Não. O navegador decodifica, muda e codifica a música.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Conversor de vídeo online',
     title: 'Conversor de Vídeo Online Grátis — MP4, WebM, MOV sem enviar nada',

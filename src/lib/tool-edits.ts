@@ -802,6 +802,10 @@ Reference implementation: https://life2film.com/tools/audio-cutter/`,
     ],
     faq: [
       {
+        q: 'How do I move a song to another key?',
+        a: 'Use Change Key (/tools/change-key/): it shifts the song by semitones and keeps the tempo, also in the browser.',
+      },
+      {
         q: 'How accurate is it?',
         a: 'Measured against djay Pro\'s analysis on 120 tracks: the same key on 76 (63%), and on 97 (81%) djay\'s key was one of the two shown here. Misses are mostly a fifth away or the parallel major/minor. Modal tracks, heavy drums and songs that change key are the hardest.',
       },

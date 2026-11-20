@@ -696,6 +696,32 @@ export const es: ToolTranslations = {
       },
     ],
   },
+  'change-key': {
+    searchPhrase: 'Cambiar el tono de una canción online',
+    title: 'Cambiar el tono de una canción online gratis — sin cambiar el tempo',
+    description:
+      'Cambia el tono de una canción online y gratis: súbelo o bájalo hasta 12 semitonos sin cambiar el tempo y guarda MP3 o WAV. Para cantar en tu registro o tocar encima. En tu navegador, sin subir el archivo.',
+    heading: 'Cambiar el tono de',
+    accent: 'una canción',
+    lede: 'Arriba o abajo por semitonos, mismo tempo. La canción se queda en tu dispositivo.',
+    blurb: 'Sube o baja una canción por semitonos sin cambiar el tempo.',
+    featureList: [
+      'De −12 a +12 semitonos',
+      'Tempo y duración sin cambios',
+      'MP3 o WAV, escucha en la página',
+      'Nada se sube',
+    ],
+    faq: [
+      {
+        q: '¿Cuántos semitonos necesito?',
+        a: 'Un semitono por paso: de Do a Re es +2. Encuentra el tono actual con el Detector de tonalidad (/es/tools/key-finder/).',
+      },
+      {
+        q: '¿Se sube el archivo?',
+        a: 'No. Tu navegador decodifica, cambia y codifica la canción.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Convertidor de vídeo online',
     title: 'Convertidor de Vídeo Online Gratis — MP4, WebM, MOV sin subir nada',

@@ -1,0 +1,105 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { shift: 'Shift', st: 'semitones', format: 'Save as', run: 'Change the key', working: 'Shifting…', saved: 'Saved — {size}, {st} semitones.', failed: 'Could not change the key — {msg}', find: 'Not sure of the key? Find it first →' },
+  ru: { shift: 'Сдвиг', st: 'полутонов', format: 'Сохранить как', run: 'Изменить тональность', working: 'Сдвигаем…', saved: 'Сохранено — {size}, {st} полутонов.', failed: 'Не удалось изменить тональность — {msg}', find: 'Не знаете тональность? Сначала определите её →' },
+  es: { shift: 'Mover', st: 'semitonos', format: 'Guardar como', run: 'Cambiar el tono', working: 'Cambiando…', saved: 'Guardado — {size}, {st} semitonos.', failed: 'No se pudo cambiar el tono — {msg}', find: '¿No sabes la tonalidad? Encuéntrala primero →' },
+  pt: { shift: 'Mover', st: 'semitons', format: 'Salvar como', run: 'Mudar o tom', working: 'Mudando…', saved: 'Salvo — {size}, {st} semitons.', failed: 'Não foi possível mudar o tom — {msg}', find: 'Não sabe o tom? Descubra primeiro →' },
+  id: { shift: 'Geser', st: 'semitone', format: 'Simpan sebagai', run: 'Ubah nada dasar', working: 'Menggeser…', saved: 'Tersimpan — {size}, {st} semitone.', failed: 'Gagal mengubah nada — {msg}', find: 'Tidak tahu nada dasarnya? Cari dulu →' },
+  tr: { shift: 'Kaydır', st: 'yarım ses', format: 'Biçim', run: 'Tonu değiştir', working: 'Kaydırılıyor…', saved: 'Kaydedildi — {size}, {st} yarım ses.', failed: 'Ton değiştirilemedi — {msg}', find: 'Tonu bilmiyor musunuz? Önce bulun →' },
+  ar: { shift: 'الإزاحة', st: 'نصف درجة', format: 'احفظ بصيغة', run: 'غيّر المقام', working: 'جارٍ الإزاحة…', saved: 'تم الحفظ — {size}، {st} نصف درجة.', failed: 'تعذّر تغيير المقام — {msg}', find: 'لا تعرف المقام؟ اكتشفه أولًا ←' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+const findHref = lang === 'en' ? '/tools/key-finder/' : `/${lang}/tools/key-finder/`;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="audio/*,video/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP3, M4A, WAV, MP4</span>
+  </label>
+  <div class="controls">
+    <label class="control grow"><span class="muted">{words.shift}: <b id="stv">+2</b> {words.st}</span>
+      <input type="range" id="st" min="-12" max="12" step="1" value="2" /></label>
+    <label class="control"><span class="muted">{words.format}</span>
+      <select id="format"><option value="mp3" selected>MP3</option><option value="wav">WAV</option></select></label>
+    <span class="spacer"></span>
+    <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+  </div>
+  <p class="muted"><a href={findHref}>{words.find}</a></p>
+  <audio id="play" controls hidden></audio>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<style>
+  .grow { flex: 1 1 260px; }
+  .grow input { width: 100%; }
+  #play { width: 100%; margin-top: 8px; }
+</style>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { saveBlob, formatBytes } from '../../lib/encode';
+  import { changeKey } from '../../lib/pitch';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  let file: File | null = null;
+  let busy = false;
+  const signed = (n: number) => (n > 0 ? `+${n}` : String(n));
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  el<HTMLInputElement>('st').addEventListener('input', (e) => { el('stv').textContent = signed(Number((e.target as HTMLInputElement).value)); });
+
+  el('run').addEventListener('click', async () => {
+    if (!file || busy) return;
+    const st = Number(el<HTMLInputElement>('st').value);
+    const format = el<HTMLSelectElement>('format').value as 'mp3' | 'wav';
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    status(w.working, 0.02);
+    try {
+      const { blob, duration } = await changeKey(file, st, format, (f) => status(w.working, f));
+      const play = el<HTMLAudioElement>('play');
+      play.src = URL.createObjectURL(blob);
+      play.hidden = false;
+      const base = file.name.replace(/\.[^.]+$/, '');
+      saveBlob(blob, `${base} (${signed(st)}).${format}`);
+      track('result_saved', { placement: 'result', format, semitones: signed(st) }, { seconds: Math.round(duration) });
+      status(w.saved.replace('{size}', formatBytes(blob.size)).replace('{st}', signed(st)), 1);
+    } catch (error) {
+      toolFailed('run', error, file);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  const take = (f: File | undefined, how: 'picker' | 'drop') => { if (!f) return; file = f; fileChosen(f, how); status(f.name); };
+  el<HTMLInputElement>('file').addEventListener('change', (e) => take((e.target as HTMLInputElement).files?.[0], 'picker'));
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => take((e as DragEvent).dataTransfer?.files?.[0], 'drop'));
+</script>

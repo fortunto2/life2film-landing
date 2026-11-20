@@ -162,4 +162,44 @@ export const TEXT_TOOLS: Tool[] = [
     facts: ['A mirrored preview is a CSS transform; MediaRecorder records the camera as it is.'],
     agentJob: 'Recording a webcam video, locally',
   },
+  {
+    // 20 Nov 2026: «изменить тональность песни онлайн», «change key of song» — pairs with key-finder.
+    slug: 'change-key',
+    group: 'audio',
+    name: 'Change Key of a Song',
+    appName: 'Change Key',
+    blurb: 'Move a song up or down by semitones without changing its tempo.',
+
+    searchPhrase: 'Change Key of a Song Online',
+    title: 'Change Key of a Song Online Free | pitch shifter, same tempo, no upload',
+    description: 'Change the key of a song online for free: move it up or down by up to 12 semitones and keep the tempo, then save MP3 or WAV. For singing in your range or playing along. Runs in your browser; the file is not uploaded.',
+    heading: 'Change the key of',
+    accent: 'a song',
+    lede: 'Up or down by semitones, same tempo. The song stays on your device.',
+    featureList: [
+      '−12 to +12 semitones, one step at a time',
+      'Tempo and length unchanged',
+      'MP3 (192 kbps) or WAV out, listen on the page',
+      'Works on the sound of a video too',
+      'Nothing is uploaded',
+    ],
+    faq: [
+      {
+        q: 'How many semitones do I need?',
+        a: 'One semitone per key step: C to D is +2, A minor to G minor is −2. Find the current key with the Key Finder (/tools/key-finder/), then count.',
+      },
+      {
+        q: 'Does it sound like the original?',
+        a: 'Within two or three semitones it stays natural; a big shift gives voices a chipmunk or giant colour, as with any pitch shifter that keeps the tempo.',
+      },
+      {
+        q: 'Is the file uploaded?',
+        a: 'No. Your browser decodes, shifts and encodes the song itself.',
+      },
+    ],
+
+    summary: 'Pitch-shift a song by semitones keeping tempo (WSOLA + resample), in the browser.',
+    facts: ['A semitone is a frequency ratio of 2^(1/12) ≈ 1.0595; twelve of them double the frequency.'],
+    agentJob: 'Changing the key of a song, locally',
+  },
 ];
