@@ -1,0 +1,87 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+import { toolById, toolAbsoluteUrl } from 'superduper-tools/registry';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { photo: 'A photo instead? Remove the background of a photo on VisaYes', video: 'Your video (a person in it)', bg: 'Background', blur: 'Blur', color: 'Colour', image: 'Picture', green: 'Green screen', pick: 'Choose a picture', run: 'Remove background', model: 'Loading the model (once)…', render: 'Cutting out the person… {n}%', saved: 'Saved — {len}, {size}.', needImage: 'Choose a picture for the background first.', failed: 'Could not do it — {msg}', limit: 'Up to 2 minutes; long side up to 1280 px.' },
+  ru: { photo: 'Нужно для фото? Удалить фон с фото на VisaYes', video: 'Видео (с человеком в кадре)', bg: 'Фон', blur: 'Размытие', color: 'Цвет', image: 'Картинка', green: 'Хромакей', pick: 'Выбрать картинку', run: 'Убрать фон', model: 'Загружаем модель (один раз)…', render: 'Вырезаем человека… {n}%', saved: 'Сохранено — {len}, {size}.', needImage: 'Сначала выберите картинку для фона.', failed: 'Не получилось — {msg}', limit: 'До 2 минут; длинная сторона до 1280 px.' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+// The photo version lives on VisaYes; its address comes from the shared registry, never typed here.
+const photoTool = toolById('visayes-background');
+// VisaYes puts the language first (/ru/background/), so swap it in when that locale exists.
+const photoUrl = photoTool && toolAbsoluteUrl(photoTool.languages.includes(lang) ? { ...photoTool, path: photoTool.path.replace(/^\/en\//, `/${lang}/`) } : photoTool);
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="video/*" hidden />
+    <strong>{words.video}</strong>
+    <span class="muted">{chrome.dragHint} — MP4, MOV, WebM. {words.limit}</span>
+  </label>
+  <div class="controls">
+    <label class="control"><span class="muted">{words.bg}</span>
+      <select id="kind">
+        <option value="blur" selected>{words.blur}</option>
+        <option value="green">{words.green}</option>
+        <option value="color">{words.color}</option>
+        <option value="image">{words.image}</option>
+      </select></label>
+    <input type="color" id="color" value="#ffffff" hidden aria-label={words.color} />
+    <label class="ghost" id="imageLabel" for="image" hidden>{words.pick}<input type="file" id="image" accept="image/*" hidden /></label>
+    <span class="spacer"></span>
+    <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+  </div>
+  {photoUrl && <p class="muted"><a href={photoUrl}>{words.photo}</a></p>}
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<script>
+  import { mountTool, messageOf } from 'superduper-tools/shell';
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { saveBlob, formatBytes, preciseClock } from '../../lib/encode';
+  import { replaceBackground, type Backdrop } from '../../lib/video-background';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const kind = el<HTMLSelectElement>('kind');
+  const sync = () => {
+    el('color').hidden = kind.value !== 'color';
+    el('imageLabel').hidden = kind.value !== 'image';
+  };
+  kind.addEventListener('change', sync);
+  sync();
+
+  mountTool({
+    onFiles: ([f], via) => fileChosen(f, via),
+    onError: (error, [f]) => { toolFailed('run', error, f); return w.failed.replace('{msg}', messageOf(error)); },
+    run: async ({ files: [file], status }) => {
+      let backdrop: Backdrop;
+      if (kind.value === 'blur') backdrop = { kind: 'blur', radius: 18 };
+      else if (kind.value === 'green') backdrop = { kind: 'color', color: '#00b140' };
+      else if (kind.value === 'color') backdrop = { kind: 'color', color: el<HTMLInputElement>('color').value };
+      else {
+        const img = el<HTMLInputElement>('image').files?.[0];
+        if (!img) { status(w.needImage, 0, true); return; }
+        backdrop = { kind: 'image', image: await createImageBitmap(img) };
+      }
+      const r = await replaceBackground(file, backdrop, (stage, f) =>
+        stage === 'model' ? status(w.model, 0.02) : status(w.render.replace('{n}', String(Math.round(f * 100))), 0.05 + f * 0.93));
+      const base = file.name.replace(/\.[^.]+$/, '');
+      saveBlob(r.blob, `${base}-background.mp4`);
+      track('result_saved', { placement: 'result', backdrop: kind.value }, { seconds: Math.round(r.duration) });
+      status(w.saved.replace('{len}', preciseClock(r.duration)).replace('{size}', formatBytes(r.blob.size)), 1);
+    },
+  });
+</script>

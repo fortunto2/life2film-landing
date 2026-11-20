@@ -900,4 +900,34 @@ export const TEXT_TOOLS: Tool[] = [
     facts: ['Frames are scored at 2 fps on a 160 px picture; segments are 2 s; output 720p at 30 fps, the song faded over its last 1.5 s.'],
     agentJob: 'Making a beat-synced montage from clips and a song, locally',
   },
+  {
+    slug: 'remove-video-background',
+    group: 'everyday',
+    name: 'Remove Video Background',
+    appName: 'Life2Film Video Background Remover',
+    blurb: 'Cut the person out of a video and put them on a blur, a colour, a green screen or a picture. In your browser.',
+
+    searchPhrase: 'Remove Background from Video Online Free',
+    title: 'Remove Background from Video Online Free | no upload, no green screen',
+    description: 'Remove or replace the background of a video online, free: blur it, make it a colour or a green screen, or put a picture behind the person. Runs in your browser; the video is never uploaded, no watermark.',
+    heading: 'Remove video',
+    accent: 'background',
+    lede: 'Drop a video with a person in it. Blur the background, paint it one colour, make it a green screen or swap in a picture.',
+    featureList: [
+      'Blur, solid colour, green screen or your own picture',
+      'The person is found in every frame; the edge is smoothed over time so it does not flicker',
+      'Sound kept; MP4 out, up to 2 minutes, long side up to 1280 px',
+      'Nothing uploaded, no watermark, no account',
+    ],
+    faq: [
+      { q: 'Is my video uploaded?', a: 'No. A small segmentation model (250 KB) runs in this tab and finds the person in each frame; the video never leaves your device.' },
+      { q: 'What kind of video works best?', a: 'One or two people, facing the camera, in reasonable light — a talking head, a dance, a selfie video. It looks for people, so a video of a car or a pet keeps its background.' },
+      { q: 'Can I get a transparent video?', a: 'Choose Green screen and key it out in your editor (CapCut, Premiere, Resolve and Final Cut all have a chroma key). MP4 cannot carry transparency itself.' },
+      { q: 'Why the 2-minute limit?', a: 'Every frame is segmented on your computer, about 30 a second of video. Two minutes keeps it to a few minutes of waiting on an ordinary laptop.' },
+    ],
+
+    summary: 'Video background removal in the browser: MediaPipe selfie segmenter (250 KB) on a 256 px copy of each frame, mask smoothed over time, person composited over blur / colour / green screen / picture; MP4 with the original sound.',
+    facts: ['Output long side up to 1280 px, up to 120 s, 30 fps; the mask keeps 40% of the previous frame and has a soft edge between 0.3 and 0.7 confidence.'],
+    agentJob: 'Removing or replacing the background of a video, locally',
+  },
 ];
