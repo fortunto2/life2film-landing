@@ -11,6 +11,7 @@
     "test": "vitest run",
     "check": "astro check && vitest run",
     "check:links": "node scripts/check-links.mjs",
+    "new-tool": "node scripts/new-tool.mjs",
     "wasm": "cp node_modules/life2film-engine/va_wasm.js node_modules/life2film-engine/va_wasm_bg.wasm public/wasm/"
   },
   "dependencies": {
