@@ -450,6 +450,32 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'video-volume-booster': {
+    searchPhrase: 'Video sesini yükseltme online',
+    title: 'Video Sesini Yükselt Online Ücretsiz — daha yüksek, yükleme yok',
+    description:
+      'Sessiz bir videoyu online ve ücretsiz yükseltin: bozulmadan en yükseğe otomatik, ya da ×1.5–×4, ya da kısın. Görüntü olduğu gibi kopyalanır. Tarayıcıda, yükleme yok.',
+    heading: 'Video sesini',
+    accent: 'yükselt',
+    lede: 'Sessiz bir klibin sesini, görüntüyü yeniden kodlamadan ve hiçbir yere göndermeden yükseltin.',
+    blurb: 'Sessiz videoyu cızırtısız yükseltin ya da yüksek olanı kısın. Görüntüye dokunulmaz.',
+    featureList: [
+      'Otomatik: en yüksek an tam sınırın altına çıkar',
+      'Ya da ×1.5, ×2, ×3, ×4 veya kısmak için ×0.5',
+      'Sert kırpma yerine yumuşak sınırlayıcı, cızırtı yok',
+      'Görüntü kayıpsız kopyalanır',
+    ],
+    faq: [
+      {
+        q: 'Video kalite kaybeder mi?',
+        a: 'Hayır. Yalnızca ses yeniden kodlanır; görüntü olduğu gibi kopyalanır.',
+      },
+      {
+        q: 'Videom yükleniyor mu?',
+        a: 'Hayır. Hepsini tarayıcınız yapar.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',

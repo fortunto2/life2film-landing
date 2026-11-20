@@ -450,6 +450,32 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'video-volume-booster': {
+    searchPhrase: 'Perbesar volume video online',
+    title: 'Perbesar Volume Video Online Gratis — lebih keras, tanpa unggah',
+    description:
+      'Buat video yang pelan jadi lebih keras secara online dan gratis: otomatis ke level tertinggi tanpa distorsi, atau ×1.5 sampai ×4, atau kecilkan. Gambar disalin utuh. Di browser, tanpa unggah.',
+    heading: 'Perbesar volume',
+    accent: 'video',
+    lede: 'Keraskan suara klip yang pelan tanpa encode ulang gambar atau mengirimnya.',
+    blurb: 'Video pelan jadi keras tanpa pecah, atau yang keras jadi pelan. Gambar tidak diubah.',
+    featureList: [
+      'Otomatis: momen terkeras naik hingga tepat di bawah maksimum',
+      'Atau ×1.5, ×2, ×3, ×4, atau ×0.5 untuk mengecilkan',
+      'Limiter lembut, bukan pemotongan keras, jadi tidak pecah',
+      'Gambar disalin tanpa kehilangan kualitas',
+    ],
+    faq: [
+      {
+        q: 'Apakah kualitas video turun?',
+        a: 'Tidak. Hanya suara yang di-encode ulang; gambar disalin apa adanya.',
+      },
+      {
+        q: 'Apakah video saya diunggah?',
+        a: 'Tidak. Browser yang mengerjakan semuanya.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',

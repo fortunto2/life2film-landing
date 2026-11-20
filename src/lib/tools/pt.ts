@@ -454,6 +454,32 @@ export const pt: ToolTranslations = {
       },
     ],
   },
+  'video-volume-booster': {
+    searchPhrase: 'Aumentar volume de vídeo online',
+    title: 'Aumentar o volume de um vídeo online grátis — mais alto, sem upload',
+    description:
+      'Aumente o volume de um vídeo online e grátis: automático ao máximo sem distorção, ou ×1.5 a ×4, ou abaixe. A imagem é copiada intacta. No navegador, sem upload.',
+    heading: 'Aumentar o volume',
+    accent: 'do vídeo',
+    lede: 'Aumente o som de um clipe baixo sem recodificar a imagem nem enviá-lo.',
+    blurb: 'Vídeo baixo mais alto sem estalos, ou alto mais baixo. A imagem não é tocada.',
+    featureList: [
+      'Auto: o momento mais alto vai até logo abaixo do máximo',
+      'Ou ×1.5, ×2, ×3, ×4, ou ×0.5 para abaixar',
+      'Limitador suave em vez de corte, sem estalos',
+      'A imagem é copiada sem perda',
+    ],
+    faq: [
+      {
+        q: 'O vídeo perde qualidade?',
+        a: 'Não. Só o som é recodificado; a imagem é copiada como está.',
+      },
+      {
+        q: 'Meu vídeo é enviado?',
+        a: 'Não. O navegador faz tudo.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Conversor de vídeo online',
     title: 'Conversor de Vídeo Online Grátis — MP4, WebM, MOV sem enviar nada',

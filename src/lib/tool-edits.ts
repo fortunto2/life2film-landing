@@ -700,4 +700,47 @@ Reference implementation: https://life2film.com/tools/audio-cutter/`,
     facts: ['Reading frames from last to first costs a seek per frame; canvasesAtTimestamps with a descending list keeps it practical for short clips.'],
     agentJob: 'Reversing a video, locally',
   },
+  {
+    // 20 Nov 2026: «increase video volume» / «увеличить громкость видео» — quiet phone clips.
+    slug: 'video-volume-booster',
+    group: 'everyday',
+    name: 'Video Volume Booster',
+    appName: 'Volume Booster',
+    blurb: 'Make a quiet video louder without crackle, or turn a loud one down. The picture is not touched.',
+
+    searchPhrase: 'Increase Video Volume Online',
+    title: 'Increase Video Volume Online Free | make a video louder, no upload',
+    description: 'Make a quiet video louder online for free: automatic boost to the loudest level without distortion, or ×1.5 to ×4, or turn it down. The picture is copied untouched. In your browser: nothing is uploaded, no watermark.',
+    heading: 'Make a video',
+    accent: 'louder',
+    lede: 'Boost a quiet clip\'s sound without re-encoding the picture or sending it anywhere.',
+    featureList: [
+      'Auto: raises the loudest moment to just under full scale',
+      'Or ×1.5, ×2, ×3, ×4, or ×0.5 to turn it down',
+      'Soft limiter instead of hard clipping, so loud parts do not crackle',
+      'The picture is copied packet for packet: no quality loss',
+      'Runs fully client-side: no upload, no size limit',
+    ],
+    faq: [
+      {
+        q: 'Why does Auto sometimes barely change anything?',
+        a: 'Auto stops where the loudest moment would distort. A clip with one loud bang and quiet speech stays limited by the bang; pick ×2 or ×3 instead, and the limiter will round off the bang rather than clip it.',
+      },
+      {
+        q: 'Does the video lose quality?',
+        a: 'No. Only the sound is decoded and encoded again; the picture is copied as it is.',
+      },
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. Your browser does all of it.',
+      },
+    ],
+
+    summary: 'Change a video\'s sound level in the browser: the picture is copied, the sound gets gain plus a soft limiter.',
+    facts: [
+      'Gain above full scale clips; a soft knee (linear to 0.8, tanh above) keeps peaks under 1 without audible crackle.',
+      'Mediabunny Conversion with only audio.process re-encodes the sound and copies the video packets.',
+    ],
+    agentJob: 'Making a video louder, locally',
+  },
 ];

@@ -1,0 +1,109 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { gain: 'Volume', auto: 'Auto (as loud as it goes without distortion)', run: 'Apply', saved: 'Saved — {size}, sound ×{x}.', failed: 'Could not change the volume — {msg}' },
+  ru: { gain: 'Громкость', auto: 'Авто (максимум без искажений)', run: 'Применить', saved: 'Сохранено — {size}, звук ×{x}.', failed: 'Не удалось изменить громкость — {msg}' },
+  es: { gain: 'Volumen', auto: 'Auto (lo más alto sin distorsión)', run: 'Aplicar', saved: 'Guardado — {size}, sonido ×{x}.', failed: 'No se pudo cambiar el volumen — {msg}' },
+  pt: { gain: 'Volume', auto: 'Auto (o mais alto sem distorção)', run: 'Aplicar', saved: 'Salvo — {size}, som ×{x}.', failed: 'Não foi possível mudar o volume — {msg}' },
+  id: { gain: 'Volume', auto: 'Otomatis (sekeras mungkin tanpa distorsi)', run: 'Terapkan', saved: 'Tersimpan — {size}, suara ×{x}.', failed: 'Gagal mengubah volume — {msg}' },
+  tr: { gain: 'Ses düzeyi', auto: 'Otomatik (bozulmadan en yüksek)', run: 'Uygula', saved: 'Kaydedildi — {size}, ses ×{x}.', failed: 'Ses düzeyi değiştirilemedi — {msg}' },
+  ar: { gain: 'مستوى الصوت', auto: 'تلقائي (أعلى ما يمكن بلا تشويه)', run: 'تطبيق', saved: 'تم الحفظ — {size}، الصوت ×{x}.', failed: 'تعذّر تغيير مستوى الصوت — {msg}' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="video/*,audio/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP4, MOV, WebM, M4A</span>
+  </label>
+  <div id="editor" hidden>
+    <div class="facts" id="facts"></div>
+    <div class="controls">
+      <label class="control"><span class="muted">{words.gain}</span>
+        <select id="gain"><option value="auto" selected>{words.auto}</option><option value="1.5">×1.5</option><option value="2">×2</option><option value="3">×3</option><option value="4">×4</option><option value="0.5">×0.5</option></select></label>
+      <span class="spacer"></span>
+      <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+    </div>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<style>
+  .check { display: flex; gap: 8px; align-items: center; }
+</style>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { toolStrings, fill } from '../../lib/strings';
+  import { probe, saveBlob, formatBytes, preciseClock } from '../../lib/encode';
+  import { changeVolume } from '../../lib/volume';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const say = toolStrings();
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  const fileInput = el<HTMLInputElement>('file');
+  let file: File | null = null;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  async function open(chosen: File) {
+    file = chosen;
+    try {
+      status(say.reading);
+      const info = await probe(chosen);
+      el('editor').hidden = false;
+      statusEl.hidden = true;
+      el('facts').innerHTML = `${info.width ? `<span>${info.width}×${info.height}</span>` : ''}<span>${preciseClock(info.duration)}</span><span>${formatBytes(info.size)}</span>`;
+    } catch (error) {
+      toolFailed('open', error, chosen);
+      status(error instanceof Error ? error.message : 'Could not read that file.', 1, true);
+    }
+  }
+
+  el<HTMLButtonElement>('run').addEventListener('click', async () => {
+    if (!file || busy) return;
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    try {
+      status(fill(say.working, { n: 0 }), 0);
+      const g = el<HTMLSelectElement>('gain').value;
+      const result = await changeVolume(file, g === 'auto' ? 'auto' : Number(g), (p) => status(fill(say.working, { n: Math.round(p * 100) }), p));
+      saveBlob(result.blob, `${file.name.replace(/\.[^.]+$/, '') || 'video'}-louder.${result.ext}`);
+      track('result_saved', { placement: 'result', format: result.ext, gain: g.replace('.', '_') }, { size_mb: Math.round(result.blob.size / 104_857.6) / 10 });
+      status(w.saved.replace('{size}', formatBytes(result.blob.size)).replace('{x}', result.factor.toFixed(1)), 1);
+    } catch (error) {
+      toolFailed('run', error, file);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  fileInput.addEventListener('change', () => { const f = fileInput.files?.[0]; if (f) { fileChosen(f, 'picker'); void open(f); } });
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => { const f = (e as DragEvent).dataTransfer?.files?.[0]; if (f) { fileChosen(f, 'drop'); void open(f); } });
+</script>
