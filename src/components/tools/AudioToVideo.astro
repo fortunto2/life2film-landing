@@ -1,0 +1,107 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { image: 'Add a cover image (optional)', shape: 'Shape', bars: 'Moving level bars', run: 'Make the video', need: 'Choose an audio file first.', working: 'Making the video… {n}%', saved: 'Saved — {size}, {len}.', failed: 'Could not make the video — {msg}' },
+  ru: { image: 'Добавить обложку (необязательно)', shape: 'Формат', bars: 'Анимированная волна', run: 'Сделать видео', need: 'Сначала выберите аудиофайл.', working: 'Делаем видео… {n}%', saved: 'Сохранено — {size}, {len}.', failed: 'Не удалось сделать видео — {msg}' },
+  es: { image: 'Añadir portada (opcional)', shape: 'Formato', bars: 'Barras de nivel animadas', run: 'Crear el video', need: 'Primero elige un audio.', working: 'Creando el video… {n}%', saved: 'Guardado — {size}, {len}.', failed: 'No se pudo crear — {msg}' },
+  pt: { image: 'Adicionar capa (opcional)', shape: 'Formato', bars: 'Barras de nível animadas', run: 'Criar o vídeo', need: 'Escolha um áudio primeiro.', working: 'Criando o vídeo… {n}%', saved: 'Salvo — {size}, {len}.', failed: 'Não foi possível criar — {msg}' },
+  id: { image: 'Tambah sampul (opsional)', shape: 'Format', bars: 'Bar level bergerak', run: 'Buat video', need: 'Pilih file audio dulu.', working: 'Membuat video… {n}%', saved: 'Tersimpan — {size}, {len}.', failed: 'Gagal membuat video — {msg}' },
+  tr: { image: 'Kapak ekle (isteğe bağlı)', shape: 'Biçim', bars: 'Hareketli seviye çubukları', run: 'Videoyu oluştur', need: 'Önce bir ses dosyası seçin.', working: 'Video oluşturuluyor… %{n}', saved: 'Kaydedildi — {size}, {len}.', failed: 'Video oluşturulamadı — {msg}' },
+  ar: { image: 'أضف صورة غلاف (اختياري)', shape: 'الشكل', bars: 'أشرطة مستوى متحركة', run: 'أنشئ الفيديو', need: 'اختر ملفًا صوتيًا أولًا.', working: 'جارٍ إنشاء الفيديو… {n}%', saved: 'تم الحفظ — {size}، {len}.', failed: 'تعذّر إنشاء الفيديو — {msg}' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="audio/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP3, M4A, WAV</span>
+  </label>
+  <div class="controls">
+    <label class="ghost" for="image">{words.image}<input type="file" id="image" accept="image/*" hidden /></label>
+    <img id="thumb" alt="" hidden />
+    <label class="control"><span class="muted">{words.shape}</span>
+      <select id="shape"><option value="16:9" selected>16:9 YouTube</option><option value="1:1">1:1</option><option value="9:16">9:16 Shorts / Reels</option></select></label>
+    <label class="control"><input type="checkbox" id="bars" checked /> <span class="muted">{words.bars}</span></label>
+    <span class="spacer"></span>
+    <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<style>
+  #thumb { height: 36px; max-width: 80px; object-fit: cover; border-radius: 4px; }
+</style>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { saveBlob, formatBytes, preciseClock } from '../../lib/encode';
+  import { audioToVideo, type Shape } from '../../lib/audio-to-video';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  let audio: File | null = null;
+  let image: File | null = null;
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  function take(files: FileList | File[] | null | undefined, how: 'picker' | 'drop') {
+    for (const f of Array.from(files ?? [])) {
+      if (f.type.startsWith('image/')) {
+        image = f;
+        const t = el<HTMLImageElement>('thumb');
+        t.src = URL.createObjectURL(f);
+        t.hidden = false;
+      } else { audio = f; fileChosen(f, how); }
+    }
+    status([audio?.name, image?.name].filter(Boolean).join(' + '));
+  }
+
+  el('run').addEventListener('click', async () => {
+    if (busy) return;
+    if (!audio) { status(w.need, 1, true); return; }
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    const shape = el<HTMLSelectElement>('shape').value as Shape;
+    const bars = el<HTMLInputElement>('bars').checked;
+    try {
+      const { blob, duration } = await audioToVideo(audio, { shape, image, bars, onProgress: (f) => status(w.working.replace('{n}', String(Math.round(f * 100))), f) });
+      saveBlob(blob, `${audio.name.replace(/\.[^.]+$/, '')}.mp4`);
+      track('result_saved', { placement: 'result', shape, bars: bars ? 'yes' : 'no', cover: image ? 'yes' : 'no' }, { seconds: Math.round(duration), size_mb: Math.round(blob.size / 104_857.6) / 10 });
+      status(w.saved.replace('{size}', formatBytes(blob.size)).replace('{len}', preciseClock(duration)), 1);
+    } catch (error) {
+      toolFailed('run', error, audio);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  });
+
+  el<HTMLInputElement>('file').addEventListener('change', (e) => take((e.target as HTMLInputElement).files, 'picker'));
+  el<HTMLInputElement>('image').addEventListener('change', (e) => take((e.target as HTMLInputElement).files, 'picker'));
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => take((e as DragEvent).dataTransfer?.files, 'drop'));
+</script>

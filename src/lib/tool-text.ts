@@ -318,4 +318,44 @@ export const TEXT_TOOLS: Tool[] = [
     facts: ['RNNoise answers two 480-sample frames late at 48 kHz (20 ms); mixing dry and clean without compensating comb-filters the voice.'],
     agentJob: 'Removing background noise from speech, locally',
   },
+  {
+    // 20 Nov 2026: «mp3 to mp4», «audio to video for youtube», «аудио в видео» — a cover + level bars.
+    slug: 'audio-to-video',
+    group: 'audio',
+    name: 'Audio to Video',
+    appName: 'Audio to Video',
+    blurb: 'Turn an MP3 into an MP4 for YouTube: a cover image, your sound, and bars that move with it.',
+
+    searchPhrase: 'Convert Audio to Video Online',
+    title: 'Audio to Video Online Free | MP3 to MP4 with a cover image for YouTube',
+    description: 'Convert audio to video online for free: an MP3, M4A or WAV plus a cover image becomes an MP4 for YouTube, Shorts or Reels, with optional level bars that move with the sound. Runs in your browser; nothing is uploaded.',
+    heading: 'Audio to',
+    accent: 'video',
+    lede: 'A song, a podcast or a voice note, ready for YouTube. Nothing leaves your device.',
+    featureList: [
+      'Cover image fitted over a blurred copy of itself, or a dark background',
+      'Level bars that move with the sound (optional)',
+      '16:9 for YouTube, 1:1, or 9:16 for Shorts and Reels',
+      'Sound encoded at 192 kbps AAC',
+      'Nothing is uploaded',
+    ],
+    faq: [
+      {
+        q: 'Why can I not upload an MP3 to YouTube?',
+        a: 'YouTube takes only video files. This wraps the sound in an MP4 with a picture, which YouTube accepts.',
+      },
+      {
+        q: 'How long does it take?',
+        a: 'The browser draws and encodes every frame (24 per second), so a song takes a while; with the bars off the picture barely changes and the file stays small.',
+      },
+      {
+        q: 'Is my file uploaded?',
+        a: 'No. Your browser builds the video itself.',
+      },
+    ],
+
+    summary: 'MP3/M4A/WAV + cover image -> MP4 with optional level bars, in the browser.',
+    facts: ['YouTube accepts only video uploads; a still image with the sound is the usual way to post audio there.'],
+    agentJob: 'Turning audio into a video for YouTube, locally',
+  },
 ];

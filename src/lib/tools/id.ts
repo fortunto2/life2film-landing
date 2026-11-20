@@ -797,6 +797,32 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'audio-to-video': {
+    searchPhrase: 'Ubah audio ke video online',
+    title: 'Audio ke Video Online Gratis — MP3 ke MP4 dengan gambar untuk YouTube',
+    description:
+      'Ubah audio menjadi video secara online dan gratis: MP3, M4A atau WAV plus gambar sampul menjadi MP4 untuk YouTube, Shorts atau Reels, dengan bar level opsional. Di browser, tanpa unggah.',
+    heading: 'Audio ke',
+    accent: 'video',
+    lede: 'Lagu, podcast atau pesan suara, siap untuk YouTube.',
+    blurb: 'MP3 ke MP4 untuk YouTube: sampul, suara Anda dan bar yang bergerak.',
+    featureList: [
+      'Sampul di atas salinan buram, atau latar gelap',
+      'Bar level bergerak (opsional)',
+      '16:9, 1:1 atau 9:16',
+      'Tidak ada yang diunggah',
+    ],
+    faq: [
+      {
+        q: 'Kenapa MP3 tidak bisa diunggah ke YouTube?',
+        a: 'YouTube hanya menerima video. Ini membungkus suara dalam MP4 bergambar.',
+      },
+      {
+        q: 'Apakah file saya diunggah?',
+        a: 'Tidak. Browser yang membuat videonya.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',

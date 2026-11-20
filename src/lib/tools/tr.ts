@@ -797,6 +797,32 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'audio-to-video': {
+    searchPhrase: 'Sesi videoya dönüştür online',
+    title: 'Sesten Videoya Online Ücretsiz — YouTube için resimli MP3’ten MP4’e',
+    description:
+      'Sesi online ve ücretsiz videoya dönüştürün: MP3, M4A veya WAV ile bir kapak görseli, isteğe bağlı hareketli seviye çubuklarıyla YouTube, Shorts veya Reels için MP4 olur. Tarayıcıda, yükleme yok.',
+    heading: 'Sesten',
+    accent: 'videoya',
+    lede: 'Bir şarkı, podcast veya sesli not, YouTube’a hazır.',
+    blurb: 'YouTube için MP3’ten MP4’e: kapak, sesiniz ve onunla hareket eden çubuklar.',
+    featureList: [
+      'Bulanık kopyası üzerinde kapak veya koyu zemin',
+      'Hareketli seviye çubukları (isteğe bağlı)',
+      '16:9, 1:1 veya 9:16',
+      'Hiçbir şey yüklenmez',
+    ],
+    faq: [
+      {
+        q: 'YouTube’a neden MP3 yüklenemiyor?',
+        a: 'YouTube yalnızca video kabul eder. Bu, sesi resimli bir MP4’e sarar.',
+      },
+      {
+        q: 'Dosyam yükleniyor mu?',
+        a: 'Hayır. Videoyu tarayıcınız oluşturur.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',

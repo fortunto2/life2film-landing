@@ -800,6 +800,32 @@ export const es: ToolTranslations = {
       },
     ],
   },
+  'audio-to-video': {
+    searchPhrase: 'Convertir audio a video online',
+    title: 'Audio a video online gratis — MP3 a MP4 con imagen para YouTube',
+    description:
+      'Convierte audio en video online y gratis: un MP3, M4A o WAV más una portada se convierten en un MP4 para YouTube, Shorts o Reels, con barras de nivel opcionales. En tu navegador, sin subir nada.',
+    heading: 'Audio a',
+    accent: 'video',
+    lede: 'Una canción, un podcast o una nota de voz, listos para YouTube.',
+    blurb: 'MP3 a MP4 para YouTube: portada, tu sonido y barras que se mueven con él.',
+    featureList: [
+      'Portada sobre una copia desenfocada, o fondo oscuro',
+      'Barras de nivel animadas (opcional)',
+      '16:9, 1:1 o 9:16',
+      'Nada se sube',
+    ],
+    faq: [
+      {
+        q: '¿Por qué no puedo subir un MP3 a YouTube?',
+        a: 'YouTube solo acepta video. Esto envuelve el sonido en un MP4 con imagen.',
+      },
+      {
+        q: '¿Se sube mi archivo?',
+        a: 'No. Tu navegador crea el video.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Convertidor de vídeo online',
     title: 'Convertidor de Vídeo Online Gratis — MP4, WebM, MOV sin subir nada',
