@@ -1,0 +1,130 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { model: 'Model', base: 'Fast (base, ~80 MB once)', small: 'Accurate (small, ~250 MB once)', language: 'Language', auto: 'Detect', run: 'Make subtitles', audio: 'Reading the sound…', loading: 'Loading the speech model, once: {n}%', listening: 'Listening…', done: '{n} lines, {len} of audio.', srt: 'Save .srt', vtt: 'Save .vtt', burn: 'Burn them into the video →', failed: 'Could not make subtitles — {msg}', note: 'The model downloads once from Hugging Face and stays in the browser cache. Your video is not uploaded.' },
+  ru: { model: 'Модель', base: 'Быстрая (base, ~80 МБ один раз)', small: 'Точная (small, ~250 МБ один раз)', language: 'Язык', auto: 'Определить', run: 'Сделать субтитры', audio: 'Читаем звук…', loading: 'Загружаем модель речи, один раз: {n}%', listening: 'Слушаем…', done: 'Строк: {n}, звука: {len}.', srt: 'Сохранить .srt', vtt: 'Сохранить .vtt', burn: 'Вшить их в видео →', failed: 'Не удалось сделать субтитры — {msg}', note: 'Модель скачивается один раз с Hugging Face и остаётся в кэше браузера. Видео никуда не загружается.' },
+  es: { model: 'Modelo', base: 'Rápido (base, ~80 MB una vez)', small: 'Preciso (small, ~250 MB una vez)', language: 'Idioma', auto: 'Detectar', run: 'Crear subtítulos', audio: 'Leyendo el sonido…', loading: 'Cargando el modelo de voz, una vez: {n}%', listening: 'Escuchando…', done: '{n} líneas, {len} de audio.', srt: 'Guardar .srt', vtt: 'Guardar .vtt', burn: 'Incrustarlos en el video →', failed: 'No se pudieron crear — {msg}', note: 'El modelo se descarga una vez de Hugging Face y queda en la caché del navegador. Tu video no se sube.' },
+  pt: { model: 'Modelo', base: 'Rápido (base, ~80 MB uma vez)', small: 'Preciso (small, ~250 MB uma vez)', language: 'Idioma', auto: 'Detectar', run: 'Criar legendas', audio: 'Lendo o som…', loading: 'Carregando o modelo de voz, uma vez: {n}%', listening: 'Ouvindo…', done: '{n} linhas, {len} de áudio.', srt: 'Salvar .srt', vtt: 'Salvar .vtt', burn: 'Embutir no vídeo →', failed: 'Não foi possível criar — {msg}', note: 'O modelo é baixado uma vez do Hugging Face e fica no cache do navegador. Seu vídeo não é enviado.' },
+  id: { model: 'Model', base: 'Cepat (base, ~80 MB sekali)', small: 'Akurat (small, ~250 MB sekali)', language: 'Bahasa', auto: 'Deteksi', run: 'Buat subtitle', audio: 'Membaca suara…', loading: 'Memuat model suara, sekali: {n}%', listening: 'Mendengarkan…', done: '{n} baris, {len} audio.', srt: 'Simpan .srt', vtt: 'Simpan .vtt', burn: 'Tanamkan ke video →', failed: 'Gagal membuat subtitle — {msg}', note: 'Model diunduh sekali dari Hugging Face dan tersimpan di cache browser. Video Anda tidak diunggah.' },
+  tr: { model: 'Model', base: 'Hızlı (base, bir kez ~80 MB)', small: 'Doğru (small, bir kez ~250 MB)', language: 'Dil', auto: 'Algıla', run: 'Altyazı oluştur', audio: 'Ses okunuyor…', loading: 'Konuşma modeli bir kez yükleniyor: %{n}', listening: 'Dinleniyor…', done: '{n} satır, {len} ses.', srt: '.srt kaydet', vtt: '.vtt kaydet', burn: 'Videoya göm →', failed: 'Altyazı oluşturulamadı — {msg}', note: 'Model Hugging Face’ten bir kez iner ve tarayıcı önbelleğinde kalır. Videonuz yüklenmez.' },
+  ar: { model: 'النموذج', base: 'سريع (base، نحو 80 ميغابايت مرة واحدة)', small: 'دقيق (small، نحو 250 ميغابايت مرة واحدة)', language: 'اللغة', auto: 'اكتشاف', run: 'أنشئ الترجمة', audio: 'جارٍ قراءة الصوت…', loading: 'جارٍ تحميل نموذج الكلام مرة واحدة: {n}%', listening: 'جارٍ الاستماع…', done: '{n} سطرًا، {len} من الصوت.', srt: 'احفظ ‎.srt', vtt: 'احفظ ‎.vtt', burn: 'ادمجها في الفيديو ←', failed: 'تعذّر إنشاء الترجمة — {msg}', note: 'يُنزَّل النموذج مرة واحدة من Hugging Face ويبقى في ذاكرة المتصفح. لا يُرفع الفيديو.' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+const burnHref = lang === 'en' ? '/tools/burn-subtitles/' : `/${lang}/tools/burn-subtitles/`;
+const LANGS = [['en', 'English'], ['ru', 'Русский'], ['es', 'Español'], ['pt', 'Português'], ['id', 'Bahasa Indonesia'], ['tr', 'Türkçe'], ['ar', 'العربية'], ['de', 'Deutsch'], ['fr', 'Français'], ['it', 'Italiano'], ['uk', 'Українська'], ['ja', '日本語'], ['zh', '中文'], ['ko', '한국어'], ['hi', 'हिन्दी']];
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="video/*,audio/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP4, MOV, MP3, M4A, WAV</span>
+  </label>
+  <div class="controls">
+    <label class="control"><span class="muted">{words.model}</span>
+      <select id="model"><option value="base" selected>{words.base}</option><option value="small">{words.small}</option></select></label>
+    <label class="control"><span class="muted">{words.language}</span>
+      <select id="language"><option value="" selected>{words.auto}</option>{LANGS.map(([v, n]) => <option value={v}>{n}</option>)}</select></label>
+    <span class="spacer"></span>
+    <button id="run" type="button" class="ghost primary" data-sda-event="tool_run" data-sda-placement="controls">{words.run}</button>
+  </div>
+  <p class="muted small">{words.note}</p>
+  <div id="result" hidden>
+    <textarea id="text" rows="10" readonly></textarea>
+    <div class="controls">
+      <button id="srt" type="button" class="ghost">{words.srt}</button>
+      <button id="vtt" type="button" class="ghost">{words.vtt}</button>
+      <span class="spacer"></span>
+      <a href={burnHref}>{words.burn}</a>
+    </div>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<style>
+  #text { width: 100%; font: inherit; font-size: 0.95rem; background: rgba(255,255,255,.03); color: inherit; border: 1px solid rgba(255,255,255,.12); border-radius: 8px; padding: 10px; margin: 8px 0; }
+  .small { font-size: 0.85rem; }
+</style>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { saveBlob, preciseClock } from '../../lib/encode';
+  import { transcribe, toSrt, toVtt, type Chunk, type ModelSize } from '../../lib/transcribe';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  let file: File | null = null;
+  let cues: Chunk[] = [];
+  let busy = false;
+
+  function status(message: string, fraction?: number, isError = false) {
+    statusEl.hidden = false;
+    statusEl.classList.toggle('err', isError);
+    el('statusText').textContent = message;
+    if (fraction !== undefined) el('fill').style.width = `${Math.round(fraction * 100)}%`;
+  }
+
+  const base = () => (file?.name.replace(/\.[^.]+$/, '') || 'subtitles');
+
+  async function run() {
+    if (!file || busy) return;
+    busy = true;
+    el<HTMLButtonElement>('run').disabled = true;
+    el('result').hidden = true;
+    const model = el<HTMLSelectElement>('model').value as ModelSize;
+    const language = el<HTMLSelectElement>('language').value || null;
+    const t0 = performance.now();
+    try {
+      const out = await transcribe(file, {
+        model,
+        language,
+        onStage: (stage, f) => {
+          if (stage === 'audio') status(w.audio, 0.02);
+          else if (stage === 'model') status(w.loading.replace('{n}', String(Math.round((f ?? 0) * 100))), 0.05 + (f ?? 0) * 0.35);
+          else status(w.listening, 0.5);
+        },
+      });
+      cues = out.cues;
+      el<HTMLTextAreaElement>('text').value = cues.map((c) => c.text).join('\n');
+      el('result').hidden = false;
+      status(w.done.replace('{n}', String(cues.length)).replace('{len}', preciseClock(out.duration)), 1);
+      track('result_shown', { placement: 'result', model, device: out.device, language: language ?? 'auto' }, { seconds: Math.round(out.duration), lines: cues.length, took_s: Math.round((performance.now() - t0) / 1000) });
+    } catch (error) {
+      toolFailed('run', error, file);
+      status(w.failed.replace('{msg}', error instanceof Error ? error.message : String(error)), 1, true);
+    } finally {
+      busy = false;
+      el<HTMLButtonElement>('run').disabled = false;
+    }
+  }
+
+  el('srt').addEventListener('click', () => {
+    saveBlob(new Blob([toSrt(cues)], { type: 'application/x-subrip' }), `${base()}.srt`);
+    track('result_saved', { placement: 'result', format: 'srt' });
+  });
+  el('vtt').addEventListener('click', () => {
+    saveBlob(new Blob([toVtt(cues)], { type: 'text/vtt' }), `${base()}.vtt`);
+    track('result_saved', { placement: 'result', format: 'vtt' });
+  });
+  el('run').addEventListener('click', () => void run());
+
+  const take = (f: File | undefined, how: 'picker' | 'drop') => { if (!f) return; file = f; fileChosen(f, how); status(f.name); };
+  el<HTMLInputElement>('file').addEventListener('change', (e) => take((e.target as HTMLInputElement).files?.[0], 'picker'));
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => take((e as DragEvent).dataTransfer?.files?.[0], 'drop'));
+</script>

@@ -597,6 +597,32 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'auto-subtitles': {
+    searchPhrase: 'Otomatik altyazı oluşturucu online',
+    title: 'Otomatik Altyazı Online Ücretsiz — Whisper ile videodan SRT, yükleme yok',
+    description:
+      'Bir videonun altyazısını otomatik, online ve ücretsiz oluşturun: Whisper tarayıcınızda çalışır ve zamanlamalı SRT veya VTT yazar, 99 dilde. Video yüklenmez; model bir kez iner.',
+    heading: 'Otomatik',
+    accent: 'altyazı',
+    lede: 'Konuşmayı, videoyu hiçbir yere göndermeden zamanlamalı altyazıya çevirin.',
+    blurb: 'Whisper ile tarayıcıda konuşmadan SRT veya VTT, sonra tek tıkla videoya gömün.',
+    featureList: [
+      'Sekmede Whisper base (hızlı) veya small (daha doğru)',
+      'Dil algılanır ya da seçilir',
+      'Zamanlamalı, okunur satırlı SRT ve WebVTT',
+      'Video yüklenmez; model bir kez iner',
+    ],
+    faq: [
+      {
+        q: 'Ne kadar doğru?',
+        a: 'Küçük boyutlarda Whisper: net konuşma neredeyse temiz çıkar; gürültü, üst üste sesler ve isimler kontrol ister.',
+      },
+      {
+        q: 'Videom yükleniyor mu?',
+        a: 'Hayır. İnternetten yalnızca model dosyaları gelir (Hugging Face); ses bilgisayarınızda yazıya dökülür.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',

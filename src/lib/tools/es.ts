@@ -600,6 +600,32 @@ export const es: ToolTranslations = {
       },
     ],
   },
+  'auto-subtitles': {
+    searchPhrase: 'Generador de subtítulos automáticos online',
+    title: 'Subtítulos automáticos online gratis — video a SRT con Whisper, sin subir',
+    description:
+      'Crea subtítulos de un video automáticamente, online y gratis: Whisper funciona en tu navegador y escribe SRT o VTT con tiempos, en 99 idiomas. El video no se sube; el modelo se descarga una vez.',
+    heading: 'Subtítulos',
+    accent: 'automáticos',
+    lede: 'Convierte la voz en subtítulos con tiempos sin enviar el video a ninguna parte.',
+    blurb: 'Voz a SRT o VTT en el navegador con Whisper, y luego incrustarlos con un clic.',
+    featureList: [
+      'Whisper base (rápido) o small (más preciso) en la pestaña',
+      'Idioma detectado o elegido',
+      'SRT y WebVTT con tiempos y líneas legibles',
+      'El video no se sube; el modelo se descarga una vez',
+    ],
+    faq: [
+      {
+        q: '¿Qué tan preciso es?',
+        a: 'Es Whisper en tamaños pequeños: la voz clara sale casi limpia; ruido, voces superpuestas y nombres necesitan revisión.',
+      },
+      {
+        q: '¿Se sube mi video?',
+        a: 'No. Solo los archivos del modelo vienen de internet (Hugging Face); el sonido se transcribe en tu equipo.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Convertidor de vídeo online',
     title: 'Convertidor de Vídeo Online Gratis — MP4, WebM, MOV sin subir nada',

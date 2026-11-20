@@ -15,6 +15,7 @@
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
     "@fontsource-variable/space-grotesk": "^5.3.0",
+    "@huggingface/transformers": "4.3.2",
     "@mediabunny/mp3-encoder": "^1.66.2",
     "@rive-app/canvas-lite": "2.45.0",
     "astro": "^6.4.8",

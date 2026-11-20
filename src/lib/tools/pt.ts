@@ -601,6 +601,32 @@ export const pt: ToolTranslations = {
       },
     ],
   },
+  'auto-subtitles': {
+    searchPhrase: 'Gerador de legendas automáticas online',
+    title: 'Legendas automáticas online grátis — vídeo para SRT com Whisper, sem upload',
+    description:
+      'Crie legendas de um vídeo automaticamente, online e grátis: o Whisper roda no navegador e escreve SRT ou VTT com tempos, em 99 idiomas. O vídeo não é enviado; o modelo é baixado uma vez.',
+    heading: 'Legendas',
+    accent: 'automáticas',
+    lede: 'Transforme a fala em legendas com tempo sem enviar o vídeo a lugar nenhum.',
+    blurb: 'Fala para SRT ou VTT no navegador com Whisper, e depois embutir com um clique.',
+    featureList: [
+      'Whisper base (rápido) ou small (mais preciso) na aba',
+      'Idioma detectado ou escolhido',
+      'SRT e WebVTT com tempos e linhas legíveis',
+      'O vídeo não é enviado; o modelo baixa uma vez',
+    ],
+    faq: [
+      {
+        q: 'É preciso?',
+        a: 'É o Whisper em tamanhos pequenos: fala clara sai quase limpa; ruído, vozes sobrepostas e nomes precisam de revisão.',
+      },
+      {
+        q: 'Meu vídeo é enviado?',
+        a: 'Não. Só os arquivos do modelo vêm da internet (Hugging Face); o som é transcrito no seu computador.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Conversor de vídeo online',
     title: 'Conversor de Vídeo Online Grátis — MP4, WebM, MOV sem enviar nada',

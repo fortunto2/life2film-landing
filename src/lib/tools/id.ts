@@ -597,6 +597,32 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'auto-subtitles': {
+    searchPhrase: 'Pembuat subtitle otomatis online',
+    title: 'Subtitle Otomatis Online Gratis — video ke SRT dengan Whisper, tanpa unggah',
+    description:
+      'Buat subtitle video secara otomatis, online dan gratis: Whisper berjalan di browser dan menulis SRT atau VTT berwaktu, dalam 99 bahasa. Video tidak diunggah; model diunduh sekali.',
+    heading: 'Subtitle',
+    accent: 'otomatis',
+    lede: 'Ubah ucapan menjadi subtitle berwaktu tanpa mengirim video ke mana pun.',
+    blurb: 'Ucapan ke SRT atau VTT di browser dengan Whisper, lalu tanamkan sekali klik.',
+    featureList: [
+      'Whisper base (cepat) atau small (lebih akurat) di tab',
+      'Bahasa terdeteksi atau dipilih',
+      'SRT dan WebVTT berwaktu, baris mudah dibaca',
+      'Video tidak diunggah; model diunduh sekali',
+    ],
+    faq: [
+      {
+        q: 'Seberapa akurat?',
+        a: 'Ini Whisper ukuran kecil: ucapan jelas hampir bersih; ruang bising, suara tumpang tindih dan nama perlu dicek.',
+      },
+      {
+        q: 'Apakah video saya diunggah?',
+        a: 'Tidak. Hanya file model dari internet (Hugging Face); suara ditranskripsi di komputer Anda.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',
