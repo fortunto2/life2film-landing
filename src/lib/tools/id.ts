@@ -154,6 +154,35 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'rotate-video': {
+    searchPhrase: 'Putar video online',
+    title: 'Putar Video Online Gratis — 90° atau balik, tanpa encode ulang',
+    description:
+      'Putar video 90°, 180° atau 270°, atau balik, secara online dan gratis. Putaran disimpan di file tanpa encode ulang, kualitas sama; atau gambar ke dalam frame untuk pemutar yang mengabaikan rotasi. Di browser, tanpa unggah.',
+    heading: 'Putar',
+    accent: 'video',
+    lede: 'Luruskan video yang terekam miring dalam hitungan detik. Tidak ada yang diunggah dan, secara bawaan, tidak di-encode ulang.',
+    blurb: 'Putar video yang miring atau balik, tanpa encode ulang.',
+    featureList: [
+      'Putar 90° ke kanan, 90° ke kiri atau 180°, dan balik horizontal',
+      'Tanpa kehilangan kualitas: putaran disimpan di file, frame disalin',
+      'Opsional: gambar putaran ke frame untuk pemutar yang mengabaikannya',
+    ],
+    faq: [
+      {
+        q: 'Apakah memutar menurunkan kualitas?',
+        a: 'Secara bawaan tidak. File video punya penanda rotasi yang dibaca pemutar: alat ini mengaturnya dan menyalin frame apa adanya. Jika Anda mencentang «gambar ke frame», gambar di-encode ulang dan sedikit kehilangan kualitas sekali.',
+      },
+      {
+        q: 'Kenapa di aplikasi tertentu masih miring?',
+        a: 'Beberapa pemutar dan formulir unggah mengabaikan penanda rotasi. Untuk itu, putar lagi dengan «gambar ke frame» dicentang.',
+      },
+      {
+        q: 'Apakah video saya diunggah?',
+        a: 'Tidak. Browser Anda membaca dan menulis file lewat WebCodecs; tidak ada yang keluar dari perangkat.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',

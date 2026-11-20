@@ -157,6 +157,35 @@ export const es: ToolTranslations = {
       },
     ],
   },
+  'rotate-video': {
+    searchPhrase: 'Rotar video online',
+    title: 'Rotar video online gratis — girar 90° o voltear, sin recodificar',
+    description:
+      'Gira un video 90°, 180° o 270°, o voltéalo, online y gratis. El giro se guarda en el archivo sin recodificar, con la misma calidad; o dibújalo en los fotogramas para reproductores que ignoran la rotación. En tu navegador, sin subir nada.',
+    heading: 'Rotar',
+    accent: 'video',
+    lede: 'Endereza un video grabado de lado en segundos. No se sube nada y, por defecto, no se recodifica.',
+    blurb: 'Gira un video grabado de lado o voltéalo, sin recodificar.',
+    featureList: [
+      'Gira 90° a la derecha, 90° a la izquierda o 180°, y voltea en horizontal',
+      'Sin pérdidas por defecto: el giro se guarda en el archivo y los fotogramas se copian',
+      'Opcional: dibujar el giro en los fotogramas para reproductores que lo ignoran',
+    ],
+    faq: [
+      {
+        q: '¿Pierde calidad al rotar?',
+        a: 'Por defecto no. El archivo lleva una marca de rotación que leen los reproductores: la herramienta la fija y copia los fotogramas tal cual. Si marcas «dibujar el giro en los fotogramas», la imagen se recodifica y pierde un poco de calidad una vez.',
+      },
+      {
+        q: '¿Por qué en alguna app sigue de lado?',
+        a: 'Algunos reproductores y formularios de subida ignoran la marca de rotación. Para ellos, rota de nuevo con «dibujar el giro en los fotogramas» marcado.',
+      },
+      {
+        q: '¿Se sube mi video?',
+        a: 'No. Tu navegador lee y escribe el archivo con WebCodecs; nada sale de tu dispositivo.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Convertidor de vídeo online',
     title: 'Convertidor de Vídeo Online Gratis — MP4, WebM, MOV sin subir nada',

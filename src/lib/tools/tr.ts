@@ -154,6 +154,35 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'rotate-video': {
+    searchPhrase: 'Video döndürme online',
+    title: 'Video Döndür Online Ücretsiz — 90° veya ayna, yeniden kodlama yok',
+    description:
+      'Videoyu online ve ücretsiz olarak 90°, 180° veya 270° döndürün ya da aynalayın. Dönüş dosyaya yeniden kodlamadan yazılır, kalite aynı kalır; ya da dönüşü tanımayan oynatıcılar için karelere işleyin. Tarayıcıda, yükleme yok.',
+    heading: 'Döndür',
+    accent: 'video',
+    lede: 'Yan çekilmiş bir videoyu saniyeler içinde düzeltin. Hiçbir şey yüklenmez ve varsayılan olarak yeniden kodlanmaz.',
+    blurb: 'Yan çekilmiş videoyu döndürün veya aynalayın, yeniden kodlamadan.',
+    featureList: [
+      '90° sağa, 90° sola veya 180° döndürme ve yatay aynalama',
+      'Varsayılan olarak kayıpsız: dönüş dosyada saklanır, kareler kopyalanır',
+      'İsteğe bağlı: dönüşü tanımayan oynatıcılar için karelere işleme',
+    ],
+    faq: [
+      {
+        q: 'Döndürmek kaliteyi düşürür mü?',
+        a: 'Varsayılan olarak hayır. Video dosyası oynatıcıların okuduğu bir dönüş işareti taşır: araç bu işareti ayarlar ve kareleri olduğu gibi kopyalar. «Karelere işle» seçilirse görüntü yeniden kodlanır ve bir kez biraz kalite kaybeder.',
+      },
+      {
+        q: 'Neden bazı uygulamalarda hâlâ yan?',
+        a: 'Bazı oynatıcılar ve yükleme formları dönüş işaretini yok sayar. Onlar için «karelere işle» seçili olarak tekrar döndürün.',
+      },
+      {
+        q: 'Videom yükleniyor mu?',
+        a: 'Hayır. Dosyayı tarayıcınız WebCodecs ile okur ve yazar; cihazınızdan hiçbir şey çıkmaz.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',

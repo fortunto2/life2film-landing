@@ -154,6 +154,35 @@ export const pt: ToolTranslations = {
       },
     ],
   },
+  'rotate-video': {
+    searchPhrase: 'Girar vídeo online',
+    title: 'Girar vídeo online grátis — 90° ou espelhar, sem recodificar',
+    description:
+      'Gire um vídeo 90°, 180° ou 270°, ou espelhe, online e grátis. A rotação é gravada no arquivo sem recodificar, com a mesma qualidade; ou desenhe-a nos quadros para players que ignoram a rotação. No navegador, sem upload.',
+    heading: 'Girar',
+    accent: 'vídeo',
+    lede: 'Endireite um vídeo gravado de lado em segundos. Nada é enviado e, por padrão, nada é recodificado.',
+    blurb: 'Gire um vídeo gravado de lado ou espelhe, sem recodificar.',
+    featureList: [
+      'Gira 90° à direita, 90° à esquerda ou 180°, e espelha na horizontal',
+      'Sem perdas por padrão: a rotação fica no arquivo e os quadros são copiados',
+      'Opcional: desenhar a rotação nos quadros para players que a ignoram',
+    ],
+    faq: [
+      {
+        q: 'Girar perde qualidade?',
+        a: 'Por padrão, não. O arquivo tem uma marca de rotação que os players leem: a ferramenta define essa marca e copia os quadros como estão. Se marcar «desenhar nos quadros», a imagem é recodificada e perde um pouco de qualidade uma vez.',
+      },
+      {
+        q: 'Por que em algum app continua de lado?',
+        a: 'Alguns players e formulários de upload ignoram a marca de rotação. Para eles, gire de novo com «desenhar nos quadros» marcado.',
+      },
+      {
+        q: 'Meu vídeo é enviado?',
+        a: 'Não. O navegador lê e grava o arquivo com WebCodecs; nada sai do seu aparelho.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Conversor de vídeo online',
     title: 'Conversor de Vídeo Online Grátis — MP4, WebM, MOV sem enviar nada',
