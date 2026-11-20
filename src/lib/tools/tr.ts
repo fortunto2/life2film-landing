@@ -322,6 +322,32 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'video-speed': {
+    searchPhrase: 'Video hızlandırma online',
+    title: 'Video Hızını Değiştir Online Ücretsiz — hızlandır veya ağır çekim',
+    description:
+      'Videoyu online ve ücretsiz hızlandırın (1,25×–8×) ya da yavaşlatın (0,25×–0,75×). Sesi görüntüyle birlikte hızlandırarak tutun ya da kaldırın. Tarayıcıda: hiçbir şey yüklenmez, filigran yok.',
+    heading: 'Video',
+    accent: 'hızı',
+    lede: 'Bir videoyu birkaç tıklamayla hızlandırın ya da yavaşlatın. Cihazınızdan hiçbir şey çıkmaz.',
+    blurb: 'Videoyu 8×’e kadar hızlandırın ya da 0,25×’e kadar yavaşlatın, sesli veya sessiz.',
+    featureList: [
+      '0,25× ağır çekimden 8× hızlıya',
+      'Ses görüntüyle birlikte ayarlanır ya da kaldırılır',
+      'Her kare kendi görüntüsünü korur: hiçbir şey karıştırılmaz',
+      'Her şey tarayıcıda: yükleme ve filigran yok',
+    ],
+    faq: [
+      {
+        q: 'Ağır çekim akıcı olur mu?',
+        a: 'Her gerçek kare daha uzun gösterilir: 30 fps klip 0,5×’te 15 fps olur. Akıcı ağır çekim 120 veya 240 fps çekilmiş videodan çıkar.',
+      },
+      {
+        q: 'Sese ne olur?',
+        a: '«Sesi koru» seçiliyse görüntüyle birlikte hızlanır ya da yavaşlar ve tonu bir kaset gibi yükselir ya da alçalır.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',

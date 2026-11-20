@@ -326,6 +326,32 @@ export const pt: ToolTranslations = {
       },
     ],
   },
+  'video-speed': {
+    searchPhrase: 'Acelerar vídeo online',
+    title: 'Mudar a velocidade do vídeo online grátis — acelerar ou câmera lenta',
+    description:
+      'Acelere um vídeo (de 1,25× a 8×) ou deixe em câmera lenta (de 0,25× a 0,75×) online e grátis. Mantenha o som, acelerado com a imagem, ou remova. No navegador: nada é enviado, sem marca d’água.',
+    heading: 'Velocidade',
+    accent: 'do vídeo',
+    lede: 'Deixe um vídeo mais rápido ou mais lento em poucos cliques. Nada sai do seu aparelho.',
+    blurb: 'Acelere um vídeo até 8× ou desacelere até 0,25×, com ou sem som.',
+    featureList: [
+      'De câmera lenta 0,25× a rápido 8×',
+      'Som mantido e ajustado com a imagem, ou removido',
+      'Cada quadro mantém sua imagem: nada é misturado nem inventado',
+      'Tudo no navegador: sem upload nem marca d’água',
+    ],
+    faq: [
+      {
+        q: 'A câmera lenta fica suave?',
+        a: 'Cada quadro real aparece por mais tempo: um clipe de 30 fps a 0,5× fica com 15 fps. Câmera lenta suave vem de vídeo gravado a 120 ou 240 fps.',
+      },
+      {
+        q: 'O que acontece com o som?',
+        a: 'Com «manter o som» ele acelera ou desacelera com a imagem e o tom sobe ou desce, como uma fita.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Conversor de vídeo online',
     title: 'Conversor de Vídeo Online Grátis — MP4, WebM, MOV sem enviar nada',

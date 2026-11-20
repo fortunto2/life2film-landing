@@ -322,6 +322,32 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'video-speed': {
+    searchPhrase: 'Percepat video online',
+    title: 'Ubah Kecepatan Video Online Gratis — percepat atau slow motion',
+    description:
+      'Percepat video (1,25× hingga 8×) atau perlambat (0,25× hingga 0,75×) secara online dan gratis. Pertahankan suara, ikut dipercepat bersama gambar, atau buang. Di browser: tidak ada yang diunggah, tanpa watermark.',
+    heading: 'Kecepatan',
+    accent: 'video',
+    lede: 'Buat video lebih cepat atau lebih lambat dalam beberapa klik. Tidak ada yang keluar dari perangkat.',
+    blurb: 'Percepat video hingga 8× atau perlambat hingga 0,25×, dengan atau tanpa suara.',
+    featureList: [
+      'Dari slow motion 0,25× hingga cepat 8×',
+      'Suara dipertahankan dan disesuaikan, atau dibuang',
+      'Setiap frame tetap gambarnya: tidak ada yang dicampur atau dibuat-buat',
+      'Semua di browser: tanpa unggah dan watermark',
+    ],
+    faq: [
+      {
+        q: 'Apakah slow motion jadi halus?',
+        a: 'Setiap frame asli ditampilkan lebih lama: klip 30 fps pada 0,5× menjadi 15 fps. Slow motion halus berasal dari video yang direkam 120 atau 240 fps.',
+      },
+      {
+        q: 'Bagaimana dengan suaranya?',
+        a: 'Dengan «pertahankan suara», suara ikut lebih cepat atau lambat dan nadanya naik atau turun, seperti kaset.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',

@@ -449,4 +449,59 @@ Requirements:
 Reference implementation: https://life2film.com/tools/merge-videos/`,
     agentJob: 'Joining videos into one, locally',
   },
+  {
+    // 20 Nov 2026: «speed up video» / «ускорить видео» / slow motion — a job searched by name.
+    slug: 'video-speed',
+    group: 'everyday',
+    name: 'Video Speed',
+    appName: 'Change Video Speed',
+    blurb: 'Speed a video up to 8× or slow it down to 0.25×, with or without its sound.',
+
+    searchPhrase: 'Speed Up Video Online',
+    title: 'Change Video Speed Online Free | speed up or slow motion, no upload',
+    description: 'Speed up a video (1.25× to 8×) or slow it down (0.25× to 0.75×) online and free. Keep the sound, sped up with the picture, or drop it. In your browser: nothing is uploaded, no watermark.',
+    heading: 'Video',
+    accent: 'speed',
+    lede: 'Make a video faster or slower in a few clicks. Nothing leaves your device.',
+    featureList: [
+      'From 0.25× slow motion to 8× fast',
+      'Sound kept and resampled with the picture, or dropped',
+      'Every frame keeps its own picture: nothing is blended or invented',
+      'Runs fully client-side: no upload, no watermark',
+    ],
+    faq: [
+      {
+        q: 'Does slow motion make the video smooth?',
+        a: 'It shows each real frame longer, so a 30 fps clip at 0.5× plays at 15 frames a second. Smooth slow motion needs footage shot at a high frame rate (120 or 240 fps on a phone); slowed down here, that footage stays smooth.',
+      },
+      {
+        q: 'What happens to the sound?',
+        a: 'With «keep the sound» it is played faster or slower together with the picture, so its pitch rises or falls like a tape. Untick it to get a silent video and put music under it with the add-music tool.',
+      },
+      {
+        q: 'Is my video uploaded?',
+        a: 'No. Your browser decodes and encodes the video itself through WebCodecs.',
+      },
+    ],
+
+    summary: 'Change a video\'s speed in the browser by retiming every frame (t / speed) and resampling the sound with it.',
+    facts: [
+      'Retiming frames is enough for speed: each frame keeps its picture and gets timestamp t / speed. At high speeds, drop frames that would land closer than 1/60 s.',
+      'Slow motion only looks smooth from high-frame-rate footage; a 30 fps clip at 0.5× is 15 fps.',
+    ],
+    code: `for await (const f of new CanvasSink(track, { width, height }).canvases()) {
+  ctx.drawImage(f.canvas, 0, 0);
+  await canvasSource.add(f.timestamp / speed, f.duration / speed);
+}`,
+    prompt: `Add "change a video's speed" to my project, running entirely in the browser.
+
+Requirements:
+- Use "mediabunny" (WebCodecs): decode with CanvasSink, re-time each frame to t / speed and encode
+  with CanvasSource. Above 60 output frames a second, drop frames that land too close together.
+- Sound: optional; resample each AudioBuffer with an OfflineAudioContext at playbackRate = speed.
+- Offer 0.25x to 8x, and say that smooth slow motion needs high-frame-rate footage.
+
+Reference implementation: https://life2film.com/tools/video-speed/`,
+    agentJob: 'Changing a video\'s speed, locally',
+  },
 ];
