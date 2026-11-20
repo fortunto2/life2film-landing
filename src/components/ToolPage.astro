@@ -49,8 +49,9 @@ if (!base) throw new Error(`No registry entry for tool "${slug}"`);
  */
 const others = TOOLS.filter((other) => other.slug !== slug).map((other) => ({
   slug: other.slug,
-  name: other.name,
-  // The blurb has a translation; the name does not, so it stays English on purpose.
+  // The name is the page's own H1 in this language (heading + accent); English only where the tool
+  // has no translation. Until 20 Nov 2026 every non-English page linked 37 tools by English names.
+  name: TRANSLATIONS[lang]?.[other.slug] ? `${TRANSLATIONS[lang]![other.slug]!.heading} ${TRANSLATIONS[lang]![other.slug]!.accent}` : other.name,
   blurb: TRANSLATIONS[lang]?.[other.slug]?.blurb ?? other.blurb,
 }));
 
