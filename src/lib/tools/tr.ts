@@ -239,6 +239,32 @@ export const tr: ToolTranslations = {
       },
     ],
   },
+  'video-to-gif': {
+    searchPhrase: 'Videoyu GIF yapma online',
+    title: 'Videodan GIF Yap Online Ücretsiz — yükleme ve filigran olmadan MP4’ten GIF',
+    description:
+      'Videoyu online ve ücretsiz GIF’e dönüştürün: başlangıcı, süreyi, saniyedeki kare sayısını ve genişliği seçin. MP4, MOV ve WebM. Tarayıcıda yapılır: hiçbir şey yüklenmez, filigran yok.',
+    heading: 'Videodan',
+    accent: 'GIF',
+    lede: 'Bir anı seçin ve GIF yapın. Video cihazınızda kalır.',
+    blurb: 'Birkaç saniyelik videoyu GIF yapın: başlangıç, süre, FPS ve genişlik.',
+    featureList: [
+      'MP4, MOV ve WebM’den GIF',
+      'Başlangıç, en fazla 15 sn, 10–20 FPS, 320–640 px genişlik',
+      'Her kareye ayrı palet: renkler bozulmaz',
+      'Her şey tarayıcıda: yükleme ve filigran yok',
+    ],
+    faq: [
+      {
+        q: 'GIF’i nasıl küçültürüm?',
+        a: 'Daha kısa, daha dar ve daha az FPS, bu sırayla. 480 px ve 15 FPS’lik 4 saniyelik GIF genelde 2–6 MB’dır; 320 px ve 10 FPS’te üçte biri.',
+      },
+      {
+        q: 'Videom yükleniyor mu?',
+        a: 'Hayır. Tarayıcınız kareleri okur ve GIF’i kendisi yazar; cihazınızdan hiçbir şey çıkmaz.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Video dönüştürücü online',
     title: 'Video Dönüştürücü Online Ücretsiz — MP4, WebM, MOV, yükleme yok',

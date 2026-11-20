@@ -239,6 +239,32 @@ export const id: ToolTranslations = {
       },
     ],
   },
+  'video-to-gif': {
+    searchPhrase: 'Video ke GIF online',
+    title: 'Video ke GIF Online Gratis — MP4 ke GIF tanpa unggah dan watermark',
+    description:
+      'Ubah video menjadi GIF secara online dan gratis: pilih awal, durasi, frame per detik dan lebar. MP4, MOV dan WebM. Dibuat di browser: tidak ada yang diunggah dan tanpa watermark.',
+    heading: 'Video',
+    accent: 'ke GIF',
+    lede: 'Pilih satu momen dan jadikan GIF. Video tetap di perangkat Anda.',
+    blurb: 'Beberapa detik video menjadi GIF: awal, durasi, FPS dan lebar.',
+    featureList: [
+      'MP4, MOV dan WebM ke GIF',
+      'Awal, hingga 15 dtk, 10–20 FPS, lebar 320–640 px',
+      'Palet per frame: warna tetap bagus',
+      'Semua di browser: tanpa unggah dan watermark',
+    ],
+    faq: [
+      {
+        q: 'Bagaimana membuat GIF lebih kecil?',
+        a: 'Lebih pendek, lebih sempit, dan FPS lebih rendah, urut seperti itu. GIF 4 detik 480 px 15 FPS biasanya 2–6 MB; 320 px 10 FPS sepertiganya.',
+      },
+      {
+        q: 'Apakah video saya diunggah?',
+        a: 'Tidak. Browser membaca frame dan menulis GIF sendiri; tidak ada yang keluar dari perangkat.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Konverter video online',
     title: 'Konverter Video Online Gratis — MP4, WebM, MOV tanpa unggah',

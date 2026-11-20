@@ -243,6 +243,32 @@ export const pt: ToolTranslations = {
       },
     ],
   },
+  'video-to-gif': {
+    searchPhrase: 'Vídeo para GIF online',
+    title: 'Vídeo para GIF online grátis — MP4 para GIF sem upload nem marca d’água',
+    description:
+      'Converta um vídeo em GIF online e grátis: escolha o início, a duração, os quadros por segundo e a largura. MP4, MOV e WebM. Feito no navegador: nada é enviado e não há marca d’água.',
+    heading: 'Vídeo',
+    accent: 'para GIF',
+    lede: 'Escolha um momento e transforme em GIF. O vídeo fica no seu aparelho.',
+    blurb: 'Alguns segundos de vídeo em GIF: início, duração, FPS e largura.',
+    featureList: [
+      'MP4, MOV e WebM para GIF',
+      'Início, até 15 s, 10–20 FPS, 320–640 px de largura',
+      'Uma paleta por quadro: as cores se mantêm',
+      'Tudo no navegador: sem upload nem marca d’água',
+    ],
+    faq: [
+      {
+        q: 'Como deixar o GIF menor?',
+        a: 'Mais curto, mais estreito e com menos FPS, nessa ordem. Um GIF de 4 s a 480 px e 15 FPS costuma ter 2–6 MB; a 320 px e 10 FPS, um terço disso.',
+      },
+      {
+        q: 'Meu vídeo é enviado?',
+        a: 'Não. O navegador lê os quadros e grava o GIF; nada sai do seu aparelho.',
+      },
+    ],
+  },
   'video-converter': {
     searchPhrase: 'Conversor de vídeo online',
     title: 'Conversor de Vídeo Online Grátis — MP4, WebM, MOV sem enviar nada',

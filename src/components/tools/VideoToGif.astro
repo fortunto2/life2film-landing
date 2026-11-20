@@ -10,6 +10,11 @@ const status = STATUS[lang];
 const WORDS: Partial<Record<Lang, Record<string, string>>> = {
   en: { run: 'Make GIF', start: 'Start, s', length: 'Length, s', fps: 'Frames per second', width: 'Width', saved: 'Saved — {size} GIF, {n} frames.', failed: 'Could not make the GIF — {msg}', long: 'A GIF is at most 15 seconds here: past that the file gets too large to share.' },
   ru: { run: 'Сделать GIF', start: 'Начало, с', length: 'Длина, с', fps: 'Кадров в секунду', width: 'Ширина', saved: 'Сохранено — GIF {size}, кадров: {n}.', failed: 'Не удалось сделать GIF — {msg}', long: 'GIF здесь не длиннее 15 секунд: дальше файл слишком тяжёлый, чтобы им делиться.' },
+  es: { run: 'Crear GIF', start: 'Inicio, s', length: 'Duración, s', fps: 'Fotogramas por segundo', width: 'Ancho', saved: 'Guardado — GIF de {size}, {n} fotogramas.', failed: 'No se pudo crear el GIF — {msg}', long: 'Aquí un GIF dura como máximo 15 segundos.' },
+  pt: { run: 'Criar GIF', start: 'Início, s', length: 'Duração, s', fps: 'Quadros por segundo', width: 'Largura', saved: 'Salvo — GIF de {size}, {n} quadros.', failed: 'Não foi possível criar o GIF — {msg}', long: 'Aqui um GIF tem no máximo 15 segundos.' },
+  id: { run: 'Buat GIF', start: 'Awal, dtk', length: 'Durasi, dtk', fps: 'Frame per detik', width: 'Lebar', saved: 'Tersimpan — GIF {size}, {n} frame.', failed: 'Gagal membuat GIF — {msg}', long: 'GIF di sini maksimal 15 detik.' },
+  tr: { run: 'GIF yap', start: 'Başlangıç, sn', length: 'Süre, sn', fps: 'Saniyedeki kare', width: 'Genişlik', saved: 'Kaydedildi — {size} GIF, {n} kare.', failed: 'GIF yapılamadı — {msg}', long: 'Burada bir GIF en fazla 15 saniyedir.' },
+  ar: { run: 'اصنع GIF', start: 'البداية، ث', length: 'المدة، ث', fps: 'إطارات في الثانية', width: 'العرض', saved: 'تم الحفظ — GIF بحجم {size}، {n} إطارًا.', failed: 'تعذّر صنع GIF — {msg}', long: 'مدة GIF هنا 15 ثانية كحد أقصى.' },
 };
 const words = WORDS[lang] ?? WORDS.en!;
 ---
