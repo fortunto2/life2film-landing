@@ -578,6 +578,65 @@ Reference implementation: https://life2film.com/tools/rotate-video/`,
     agentJob: 'Rotating a video, locally',
   },
   {
+    // 20 Nov 2026: «узнать битрейт аудио онлайн» had 42 impressions and no page that answers it.
+    slug: 'video-info',
+    group: 'everyday',
+    name: 'Video Info',
+    appName: 'Video Info and Bitrate Checker',
+    blurb: 'Bitrate, codec, frame rate, resolution and audio details of any video or audio file.',
+
+    searchPhrase: 'Check Video Bitrate Online',
+    title: 'Check Video and Audio Bitrate Online Free | codec, FPS, resolution',
+    description: 'Find the bitrate, codec, frame rate, resolution, HDR and audio sample rate of a video or audio file, online and free. Read in your browser: the file is not uploaded, so large files are fine.',
+    heading: 'Video',
+    accent: 'info',
+    lede: 'Drop a file and see what is inside it: bitrate, codec, frame rate, resolution, audio. Nothing is uploaded.',
+    featureList: [
+      'Overall, video and audio bitrate',
+      'Codec, resolution, frame rate, rotation and HDR',
+      'Audio channels and sample rate',
+      'Copy the whole report as text',
+      'Runs fully client-side: no upload',
+    ],
+    faq: [
+      {
+        q: 'How is the bitrate measured?',
+        a: 'From the file itself: the size of the packets of each track over their duration, read from up to 600 packets, so long files stay fast. The overall bitrate is the file size over its length and includes the container overhead.',
+      },
+      {
+        q: 'Is my file uploaded?',
+        a: 'No. Your browser reads only the parts of the file it needs; nothing leaves your device, so a several-gigabyte file works as well as a small one.',
+      },
+      {
+        q: 'Which files can it read?',
+        a: 'MP4, MOV, WebM, MKV, MP3, M4A, WAV, OGG and FLAC. Reading the details does not need a decoder, so it works even for codecs your browser cannot play, such as ProRes.',
+      },
+    ],
+
+    summary: 'Read the bitrate, codec, frame rate, resolution and audio details of a media file in the browser.',
+    facts: [
+      'Track bitrate and frame rate can be computed from packet sizes and timestamps without decoding a single frame.',
+      'Overall bitrate (size × 8 / duration) includes container overhead and is always a little above the sum of the tracks.',
+    ],
+    code: `import { Input, BlobSource, ALL_FORMATS } from 'mediabunny';
+
+const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
+const video = await input.getPrimaryVideoTrack();
+const stats = await video.computePacketStats(600); // averageBitrate, averagePacketRate (fps)`,
+    prompt: `Add "show what is inside a media file" to my project, running entirely in the browser.
+
+Requirements:
+- Use "mediabunny". Show container, size, duration, overall bitrate; per video track codec,
+  display resolution, frame rate, bitrate, rotation and HDR; per audio track codec, bitrate,
+  channels and sample rate.
+- Compute bitrate and frame rate with computePacketStats on a bounded number of packets, so a
+  multi-gigabyte file answers in a second. No decoding is needed.
+- Offer the report as copyable text.
+
+Reference implementation: https://life2film.com/tools/video-info/`,
+    agentJob: 'Reading a media file\'s details, locally',
+  },
+  {
     slug: 'video-to-frames',
     group: 'everyday',
     name: 'Video to Frames',

@@ -1,0 +1,115 @@
+---
+import { CHROME, STATUS } from '../../lib/tools-i18n';
+import type { Lang } from '../../i18n';
+
+interface Props { lang?: Lang }
+const { lang = 'en' } = Astro.props;
+const chrome = CHROME[lang];
+const status = STATUS[lang];
+
+const WORDS: Partial<Record<Lang, Record<string, string>>> = {
+  en: { file: 'File', container: 'Container', size: 'Size', length: 'Length', total: 'Overall bitrate', video: 'Video', audio: 'Audio', codec: 'Codec', res: 'Resolution', fps: 'Frame rate', bitrate: 'Bitrate', rotation: 'Rotation', hdr: 'HDR', channels: 'Channels', rate: 'Sample rate', yes: 'yes', no: 'no', none: 'none', copy: 'Copy as text', copied: 'Copied.' },
+  ru: { file: 'Файл', container: 'Контейнер', size: 'Размер', length: 'Длительность', total: 'Общий битрейт', video: 'Видео', audio: 'Звук', codec: 'Кодек', res: 'Разрешение', fps: 'Частота кадров', bitrate: 'Битрейт', rotation: 'Поворот', hdr: 'HDR', channels: 'Каналы', rate: 'Частота дискретизации', yes: 'да', no: 'нет', none: 'нет', copy: 'Скопировать текстом', copied: 'Скопировано.' },
+};
+const words = WORDS[lang] ?? WORDS.en!;
+---
+
+<div class="tool" slot="tool">
+  <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+  <span id="words" data-words={JSON.stringify(words)} hidden></span>
+  <label class="drop" id="drop" for="file">
+    <input type="file" id="file" accept="video/*,audio/*" hidden />
+    <strong>{chrome.chooseFile}</strong>
+    <span class="muted">{chrome.dragHint} — MP4, MOV, WebM, MKV, MP3, M4A, WAV</span>
+  </label>
+  <div id="editor" hidden>
+    <table class="info" id="info"></table>
+    <div class="controls"><span class="spacer"></span><button id="copy" type="button" class="ghost">{words.copy}</button></div>
+  </div>
+  <div id="status" class="status" hidden>
+    <div class="bar"><span id="fill"></span></div>
+    <div class="statustext" id="statusText"></div>
+  </div>
+</div>
+
+<style>
+  .info { width: 100%; border-collapse: collapse; font-size: 15px; }
+  .info :global(th) { text-align: left; padding: 14px 0 6px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; opacity: .7; }
+  .info :global(td) { padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .info :global(td:last-child) { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+</style>
+
+<script>
+  import { fileChosen, toolFailed, track } from '../../lib/track';
+  import { toolStrings } from '../../lib/strings';
+  import { loadMediabunny, formatBytes, preciseClock } from '../../lib/encode';
+
+  const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const say = toolStrings();
+  const w = JSON.parse(el('words').dataset.words ?? '{}') as Record<string, string>;
+  const statusEl = el<HTMLDivElement>('status');
+  const drop = el<HTMLLabelElement>('drop');
+  const fileInput = el<HTMLInputElement>('file');
+  let text = '';
+
+  const kbps = (bps: number | null | undefined) =>
+    bps && Number.isFinite(bps) ? (bps >= 1e6 ? `${(bps / 1e6).toFixed(2)} Mbps` : `${Math.round(bps / 1000)} kbps`) : '—';
+  const esc = (s: string) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]!);
+
+  async function open(file: File) {
+    statusEl.hidden = false;
+    el('statusText').textContent = say.reading;
+    try {
+      const { Input, BlobSource, ALL_FORMATS } = await loadMediabunny();
+      const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
+      const [duration, format, v, a] = await Promise.all([
+        input.computeDuration(), input.getFormat(), input.getPrimaryVideoTrack(), input.getPrimaryAudioTrack(),
+      ]);
+      const rows: [string, string][] = [];
+      const sections: [string, [string, string][]][] = [];
+      rows.push([w.file, file.name], [w.container, format.name], [w.size, formatBytes(file.size)], [w.length, preciseClock(duration)], [w.total, kbps(duration > 0 ? (file.size * 8) / duration : null)]);
+      sections.push(['', rows]);
+      if (v) {
+        const stats = await v.computePacketStats(600).catch(() => null);
+        const hdr = await v.hasHighDynamicRange().catch(() => false);
+        sections.push([w.video, [
+          [w.codec, String(v.codec ?? '—')],
+          [w.res, `${v.displayWidth}×${v.displayHeight}`],
+          [w.fps, stats && Number.isFinite(stats.averagePacketRate) ? `${stats.averagePacketRate.toFixed(2)} fps` : '—'],
+          [w.bitrate, kbps(stats?.averageBitrate)],
+          [w.rotation, `${v.rotation}°`],
+          [w.hdr, hdr ? w.yes : w.no],
+        ]]);
+      }
+      if (a) {
+        const stats = await a.computePacketStats(600).catch(() => null);
+        sections.push([w.audio, [
+          [w.codec, String(a.codec ?? '—')],
+          [w.bitrate, kbps(stats?.averageBitrate)],
+          [w.channels, String(a.numberOfChannels)],
+          [w.rate, `${a.sampleRate} Hz`],
+        ]]);
+      } else sections.push([w.audio, [[w.codec, w.none]]]);
+      el('info').innerHTML = sections.map(([h, r]) =>
+        (h ? `<tr><th colspan="2">${esc(h)}</th></tr>` : '') + r.map(([k, x]) => `<tr><td>${esc(k)}</td><td>${esc(x)}</td></tr>`).join('')).join('');
+      text = sections.map(([h, r]) => (h ? `${h}\n` : '') + r.map(([k, x]) => `  ${k}: ${x}`).join('\n')).join('\n');
+      el('editor').hidden = false;
+      statusEl.hidden = true;
+      track('result_shown', { placement: 'result', format: format.name.slice(0, 20).replace(/[^A-Za-z0-9_+-]/g, '') });
+    } catch (error) {
+      toolFailed('open', error, file);
+      el('statusText').textContent = error instanceof Error ? error.message : 'Could not read that file.';
+      statusEl.classList.add('err');
+    }
+  }
+
+  el('copy').addEventListener('click', async () => {
+    await navigator.clipboard.writeText(text).catch(() => {});
+    el('copy').textContent = w.copied;
+    track('result_saved', { placement: 'result', format: 'text' });
+  });
+  fileInput.addEventListener('change', () => { const f = fileInput.files?.[0]; if (f) { fileChosen(f, 'picker'); void open(f); } });
+  for (const t of ['dragenter', 'dragover']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); });
+  for (const t of ['dragleave', 'drop']) drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); });
+  drop.addEventListener('drop', (e) => { const f = (e as DragEvent).dataTransfer?.files?.[0]; if (f) { fileChosen(f, 'drop'); void open(f); } });
+</script>
