@@ -10,6 +10,19 @@ const { lang = 'en' } = Astro.props;
 const chrome = CHROME[lang];
 const status = STATUS[lang];
 
+// Tap tempo: no file at all, tap along and read the tempo. People search for exactly that
+// («bpm finder tap», «счетчик бпм», 20 Nov 2026).
+const TAP: Record<Lang, { button: string; hint: string; reset: string }> = {
+  en: { button: 'Tap', hint: 'No file? Tap along with the beat (or press Space) to count the tempo.', reset: 'Reset' },
+  es: { button: 'Toca', hint: '¿Sin archivo? Toca al ritmo (o pulsa Espacio) para contar el tempo.', reset: 'Reiniciar' },
+  pt: { button: 'Toque', hint: 'Sem arquivo? Toque no ritmo (ou aperte Espaço) para contar o andamento.', reset: 'Zerar' },
+  id: { button: 'Ketuk', hint: 'Tidak ada file? Ketuk mengikuti ketukan (atau tekan Spasi) untuk menghitung tempo.', reset: 'Ulangi' },
+  ar: { button: 'انقر', hint: 'لا يوجد ملف؟ انقر مع الإيقاع (أو اضغط المسافة) لحساب السرعة.', reset: 'إعادة' },
+  ru: { button: 'Тап', hint: 'Нет файла? Отстучите ритм кнопкой (или пробелом), и счётчик покажет БПМ.', reset: 'Сброс' },
+  tr: { button: 'Dokun', hint: 'Dosya yok mu? Ritme göre dokunun (ya da Boşluk tuşuna basın), tempo sayılsın.', reset: 'Sıfırla' },
+};
+const tap = TAP[lang];
+
 /**
  * The bpm-detector interface: markup and behaviour, with no page metadata.
  *
@@ -25,6 +38,13 @@ const status = STATUS[lang];
             <strong>{chrome.chooseFile}</strong>
             <span class="muted">{chrome.dragHint} — MP3, WAV, M4A, FLAC, OGG</span>
           </label>
+
+          <div class="tap" id="tap">
+            <span class="muted">{tap.hint}</span>
+            <button id="tapBtn" type="button" class="ghost primary" data-sda-event="tool_tap" data-sda-placement="tap">{tap.button}</button>
+            <output id="tapBpm" aria-live="polite">—</output>
+            <button id="tapReset" type="button" class="ghost">{tap.reset}</button>
+          </div>
 
           <div id="status" class="status" hidden></div>
 
@@ -141,9 +161,41 @@ const status = STATUS[lang];
     .scrubline .hint { opacity: .7; }
     canvas { cursor: grab; touch-action: pan-y; }
     canvas:active { cursor: grabbing; }
+  .tap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 12px 0; }
+  .tap > span { flex-basis: 100%; }
+  .tap output { font-variant-numeric: tabular-nums; font-weight: 600; min-width: 6ch; }
 </style>
 
 <script>
+  // Tap tempo: the median interval of the last eight taps; a pause over 2 s starts a new count.
+  {
+    const btn = document.getElementById('tapBtn');
+    const out = document.getElementById('tapBpm');
+    const reset = document.getElementById('tapReset');
+    let taps: number[] = [];
+    const show = () => {
+      if (!out) return;
+      if (taps.length < 2) { out.textContent = taps.length ? '…' : '—'; return; }
+      const gaps = taps.slice(1).map((t, i) => t - taps[i]).sort((a, b) => a - b);
+      const mid = gaps[Math.floor(gaps.length / 2)];
+      out.textContent = `${Math.round(60000 / mid)} BPM`;
+    };
+    const hit = () => {
+      const now = performance.now();
+      if (taps.length && now - taps[taps.length - 1] > 2000) taps = [];
+      taps = [...taps, now].slice(-9);
+      show();
+    };
+    btn?.addEventListener('pointerdown', (e) => { e.preventDefault(); hit(); });
+    reset?.addEventListener('click', () => { taps = []; show(); });
+    addEventListener('keydown', (e) => {
+      const t = e.target as HTMLElement | null;
+      if (e.code !== 'Space' || e.repeat || (t && /INPUT|TEXTAREA|SELECT|BUTTON/.test(t.tagName))) return;
+      e.preventDefault();
+      hit();
+    });
+  }
+
     import { fileChosen, toolFailed, track } from '../../lib/track';
   import { toolStrings } from '../../lib/strings';
     import { loadEngine } from '../../lib/engine';
