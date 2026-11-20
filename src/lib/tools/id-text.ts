@@ -527,4 +527,26 @@ export const idText: ToolTranslations = {
       },
     ],
   },
+  'add-border-to-video': {
+    searchPhrase: 'Bingkai video online',
+    title: 'Tambah Bingkai ke Video Online Gratis — putih atau berwarna, tanpa unggah',
+    description:
+      'Tambahkan bingkai ke video secara online dan gratis: putih, hitam atau berwarna, tipis, sedang atau tebal, gambar utuh di dalamnya. Di browser, tanpa unggah.',
+    heading: 'Tambah bingkai',
+    accent: 'ke video',
+    lede: 'Bingkai rapi di sekeliling gambar.',
+    blurb: 'Bingkai berwarna di sekeliling video, gambar utuh di dalam.',
+    featureList: [
+      'Enam warna, tiga ketebalan',
+      'Tidak ada yang terpotong',
+      'Ukuran dan suara sama',
+      'Tanpa unggah dan watermark',
+    ],
+    faq: [
+      {
+        q: 'Apakah video diunggah?',
+        a: 'Tidak.',
+      },
+    ],
+  },
 };

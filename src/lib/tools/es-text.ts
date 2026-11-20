@@ -527,4 +527,26 @@ export const esText: ToolTranslations = {
       },
     ],
   },
+  'add-border-to-video': {
+    searchPhrase: 'Borde para video online',
+    title: 'Añadir borde a un video online gratis — marco blanco o de color, sin subir',
+    description:
+      'Añade un borde a un video online y gratis: blanco, negro o de color, fino, medio o grueso, con toda la imagen dentro. En tu navegador, sin subir.',
+    heading: 'Añadir borde',
+    accent: 'al video',
+    lede: 'Un marco limpio alrededor de la imagen.',
+    blurb: 'Un borde de color alrededor del video, la imagen entera dentro.',
+    featureList: [
+      'Seis colores, tres grosores',
+      'No se recorta nada',
+      'Mismo tamaño y sonido',
+      'Sin subidas ni marca de agua',
+    ],
+    faq: [
+      {
+        q: '¿Se sube el video?',
+        a: 'No.',
+      },
+    ],
+  },
 };

@@ -527,4 +527,26 @@ export const ptText: ToolTranslations = {
       },
     ],
   },
+  'add-border-to-video': {
+    searchPhrase: 'Borda para vídeo online',
+    title: 'Adicionar borda ao vídeo online grátis — moldura branca ou colorida, sem upload',
+    description:
+      'Adicione uma borda a um vídeo online e grátis: branca, preta ou colorida, fina, média ou grossa, com a imagem inteira dentro. No navegador, sem upload.',
+    heading: 'Adicionar borda',
+    accent: 'ao vídeo',
+    lede: 'Uma moldura limpa ao redor da imagem.',
+    blurb: 'Uma borda colorida ao redor do vídeo, a imagem inteira dentro.',
+    featureList: [
+      'Seis cores, três espessuras',
+      'Nada é cortado',
+      'Mesmo tamanho e som',
+      'Sem upload nem marca d’água',
+    ],
+    faq: [
+      {
+        q: 'O vídeo é enviado?',
+        a: 'Não.',
+      },
+    ],
+  },
 };

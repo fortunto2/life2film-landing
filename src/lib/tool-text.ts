@@ -807,4 +807,39 @@ export const TEXT_TOOLS: Tool[] = [
     facts: ['Loudness mode stops at the -1 dB peak ceiling, so a spiky recording may stay below -16 dB.'],
     agentJob: 'Normalizing the loudness of a recording, locally',
   },
+  {
+    // 20 Nov 2026: «add border to video», «video frame border», «рамка для видео».
+    slug: 'add-border-to-video',
+    group: 'create',
+    name: 'Add Border to Video',
+    appName: 'Video Border',
+    blurb: 'A coloured border around the video, the picture kept whole inside it.',
+
+    searchPhrase: 'Add Border to Video Online',
+    title: 'Add Border to Video Online Free | white or coloured frame, no upload',
+    description: 'Add a border to a video online for free: a white, black or coloured frame, thin, medium or thick, with the whole picture kept inside. Size and sound stay the same. Runs in your browser; nothing is uploaded.',
+    heading: 'Add a border',
+    accent: 'to video',
+    lede: 'A clean frame around the picture. The video stays on your device.',
+    featureList: [
+      'Six colours, three thicknesses',
+      'The whole picture kept, scaled inside the frame',
+      'Same size and sound as the original',
+      'Nothing uploaded, no watermark',
+    ],
+    faq: [
+      {
+        q: 'Is anything cut off?',
+        a: 'No. The picture is scaled down to fit inside the border, so every edge stays visible.',
+      },
+      {
+        q: 'Is the video uploaded?',
+        a: 'No. Your browser redraws the frames and encodes the result.',
+      },
+    ],
+
+    summary: 'A coloured border (2–9% of the short edge) around a video, picture kept whole, in the browser.',
+    facts: ['A medium border is 5% of the short edge: 54 px on a 1080x1920 video.'],
+    agentJob: 'Adding a border to a video, locally',
+  },
 ];

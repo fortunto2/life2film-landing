@@ -20,7 +20,7 @@ export function fadeVideo(file: File, fin: number, fout: number, onProgress?: (f
   return redrawVideo(file, { fin, fout }, onProgress);
 }
 
-export async function redrawVideo(file: File, o: { fin?: number; fout?: number; decorate?: Decorate }, onProgress?: (f: number) => void): Promise<{ blob: Blob; duration: number }> {
+export async function redrawVideo(file: File, o: { fin?: number; fout?: number; decorate?: Decorate; inset?: number; background?: string }, onProgress?: (f: number) => void): Promise<{ blob: Blob; duration: number }> {
   const fin = o.fin ?? 0, fout = o.fout ?? 0;
   const { Input, BlobSource, ALL_FORMATS, Output, StreamTarget, Mp4OutputFormat, CanvasSink, CanvasSource, AudioBufferSink, AudioBufferSource, getFirstEncodableAudioCodec, QUALITY_HIGH } = await loadMediabunny();
   const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
@@ -53,11 +53,12 @@ export async function redrawVideo(file: File, o: { fin?: number; fout?: number; 
   let i = 0;
   for await (const wrapped of new CanvasSink(video, { width, height, fit: 'fill', poolSize: 2 }).canvasesAtTimestamps(times)) {
     const t = i / FPS;
-    ctx.fillStyle = '#000';
+    ctx.fillStyle = o.background ?? '#000';
     ctx.fillRect(0, 0, width, height);
     if (wrapped) {
       ctx.globalAlpha = fadeGain(t, duration, fin, fout);
-      ctx.drawImage(wrapped.canvas as OffscreenCanvas, 0, 0, width, height);
+      const m = Math.round(Math.min(width, height) * (o.inset ?? 0));
+      ctx.drawImage(wrapped.canvas as OffscreenCanvas, m, m, width - 2 * m, height - 2 * m);
       ctx.globalAlpha = 1;
     }
     o.decorate?.(ctx, t, duration, width, height);

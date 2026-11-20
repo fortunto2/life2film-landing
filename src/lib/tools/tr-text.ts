@@ -527,4 +527,26 @@ export const trText: ToolTranslations = {
       },
     ],
   },
+  'add-border-to-video': {
+    searchPhrase: 'Videoya çerçeve online',
+    title: 'Videoya Çerçeve Ekle Online Ücretsiz — beyaz veya renkli, yükleme yok',
+    description:
+      'Bir videoya online ve ücretsiz çerçeve ekleyin: beyaz, siyah veya renkli, ince, orta ya da kalın; görüntünün tamamı içeride kalır. Tarayıcıda, yükleme yok.',
+    heading: 'Çerçeve ekle',
+    accent: 'videoya',
+    lede: 'Görüntünün çevresinde temiz bir çerçeve.',
+    blurb: 'Videonun çevresinde renkli bir çerçeve, görüntü bütün halde.',
+    featureList: [
+      'Altı renk, üç kalınlık',
+      'Hiçbir şey kesilmez',
+      'Aynı boyut ve ses',
+      'Yükleme ve filigran yok',
+    ],
+    faq: [
+      {
+        q: 'Video yükleniyor mu?',
+        a: 'Hayır.',
+      },
+    ],
+  },
 };
