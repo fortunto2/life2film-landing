@@ -36,11 +36,27 @@ function toRGB24(rgba: Uint8ClampedArray): Uint8Array {
   return rgb;
 }
 
+/**
+ * What kind of file a refusal was about, never its name: MIME type, extension, size in MB.
+ * 21 Nov 2026: «found no video track it knows» was the commonest tool failure left (Android and
+ * Windows Chrome, video-to-frames and video-splitter) and the event said nothing about the file,
+ * so the cause could not be told apart from a container mediabunny does not read.
+ */
+export function fileShape(file: { name: string; type: string; size: number }): string {
+  const dot = file.name.lastIndexOf('.');
+  const ext = dot > 0 ? file.name.slice(dot + 1).toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 8) : '';
+  return `type=${file.type || '?'} ext=${ext || '?'} mb=${Math.round(file.size / 1e6)}`;
+}
+
 export async function openVideoWebCodecs(file: File): Promise<VideoSource> {
   const { Input, BlobSource, ALL_FORMATS, CanvasSink } = await loadMediabunny();
   const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
+  const format = await input.getFormat().then((f) => f.name).catch(() => 'unread');
   const track = await input.getPrimaryVideoTrack().catch(() => null);
-  if (!track) throw new Error(undecodableMessage(null));
+  if (!track) {
+    // `context` is what `toolFailed` sends as `cfg`.
+    throw Object.assign(new Error(undecodableMessage(null)), { context: `${fileShape(file)} format=${format}` });
+  }
   if (!(await track.canDecode().catch(() => false))) throw new Error(undecodableMessage(track.codec));
 
   const duration = await input.computeDuration();
