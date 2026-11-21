@@ -1,4 +1,4 @@
-// POST /api/waitlist — one address, one reason (android | studio).
+// POST /api/waitlist — one address, one reason (android | studio = Studio for Windows/Linux).
 //
 // Stored under `email:<sha256(address)>`, so sending twice updates one row instead of
 // adding a second; a per-reason counter is kept beside it. Nothing else is recorded: no
@@ -9,6 +9,8 @@
 // The `website` field is a honeypot: a bot that fills it gets a 204 and nothing stored.
 
 const REASONS = new Set(['android', 'studio']);
+// reason -> Mailroom sign-up form (mailroom.life2film.com, Contacts > Sign-up forms).
+const MAILROOM_FORMS = { android: 'frm_waitlistAndroid', studio: 'frm_waitlistWindows' };
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 async function sha256(text) {
@@ -17,7 +19,7 @@ async function sha256(text) {
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
-export async function onRequestPost({ request, env }) {
+export async function onRequestPost({ request, env, waitUntil }) {
   const type = request.headers.get('content-type') || '';
   const wantsJson = type.includes('application/json');
   const data = wantsJson
@@ -45,6 +47,19 @@ export async function onRequestPost({ request, env }) {
     const counter = `count:${reason}`;
     const n = Number(await env.WAITLIST.get(counter)) || 0;
     await env.WAITLIST.put(counter, String(n + 1));
+  }
+
+  // A copy goes to Mailroom's sign-up form for that platform: it sends the double opt-in, and
+  // the confirmed address lands in the "Waitlist <platform>" segment, ready for the launch email.
+  // Best effort: the KV row above is the record, a Mailroom outage must not lose the sign-up.
+  const form = MAILROOM_FORMS[reason];
+  if (form) {
+    const copy = fetch(`https://mailroom.life2film.com/subscribe/${form}`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', origin: 'https://life2film.com' },
+      body: JSON.stringify({ email, utm_source: 'life2film-waitlist' }),
+    }).catch(() => {});
+    if (waitUntil) waitUntil(copy);
   }
 
   if (wantsJson) return new Response(null, { status: 204 });
