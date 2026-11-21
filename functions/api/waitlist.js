@@ -36,12 +36,22 @@ export async function onRequestPost({ request, env, waitUntil }) {
   }
   if (!env.WAITLIST) return new Response('waitlist store not bound', { status: 503 });
 
+  // Where the sign-up came from: utm_* of the page the form sat on (the referer), so an email
+  // campaign's clicks are counted to the end. Only the five utm keys, nothing about the visitor.
+  const utm = {};
+  try {
+    const q = new URL(request.headers.get('referer') || '').searchParams;
+    for (const k of ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term']) {
+      const v = q.get(k) || data[k];
+      if (v) utm[k] = String(v).slice(0, 100);
+    }
+  } catch {}
   const key = `email:${await sha256(email)}`;
   const now = new Date().toISOString();
   const prior = await env.WAITLIST.get(key, 'json');
   await env.WAITLIST.put(
     key,
-    JSON.stringify({ email, reason, lang, since: prior?.since ?? now, updated: now }),
+    JSON.stringify({ email, reason, lang, ...utm, since: prior?.since ?? now, updated: now }),
   );
   if (!prior || prior.reason !== reason) {
     const counter = `count:${reason}`;
@@ -57,7 +67,7 @@ export async function onRequestPost({ request, env, waitUntil }) {
     const copy = fetch(`https://mailroom.life2film.com/subscribe/${form}`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', origin: 'https://life2film.com' },
-      body: JSON.stringify({ email, utm_source: 'life2film-waitlist' }),
+      body: JSON.stringify({ email, utm_source: 'life2film-waitlist', ...utm }),
     }).catch(() => {});
     if (waitUntil) waitUntil(copy);
   }
