@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { frameSchedule, toSegments } from './auto-montage';
+import { clipOf, frameSchedule, toSegments } from './auto-montage';
 
 describe('toSegments', () => {
   it('2-second windows scored by the mean of their frames, best frame kept, dark ones marked garbage', () => {
@@ -22,5 +22,18 @@ describe('frameSchedule', () => {
     expect(f[0]).toEqual({ source: 2, t: 5 });
     expect(f[15]).toEqual({ source: 0, t: 1 });
     expect(f[44].t).toBeCloseTo(1 + 29 / 30);
+  });
+});
+
+describe('clipOf', () => {
+  it('reads the clip from source_file: one clip comes back from the planner as source_id 0', () => {
+    expect(clipOf({ source_id: 0, source_file: 'clip-1' }, 1)).toBe(1);
+    expect(clipOf({ source_id: 0 }, 1)).toBe(1);
+    expect(clipOf({ source_id: 2, source_file: 'clip-3' }, 3)).toBe(3);
+    expect(clipOf({ source_id: 2 }, 3)).toBe(2);
+  });
+  it('refuses a clip that was not added instead of rendering from nothing', () => {
+    expect(() => clipOf({ source_id: 0 }, 2)).toThrow(/not one of the 2/);
+    expect(() => clipOf({ source_id: 1, source_file: 'clip-4' }, 3)).toThrow(/clip-4/);
   });
 });

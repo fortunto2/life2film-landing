@@ -56,6 +56,18 @@ export function toSegments(frames: { t: number; score: number }[], duration: num
   return out;
 }
 
+/**
+ * The 1-based clip a planned shot comes from, read from the `source_file` we gave it (`clip-N`).
+ * AI-NOTE: with one clip the planner returns `source_id: 0` (measured 26 Nov 2026, 12 of 12 asks);
+ * the renderer then read `iters[-1]` and every one-clip montage died with «reading 'next'».
+ */
+export function clipOf(s: { source_id: number; source_file?: string }, clips: number): number {
+  const named = Number(/^clip-(\d+)$/.exec(s.source_file ?? '')?.[1]);
+  const id = named >= 1 ? named : clips === 1 ? 1 : s.source_id;
+  if (!(id >= 1 && id <= clips)) throw new Error(`The planner named clip ${s.source_file ?? s.source_id}, which is not one of the ${clips} added.`);
+  return id;
+}
+
 async function scoreClip(p: Planner, clip: OpenedVideo, onFrame: () => void): Promise<{ t: number; score: number }[]> {
   const { CanvasSink } = await loadMediabunny();
   const w = 160, h = Math.max(2, Math.round((160 * clip.height) / clip.width / 2) * 2);
@@ -111,7 +123,7 @@ export async function autoMontage(
   const ask = Math.min(target, music.duration);
   const plan = JSON.parse(p.beat_sync_timeline(JSON.stringify({ segments, beats: music.beats, profile: 'music-video', target_duration: ask }))) as { shots?: Shot[]; total_duration?: number; error?: string };
   if (plan.error || !plan.shots?.length) throw new Error(plan.error ?? 'The planner found nothing worth keeping. Try brighter or longer clips.');
-  const shots = plan.shots;
+  const shots = plan.shots.map((s) => ({ ...s, source_id: clipOf(s, opened.length) }));
   const duration = plan.total_duration ?? ask;
 
   // Output shape: the majority of the clips, ties portrait (the app's rule).
