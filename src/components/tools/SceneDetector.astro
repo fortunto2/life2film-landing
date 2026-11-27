@@ -9,6 +9,19 @@ interface Props {
 const { lang = 'en' } = Astro.props;
 const chrome = CHROME[lang];
 
+// The detector choice and its two knobs, in the page's language. Three of the Life2Film core's
+// detectors (shots.ts says which is which and why).
+const TUNE: Record<Lang, Record<string, string>> = {
+  en: { watch: 'Watch', download: 'Download', fullscreen: 'Full screen', method: 'Detector', strict: 'Strict — two detectors agree', camera: 'Camera footage — colour change', edited: 'Edited video — films, ads, clips', sensitivity: 'Sensitivity', minShot: 'Shortest shot', hint_strict: 'Fewest false cuts; may miss cuts between similar shots.', hint_camera: 'The Life2Film app\'s default: a cut is a jump in colour and brightness.', hint_edited: 'A cut must stand out from the seconds around it. Best for edited video; finds little in one continuous take.' },
+  ru: { watch: 'Смотреть', download: 'Скачать', fullscreen: 'Во весь экран', method: 'Детектор', strict: 'Строгий — два детектора согласны', camera: 'Съёмка с камеры — смена цвета', edited: 'Смонтированное видео — фильмы, реклама, клипы', sensitivity: 'Чувствительность', minShot: 'Самый короткий план', hint_strict: 'Меньше всего ложных склеек; может пропустить склейку между похожими планами.', hint_camera: 'Как в приложении Life2Film: склейка — это скачок цвета и яркости.', hint_edited: 'Склейка должна выделяться на фоне соседних секунд. Лучше всего для смонтированного видео; в одном непрерывном дубле найдёт мало.' },
+  es: { watch: 'Ver', download: 'Descargar', fullscreen: 'Pantalla completa', method: 'Detector', strict: 'Estricto — dos detectores coinciden', camera: 'Grabación de cámara — cambio de color', edited: 'Vídeo editado — películas, anuncios, clips', sensitivity: 'Sensibilidad', minShot: 'Plano más corto', hint_strict: 'Menos cortes falsos; puede saltarse cortes entre planos parecidos.', hint_camera: 'Lo que usa la app Life2Film: un corte es un salto de color y brillo.', hint_edited: 'Un corte debe destacar sobre los segundos de alrededor. Ideal para vídeo editado; en una toma continua encuentra poco.' },
+  pt: { watch: 'Assistir', download: 'Baixar', fullscreen: 'Tela cheia', method: 'Detector', strict: 'Estrito — dois detectores concordam', camera: 'Gravação de câmera — mudança de cor', edited: 'Vídeo editado — filmes, anúncios, clipes', sensitivity: 'Sensibilidade', minShot: 'Plano mais curto', hint_strict: 'Menos cortes falsos; pode perder cortes entre planos parecidos.', hint_camera: 'O padrão do app Life2Film: um corte é um salto de cor e brilho.', hint_edited: 'Um corte precisa se destacar dos segundos ao redor. Melhor para vídeo editado; numa tomada contínua acha pouco.' },
+  id: { watch: 'Tonton', download: 'Unduh', fullscreen: 'Layar penuh', method: 'Detektor', strict: 'Ketat — dua detektor sepakat', camera: 'Rekaman kamera — perubahan warna', edited: 'Video hasil edit — film, iklan, klip', sensitivity: 'Sensitivitas', minShot: 'Shot terpendek', hint_strict: 'Potongan palsu paling sedikit; bisa melewatkan potongan antar shot yang mirip.', hint_camera: 'Bawaan aplikasi Life2Film: potongan adalah lonjakan warna dan kecerahan.', hint_edited: 'Potongan harus menonjol dari detik di sekitarnya. Terbaik untuk video hasil edit; di satu take panjang hanya menemukan sedikit.' },
+  ar: { watch: 'مشاهدة', download: 'تنزيل', fullscreen: 'ملء الشاشة', method: 'الكاشف', strict: 'صارم — يتفق كاشفان', camera: 'تصوير الكاميرا — تغيّر اللون', edited: 'فيديو مُحرَّر — أفلام وإعلانات ومقاطع', sensitivity: 'الحساسية', minShot: 'أقصر لقطة', hint_strict: 'أقل القطعات الخاطئة؛ قد يفوّت القطع بين لقطات متشابهة.', hint_camera: 'الإعداد الافتراضي في تطبيق Life2Film: القطع قفزة في اللون والسطوع.', hint_edited: 'يجب أن يبرز القطع عن الثواني المحيطة. الأفضل للفيديو المحرَّر؛ يجد القليل في لقطة واحدة متصلة.' },
+  tr: { watch: 'İzle', download: 'İndir', fullscreen: 'Tam ekran', method: 'Dedektör', strict: 'Katı — iki dedektör hemfikir', camera: 'Kamera çekimi — renk değişimi', edited: 'Kurgulanmış video — film, reklam, klip', sensitivity: 'Hassasiyet', minShot: 'En kısa çekim', hint_strict: 'En az yanlış kesme; benzer çekimler arasındaki kesmeleri kaçırabilir.', hint_camera: 'Life2Film uygulamasının varsayılanı: kesme, renk ve parlaklıkta bir sıçramadır.', hint_edited: 'Kesme, çevresindeki saniyelerden belirgin olmalı. Kurgulanmış video için en iyisi; tek kesintisiz çekimde az bulur.' },
+};
+const tune = TUNE[lang];
+
 /**
  * The scene-detector interface: markup and behaviour, with no page metadata.
  *
@@ -18,6 +31,7 @@ const chrome = CHROME[lang];
 ---
 
 <div class="tool" slot="tool">
+          <span id="sceneI18n" data-strings={JSON.stringify(tune)} hidden></span>
           <label class="drop" id="drop" for="file">
             <input type="file" id="file" accept="video/*" hidden />
             <strong>{chrome.chooseVideo}</strong>
@@ -66,7 +80,49 @@ const chrome = CHROME[lang];
               </div>
             </div>
 
+            <div class="tune">
+              <label>
+                <span class="muted">{tune.method}</span>
+                <select id="method">
+                  <option value="edited" selected>{tune.edited}</option>
+                  <option value="camera">{tune.camera}</option>
+                  <option value="strict">{tune.strict}</option>
+                </select>
+              </label>
+              <label>
+                <span class="muted">{tune.sensitivity} <output id="sensValue">50%</output></span>
+                <input id="sensitivity" type="range" min="0" max="1" step="0.05" value="0.5" />
+              </label>
+              <label>
+                <span class="muted">{tune.minShot}</span>
+                <select id="minShot">
+                  <option value="0.3">0.3 s</option>
+                  <option value="0.6" selected>0.6 s</option>
+                  <option value="1">1 s</option>
+                  <option value="2">2 s</option>
+                  <option value="4">4 s</option>
+                </select>
+              </label>
+              <p class="muted hint" id="methodHint"></p>
+            </div>
+
             <div class="shots" id="shotGrid"></div>
+
+            <div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-labelledby="viewerTitle">
+              <div class="frame">
+                <div class="vbar">
+                  <span id="viewerTitle"></span>
+                  <button type="button" class="ghost" id="viewerClose" aria-label="Close">✕</button>
+                </div>
+                <video id="viewerVideo" playsinline controls></video>
+                <div class="vbar">
+                  <button type="button" class="ghost" id="viewerPrev">←</button>
+                  <button type="button" class="ghost" id="viewerNext">→</button>
+                  <button type="button" class="ghost" id="viewerFull">{tune.fullscreen}</button>
+                  <button type="button" class="ghost primary" id="viewerGet">{tune.download}</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -127,12 +183,28 @@ const chrome = CHROME[lang];
     .tool select:hover { border-color: var(--cyan); }
     .fps select { padding: 7px 8px; font-size: 13px; }
 
+    .tune { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: flex-end; margin: 0 0 18px; padding: 14px; border: 1px solid var(--line); border-radius: 12px; }
+    .tune label { display: grid; gap: 6px; font-size: 13px; min-width: 0; }
+    .tune input[type=range] { width: 180px; accent-color: var(--cyan); }
+    .tune .hint { flex-basis: 100%; margin: 0; font-size: 13px; }
+    .tune select { max-width: 100%; }
     .shots { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(158px, 1fr)); }
     .shot {
       border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #08080a;
     }
     .shot img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #111; }
     .shot .info { padding: 8px 10px; display: grid; gap: 2px; }
+    .shot .thumb { position: relative; display: block; width: 100%; padding: 0; border: 0; background: none; cursor: pointer; }
+    .shot .thumb .play { position: absolute; inset: 0; display: grid; place-items: center; font-size: 26px; color: #fff; opacity: 0; transition: opacity .15s; background: rgba(0,0,0,.35); }
+    .shot .thumb:hover .play, .shot .thumb:focus-visible .play { opacity: 1; }
+    .shot .acts { display: flex; gap: 6px; margin-top: 6px; }
+    .shot .acts button { padding: 4px 8px; font-size: 12px; }
+    .viewer { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 16px; background: rgba(0,0,0,.94); }
+    .viewer[hidden] { display: none; }
+    .viewer .frame { width: min(1100px, 100%); display: grid; gap: 10px; }
+    .viewer video { width: 100%; max-height: calc(100dvh - 140px); background: #000; border-radius: 10px; }
+    .viewer .vbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; color: #ddd; font-size: 14px; }
+    .viewer .vbar #viewerTitle { margin-right: auto; font-family: ui-monospace, monospace; }
     .shot .tc { font-size: 13px; font-family: ui-monospace, monospace; }
     .shot .len { font-size: 12px; color: var(--muted); }
     .shot .score { height: 3px; border-radius: 2px; background: #17171c; margin-top: 4px; }
@@ -142,9 +214,11 @@ const chrome = CHROME[lang];
 <script>
     import { fileChosen, toolFailed, track } from '../../lib/track';
     import type { Shot } from '../../lib/clips';
-    import { loadEngine } from '../../lib/engine';
+    import { loadEngine, loadFullEngine } from '../../lib/engine';
+    import { encode, saveBlob } from '../../lib/encode';
+    import { contentWidth, hsvDelta, toHsv, type ContentDelta } from '../../lib/content-delta';
     import { openVideo, samplePlan, centerPixel, refineBoundary, type VideoSource } from '../../lib/frames';
-    import { detectShots } from '../../lib/shots';
+    import { detectShots, type ShotInput, type ShotMethod, type ShotOptions } from '../../lib/shots';
     import { clock, timecode, render, download, EXTENSION, type Format, type Mark } from '../../lib/timeline-export';
 
     const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -170,11 +244,43 @@ const chrome = CHROME[lang];
     const LONG_AFTER_S = 600;
     const LONG_MAX_SAMPLES = 2000;
     const REFINE_LIMIT = 150;
+    // The colour detectors' density: the core's CLI decodes them at 5 fps; 4 is the browser's budget.
+    const CONTENT_PER_S = 4;
+    const CONTENT_MAX_SAMPLES = 4000;
 
 
     let shots: Shot[] = [];
     let videoDuration = 0;
     let fileName = 'video';
+
+    // What one read of the video measured: every knob re-detects from this without reading again.
+    interface Measured {
+      source: VideoSource;
+      file: File;
+      /** Object URL of the file for the shot viewer; revoked with the next file. */
+      url: string;
+      input: ShotInput;
+      scores: Array<{ timestamp: number; score: number }>;
+      coarseStep: number;
+      samples: number;
+      startedAt: number;
+    }
+    let measured: Measured | null = null;
+    // Bumped by every detection; a thumbnail loop from an older one stops when it sees a newer number.
+    let generation = 0;
+
+    const TXT = JSON.parse(el('sceneI18n').dataset.strings ?? '{}') as Record<string, string>;
+    const T = (key: string, vars: Record<string, string> = {}) =>
+      (TXT[key] ?? key).replace(/\{(\w+)\}/g, (_, k: string) => vars[k] ?? '');
+
+    const methodEl = el<HTMLSelectElement>('method');
+    const sensEl = el<HTMLInputElement>('sensitivity');
+    const minEl = el<HTMLSelectElement>('minShot');
+    const options = (): ShotOptions => ({
+      method: (methodEl.value as ShotMethod) || 'edited',
+      sensitivity: Number(sensEl.value),
+      minShot: Number(minEl.value) || 0.6,
+    });
 
     function status(message: string, fraction?: number, isError = false) {
       statusEl.hidden = false;
@@ -194,6 +300,11 @@ const chrome = CHROME[lang];
       fileName = file.name.replace(/\.[^.]+$/, '') || 'video';
       resultEl.hidden = true;
       grid.replaceChildren();
+      generation++;
+      measured?.source.release();
+      if (measured) URL.revokeObjectURL(measured.url);
+      measured = null;
+      closeViewer();
       status('Opening video…', 0);
 
       let source: VideoSource | null = null;
@@ -204,32 +315,51 @@ const chrome = CHROME[lang];
         videoDuration = source.duration;
 
         const engine = await loadEngine();
+        // Two densities from one read. The colour detectors want neighbouring samples close
+        // together (CONTENT_PER_S); the strict pair gets every `stride`-th sample, its old density
+        // (500 samples, or one a second past 10 minutes) — denser made it worse.
         const long = source.duration > LONG_AFTER_S;
-        const plan = long
-          ? samplePlan(source.duration, Math.min(LONG_MAX_SAMPLES, Math.ceil(source.duration)))
-          : samplePlan(source.duration);
-        const coarseStep = source.duration / plan.length;
-
-        el('sampling').textContent =
-          `${plan.length} samples · ${(1 / coarseStep).toFixed(1)} per second`;
+        const strictCount = long
+          ? Math.min(LONG_MAX_SAMPLES, Math.ceil(source.duration))
+          : Math.min(500, Math.max(2, Math.ceil(source.duration * 10)));
+        const plan = samplePlan(source.duration, Math.max(strictCount, Math.min(CONTENT_MAX_SAMPLES, Math.ceil(source.duration * CONTENT_PER_S))));
+        const stride = Math.max(1, Math.round(plan.length / strictCount));
+        const coarseStep = (source.duration / plan.length) * stride;
+        const cw = contentWidth(source.width, source.height);
 
         const pixels: Array<{ r: number; g: number; b: number }> = [];
         const timestamps: number[] = [];
         const scores: Array<{ timestamp: number; score: number }> = [];
         const vectors: number[][] = [];
+        const deltas: ContentDelta[] = [];
+        let prevHsv: Uint8Array | null = null;
 
         for (const [i, at] of plan.entries()) {
-          const frame = await source.frameAt(at, ANALYSIS_WIDTH);
-          pixels.push(centerPixel(frame));
-          timestamps.push(at);
+          // The 120 px read goes first. Read after the 64 px one it changed what the 64 px read saw on
+          // the next sample: strict found 5 cuts on the 9-minute test instead of 12 (27 Nov 2026).
+          const contentRgb = (await source.frameAt(at, cw)).rgb24;
+          if (i % stride === 0) {
+            const frame = await source.frameAt(at, ANALYSIS_WIDTH);
+            pixels.push(centerPixel(frame));
+            timestamps.push(at);
 
-          const scored = JSON.parse(
-            engine.score_frame(frame.width, frame.height, frame.rgb24, at, null),
-          ) as { score?: number; vector?: number[]; error?: string };
-          if (!scored.error) scores.push({ timestamp: at, score: scored.score ?? 0 });
-          // The same measurements feed the second detector; a frame the scorer refused gets a zero
-          // vector so the two series stay aligned with `timestamps`.
-          vectors.push(scored.vector ?? []);
+            const scored = JSON.parse(
+              engine.score_frame(frame.width, frame.height, frame.rgb24, at, null),
+            ) as { score?: number; vector?: number[]; error?: string };
+            if (!scored.error) scores.push({ timestamp: at, score: scored.score ?? 0 });
+            // The same measurements feed the second detector; a frame the scorer refused gets a zero
+            // vector so the two series stay aligned with `timestamps`.
+            vectors.push(scored.vector ?? []);
+          }
+
+          // The colour delta the `content` / `adaptive` detectors read, at the core's 120 px short
+          // side; the same instant, so no second seek.
+          const hsv = toHsv(contentRgb);
+          if (prevHsv) {
+            const d = hsvDelta(prevHsv, hsv, at);
+            if (d) deltas.push(d);
+          }
+          prevHsv = hsv;
 
           // Reading every sample is the slow part, so the bar tracks it rather than the analysis.
           if (i % 4 === 0) {
@@ -237,60 +367,18 @@ const chrome = CHROME[lang];
           }
         }
 
-        status('Finding the cuts…', 0.93);
-
-        const ranges = detectShots(engine, { pixels, vectors, timestamps, duration: source.duration });
-
-        // Second pass: the coarse grid can only say which sample the picture changed by, so each
-        // boundary is re-examined by `refineBoundary` — a wide pass at the coarse step, bounded by
-        // the midpoints to the neighbouring cuts, then a fine pass at a tenth of it. It is what
-        // moves the reported cut from "about right" to "on the frame".
-        const boundaries = ranges.slice(1).map(([start]) => start);
-        const refined = new Map<number, number>();
-        const refine = boundaries.length <= REFINE_LIMIT;
-        if (!refine) {
-          el('sampling').textContent += ` · cuts within ±${(coarseStep / 2).toFixed(1)} s`;
-        }
-
-        for (const [i, boundary] of (refine ? boundaries : []).entries()) {
-          status(`Refining cut ${i + 1} of ${boundaries.length}…`, 0.93 + (i / boundaries.length) * 0.06);
-          refined.set(boundary, await refineBoundary(source, boundary, coarseStep, ANALYSIS_WIDTH, {
-            previous: boundaries[i - 1] ?? 0,
-            next: boundaries[i + 1] ?? source.duration,
-          }));
-        }
-
-        shots = ranges.map(([start, end]) => {
-          const movedStart = refined.get(start) ?? start;
-          const movedEnd = refined.get(end) ?? end;
-          return [movedStart, movedEnd] as [number, number];
-        }).map(([start, end]) => {
-          // Median score of the samples inside the shot — a mean would let one bad frame sink it.
-          const inside = scores.filter((s) => s.timestamp >= start && s.timestamp < end).map((s) => s.score);
-          inside.sort((a, b) => a - b);
-          return {
-            start,
-            end,
-            score: inside.length ? inside[Math.floor(inside.length / 2)] : 0,
-          };
-        });
-
-        el('shots').textContent = String(shots.length);
-        el('duration').textContent = clock(source.duration);
-        el('average').textContent = clock(source.duration / shots.length);
-
-        statusEl.hidden = true;
-        resultEl.hidden = false;
-        track('result_shown', { placement: 'result', refined: refine ? 'yes' : 'no' }, {
-          shots: shots.length,
-          duration_s: Math.round(source.duration),
+        measured = {
+          source,
+          file,
+          url: URL.createObjectURL(file),
+          input: { pixels, vectors, timestamps, duration: source.duration, deltas },
+          scores,
+          coarseStep,
           samples: plan.length,
-          seconds: Math.round((performance.now() - startedAt) / 1000),
-        });
-
-        // Thumbnails come last, from a second pass over shot starts only — a few dozen seeks rather
-        // than a few hundred, so the numbers appear before the pictures do.
-        await renderShots(source);
+          startedAt,
+        };
+        source = null; // owned by `measured` now, released by the next file
+        await detect(true);
       } catch (error) {
         toolFailed('analyse', error, file);
         status(
@@ -304,19 +392,113 @@ const chrome = CHROME[lang];
       }
     }
 
-    async function renderShots(source: VideoSource) {
+    /** Cuts from what was measured, with the knobs as they are now. */
+    async function detect(first = false) {
+      const m = measured;
+      if (!m) return;
+      const mine = ++generation;
+      const opts = options();
+      const engine = opts.method === 'strict' ? await loadEngine() : await loadFullEngine();
+      if (mine !== generation) return;
+
+      status('Finding the cuts…', 0.93);
+      const ranges = detectShots(engine, m.input, opts);
+
+      // Second pass: the coarse grid can only say which sample the picture changed by, so each
+      // boundary is re-examined by `refineBoundary` — a wide pass at the coarse step, bounded by
+      // the midpoints to the neighbouring cuts, then a fine pass at a tenth of it. It is what
+      // moves the reported cut from "about right" to "on the frame".
+      const boundaries = ranges.slice(1).map(([start]) => start);
+      const refined = new Map<number, number>();
+      // Only the strict pair is refined: the refinement reads the centre column, the weak signal, and
+      // on the colour detectors' cuts (already on a 0.25 s grid) it moved right cuts to wrong frames —
+      // content at 13 scored F1 0.24 refined against the core's 0.82 unrefined (27 Nov 2026).
+      const strict = opts.method === 'strict';
+      const step = strict ? m.coarseStep : m.input.duration / m.samples;
+      const refine = strict && boundaries.length <= REFINE_LIMIT;
+      el('sampling').textContent =
+        `${strict ? m.input.timestamps.length : m.samples} samples · ${(1 / step).toFixed(1)} per second` +
+        (refine ? '' : ` · cuts within ±${(step / 2).toFixed(2)} s`);
+
+      for (const [i, boundary] of (refine ? boundaries : []).entries()) {
+        if (mine !== generation) return;
+        status(`Refining cut ${i + 1} of ${boundaries.length}…`, 0.93 + (i / boundaries.length) * 0.06);
+        refined.set(boundary, await refineBoundary(m.source, boundary, m.coarseStep, ANALYSIS_WIDTH, {
+          previous: boundaries[i - 1] ?? 0,
+          next: boundaries[i + 1] ?? m.input.duration,
+        }));
+      }
+      if (mine !== generation) return;
+
+      shots = ranges.map(([start, end]) => {
+        const movedStart = refined.get(start) ?? start;
+        const movedEnd = refined.get(end) ?? end;
+        return [movedStart, movedEnd] as [number, number];
+      }).map(([start, end]) => {
+        // Median score of the samples inside the shot — a mean would let one bad frame sink it.
+        const inside = m.scores.filter((s) => s.timestamp >= start && s.timestamp < end).map((s) => s.score);
+        inside.sort((a, b) => a - b);
+        return {
+          start,
+          end,
+          score: inside.length ? inside[Math.floor(inside.length / 2)] : 0,
+        };
+      });
+
+      el('shots').textContent = String(shots.length);
+      el('duration').textContent = clock(m.input.duration);
+      el('average').textContent = clock(m.input.duration / shots.length);
+      el('methodHint').textContent = T(`hint_${opts.method}`);
+
+      statusEl.hidden = true;
+      resultEl.hidden = false;
+      grid.replaceChildren();
+      track(first ? 'result_shown' : 'tool_tuned', {
+        placement: 'result', refined: refine ? 'yes' : 'no', method: opts.method,
+      }, {
+        shots: shots.length,
+        duration_s: Math.round(m.input.duration),
+        samples: m.samples,
+        seconds: Math.round((performance.now() - m.startedAt) / 1000),
+        sensitivity: opts.sensitivity,
+        min_shot: opts.minShot,
+      });
+
+      // Thumbnails come last, from a second pass over shot starts only — a few dozen seeks rather
+      // than a few hundred, so the numbers appear before the pictures do.
+      await renderShots(m.source, mine);
+    }
+
+    let tuneTimer: ReturnType<typeof setTimeout> | undefined;
+    const retune = () => {
+      clearTimeout(tuneTimer);
+      el('sensValue').textContent = `${Math.round(Number(sensEl.value) * 100)}%`;
+      tuneTimer = setTimeout(() => {
+        void detect().catch((error: unknown) => {
+          toolFailed('analyse', error);
+          status(error instanceof Error ? error.message : String(error), 1, true);
+        });
+      }, 200);
+    };
+    methodEl.addEventListener('change', retune);
+    sensEl.addEventListener('input', retune);
+    minEl.addEventListener('change', retune);
+
+    async function renderShots(source: VideoSource, mine: number) {
       const rate = fps();
       const highest = Math.max(...shots.map((s) => s.score), 1);
 
       for (const [i, shot] of shots.entries()) {
+        if (mine !== generation) return;
         const card = document.createElement('div');
         card.className = 'shot';
         card.innerHTML = `
-          <img alt="Shot ${i + 1}" loading="lazy" />
+          <button type="button" class="thumb" data-view="${i}" aria-label="${T('watch')} ${i + 1}"><img alt="Shot ${i + 1}" loading="lazy" /><span class="play">▶</span></button>
           <div class="info">
             <span class="tc">${timecode(shot.start, rate)}</span>
             <span class="len">Shot ${i + 1} · ${(shot.end - shot.start).toFixed(1)}s</span>
             <span class="score"><span style="width:${Math.round((shot.score / highest) * 100)}%"></span></span>
+            <span class="acts"><button type="button" class="ghost" data-view="${i}">${T('watch')}</button><button type="button" class="ghost" data-get="${i}">${T('download')}</button></span>
           </div>`;
         grid.append(card);
 
@@ -356,6 +538,88 @@ const chrome = CHROME[lang];
       if (file) { fileChosen(file, 'drop'); void analyse(file); }
     });
 
+    // --- one shot: watch it (full screen too) or download it as its own MP4 ---
+
+    const viewer = el<HTMLDivElement>('viewer');
+    // Moved to <body>: an ancestor of the tool makes a containing block for `position: fixed`, which
+    // left the overlay boxed inside the page under the site header.
+    document.body.append(viewer);
+    const player = el<HTMLVideoElement>('viewerVideo');
+    let viewing = -1;
+
+    function closeViewer() {
+      if (viewing < 0) return;
+      viewing = -1;
+      player.pause();
+      player.removeAttribute('src');
+      player.load();
+      viewer.hidden = true;
+      if (document.fullscreenElement) void document.exitFullscreen().catch(() => {});
+    }
+
+    function openViewer(i: number) {
+      const m = measured;
+      const shot = shots[i];
+      if (!m || !shot) return;
+      viewing = i;
+      viewer.hidden = false;
+      el('viewerTitle').textContent = `#${i + 1} / ${shots.length} · ${timecode(shot.start, fps())} · ${(shot.end - shot.start).toFixed(1)}s`;
+      if (player.getAttribute('src') !== m.url) player.src = m.url;
+      player.currentTime = shot.start;
+      void player.play().catch(() => {});
+      track('shot_viewed', { placement: 'result' }, { shot: i + 1 });
+    }
+
+    // The shot loops inside its own bounds rather than running on into the next one.
+    player.addEventListener('timeupdate', () => {
+      const shot = shots[viewing];
+      if (shot && player.currentTime >= shot.end - 0.04) player.currentTime = shot.start;
+    });
+
+    async function downloadShot(i: number) {
+      const m = measured;
+      const shot = shots[i];
+      if (!m || !shot) return;
+      const button = grid.querySelector<HTMLButtonElement>(`[data-get="${i}"]`);
+      const label = button?.textContent ?? '';
+      try {
+        // Re-encoded from the exact in-point (a copied cut could only start on a keyframe); the
+        // same `encode` the splitter saves its clips through.
+        const blob = await encode(m.file, {
+          container: 'mp4',
+          trim: { start: shot.start, end: shot.end },
+          forceTranscode: true,
+          onProgress: (p) => { if (button) button.textContent = `${Math.round(p * 100)}%`; },
+        });
+        saveBlob(blob, `${fileName}-shot-${i + 1}.mp4`);
+        track('result_saved', { placement: 'shot', format: 'mp4', method: options().method }, { shot: i + 1, seconds: Math.round(shot.end - shot.start) });
+      } catch (error) {
+        toolFailed('save', error, m.file);
+        status(error instanceof Error ? error.message : String(error), 1, true);
+      } finally {
+        if (button) button.textContent = label;
+      }
+    }
+
+    grid.addEventListener('click', (e) => {
+      const t = (e.target as HTMLElement).closest<HTMLElement>('[data-view],[data-get]');
+      if (!t) return;
+      if (t.dataset.view !== undefined) openViewer(Number(t.dataset.view));
+      else void downloadShot(Number(t.dataset.get));
+    });
+    el('viewerClose').addEventListener('click', closeViewer);
+    el('viewerPrev').addEventListener('click', () => openViewer(Math.max(0, viewing - 1)));
+    el('viewerNext').addEventListener('click', () => openViewer(Math.min(shots.length - 1, viewing + 1)));
+    el('viewerGet').addEventListener('click', () => { if (viewing >= 0) void downloadShot(viewing); });
+    el('viewerFull').addEventListener('click', () => { void player.requestFullscreen?.().catch(() => {}); });
+    viewer.addEventListener('click', (e) => { if (e.target === viewer) closeViewer(); });
+    addEventListener('keydown', (e) => {
+      if (viewing < 0) return;
+      if (e.key === 'Escape') closeViewer();
+      else if (e.key === 'ArrowLeft') openViewer(Math.max(0, viewing - 1));
+      else if (e.key === 'ArrowRight') openViewer(Math.min(shots.length - 1, viewing + 1));
+    });
+
     // --- export ---
 
     el<HTMLButtonElement>('save').addEventListener('click', () => {
@@ -378,6 +642,7 @@ const chrome = CHROME[lang];
         }),
         `${fileName}-shots.${EXTENSION[format]}`,
       );
-      track('result_saved', { placement: 'result', format }, { shots: shots.length });
+      const o = options();
+      track('result_saved', { placement: 'result', format, method: o.method }, { shots: shots.length, sensitivity: o.sensitivity, min_shot: o.minShot });
     });
 </script>

@@ -28,6 +28,14 @@ export interface Engine {
 
   /** `{ features, timestamps, duration, method: 'feature_cosine', threshold_k, min_gap }` in, `{ scenes }` out. */
   detect_scenes_features: (inputJson: string) => string;
+
+  /**
+   * Only in the full build (`/wasm/montage/`, `loadFullEngine`): `{ deltas, duration, method:
+   * 'content' | 'adaptive', threshold, adaptive_ratio, min_content_val, window, min_scene_len }` in,
+   * `{ scenes }` out. `content` is the CLI's default detector, `adaptive` leads the SHOT benchmark
+   * of edited video.
+   */
+  detect_scenes_content?: (inputJson: string) => string;
 }
 
 interface Module extends Engine {
@@ -59,4 +67,22 @@ export function loadEngine(): Promise<Engine> {
   });
 
   return loading;
+}
+
+// The full engine, already public for the auto-montage page (1.3 MB). The scene detector loads it
+// only when a person picks a detector the site build lacks (`content`, `adaptive`).
+const FULL_JS = '/wasm/montage/va_wasm.js';
+const FULL_WASM = '/wasm/montage/va_wasm_bg.wasm';
+let loadingFull: Promise<Engine> | null = null;
+
+export function loadFullEngine(): Promise<Engine> {
+  loadingFull ??= (async () => {
+    const module = (await import(/* @vite-ignore */ FULL_JS)) as Module;
+    await module.default({ module_or_path: FULL_WASM });
+    return module;
+  })().catch((error: unknown) => {
+    loadingFull = null;
+    throw error;
+  });
+  return loadingFull;
 }
