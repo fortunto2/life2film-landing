@@ -10,7 +10,7 @@
  * When this fails too the error names the codec, which is what a person can act on.
  */
 import type { Frame, VideoSource } from './frames';
-import { loadMediabunny } from './encode';
+import { isFileLost, loadMediabunny } from './encode';
 
 const CODEC_NAMES: Record<string, string> = {
   hevc: 'HEVC (H.265)',
@@ -48,14 +48,58 @@ export function fileShape(file: { name: string; type: string; size: number }): s
   return `type=${file.type || '?'} ext=${ext || '?'} mb=${Math.round(file.size / 1e6)}`;
 }
 
+/**
+ * What the file's first bytes are, never its content: the MP4 `ftyp` brand, a known container
+ * magic, or the first four bytes in hex. `unreadable:<ErrorName>` when the bytes cannot be read.
+ * 27 Nov 2026: 22 of 27 «found no video track it knows» in 7 days were `.mp4` on Android Chrome
+ * with `format=unread` — mediabunny could not read the container at all, and the swallowed error
+ * left open whether the file was unreadable (a cloud copy) or not an MP4 inside.
+ */
+export function headSignature(bytes: Uint8Array): string {
+  if (bytes.length === 0) return 'empty';
+  const ascii = (from: number, to: number) =>
+    String.fromCharCode(...bytes.slice(from, to)).replace(/[^ -~]/g, '.');
+  if (bytes.length >= 12 && ascii(4, 8) === 'ftyp') return `ftyp:${ascii(8, 12).trim()}`;
+  if (bytes[0] === 0x1a && bytes[1] === 0x45 && bytes[2] === 0xdf && bytes[3] === 0xa3) return 'ebml';
+  if (ascii(0, 4) === 'RIFF') return `riff:${ascii(8, 12)}`;
+  if (bytes.length >= 8 && ['moov', 'mdat', 'wide', 'free', 'skip'].includes(ascii(4, 8))) return `box:${ascii(4, 8)}`;
+  if (ascii(0, 5).toLowerCase() === '<!doc' || ascii(0, 5).toLowerCase() === '<html') return 'html';
+  return `hex:${Array.from(bytes.slice(0, 4), (b) => b.toString(16).padStart(2, '0')).join('')}`;
+}
+
+async function readHead(file: Blob): Promise<{ head: string; lost: boolean }> {
+  try {
+    return { head: headSignature(new Uint8Array(await file.slice(0, 16).arrayBuffer())), lost: false };
+  } catch (error) {
+    const name = error instanceof Error ? error.name : 'Error';
+    return { head: `unreadable:${name}`, lost: isFileLost(error) || name === 'TypeError' };
+  }
+}
+
+/** Shown when the browser cannot read the file's bytes at all — on a phone, mostly a cloud copy. */
+export const FILE_UNREADABLE_MESSAGE =
+  'The browser could not read that file at all. On a phone this is usually a video that is still in the cloud (Google Photos, Drive): download it to the phone and choose it again.';
+
 export async function openVideoWebCodecs(file: File): Promise<VideoSource> {
   const { Input, BlobSource, ALL_FORMATS, CanvasSink } = await loadMediabunny();
   const input = new Input({ source: new BlobSource(file), formats: ALL_FORMATS });
-  const format = await input.getFormat().then((f) => f.name).catch(() => 'unread');
+  const format = await input
+    .getFormat()
+    .then((f) => f.name)
+    .catch((e: unknown) => `unread:${e instanceof Error ? e.name : 'Error'}`);
   const track = await input.getPrimaryVideoTrack().catch(() => null);
   if (!track) {
+    const { head, lost } = await readHead(file);
     // `context` is what `toolFailed` sends as `cfg`.
-    throw Object.assign(new Error(undecodableMessage(null)), { context: `${fileShape(file)} format=${format}` });
+    const context = `${fileShape(file)} format=${format} head=${head}`;
+    const message = lost
+      ? FILE_UNREADABLE_MESSAGE
+      : head === 'empty'
+        ? 'That file is empty (0 bytes).'
+        : head === 'html'
+          ? 'That file is a web page saved with a video name, not a video. Download the video itself and choose it again.'
+          : undecodableMessage(null);
+    throw Object.assign(new Error(message), { context });
   }
   if (!(await track.canDecode().catch(() => false))) throw new Error(undecodableMessage(track.codec));
 
