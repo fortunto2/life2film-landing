@@ -160,10 +160,16 @@ const chrome = CHROME[lang];
     const ANALYSIS_WIDTH = 64;
     const THUMB_WIDTH = 320;
 
-    // Every sample is a seek, and a seek is tens of milliseconds. Ten minutes is where the wait
-    // stops being reasonable, and it is also where a browser tab starts holding more decoded
-    // frames than it should.
-    const MAX_MINUTES = 10;
+    // AI-NOTE: no length limit. Until 27 Nov 2026 anything past 10 minutes was refused — half the
+    // tool's failures that week (films of 23, 78 and 119 minutes) — although `samplePlan` already
+    // capped the seeks at 500 whatever the length. Long videos get one sample a second (at most
+    // LONG_MAX_SAMPLES), and past REFINE_LIMIT cuts the per-cut refinement (~20 seeks each) is
+    // skipped and the precision is said instead.
+    // Denser sampling does not help: 4/s on a 9-minute real-footage test raised the column
+    // detector's false cuts from 6 to 74 and the agreed cuts fell from 12 to 10 (27 Nov 2026).
+    const LONG_AFTER_S = 600;
+    const LONG_MAX_SAMPLES = 2000;
+    const REFINE_LIMIT = 150;
 
 
     let shots: Shot[] = [];
@@ -191,21 +197,17 @@ const chrome = CHROME[lang];
       status('Opening video…', 0);
 
       let source: VideoSource | null = null;
+      const startedAt = performance.now();
 
       try {
         source = await openVideo(file);
         videoDuration = source.duration;
 
-        if (source.duration > MAX_MINUTES * 60) {
-          throw new Error(
-            `That video is ${clock(source.duration)} long. This tool reads frames one seek at a ` +
-              `time, so anything past ${MAX_MINUTES} minutes takes longer than it is worth — ` +
-              `trim it, or cut a section out first.`,
-          );
-        }
-
         const engine = await loadEngine();
-        const plan = samplePlan(source.duration);
+        const long = source.duration > LONG_AFTER_S;
+        const plan = long
+          ? samplePlan(source.duration, Math.min(LONG_MAX_SAMPLES, Math.ceil(source.duration)))
+          : samplePlan(source.duration);
         const coarseStep = source.duration / plan.length;
 
         el('sampling').textContent =
@@ -245,8 +247,12 @@ const chrome = CHROME[lang];
         // moves the reported cut from "about right" to "on the frame".
         const boundaries = ranges.slice(1).map(([start]) => start);
         const refined = new Map<number, number>();
+        const refine = boundaries.length <= REFINE_LIMIT;
+        if (!refine) {
+          el('sampling').textContent += ` · cuts within ±${(coarseStep / 2).toFixed(1)} s`;
+        }
 
-        for (const [i, boundary] of boundaries.entries()) {
+        for (const [i, boundary] of (refine ? boundaries : []).entries()) {
           status(`Refining cut ${i + 1} of ${boundaries.length}…`, 0.93 + (i / boundaries.length) * 0.06);
           refined.set(boundary, await refineBoundary(source, boundary, coarseStep, ANALYSIS_WIDTH, {
             previous: boundaries[i - 1] ?? 0,
@@ -275,9 +281,11 @@ const chrome = CHROME[lang];
 
         statusEl.hidden = true;
         resultEl.hidden = false;
-        track('result_shown', { placement: 'result' }, {
+        track('result_shown', { placement: 'result', refined: refine ? 'yes' : 'no' }, {
           shots: shots.length,
           duration_s: Math.round(source.duration),
+          samples: plan.length,
+          seconds: Math.round((performance.now() - startedAt) / 1000),
         });
 
         // Thumbnails come last, from a second pass over shot starts only — a few dozen seeks rather

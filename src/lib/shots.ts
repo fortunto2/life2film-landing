@@ -64,7 +64,12 @@ export function detectShots(
   }
 
   // Agreement when both detectors ran; the one detector's word when only one could.
-  const boundaries = mergeBoundaries(signals, 0.5, signals.length).filter((t) => t < duration);
+  // AI-NOTE: the tolerance follows the sampling step. A fixed 0.5 s was set on a 70 s video sampled
+  // every 0.14 s; past ~50 s the step is wider (`samplePlan` caps at 500 samples), two detectors
+  // naming neighbouring samples could not agree. On a 9-minute real-footage test (100 cuts) it moved
+  // the agreed cuts 11 -> 12 with no new false one; the detectors themselves see 31 and 18 (27 Nov 2026).
+  const step = timestamps.length > 1 ? duration / timestamps.length : 0;
+  const boundaries = mergeBoundaries(signals, Math.max(0.5, 1.5 * step), signals.length).filter((t) => t < duration);
   const starts = [0, ...boundaries];
   return starts.map((start, i) => [start, i + 1 < starts.length ? starts[i + 1] : duration]);
 }
