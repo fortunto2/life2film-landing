@@ -23,6 +23,19 @@ const TAP: Record<Lang, { button: string; hint: string; reset: string }> = {
 };
 const tap = TAP[lang];
 
+// The result panel in the page's language. Until 27 Nov 2026 it was English everywhere, and the
+// Russian page is the site's most shown page in search (5341 impressions in 14 days).
+const RESULT: Record<Lang, Record<string, string>> = {
+  en: { beats: 'beats', long: 'long', alt: 'also valid as {half} or {double} BPM', drag: 'drag the waveform to move through the track', of: '{from}–{to} of {all}', play: '▶ Play with clicks', stop: '■ Stop', download: 'Download', finding: 'Finding the beat…', noPulse: 'No steady pulse found. Speech, ambient and free-tempo recordings often have none.', cannot: 'Could not read that file — {reason}. Browsers only decode the formats they ship with.' },
+  ru: { beats: 'долей', long: 'длина', alt: 'можно считать и {half}, и {double} BPM', drag: 'тяните волну, чтобы листать трек', of: '{from}–{to} из {all}', play: '▶ Слушать с метрономом', stop: '■ Стоп', download: 'Скачать', finding: 'Ищу ритм…', noPulse: 'Ровного ритма не нашлось. У речи, эмбиента и музыки со свободным темпом его часто нет.', cannot: 'Не удалось прочитать файл — {reason}. Браузер открывает только те форматы, что в него встроены.' },
+  es: { beats: 'pulsos', long: 'de duración', alt: 'también vale como {half} o {double} BPM', drag: 'arrastra la onda para recorrer la pista', of: '{from}–{to} de {all}', play: '▶ Escuchar con clics', stop: '■ Parar', download: 'Descargar', finding: 'Buscando el ritmo…', noPulse: 'No se encontró un pulso estable. La voz, el ambient y la música de tempo libre a menudo no lo tienen.', cannot: 'No se pudo leer el archivo — {reason}. El navegador solo decodifica los formatos que trae.' },
+  pt: { beats: 'batidas', long: 'de duração', alt: 'também vale como {half} ou {double} BPM', drag: 'arraste a onda para percorrer a faixa', of: '{from}–{to} de {all}', play: '▶ Ouvir com cliques', stop: '■ Parar', download: 'Baixar', finding: 'Procurando o ritmo…', noPulse: 'Nenhum pulso estável encontrado. Fala, ambient e música de andamento livre muitas vezes não têm.', cannot: 'Não foi possível ler o arquivo — {reason}. O navegador só decodifica os formatos que traz.' },
+  id: { beats: 'ketukan', long: 'durasi', alt: 'juga valid sebagai {half} atau {double} BPM', drag: 'geser gelombang untuk menelusuri lagu', of: '{from}–{to} dari {all}', play: '▶ Putar dengan klik', stop: '■ Berhenti', download: 'Unduh', finding: 'Mencari ketukan…', noPulse: 'Tidak ada ketukan yang stabil. Ucapan, ambient, dan musik bertempo bebas sering tidak memilikinya.', cannot: 'File tidak bisa dibaca — {reason}. Browser hanya bisa membuka format bawaannya.' },
+  ar: { beats: 'نبضة', long: 'المدة', alt: 'يصح أيضًا {half} أو {double} BPM', drag: 'اسحب الموجة للتنقل في المقطع', of: '{from}–{to} من {all}', play: '▶ تشغيل مع النقرات', stop: '■ إيقاف', download: 'تنزيل', finding: 'جارٍ البحث عن الإيقاع…', noPulse: 'لم يُعثر على نبض ثابت. الكلام والموسيقى المحيطة والإيقاع الحر غالبًا بلا نبض.', cannot: 'تعذّرت قراءة الملف — {reason}. المتصفح يفتح الصيغ المدمجة فيه فقط.' },
+  tr: { beats: 'vuruş', long: 'süre', alt: '{half} ya da {double} BPM olarak da geçerli', drag: 'parçada gezinmek için dalgayı sürükleyin', of: '{from}–{to} / {all}', play: '▶ Tıklarla dinle', stop: '■ Durdur', download: 'İndir', finding: 'Ritim aranıyor…', noPulse: 'Düzenli bir ritim bulunamadı. Konuşma, ambient ve serbest tempolu kayıtlarda çoğu zaman yoktur.', cannot: 'Dosya okunamadı — {reason}. Tarayıcı yalnızca yerleşik biçimleri açar.' },
+};
+const res = RESULT[lang];
+
 /**
  * The bpm-detector interface: markup and behaviour, with no page metadata.
  *
@@ -33,6 +46,7 @@ const tap = TAP[lang];
 
 <div class="tool" slot="tool">
     <span id="i18n" data-strings={JSON.stringify(status)} hidden></span>
+    <span id="bpmI18n" data-strings={JSON.stringify(res)} hidden></span>
           <label class="drop" id="drop" for="file">
             <input type="file" id="file" accept="audio/*,video/*" hidden />
             <strong>{chrome.chooseFile}</strong>
@@ -55,8 +69,8 @@ const tap = TAP[lang];
                 <em>BPM</em>
               </div>
               <div class="meta">
-                <div><span id="beatCount">0</span> beats</div>
-                <div><span id="duration">0:00</span> long</div>
+                <div><span id="beatCount">0</span> {res.beats}</div>
+                <div>{res.long} <span id="duration">0:00</span></div>
                 <div class="muted" id="alt"></div>
               </div>
             </div>
@@ -64,11 +78,11 @@ const tap = TAP[lang];
             <canvas id="wave" height="120" aria-label="Waveform with detected beats"></canvas>
             <div class="scrubline">
               <span class="muted" id="window">—</span>
-              <span class="muted hint">drag the waveform to move through the track</span>
+              <span class="muted hint">{res.drag}</span>
             </div>
 
             <div class="actions">
-              <button id="play" type="button" class="ghost">▶ Play with clicks</button>
+              <button id="play" type="button" class="ghost">{res.play}</button>
 
               <div class="export">
                 <select id="format" aria-label="Export format">
@@ -79,7 +93,7 @@ const tap = TAP[lang];
                   <option value="csv">CSV — spreadsheets</option>
                   <option value="json">JSON — scripts</option>
                 </select>
-                <button id="save" type="button" class="ghost primary">Download</button>
+                <button id="save" type="button" class="ghost primary">{res.download}</button>
               </div>
 
               <label class="fps">
@@ -198,6 +212,9 @@ const tap = TAP[lang];
 
     import { fileChosen, toolFailed, track } from '../../lib/track';
   import { toolStrings } from '../../lib/strings';
+  const RES = JSON.parse(document.getElementById('bpmI18n')?.dataset.strings ?? '{}') as Record<string, string>;
+  const R = (key: string, vars: Record<string, string> = {}) =>
+    (RES[key] ?? key).replace(/\{(\w+)\}/g, (_, k: string) => vars[k] ?? '');
     import { loadEngine } from '../../lib/engine';
     import { clock, render, download, EXTENSION, type Format, type Mark } from '../../lib/timeline-export';
 
@@ -321,7 +338,7 @@ const tap = TAP[lang];
       }
       ctx.stroke();
 
-      el('window').textContent = `${clock(viewStart)}–${clock(end)} of ${clock(audioBuffer.duration)}`;
+      el('window').textContent = R('of', { from: clock(viewStart), to: clock(end), all: clock(audioBuffer.duration) });
     }
 
     function setView(seconds: number) {
@@ -353,7 +370,7 @@ const tap = TAP[lang];
         status(say.loadingAnalyser);
         const engine = await loadEngine();
 
-        status('Finding the beat…');
+        status(R('finding'));
         const mono = await toMono(audioBuffer);
         const raw = engine.detect_beats(mono, 22050, null);
         const parsed = JSON.parse(raw) as { beats: number[]; bpm: number; pulse_strength?: number };
@@ -366,14 +383,14 @@ const tap = TAP[lang];
         const pulse = parsed.pulse_strength ?? 1;
         if (!beats.length || pulse < 0.2) {
           toolFailed('analyse', `no steady pulse (${pulse.toFixed(2)})`);
-          status('No steady pulse found. Speech, ambient and free-tempo recordings often have none.', true);
+          status(R('noPulse'), true);
           return;
         }
 
         el('bpm').textContent = bpm.toFixed(1);
         el('beatCount').textContent = String(beats.length);
         el('duration').textContent = clock(audioBuffer.duration);
-        el('alt').textContent = `also valid as ${(bpm / 2).toFixed(1)} or ${(bpm * 2).toFixed(1)} BPM`;
+        el('alt').textContent = R('alt', { half: (bpm / 2).toFixed(1), double: (bpm * 2).toFixed(1) });
 
         statusEl.hidden = true;
         resultEl.hidden = false;
@@ -391,8 +408,7 @@ const tap = TAP[lang];
       } catch (error) {
         toolFailed('open', error, file);
         status(
-          `Could not read that file — ${error instanceof Error ? error.message : 'unknown error'}. ` +
-            'Browsers only decode the formats they ship with.',
+          R('cannot', { reason: error instanceof Error ? error.message : 'unknown error' }),
           true,
         );
       } finally {
@@ -463,7 +479,7 @@ const tap = TAP[lang];
       if (playCtx) {
         await playCtx.close();
         playCtx = null;
-        button.textContent = '▶ Play with clicks';
+        button.textContent = R('play');
         return;
       }
       if (!audioBuffer) return;
@@ -486,10 +502,10 @@ const tap = TAP[lang];
       }
 
       source.start(startAt);
-      button.textContent = '■ Stop';
+      button.textContent = R('stop');
       const ctx = playCtx;
       source.onended = () => {
-        button.textContent = '▶ Play with clicks';
+        button.textContent = R('play');
         // A context left open per playback is a leak; Safari runs out after about four.
         if (playCtx === ctx) playCtx = null;
         void ctx.close();
