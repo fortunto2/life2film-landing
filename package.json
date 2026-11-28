@@ -29,7 +29,7 @@
     "mediabunny": "^1.66.2",
     "qrcode": "1.5.4",
     "superduper-site-kit": "git+file:///Users/rustam/startups/shared/superduper-site-kit",
-    "superduper-tools": "git+file:///Users/rustam/startups/shared/superduper-tools#2c8662928de1bb12f78152ad0886aeb8a884bb27"
+    "superduper-tools": "git+file:///Users/rustam/startups/shared/superduper-tools#98e0c017f466fc4df62e26190ae42c06be3397f1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
